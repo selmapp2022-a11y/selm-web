@@ -1,4 +1,5 @@
 import { api, parseAIContent } from './api';
+import { remapDialogueSpeakers } from './speakerNames';
 
 export type PhonemeScore = { phoneme: string; quality_score: number; ipa?: string };
 export type WordScore = { word: string; quality_score: number; phonemes?: PhonemeScore[] };
@@ -30,9 +31,12 @@ export type ConversationDialogue = {
 export async function generateConversation(topic: string, level: string, turns = 6): Promise<ConversationDialogue> {
   const { data } = await api.post('/ai/conversation-practice', { topic, level, turns });
   const parsed = parseAIContent<any>(data) || {};
+  const rawDialogue = parsed.dialogue || parsed.turns || [];
   return {
     scenario: parsed.scenario || `Practice talking about ${topic}.`,
-    dialogue: parsed.dialogue || parsed.turns || [],
+    // Backend returns the same Sarah/Tom (or A/B) for every topic.
+    // Remap to topic-specific speakers so each conversation feels distinct.
+    dialogue: remapDialogueSpeakers(rawDialogue, topic),
   };
 }
 

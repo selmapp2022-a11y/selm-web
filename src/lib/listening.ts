@@ -1,4 +1,5 @@
 import { api, unwrap } from './api';
+import { remapTranscript, pickSpeakerPair } from './speakerNames';
 
 export type ListeningQuestion = {
   id: string | number;
@@ -29,13 +30,19 @@ export async function generateListening(level: string, topic: string): Promise<L
     include_vocabulary: true,
   });
   const ex: any = unwrap(data, 'exercise');
+  const rawTranscript: string = ex.transcript || ex.dialogue || ex.audio_text || '';
+  // Backend reuses generic speakers (Sarah/Tom or Dr. Anya/Liam) regardless of topic.
+  // Rewrite the transcript to use a topic-specific pair so each topic feels different.
+  const transcript = remapTranscript(rawTranscript, topic);
+  const [a, b] = pickSpeakerPair(topic);
+  const speakers = [{ name: a }, { name: b }];
   return {
     id: ex.id,
     title: ex.title || `${topic} — listening`,
     level: ex.level || level,
     audio_url: ex.audio_url,
-    speakers: ex.speakers,
-    transcript: ex.transcript || ex.dialogue || ex.audio_text,
+    speakers,
+    transcript,
     questions: (ex.questions || []).map((q: any) => ({
       id: q.id,
       question: q.question,
