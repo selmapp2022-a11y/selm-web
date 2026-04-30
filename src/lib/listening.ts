@@ -36,11 +36,15 @@ export async function generateListening(level: string, topic: string): Promise<L
   const transcript = remapTranscript(rawTranscript, topic);
   const [a, b] = pickSpeakerPair(topic);
   const speakers = [{ name: a }, { name: b }];
+  // Backend's audio_url under /media/audio/tts/ is consistently 404 (file isn't actually written).
+  // Drop it so the player skips the broken audio element and goes straight to per-line Gemini TTS.
+  const audioUrl: string | undefined =
+    ex.audio_url && !/\/media\/audio\/tts\//.test(ex.audio_url) ? ex.audio_url : undefined;
   return {
     id: ex.id,
     title: ex.title || `${topic} — listening`,
     level: ex.level || level,
-    audio_url: ex.audio_url,
+    audio_url: audioUrl,
     speakers,
     transcript,
     questions: (ex.questions || []).map((q: any) => ({
