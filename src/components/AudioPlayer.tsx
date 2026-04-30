@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
-import { Play, Pause, RotateCcw, Volume2, AlertCircle } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Play, Pause, RotateCcw, Volume2, AlertCircle, Users } from 'lucide-react';
 import clsx from 'clsx';
+import { parseDialogue, speakSequence, stopBrowserTTS } from '../lib/tts';
 
 const RATES = [0.5, 0.75, 1, 1.25, 1.5];
 
@@ -62,10 +63,27 @@ export function AudioPlayer({ src, fallbackText, onEnd }: Props) {
   }, [rate]);
 
   const usingTTS = (!src || audioFailed) && !!fallbackText;
+  const dialogue = useMemo(() => (fallbackText ? parseDialogue(fallbackText) : null), [fallbackText]);
+  const isDialogue = !!dialogue && dialogue.length >= 2;
+  const cancelSeqRef = useRef<() => void>(() => {});
+  const [seqIdx, setSeqIdx] = useState(-1);
 
   const playTTS = () => {
     if (!fallbackText) return;
-    speechSynthesis.cancel();
+    stopBrowserTTS();
+    setSeqIdx(-1);
+    if (isDialogue && dialogue) {
+      setPlaying(true);
+      cancelSeqRef.current = speakSequence(
+        dialogue.map((d) => ({ text: d.text, speaker: d.speaker })),
+        {
+          rate,
+          onProgress: setSeqIdx,
+          onDone: () => { setPlaying(false); setSeqIdx(-1); onEnd?.(); },
+        },
+      );
+      return;
+    }
     const u = new SpeechSynthesisUtterance(fallbackText);
     u.lang = 'en-US';
     u.rate = rate;
@@ -74,9 +92,16 @@ export function AudioPlayer({ src, fallbackText, onEnd }: Props) {
     setPlaying(true);
   };
 
+  const stopTTS = () => {
+    cancelSeqRef.current();
+    stopBrowserTTS();
+    setPlaying(false);
+    setSeqIdx(-1);
+  };
+
   const togglePlay = async () => {
     if (usingTTS) {
-      if (playing) { speechSynthesis.cancel(); setPlaying(false); }
+      if (playing) stopTTS();
       else playTTS();
       return;
     }
@@ -125,8 +150,19 @@ export function AudioPlayer({ src, fallbackText, onEnd }: Props) {
             </>
           ) : (
             <div className="text-sm opacity-80">
-              {audioFailed ? <AlertCircle className="mr-1 inline h-4 w-4" /> : <Volume2 className="mr-1 inline h-4 w-4" />}
-              {audioFailed ? 'Audio file unavailable — using browser voice' : 'Browser voice'}
+              {isDialogue ? (
+                <>
+                  <Users className="mr-1 inline h-4 w-4" />
+                  {playing && seqIdx >= 0 && dialogue
+                    ? <>Now speaking: <span className="font-semibold text-teal">{dialogue[seqIdx].speaker}</span> ({seqIdx + 1}/{dialogue.length})</>
+                    : <>Dialogue • {dialogue!.length} lines • {Array.from(new Set(dialogue!.map((d) => d.speaker))).join(' & ')}</>}
+                </>
+              ) : (
+                <>
+                  {audioFailed ? <AlertCircle className="mr-1 inline h-4 w-4" /> : <Volume2 className="mr-1 inline h-4 w-4" />}
+                  {audioFailed ? 'Audio file unavailable — using browser voice' : 'Browser voice'}
+                </>
+              )}
             </div>
           )}
         </div>

@@ -108,6 +108,34 @@ export function browserTTS(text: string, opts?: { rate?: number; speaker?: strin
   } catch { return false; }
 }
 
+/**
+ * Parse a transcript like:
+ *   "Dr. Anya: Hello.\nLiam: Hi there!"
+ * into [{speaker, text}, ...]. Returns null if the text doesn't look like a multi-speaker dialogue.
+ */
+export function parseDialogue(raw: string): Array<{ speaker: string; text: string }> | null {
+  if (!raw) return null;
+  const text = raw.trim();
+  // Matches "Name:" or "Dr. Anya:" at start of a line. Speaker name = letters/spaces/dots, max 32 chars.
+  const re = /(^|\n)\s*([A-Z][A-Za-z .'\-]{0,31}?):\s+/g;
+  const matches: Array<{ speaker: string; start: number; end: number }> = [];
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(text)) !== null) {
+    matches.push({ speaker: m[2].trim(), start: m.index + m[1].length, end: m.index + m[0].length });
+  }
+  if (matches.length < 2) return null;
+  const uniqueSpeakers = new Set(matches.map((mm) => mm.speaker.toLowerCase()));
+  if (uniqueSpeakers.size < 2) return null;
+  const lines: Array<{ speaker: string; text: string }> = [];
+  for (let i = 0; i < matches.length; i++) {
+    const cur = matches[i];
+    const next = matches[i + 1];
+    const body = text.slice(cur.end, next ? next.start : text.length).trim();
+    if (body) lines.push({ speaker: cur.speaker, text: body });
+  }
+  return lines.length >= 2 ? lines : null;
+}
+
 export function speakSequence(parts: Array<{ text: string; speaker?: string }>, opts?: { rate?: number; onProgress?: (i: number) => void; onDone?: () => void }) {
   if (!('speechSynthesis' in window)) return () => {};
   speechSynthesis.cancel();
