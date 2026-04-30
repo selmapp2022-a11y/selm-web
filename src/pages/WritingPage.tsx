@@ -89,13 +89,20 @@ function LiveMode() {
         {check && check.errors.length > 0 && (
           <div className="card p-5">
             <h4 className="mb-3 font-display font-bold text-navy">{check.errors.length} suggestion{check.errors.length > 1 ? 's' : ''}</h4>
+            {check.corrected_text && (
+              <div className="mb-4 rounded-xl border-l-4 border-teal bg-teal/5 p-3 text-sm">
+                <div className="mb-1 text-xs font-bold uppercase text-teal">Corrected</div>
+                <p>{check.corrected_text}</p>
+              </div>
+            )}
             <div className="space-y-3">
               {check.errors.slice(0, 12).map((e, i) => (
-                <div key={i} className="rounded-xl border-l-4 border-teal bg-surface-muted p-3 text-sm">
+                <div key={i} className="rounded-xl border-l-4 border-amber-400 bg-surface-muted p-3 text-sm">
                   <div className="mb-1 text-xs font-bold uppercase text-ink-secondary">{e.type}</div>
                   {e.text && <div className="line-through text-red-600">{e.text}</div>}
                   {e.suggestion && <div className="font-medium text-teal-600">→ {e.suggestion}</div>}
                   {e.explanation && <div className="mt-1 text-xs text-ink-secondary">{e.explanation}</div>}
+                  {e.rule && <div className="mt-1 text-xs italic text-ink-disabled">Rule: {e.rule}</div>}
                 </div>
               ))}
             </div>
@@ -213,8 +220,19 @@ function TemplatesMode() {
               {assessment.coherence_score != null && <SubScore label="Coherence" v={assessment.coherence_score} />}
               {assessment.task_response_score != null && <SubScore label="Task" v={assessment.task_response_score} />}
             </div>
-            {assessment.tone && <div className="mt-4 text-center"><span className="chip">Tone: {assessment.tone}</span></div>}
             {assessment.feedback && <div className="mt-4 rounded-xl bg-surface-muted p-4 text-sm">{assessment.feedback}</div>}
+            {assessment.strengths && assessment.strengths.length > 0 && (
+              <div className="mt-4">
+                <h5 className="mb-2 text-xs font-bold uppercase text-teal">Strengths</h5>
+                <ul className="space-y-1 text-sm">{assessment.strengths.map((s, i) => <li key={i}>• {s}</li>)}</ul>
+              </div>
+            )}
+            {assessment.weaknesses && assessment.weaknesses.length > 0 && (
+              <div className="mt-4">
+                <h5 className="mb-2 text-xs font-bold uppercase text-amber-700">To improve</h5>
+                <ul className="space-y-1 text-sm">{assessment.weaknesses.map((s, i) => <li key={i}>• {s}</li>)}</ul>
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -1,90 +1,107 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://selmapp.com/api/v1';
+export const API_BASE = 'https://selmapp.com/api/v1';
 
 export const api = axios.create({
-  baseURL: API_BASE_URL,
-  timeout: 30_000,
+  baseURL: API_BASE,
+  timeout: 60_000,
 });
 
-const TOKEN_KEY = 'selm_access_token';
-const REFRESH_KEY = 'selm_refresh_token';
-
-export const tokenStore = {
-  get: () => localStorage.getItem(TOKEN_KEY),
-  getRefresh: () => localStorage.getItem(REFRESH_KEY),
-  set: (access: string, refresh?: string) => {
-    localStorage.setItem(TOKEN_KEY, access);
-    if (refresh) localStorage.setItem(REFRESH_KEY, refresh);
-  },
-  clear: () => {
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(REFRESH_KEY);
-  },
-};
-
 api.interceptors.request.use((config) => {
-  const token = tokenStore.get();
+  const token = localStorage.getItem('selm_token');
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
 api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error?.response?.status === 401) {
-      tokenStore.clear();
-      if (!window.location.pathname.startsWith('/login')) {
-        window.location.href = '/login';
+  (r) => r,
+  (err) => {
+    if (err.response?.status === 401) {
+      localStorage.removeItem('selm_token');
+      if (!location.pathname.startsWith('/login') && !location.pathname.startsWith('/register')) {
+        location.href = '/login';
       }
     }
-    return Promise.reject(error);
+    return Promise.reject(err);
   }
 );
 
-export type LoginResponse = {
-  access_token: string;
-  refresh_token: string;
-  token_type: string;
-  user: {
-    id: number;
-    email: string;
-    username: string;
-    full_name?: string;
-    current_level?: string;
-    onboarding_completed?: boolean;
-  };
+export const tokenStore = {
+  get: () => localStorage.getItem('selm_token'),
+  set: (t: string) => localStorage.setItem('selm_token', t),
+  clear: () => localStorage.removeItem('selm_token'),
 };
 
 export const auth = {
-  async login(email: string, password: string): Promise<LoginResponse> {
-    const form = new URLSearchParams();
-    form.append('username', email);
-    form.append('password', password);
-    const { data } = await api.post<LoginResponse>('/auth/login', form, {
+  async login(email: string, password: string) {
+    const fd = new URLSearchParams();
+    fd.set('username', email);
+    fd.set('password', password);
+    const r = await fetch(`${API_BASE}/auth/login`, {
+      method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: fd.toString(),
     });
-    tokenStore.set(data.access_token, data.refresh_token);
-    return data;
+    const data = await r.json();
+    if (!r.ok) throw new Error(data?.detail || 'Login failed');
+    const token = data.access_token || data.token;
+    if (token) tokenStore.set(token);
+    return { token, user: data.user || null };
   },
-
-  async register(payload: {
-    email: string;
-    username: string;
-    password: string;
-    full_name?: string;
-  }): Promise<LoginResponse> {
-    const { data } = await api.post<LoginResponse>('/auth/register', payload);
-    tokenStore.set(data.access_token, data.refresh_token);
-    return data;
+  async register(payload: { email: string; password: string; full_name?: string; username?: string; native_language?: string }) {
+    const r = await fetch(`${API_BASE}/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: payload.email,
+        password: payload.password,
+        full_name: payload.full_name || payload.email.split('@')[0],
+        username: payload.username || payload.email.split('@')[0] + Math.floor(Math.random() * 1000),
+        native_language: payload.native_language || 'en',
+      }),
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data?.detail || 'Registration failed');
+    const token = data.access_token || data.token;
+    if (token) tokenStore.set(token);
+    return { token, user: data.user || null };
   },
-
   async me() {
     const { data } = await api.get('/auth/me');
     return data;
   },
-
-  logout() {
-    tokenStore.clear();
-  },
 };
+
+// Many backend endpoints wrap their payload as { success: true, <key>: ..., metadata: ... }
+// This helper unwraps it, returning the first non-success/metadata field if present.
+export function unwrap<T = any>(raw: any, preferredKey?: string): T {
+  if (!raw || typeof raw !== 'object') return raw;
+  if (preferredKey && raw[preferredKey] !== undefined) return raw[preferredKey];
+  if ('success' in raw) {
+    const ignore = new Set(['success', 'metadata', 'error', 'message']);
+    const k = Object.keys(raw).find((kk) => !ignore.has(kk));
+    if (k) return raw[k];
+  }
+  return raw;
+}
+
+// Backend AI endpoints often return { content: "```json\n{...}\n```", success: true }.
+// Strip the markdown fence and parse the JSON inside.
+export function parseAIContent<T = any>(raw: any): T | null {
+  let s: string | undefined;
+  if (typeof raw === 'string') s = raw;
+  else if (raw?.content) s = String(raw.content);
+  else if (raw?.message) s = String(raw.message);
+  if (!s) return null;
+  // Strip ```json ... ``` fences
+  s = s.trim();
+  const fence = s.match(/^```(?:json)?\s*\n?([\s\S]*?)\n?```\s*$/);
+  if (fence) s = fence[1];
+  try { return JSON.parse(s) as T; }
+  catch {
+    // Try to find a JSON object inside
+    const m = s.match(/\{[\s\S]*\}/);
+    if (m) { try { return JSON.parse(m[0]) as T; } catch { /* */ } }
+    return null;
+  }
+}

@@ -46,7 +46,7 @@ function PracticeMode({ level, topic }: { level: string; topic: string }) {
   const [exercise, setExercise] = useState<ListeningExercise | null>(null);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
-  const [answers, setAnswers] = useState<Record<number, string>>({});
+  const [answers, setAnswers] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
 
   const load = async () => {
@@ -77,35 +77,41 @@ function PracticeMode({ level, topic }: { level: string; topic: string }) {
     const q = exercise.questions!.find((qq) => String(qq.id) === qid);
     return q && ans.trim().toLowerCase() === q.correct_answer.trim().toLowerCase();
   }).length : 0;
+  void score;
 
   return (
     <div className="space-y-6">
       <div className="card p-6">
         <div className="mb-4 flex items-start justify-between gap-4">
           <div>
-            <span className="chip">Level {exercise.difficulty_level}</span>
+            <span className="chip">Level {exercise.level}</span>
             <h3 className="mt-2 font-display text-xl font-bold text-navy">{exercise.title}</h3>
+            {exercise.speakers && exercise.speakers.length > 0 && (
+              <p className="mt-1 text-xs text-ink-secondary">Speakers: {exercise.speakers.map((s) => s.name).join(', ')}</p>
+            )}
           </div>
           <button onClick={load} className="btn-ghost text-sm"><RefreshCcw className="h-4 w-4" /> New</button>
         </div>
-        <AudioPlayer src={exercise.audio_url} fallbackText={exercise.audio_text || exercise.transcript} />
+        <AudioPlayer src={exercise.audio_url} fallbackText={exercise.transcript} />
       </div>
 
       {exercise.questions && exercise.questions.length > 0 && (
         <div className="card p-6">
           <h4 className="mb-4 font-display text-lg font-bold text-navy">Comprehension</h4>
           <div className="space-y-5">
-            {exercise.questions.map((q, idx) => (
-              <div key={q.id || idx}>
+            {exercise.questions.map((q, idx) => {
+              const qid = String(q.id ?? idx);
+              return (
+              <div key={qid}>
                 <p className="mb-3 font-medium text-ink-primary">{idx + 1}. {q.question}</p>
                 <div className="space-y-2">
                   {(q.options || ['True', 'False']).map((opt) => {
-                    const selected = answers[q.id || idx] === opt;
+                    const selected = answers[qid] === opt;
                     const isRight = opt.trim().toLowerCase() === q.correct_answer.trim().toLowerCase();
                     return (
                       <button
                         key={opt}
-                        onClick={() => !submitted && setAnswers((a) => ({ ...a, [q.id || idx]: opt }))}
+                        onClick={() => !submitted && setAnswers((a) => ({ ...a, [qid]: opt }))}
                         disabled={submitted}
                         className={clsx(
                           'w-full rounded-xl border-2 px-4 py-2.5 text-left text-sm transition',
@@ -124,7 +130,8 @@ function PracticeMode({ level, topic }: { level: string; topic: string }) {
                 </div>
                 {submitted && q.explanation && <p className="mt-2 rounded-xl bg-surface-muted p-3 text-xs text-ink-secondary">{q.explanation}</p>}
               </div>
-            ))}
+              );
+            })}
           </div>
           {!submitted ? (
             <button onClick={() => setSubmitted(true)} disabled={Object.keys(answers).length !== exercise.questions!.length} className="btn-primary mt-6 w-full">Submit answers</button>
@@ -137,10 +144,10 @@ function PracticeMode({ level, topic }: { level: string; topic: string }) {
         </div>
       )}
 
-      {(exercise.transcript || exercise.audio_text) && (
+      {exercise.transcript && (
         <details className="card p-6">
           <summary className="cursor-pointer font-display font-semibold text-navy">Show transcript</summary>
-          <p className="mt-4 leading-relaxed text-ink-primary">{exercise.transcript || exercise.audio_text}</p>
+          <p className="mt-4 whitespace-pre-wrap leading-relaxed text-ink-primary">{exercise.transcript}</p>
         </details>
       )}
     </div>
@@ -201,7 +208,15 @@ function DictationMode({ level }: { level: string }) {
   if (err) return <ErrorBox msg={err} onRetry={load} />;
   if (!exercise) return null;
 
-  const target = (exercise.transcript || exercise.audio_text || '').trim();
+  const target = (exercise.transcript || '').trim();
+  if (!target) {
+    return (
+      <div className="card p-8 text-center">
+        <p className="mb-3 text-ink-secondary">Dictation needs a transcript. Backend didn't return one for this clip.</p>
+        <button onClick={load} className="btn-secondary">Try another</button>
+      </div>
+    );
+  }
   const accuracy = revealed ? wordAccuracy(userText, target) : 0;
 
   return (

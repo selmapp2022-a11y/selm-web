@@ -1,17 +1,18 @@
-import { api } from './api';
+import { api, unwrap, parseAIContent } from './api';
+
+export type GrammarError = {
+  type: string;
+  text: string;
+  suggestion: string;
+  explanation?: string;
+  rule?: string;
+  severity?: string;
+};
 
 export type GrammarCheck = {
-  errors: Array<{
-    type: string;
-    text: string;
-    suggestion: string;
-    explanation?: string;
-    start?: number;
-    end?: number;
-    severity?: 'low' | 'medium' | 'high';
-  }>;
+  errors: GrammarError[];
   corrected_text?: string;
-  overall_score?: number;
+  original?: string;
 };
 
 export type WritingAssessment = {
@@ -20,23 +21,43 @@ export type WritingAssessment = {
   vocabulary_score?: number;
   coherence_score?: number;
   task_response_score?: number;
-  tone?: string;
   feedback?: string;
-  suggestions?: string[];
+  strengths?: string[];
+  weaknesses?: string[];
+  errors?: GrammarError[];
 };
 
 export async function checkGrammar(text: string): Promise<GrammarCheck> {
-  const { data } = await api.post('/ai/grammar-check', { text, level: 'detailed' });
-  return normalizeGrammar(data);
+  const { data } = await api.post('/ai/grammar-check', { text });
+  // backend returns { content: "```json {...} ```", success: true }
+  const parsed = parseAIContent<any>(data) || {};
+  const errors = (parsed.errors || []).map((e: any) => ({
+    type: e.type || 'grammar',
+    text: e.error || e.original || e.text || '',
+    suggestion: e.correction || e.suggestion || e.replacement || '',
+    explanation: e.explanation,
+    rule: e.rule,
+    severity: e.severity,
+  }));
+  return {
+    errors,
+    original: parsed.original,
+    corrected_text: parsed.corrected || parsed.corrected_text,
+  };
 }
 
-export async function rewriteText(text: string, style: 'formal' | 'simple' | 'natural' | 'academic' | 'friendly'): Promise<string> {
+export async function rewriteText(text: string, style: string): Promise<string> {
+  // No dedicated endpoint — use grammar-check with a styling instruction.
   const { data } = await api.post('/ai/grammar-check', {
-    text,
-    rewrite_style: style,
-    return_rewritten: true,
+    text: `Rewrite the following in a ${style} tone, keeping the same meaning. Return ONLY the rewritten text. Original: """${text}"""`,
   });
-  return data?.rewritten || data?.corrected_text || text;
+  const parsed = parseAIContent<any>(data);
+  if (parsed?.corrected) return parsed.corrected;
+  if (typeof data?.content === 'string') {
+    // strip markdown if present
+    return data.content.replace(/^```(?:\w+)?\n?/, '').replace(/```$/, '').trim();
+  }
+  return text;
 }
 
 export async function assessWriting(text: string, prompt?: string): Promise<WritingAssessment> {
@@ -45,36 +66,23 @@ export async function assessWriting(text: string, prompt?: string): Promise<Writ
     prompt: prompt || '',
     assessment_type: 'comprehensive',
   });
+  const a: any = unwrap(data, 'assessment');
+  const scores = a?.scores || {};
   return {
-    overall_score: data?.overall_score ?? 0,
-    grammar_score: data?.grammar_score,
-    vocabulary_score: data?.vocabulary_score,
-    coherence_score: data?.coherence_score,
-    task_response_score: data?.task_response_score,
-    tone: data?.tone || data?.detected_tone,
-    feedback: data?.feedback || data?.ai_feedback,
-    suggestions: data?.suggestions,
-  };
-}
-
-export async function listTemplates() {
-  const { data } = await api.get('/writing/templates/');
-  return data;
-}
-
-function normalizeGrammar(data: any): GrammarCheck {
-  const errors = (data?.errors || data?.issues || []).map((e: any) => ({
-    type: e.type || e.error_type || 'grammar',
-    text: e.text || e.original || e.error_text || '',
-    suggestion: e.suggestion || e.correction || e.replacement || '',
-    explanation: e.explanation || e.message,
-    start: e.start ?? e.offset,
-    end: e.end ?? (e.offset != null && e.length != null ? e.offset + e.length : undefined),
-    severity: e.severity,
-  }));
-  return {
-    errors,
-    corrected_text: data?.corrected_text || data?.corrected,
-    overall_score: data?.overall_score ?? data?.score,
+    overall_score: Math.round(scores.overall ?? a?.overall_score ?? 0),
+    grammar_score: scores.grammar ?? a?.grammar_score,
+    vocabulary_score: scores.vocabulary ?? a?.vocabulary_score,
+    coherence_score: scores.coherence ?? a?.coherence_score,
+    task_response_score: scores.task_achievement ?? scores.task_response ?? a?.task_response_score,
+    feedback: a?.feedback,
+    strengths: a?.strengths,
+    weaknesses: a?.weaknesses,
+    errors: (a?.errors || []).map((e: any) => ({
+      type: e.type || 'grammar',
+      text: e.original || e.text || '',
+      suggestion: e.corrected || e.suggestion || '',
+      explanation: e.explanation,
+      severity: e.severity,
+    })),
   };
 }
