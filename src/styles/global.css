@@ -5,20 +5,56 @@
 @layer base {
   :root {
     color-scheme: light;
+    --c-app: #F8F8F8;
+    --c-card: #FFFFFF;
+    --c-muted: #E7EBEF;
+    --c-divider: #C0C6CC;
+    --c-ink: #0B0F14;
+    --c-ink-2: #5B6670;
+    --c-ink-3: #9AA4AE;
+    --c-navy: #183048;
+    --c-teal: #2EC4B6;
+  }
+  html.dark {
+    color-scheme: dark;
+    --c-app: #0B1929;
+    --c-card: #122438;
+    --c-muted: #1B3047;
+    --c-divider: #2C4665;
+    --c-ink: #EDF2F7;
+    --c-ink-2: #9AA8BA;
+    --c-ink-3: #6B7A8E;
+    --c-navy: #5BD4C8;
+    --c-teal: #2EC4B6;
   }
   html, body, #root { height: 100%; }
   body {
-    @apply font-body bg-surface-app text-ink-primary antialiased;
+    background: var(--c-app);
+    color: var(--c-ink);
+    @apply font-body antialiased;
     font-feature-settings: 'cv11', 'ss01';
   }
   h1, h2, h3, h4, h5 { @apply font-display tracking-tight; }
   ::selection { background: #2EC4B6; color: #fff; }
+  * { transition: background-color .15s ease, border-color .15s ease, color .15s ease; }
 }
 
 @layer components {
-  .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 font-display font-semibold transition-all duration-150 select-none disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal;
-  }
+  /* Override the static surface/ink classes to use CSS variables so dark mode works for everything */
+  .bg-surface-app { background-color: var(--c-app) !important; }
+  .bg-surface-card { background-color: var(--c-card) !important; }
+  .bg-surface-muted { background-color: var(--c-muted) !important; }
+  .border-surface-divider { border-color: var(--c-divider) !important; }
+  .border-surface-muted\/40 { border-color: color-mix(in srgb, var(--c-muted) 40%, transparent) !important; }
+  .text-ink-primary { color: var(--c-ink) !important; }
+  .text-ink-secondary { color: var(--c-ink-2) !important; }
+  .text-ink-disabled { color: var(--c-ink-3) !important; }
+  .text-navy { color: var(--c-navy) !important; }
+  .bg-navy { background-color: #183048 !important; }
+  html.dark .bg-navy { background-color: #1B3047 !important; }
+  html.dark .bg-white { background-color: var(--c-card) !important; }
+
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 font-display font-semibold transition-all duration-150 select-none disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal; }
   .btn-primary { @apply btn bg-navy text-white hover:bg-navy-700 active:scale-[.98]; }
   .btn-secondary { @apply btn bg-white text-navy border border-surface-divider hover:bg-surface-muted; }
   .btn-accent { @apply btn bg-teal text-white hover:bg-teal-600 active:scale-[.98]; }
@@ -28,13 +64,9 @@
     @apply w-full rounded-xl border border-surface-divider bg-white px-4 py-3 text-ink-primary placeholder:text-ink-disabled focus:border-navy focus:outline-none focus:ring-2 focus:ring-teal/30 transition;
   }
 
-  .card {
-    @apply bg-surface-card rounded-2xl shadow-card border border-surface-muted/40 transition-shadow hover:shadow-cardHover;
-  }
+  .card { @apply bg-surface-card rounded-2xl shadow-card border border-surface-muted/40 transition-shadow hover:shadow-cardHover animate-slideUp; }
 
-  .chip {
-    @apply inline-flex items-center gap-1.5 rounded-full bg-surface-muted text-ink-secondary text-sm font-medium px-3 py-1;
-  }
+  .chip { @apply inline-flex items-center gap-1.5 rounded-full bg-surface-muted text-ink-secondary text-sm font-medium px-3 py-1; }
 
   .label { @apply text-sm font-medium text-ink-secondary mb-1.5 block; }
 }

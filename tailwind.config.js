@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
@@ -46,6 +47,14 @@ export default {
       boxShadow: {
         card: '0 1px 2px rgba(11,15,20,0.04), 0 4px 12px rgba(11,15,20,0.06)',
         cardHover: '0 4px 8px rgba(11,15,20,0.06), 0 12px 24px rgba(11,15,20,0.08)',
+      },
+      keyframes: {
+        slideUp: { '0%': { transform: 'translateY(8px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } },
+        fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+      },
+      animation: {
+        slideUp: 'slideUp .25s ease-out',
+        fadeIn: 'fadeIn .2s ease-out',
       },
     },
   },
