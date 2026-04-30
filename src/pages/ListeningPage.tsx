@@ -4,10 +4,9 @@ import clsx from 'clsx';
 import { AudioPlayer } from '../components/AudioPlayer';
 import { useAuthStore } from '../store/authStore';
 import { generateListening, type ListeningExercise } from '../lib/listening';
+import { TopicPicker, LISTENING_TOPICS } from '../components/TopicPicker';
 
 type Mode = 'practice' | 'news' | 'dictation';
-
-const NEWS_TOPICS = ['Technology', 'Science', 'Health', 'Business', 'Climate', 'Sports'];
 
 export default function ListeningPage() {
   const { user } = useAuthStore();
@@ -27,8 +26,8 @@ export default function ListeningPage() {
         <ModeBtn active={mode === 'dictation'} onClick={() => setMode('dictation')} icon={PenLine}>Dictation</ModeBtn>
       </div>
 
-      {mode === 'practice' && <PracticeMode level={level} topic="general" />}
-      {mode === 'news' && <NewsMode level={level} />}
+      {mode === 'practice' && <PracticeWithPicker level={level} />}
+      {mode === 'news' && <PracticeWithPicker level={level} forceNews />}
       {mode === 'dictation' && <DictationMode level={level} />}
     </div>
   );
@@ -42,7 +41,29 @@ function ModeBtn({ active, onClick, icon: Icon, children }: any) {
   );
 }
 
-function PracticeMode({ level, topic }: { level: string; topic: string }) {
+function PracticeWithPicker({ level, forceNews }: { level: string; forceNews?: boolean }) {
+  const [picked, setPicked] = useState<{ value: string; label: string } | null>(null);
+  if (!picked) {
+    return (
+      <TopicPicker
+        topics={LISTENING_TOPICS}
+        title={forceNews ? 'Pick a news topic' : 'Pick a listening topic'}
+        subtitle={forceNews
+          ? 'A short audio piece on today\'s topic, graded for your level.'
+          : 'A fresh audio passage at your level, with comprehension questions.'}
+        onPick={(value, t) => setPicked({ value, label: t.label })}
+      />
+    );
+  }
+  return (
+    <div className="space-y-4">
+      <button onClick={() => setPicked(null)} className="btn-ghost text-sm">← Change topic</button>
+      <PracticeMode level={level} topic={picked.value} topicLabel={picked.label} />
+    </div>
+  );
+}
+
+function PracticeMode({ level, topic, topicLabel }: { level: string; topic: string; topicLabel?: string }) {
   const [exercise, setExercise] = useState<ListeningExercise | null>(null);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -84,8 +105,8 @@ function PracticeMode({ level, topic }: { level: string; topic: string }) {
       <div className="card p-6">
         <div className="mb-4 flex items-start justify-between gap-4">
           <div>
-            <span className="chip">Level {exercise.level}</span>
-            <h3 className="mt-2 font-display text-xl font-bold text-navy">{exercise.title}</h3>
+            <span className="chip">{topicLabel || topic} • Level {exercise.level}</span>
+            <h3 className="mt-2 font-display text-xl font-bold text-navy">{exercise.title || `${topicLabel || topic} — Listening`}</h3>
             {exercise.speakers && exercise.speakers.length > 0 && (
               <p className="mt-1 text-xs text-ink-secondary">Speakers: {exercise.speakers.map((s) => s.name).join(', ')}</p>
             )}
@@ -150,29 +171,6 @@ function PracticeMode({ level, topic }: { level: string; topic: string }) {
           <p className="mt-4 whitespace-pre-wrap leading-relaxed text-ink-primary">{exercise.transcript}</p>
         </details>
       )}
-    </div>
-  );
-}
-
-function NewsMode({ level }: { level: string }) {
-  const [topic, setTopic] = useState<string | null>(null);
-  if (!topic) {
-    return (
-      <div className="card p-8">
-        <h3 className="mb-2 font-display text-xl font-bold text-navy">Pick a topic</h3>
-        <p className="mb-6 text-sm text-ink-secondary">A short audio piece on today's topic, graded for your level.</p>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {NEWS_TOPICS.map((t) => (
-            <button key={t} onClick={() => setTopic(t)} className="btn-secondary justify-start">{t}</button>
-          ))}
-        </div>
-      </div>
-    );
-  }
-  return (
-    <div className="space-y-4">
-      <button onClick={() => setTopic(null)} className="btn-ghost text-sm">← Change topic</button>
-      <PracticeMode level={level} topic={topic.toLowerCase()} />
     </div>
   );
 }

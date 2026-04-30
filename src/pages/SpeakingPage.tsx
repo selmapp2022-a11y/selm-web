@@ -5,6 +5,7 @@ import { AudioRecorder } from '../components/AudioRecorder';
 import { SpeechResults } from '../components/SpeechResults';
 import { assessRealtime, audioConversation, generateConversation, type SpeechAssessment, type ConversationDialogue } from '../lib/speaking';
 import { aiTTS, browserTTS, stopBrowserTTS, aiSpeakSequence, genderForSpeaker } from '../lib/tts';
+import { TopicPicker, SPEAKING_TOPICS } from '../components/TopicPicker';
 import { useAuthStore } from '../store/authStore';
 
 type Mode = 'pronunciation' | 'conversation' | 'ielts';
@@ -172,18 +173,18 @@ function PronunciationMode({ level }: { level: string }) {
 }
 
 function ConversationMode({ level }: { level: string }) {
-  const TOPICS = ['Travel', 'Food & cooking', 'Work life', 'Movies', 'Hobbies', 'Daily routine'];
   const [topic, setTopic] = useState<string | null>(null);
+  const [topicLabel, setTopicLabel] = useState<string>('');
   const [convo, setConvo] = useState<ConversationDialogue | null>(null);
   const [turnIdx, setTurnIdx] = useState(0);
   const [userTurns, setUserTurns] = useState<Array<{ transcript?: string; ai_response?: string }>>([]);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
-  const startTopic = async (t: string) => {
-    setTopic(t); setConvo(null); setTurnIdx(0); setUserTurns([]); setErr(null); setLoading(true);
+  const startTopic = async (value: string, label: string) => {
+    setTopic(value); setTopicLabel(label); setConvo(null); setTurnIdx(0); setUserTurns([]); setErr(null); setLoading(true);
     try {
-      const c = await generateConversation(t.toLowerCase(), level, 6);
+      const c = await generateConversation(value, level, 6);
       setConvo(c);
     } catch (e: any) { setErr(e?.response?.data?.detail || e?.message || 'Could not start conversation.'); }
     finally { setLoading(false); }
@@ -201,13 +202,12 @@ function ConversationMode({ level }: { level: string }) {
 
   if (!topic) {
     return (
-      <div className="card p-8">
-        <h3 className="mb-2 font-display text-xl font-bold text-navy">Pick a topic</h3>
-        <p className="mb-6 text-sm text-ink-secondary">A scripted scenario opens, then you take over and respond by voice.</p>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {TOPICS.map((t) => <button key={t} onClick={() => startTopic(t)} className="btn-secondary justify-start">{t}</button>)}
-        </div>
-      </div>
+      <TopicPicker
+        topics={SPEAKING_TOPICS}
+        title="Pick a conversation topic"
+        subtitle="A short scripted scene opens, then you join in and reply with your voice."
+        onPick={(value, t) => startTopic(value, t.label)}
+      />
     );
   }
 
@@ -219,7 +219,7 @@ function ConversationMode({ level }: { level: string }) {
     <div className="space-y-4">
       <div className="card p-6">
         <div className="mb-3 flex items-center justify-between">
-          <span className="chip">Topic: {topic}</span>
+          <span className="chip">Topic: {topicLabel || topic}</span>
           <button onClick={() => { setTopic(null); setConvo(null); }} className="btn-ghost text-sm">Change</button>
         </div>
         <p className="text-sm italic text-ink-secondary">{convo.scenario}</p>
