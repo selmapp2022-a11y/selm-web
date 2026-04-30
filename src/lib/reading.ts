@@ -57,18 +57,28 @@ export async function enhanceText(text: string, level: string): Promise<ReadingT
 }
 
 function normalize(raw: any, level: string): ReadingText {
-  // Most reading endpoints return either flat or wrapped or with a content string
-  let body: any = unwrap(raw, 'reading_text') || unwrap(raw, 'text') || raw;
-  // Some return { content: '```json {...} ```' }
-  const parsed = body?.content && typeof body.content === 'string' && body.content.includes('```')
-    ? parseAIContent(body) : null;
-  if (parsed) body = parsed;
-
-  const title = body?.title || body?.topic || 'Reading passage';
-  const content = body?.text || body?.content || body?.passage || body?.body || '';
-  const vocab = (body?.vocabulary || body?.key_words || []).map((v: any) =>
+  // /ai/reading/generate-text returns flat:
+  //   { text_content, vocabulary_used, comprehension_questions, reading_text_id, level, topic, word_count, ... }
+  // Some other variants wrap inside `reading_text` or `text`, or send a JSON-in-content string.
+  let body: any = raw;
+  if (body && typeof body === 'object') {
+    body = body.reading_text || body.text || body;
+  }
+  // Fallback: AI-content-as-string (e.g. wrapped in ```json fences)
+  if (body?.content && typeof body.content === 'string' && body.content.includes('```')) {
+    const parsed = parseAIContent<any>(body);
+    if (parsed) body = parsed;
+  }
+  // Pull title from a sensible default. The text body often starts with "## Title\n..."
+  let title: string = body?.title || body?.topic || '';
+  const content: string = body?.text_content || body?.text || body?.content || body?.passage || body?.body || '';
+  if (!title && typeof content === 'string') {
+    const m = content.match(/^\s*#{1,6}\s*(.+?)\s*$/m);
+    title = m ? m[1] : 'Reading passage';
+  }
+  const vocab = (body?.vocabulary_used || body?.vocabulary || body?.key_words || []).map((v: any) =>
     typeof v === 'string' ? { word: v, definition: '' } : { word: v.word || v.term, definition: v.definition || v.meaning, example: v.example });
-  const questions = (body?.questions || []).map((q: any) => ({
+  const questions = (body?.comprehension_questions || body?.questions || []).map((q: any) => ({
     question: q.question || q.text,
     question_type: q.question_type || q.type,
     options: q.options || q.choices,
@@ -76,7 +86,7 @@ function normalize(raw: any, level: string): ReadingText {
     explanation: q.explanation,
   }));
   return {
-    id: body?.id,
+    id: body?.reading_text_id ?? body?.id,
     title,
     content: typeof content === 'string' ? content : '',
     difficulty_level: body?.level || body?.difficulty_level || level,
@@ -85,3 +95,5 @@ function normalize(raw: any, level: string): ReadingText {
     questions,
   };
 }
+// Suppress lint warning for unwrap import (kept for back-compat usage)
+void unwrap;
