@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import { AudioRecorder } from '../components/AudioRecorder';
 import { SpeechResults } from '../components/SpeechResults';
 import { assessRealtime, audioConversation, generateConversation, type SpeechAssessment, type ConversationDialogue } from '../lib/speaking';
-import { aiTTS, browserTTS, stopBrowserTTS } from '../lib/tts';
+import { aiTTS, browserTTS, stopBrowserTTS, speakSequence, genderForSpeaker } from '../lib/tts';
 import { useAuthStore } from '../store/authStore';
 
 type Mode = 'pronunciation' | 'conversation' | 'ielts';
@@ -58,7 +58,7 @@ function ModeBtn({ active, onClick, icon: Icon, children }: any) {
   );
 }
 
-function PlayButton({ text }: { text: string }) {
+function PlayButton({ text, speaker }: { text: string; speaker?: string }) {
   const [loading, setLoading] = useState(false);
   const [playing, setPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -68,6 +68,12 @@ function PlayButton({ text }: { text: string }) {
       audioRef.current?.pause();
       stopBrowserTTS();
       setPlaying(false);
+      return;
+    }
+    // For dialogue lines (with speaker), use browser TTS directly so we can pick a per-speaker voice.
+    if (speaker) {
+      setPlaying(true);
+      browserTTS(text, { speaker, onEnd: () => setPlaying(false) });
       return;
     }
     setLoading(true);
@@ -81,15 +87,32 @@ function PlayButton({ text }: { text: string }) {
       void a.play();
     } else {
       setPlaying(true);
-      browserTTS(text);
-      // approximate end
-      setTimeout(() => setPlaying(false), Math.max(2000, text.length * 60));
+      browserTTS(text, { onEnd: () => setPlaying(false) });
     }
   };
   return (
     <button onClick={play} className="btn-ghost text-sm">
       {loading ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-teal/30 border-t-teal" /> : <Play className="h-4 w-4" />}
       {playing ? 'Stop' : 'Listen'}
+    </button>
+  );
+}
+
+function PlayAllButton({ dialogue }: { dialogue: Array<{ speaker: string; text: string }> }) {
+  const [playing, setPlaying] = useState(false);
+  const [idx, setIdx] = useState(-1);
+  const cancelRef = useRef<() => void>(() => {});
+  const start = () => {
+    if (playing) { cancelRef.current(); setPlaying(false); setIdx(-1); return; }
+    setPlaying(true);
+    cancelRef.current = speakSequence(
+      dialogue.map((d) => ({ text: d.text, speaker: d.speaker })),
+      { onProgress: setIdx, onDone: () => { setPlaying(false); setIdx(-1); } },
+    );
+  };
+  return (
+    <button onClick={start} className="btn-accent text-sm">
+      {playing ? <><Volume2 className="h-4 w-4 animate-pulse" /> Stop ({idx + 1}/{dialogue.length})</> : <><Play className="h-4 w-4" /> Play full conversation</>}
     </button>
   );
 }
@@ -199,17 +222,25 @@ function ConversationMode({ level }: { level: string }) {
       </div>
 
       <div className="card p-6">
-        <h4 className="mb-4 font-display font-bold text-navy">Conversation</h4>
+        <div className="mb-4 flex items-center justify-between">
+          <h4 className="font-display font-bold text-navy">Conversation</h4>
+          <PlayAllButton dialogue={convo.dialogue.slice(0, turnIdx + 1)} />
+        </div>
         <div className="space-y-3">
-          {convo.dialogue.slice(0, turnIdx + 1).map((d, i) => (
-            <div key={i} className="rounded-xl bg-surface-muted p-3">
-              <div className="mb-1 flex items-center justify-between">
-                <span className="text-xs font-bold uppercase text-teal">{d.speaker}</span>
-                <PlayButton text={d.text} />
+          {convo.dialogue.slice(0, turnIdx + 1).map((d, i) => {
+            const g = genderForSpeaker(d.speaker);
+            return (
+              <div key={i} className="rounded-xl bg-surface-muted p-3">
+                <div className="mb-1 flex items-center justify-between">
+                  <span className="text-xs font-bold uppercase text-teal">
+                    {g === 'female' ? '♀' : '♂'} {d.speaker}
+                  </span>
+                  <PlayButton text={d.text} speaker={d.speaker} />
+                </div>
+                <p className="text-sm text-ink-primary">{d.text}</p>
               </div>
-              <p className="text-sm text-ink-primary">{d.text}</p>
-            </div>
-          ))}
+            );
+          })}
           {userTurns.map((u, i) => (
             <div key={`u${i}`} className="space-y-2">
               {u.transcript && (
