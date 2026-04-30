@@ -1,5 +1,6 @@
 import { api, unwrap } from './api';
 import { remapTranscript, pickSpeakerPair } from './speakerNames';
+import { variantOfTopic } from './topicVariants';
 
 export type ListeningQuestion = {
   id: string | number;
@@ -21,9 +22,12 @@ export type ListeningExercise = {
 };
 
 export async function generateListening(level: string, topic: string): Promise<ListeningExercise> {
+  // Backend caches by (topic, level), so sending the bare topic always returns
+  // the same transcript. Send a fresh phrasing each time so we get new content.
+  const apiTopic = variantOfTopic(topic);
   const { data } = await api.post('/listening/generate', {
     difficulty_level: level,
-    topic,
+    topic: apiTopic,
     duration_seconds: 60,
     question_count: 5,
     include_transcript: true,

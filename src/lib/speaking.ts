@@ -1,5 +1,6 @@
 import { api, parseAIContent } from './api';
 import { remapDialogueSpeakers } from './speakerNames';
+import { variantOfTopic } from './topicVariants';
 
 export type PhonemeScore = { phoneme: string; quality_score: number; ipa?: string };
 export type WordScore = { word: string; quality_score: number; phonemes?: PhonemeScore[] };
@@ -29,7 +30,9 @@ export type ConversationDialogue = {
 };
 
 export async function generateConversation(topic: string, level: string, turns = 6): Promise<ConversationDialogue> {
-  const { data } = await api.post('/ai/conversation-practice', { topic, level, turns });
+  // Vary the phrasing each call so the cached backend response doesn't repeat.
+  const apiTopic = variantOfTopic(topic);
+  const { data } = await api.post('/ai/conversation-practice', { topic: apiTopic, level, turns });
   const parsed = parseAIContent<any>(data) || {};
   const rawDialogue = parsed.dialogue || parsed.turns || [];
   return {
