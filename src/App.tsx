@@ -7,6 +7,7 @@ import OnboardingProfilePage from './pages/OnboardingProfilePage';
 import AssessmentPage from './pages/AssessmentPage';
 import DashboardPage from './pages/DashboardPage';
 import SkillPlaceholder from './pages/SkillPlaceholder';
+import SpeakingPage from './pages/SpeakingPage';
 
 export default function App() {
   return (
@@ -22,7 +23,7 @@ export default function App() {
           <Route path="/onboarding/profile" element={<OnboardingProfilePage />} />
           <Route path="/onboarding/assessment" element={<AssessmentPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/speaking" element={<SkillPlaceholder skill="Speaking" />} />
+          <Route path="/speaking" element={<SpeakingPage />} />
           <Route path="/listening" element={<SkillPlaceholder skill="Listening" />} />
           <Route path="/reading" element={<SkillPlaceholder skill="Reading" />} />
           <Route path="/writing" element={<SkillPlaceholder skill="Writing" />} />
