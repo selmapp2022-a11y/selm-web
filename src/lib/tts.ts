@@ -138,7 +138,7 @@ export function parseDialogue(raw: string): Array<{ speaker: string; text: strin
 
 /**
  * Play a sequence using REAL Gemini TTS (per line). Falls back to browser TTS per line on failure.
- * Pitch differentiation between speakers is achieved by adjusting playbackRate with preservesPitch=false.
+ * Plays each line at its natural pitch and speed — no rate shifting, no pitch hacks.
  */
 export function aiSpeakSequence(
   parts: Array<{ text: string; speaker?: string }>,
@@ -157,7 +157,6 @@ export function aiSpeakSequence(
     opts?.onLoading?.(false);
     if (cancelled) return;
     if (!url) {
-      // Per-line fallback to browser
       await new Promise<void>((resolve) => {
         browserTTS(p.text, { rate: baseRate, speaker: p.speaker, onEnd: () => resolve() });
       });
@@ -166,11 +165,9 @@ export function aiSpeakSequence(
     await new Promise<void>((resolve) => {
       const a = new Audio(url);
       currentAudio = a;
-      try { (a as any).preservesPitch = false; (a as any).mozPreservesPitch = false; (a as any).webkitPreservesPitch = false; } catch { /* */ }
-      const g = p.speaker ? genderForSpeaker(p.speaker) : null;
-      // Slight rate shift creates an audible pitch difference between speakers.
-      const pitchShift = g === 'female' ? 1.08 : g === 'male' ? 0.92 : 1;
-      a.playbackRate = baseRate * pitchShift;
+      // Preserve pitch when adjusting speed; never warp the voice.
+      try { (a as any).preservesPitch = true; (a as any).mozPreservesPitch = true; (a as any).webkitPreservesPitch = true; } catch { /* */ }
+      a.playbackRate = baseRate;
       a.onended = () => resolve();
       a.onerror = () => resolve();
       a.play().catch(() => resolve());

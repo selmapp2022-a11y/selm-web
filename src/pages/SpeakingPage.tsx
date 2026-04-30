@@ -78,9 +78,7 @@ function PlayButton({ text, speaker }: { text: string; speaker?: string }) {
     if (url) {
       const a = new Audio(url);
       audioRef.current = a;
-      try { (a as any).preservesPitch = false; } catch { /* */ }
-      const g = speaker ? genderForSpeaker(speaker) : null;
-      a.playbackRate = g === 'female' ? 1.08 : g === 'male' ? 0.92 : 1;
+      try { (a as any).preservesPitch = true; } catch { /* */ }
       a.onended = () => setPlaying(false);
       setPlaying(true);
       void a.play();
