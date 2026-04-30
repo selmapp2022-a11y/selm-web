@@ -25,6 +25,8 @@ export async function generateListening(level: string, topic: string): Promise<L
     topic,
     duration_seconds: 60,
     question_count: 5,
+    include_transcript: true,
+    include_vocabulary: true,
   });
   const ex: any = unwrap(data, 'exercise');
   return {

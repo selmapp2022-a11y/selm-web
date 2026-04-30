@@ -1,63 +1,103 @@
 import { useEffect, useRef, useState } from 'react';
-import { Play, Pause, RotateCcw, Volume2 } from 'lucide-react';
+import { Play, Pause, RotateCcw, Volume2, AlertCircle } from 'lucide-react';
 import clsx from 'clsx';
 
 const RATES = [0.5, 0.75, 1, 1.25, 1.5];
 
 type Props = {
   src?: string;
-  fallbackText?: string; // use browser TTS if no audio src
+  fallbackText?: string;
   onEnd?: () => void;
 };
 
+// Mode: try the real audio file first; if it fails (404/network),
+// fall back to browser SpeechSynthesis using fallbackText.
 export function AudioPlayer({ src, fallbackText, onEnd }: Props) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const [rate, setRate] = useState(1);
-  const usingTTS = !src && !!fallbackText;
+  const [audioFailed, setAudioFailed] = useState(false);
 
   useEffect(() => {
+    setAudioFailed(false);
+    setProgress(0);
+    setDuration(0);
+    setPlaying(false);
     if (!src) return;
-    const a = new Audio(src);
-    audioRef.current = a;
+
+    const a = new Audio();
+    a.crossOrigin = 'anonymous';
+    a.preload = 'metadata';
     a.preservesPitch = true;
     a.playbackRate = rate;
-    a.addEventListener('timeupdate', () => setProgress(a.currentTime));
-    a.addEventListener('loadedmetadata', () => setDuration(a.duration || 0));
-    a.addEventListener('ended', () => { setPlaying(false); onEnd?.(); });
-    return () => { a.pause(); audioRef.current = null; };
+    audioRef.current = a;
+
+    const onTime = () => setProgress(a.currentTime);
+    const onMeta = () => setDuration(a.duration || 0);
+    const onErr = () => { setAudioFailed(true); setPlaying(false); };
+    const onEnded = () => { setPlaying(false); onEnd?.(); };
+
+    a.addEventListener('timeupdate', onTime);
+    a.addEventListener('loadedmetadata', onMeta);
+    a.addEventListener('error', onErr);
+    a.addEventListener('ended', onEnded);
+
+    a.src = src;
+    return () => {
+      a.pause();
+      a.removeEventListener('timeupdate', onTime);
+      a.removeEventListener('loadedmetadata', onMeta);
+      a.removeEventListener('error', onErr);
+      a.removeEventListener('ended', onEnded);
+      audioRef.current = null;
+      try { speechSynthesis.cancel(); } catch { /* */ }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [src]);
 
   useEffect(() => {
     if (audioRef.current) audioRef.current.playbackRate = rate;
-    if (usingTTS) (window as any).__selmTTSRate = rate;
-  }, [rate, usingTTS]);
+  }, [rate]);
 
-  const togglePlay = () => {
-    if (audioRef.current) {
-      if (playing) audioRef.current.pause();
-      else void audioRef.current.play();
-      setPlaying(!playing);
-    } else if (fallbackText) {
-      if (playing) {
-        speechSynthesis.cancel();
-        setPlaying(false);
-      } else {
-        speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(fallbackText);
-        u.lang = 'en-US';
-        u.rate = rate;
-        u.onend = () => { setPlaying(false); onEnd?.(); };
-        speechSynthesis.speak(u);
-        setPlaying(true);
+  const usingTTS = (!src || audioFailed) && !!fallbackText;
+
+  const playTTS = () => {
+    if (!fallbackText) return;
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(fallbackText);
+    u.lang = 'en-US';
+    u.rate = rate;
+    u.onend = () => { setPlaying(false); onEnd?.(); };
+    speechSynthesis.speak(u);
+    setPlaying(true);
+  };
+
+  const togglePlay = async () => {
+    if (usingTTS) {
+      if (playing) { speechSynthesis.cancel(); setPlaying(false); }
+      else playTTS();
+      return;
+    }
+    if (audioRef.current && !audioFailed) {
+      if (playing) { audioRef.current.pause(); setPlaying(false); }
+      else {
+        try {
+          await audioRef.current.play();
+          setPlaying(true);
+        } catch {
+          setAudioFailed(true);
+          if (fallbackText) playTTS();
+        }
       }
+    } else if (fallbackText) {
+      playTTS();
     }
   };
 
   const restart = () => {
-    if (audioRef.current) {
+    if (audioRef.current && !audioFailed) {
       audioRef.current.currentTime = 0;
       setProgress(0);
     }
@@ -73,7 +113,7 @@ export function AudioPlayer({ src, fallbackText, onEnd }: Props) {
           {playing ? <Pause className="h-6 w-6" /> : <Play className="ml-1 h-6 w-6" />}
         </button>
         <div className="flex-1">
-          {!usingTTS && (
+          {!usingTTS ? (
             <>
               <div className="mb-1 flex justify-between font-mono text-xs opacity-70">
                 <span>{fmt(progress)}</span>
@@ -83,10 +123,10 @@ export function AudioPlayer({ src, fallbackText, onEnd }: Props) {
                 <div className="h-full bg-teal transition-all" style={{ width: `${pct}%` }} />
               </div>
             </>
-          )}
-          {usingTTS && (
+          ) : (
             <div className="text-sm opacity-80">
-              <Volume2 className="mr-1 inline h-4 w-4" /> Browser voice
+              {audioFailed ? <AlertCircle className="mr-1 inline h-4 w-4" /> : <Volume2 className="mr-1 inline h-4 w-4" />}
+              {audioFailed ? 'Audio file unavailable — using browser voice' : 'Browser voice'}
             </div>
           )}
         </div>
