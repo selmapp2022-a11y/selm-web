@@ -2,7 +2,7 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { Logo } from './Logo';
 import { ThemeToggle } from './ThemeToggle';
 import { useAuthStore } from '../store/authStore';
-import { LayoutDashboard, Mic, Headphones, BookOpen, PenLine, Brain, LogOut } from 'lucide-react';
+import { LayoutDashboard, Mic, Headphones, BookOpen, PenLine, Brain, Trophy, LogOut } from 'lucide-react';
 import clsx from 'clsx';
 
 const navItems = [
@@ -12,6 +12,7 @@ const navItems = [
   { to: '/reading', label: 'Reading', icon: BookOpen },
   { to: '/writing', label: 'Writing', icon: PenLine },
   { to: '/vocabulary', label: 'Vocabulary', icon: Brain },
+  { to: '/progress', label: 'Progress', icon: Trophy },
 ];
 
 export function AppLayout() {

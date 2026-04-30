@@ -12,6 +12,7 @@ import ListeningPage from './pages/ListeningPage';
 import ReadingPage from './pages/ReadingPage';
 import WritingPage from './pages/WritingPage';
 import VocabularyPage from './pages/VocabularyPage';
+import ProgressPage from './pages/ProgressPage';
 import { initTheme } from './lib/theme';
 
 export default function App() {
@@ -32,6 +33,7 @@ export default function App() {
           <Route path="/reading" element={<ReadingPage />} />
           <Route path="/writing" element={<WritingPage />} />
           <Route path="/vocabulary" element={<VocabularyPage />} />
+          <Route path="/progress" element={<ProgressPage />} />
         </Route>
       </Route>
 
