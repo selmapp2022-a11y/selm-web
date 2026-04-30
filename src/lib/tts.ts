@@ -136,6 +136,55 @@ export function parseDialogue(raw: string): Array<{ speaker: string; text: strin
   return lines.length >= 2 ? lines : null;
 }
 
+/**
+ * Play a sequence using REAL Gemini TTS (per line). Falls back to browser TTS per line on failure.
+ * Pitch differentiation between speakers is achieved by adjusting playbackRate with preservesPitch=false.
+ */
+export function aiSpeakSequence(
+  parts: Array<{ text: string; speaker?: string }>,
+  opts?: { rate?: number; onProgress?: (i: number) => void; onDone?: () => void; onLoading?: (loading: boolean) => void },
+) {
+  let cancelled = false;
+  let currentAudio: HTMLAudioElement | null = null;
+  const baseRate = opts?.rate ?? 1;
+
+  const playOne = async (i: number): Promise<void> => {
+    if (cancelled || i >= parts.length) { opts?.onDone?.(); return; }
+    opts?.onProgress?.(i);
+    const p = parts[i];
+    opts?.onLoading?.(true);
+    const url = await aiTTS(p.text);
+    opts?.onLoading?.(false);
+    if (cancelled) return;
+    if (!url) {
+      // Per-line fallback to browser
+      await new Promise<void>((resolve) => {
+        browserTTS(p.text, { rate: baseRate, speaker: p.speaker, onEnd: () => resolve() });
+      });
+      return playOne(i + 1);
+    }
+    await new Promise<void>((resolve) => {
+      const a = new Audio(url);
+      currentAudio = a;
+      try { (a as any).preservesPitch = false; (a as any).mozPreservesPitch = false; (a as any).webkitPreservesPitch = false; } catch { /* */ }
+      const g = p.speaker ? genderForSpeaker(p.speaker) : null;
+      // Slight rate shift creates an audible pitch difference between speakers.
+      const pitchShift = g === 'female' ? 1.08 : g === 'male' ? 0.92 : 1;
+      a.playbackRate = baseRate * pitchShift;
+      a.onended = () => resolve();
+      a.onerror = () => resolve();
+      a.play().catch(() => resolve());
+    });
+    return playOne(i + 1);
+  };
+  playOne(0);
+  return () => {
+    cancelled = true;
+    if (currentAudio) { try { currentAudio.pause(); } catch { /* */ } }
+    stopBrowserTTS();
+  };
+}
+
 export function speakSequence(parts: Array<{ text: string; speaker?: string }>, opts?: { rate?: number; onProgress?: (i: number) => void; onDone?: () => void }) {
   if (!('speechSynthesis' in window)) return () => {};
   speechSynthesis.cancel();

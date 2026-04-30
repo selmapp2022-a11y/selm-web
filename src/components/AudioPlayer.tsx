@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Play, Pause, RotateCcw, Volume2, AlertCircle, Users } from 'lucide-react';
 import clsx from 'clsx';
-import { parseDialogue, speakSequence, stopBrowserTTS } from '../lib/tts';
+import { aiSpeakSequence, aiTTS, parseDialogue, stopBrowserTTS } from '../lib/tts';
 
 const RATES = [0.5, 0.75, 1, 1.25, 1.5];
 
@@ -66,22 +66,44 @@ export function AudioPlayer({ src, fallbackText, onEnd }: Props) {
   const dialogue = useMemo(() => (fallbackText ? parseDialogue(fallbackText) : null), [fallbackText]);
   const isDialogue = !!dialogue && dialogue.length >= 2;
   const cancelSeqRef = useRef<() => void>(() => {});
+  const aiAudioRef = useRef<HTMLAudioElement | null>(null);
   const [seqIdx, setSeqIdx] = useState(-1);
+  const [ttsLoading, setTtsLoading] = useState(false);
 
-  const playTTS = () => {
+  const playTTS = async () => {
     if (!fallbackText) return;
+    cancelSeqRef.current();
     stopBrowserTTS();
     setSeqIdx(-1);
+
+    // Multi-speaker dialogue: real Gemini voice per line
     if (isDialogue && dialogue) {
       setPlaying(true);
-      cancelSeqRef.current = speakSequence(
+      cancelSeqRef.current = aiSpeakSequence(
         dialogue.map((d) => ({ text: d.text, speaker: d.speaker })),
         {
           rate,
+          onLoading: setTtsLoading,
           onProgress: setSeqIdx,
-          onDone: () => { setPlaying(false); setSeqIdx(-1); onEnd?.(); },
+          onDone: () => { setPlaying(false); setSeqIdx(-1); setTtsLoading(false); onEnd?.(); },
         },
       );
+      return;
+    }
+
+    // Single passage: try real Gemini voice; fall back to browser if it fails.
+    setPlaying(true);
+    setTtsLoading(true);
+    const url = await aiTTS(fallbackText);
+    setTtsLoading(false);
+    if (url) {
+      const a = new Audio(url);
+      aiAudioRef.current = a;
+      try { (a as any).preservesPitch = true; } catch { /* */ }
+      a.playbackRate = rate;
+      a.onended = () => { setPlaying(false); onEnd?.(); };
+      a.onerror = () => { setPlaying(false); };
+      a.play().catch(() => setPlaying(false));
       return;
     }
     const u = new SpeechSynthesisUtterance(fallbackText);
@@ -89,14 +111,15 @@ export function AudioPlayer({ src, fallbackText, onEnd }: Props) {
     u.rate = rate;
     u.onend = () => { setPlaying(false); onEnd?.(); };
     speechSynthesis.speak(u);
-    setPlaying(true);
   };
 
   const stopTTS = () => {
     cancelSeqRef.current();
     stopBrowserTTS();
+    if (aiAudioRef.current) { try { aiAudioRef.current.pause(); } catch { /* */ } }
     setPlaying(false);
     setSeqIdx(-1);
+    setTtsLoading(false);
   };
 
   const togglePlay = async () => {
@@ -153,10 +176,14 @@ export function AudioPlayer({ src, fallbackText, onEnd }: Props) {
               {isDialogue ? (
                 <>
                   <Users className="mr-1 inline h-4 w-4" />
-                  {playing && seqIdx >= 0 && dialogue
+                  {ttsLoading
+                    ? <>Loading audio…</>
+                    : playing && seqIdx >= 0 && dialogue
                     ? <>Now speaking: <span className="font-semibold text-teal">{dialogue[seqIdx].speaker}</span> ({seqIdx + 1}/{dialogue.length})</>
                     : <>Dialogue • {dialogue!.length} lines • {Array.from(new Set(dialogue!.map((d) => d.speaker))).join(' & ')}</>}
                 </>
+              ) : ttsLoading ? (
+                <><Volume2 className="mr-1 inline h-4 w-4 animate-pulse" /> Loading audio…</>
               ) : (
                 <>
                   {audioFailed ? <AlertCircle className="mr-1 inline h-4 w-4" /> : <Volume2 className="mr-1 inline h-4 w-4" />}

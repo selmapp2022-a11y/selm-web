@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import { AudioRecorder } from '../components/AudioRecorder';
 import { SpeechResults } from '../components/SpeechResults';
 import { assessRealtime, audioConversation, generateConversation, type SpeechAssessment, type ConversationDialogue } from '../lib/speaking';
-import { aiTTS, browserTTS, stopBrowserTTS, speakSequence, genderForSpeaker } from '../lib/tts';
+import { aiTTS, browserTTS, stopBrowserTTS, aiSpeakSequence, genderForSpeaker } from '../lib/tts';
 import { useAuthStore } from '../store/authStore';
 
 type Mode = 'pronunciation' | 'conversation' | 'ielts';
@@ -70,25 +70,22 @@ function PlayButton({ text, speaker }: { text: string; speaker?: string }) {
       setPlaying(false);
       return;
     }
-    // For dialogue lines (with speaker), use browser TTS directly so we can pick a per-speaker voice.
-    if (speaker) {
-      setPlaying(true);
-      browserTTS(text, { speaker, onEnd: () => setPlaying(false) });
-      return;
-    }
     setLoading(true);
     const url = await aiTTS(text);
     setLoading(false);
     if (url) {
       const a = new Audio(url);
       audioRef.current = a;
+      try { (a as any).preservesPitch = false; } catch { /* */ }
+      const g = speaker ? genderForSpeaker(speaker) : null;
+      a.playbackRate = g === 'female' ? 1.08 : g === 'male' ? 0.92 : 1;
       a.onended = () => setPlaying(false);
       setPlaying(true);
       void a.play();
-    } else {
-      setPlaying(true);
-      browserTTS(text, { onEnd: () => setPlaying(false) });
+      return;
     }
+    setPlaying(true);
+    browserTTS(text, { speaker, onEnd: () => setPlaying(false) });
   };
   return (
     <button onClick={play} className="btn-ghost text-sm">
@@ -101,18 +98,25 @@ function PlayButton({ text, speaker }: { text: string; speaker?: string }) {
 function PlayAllButton({ dialogue }: { dialogue: Array<{ speaker: string; text: string }> }) {
   const [playing, setPlaying] = useState(false);
   const [idx, setIdx] = useState(-1);
+  const [loading, setLoading] = useState(false);
   const cancelRef = useRef<() => void>(() => {});
   const start = () => {
-    if (playing) { cancelRef.current(); setPlaying(false); setIdx(-1); return; }
+    if (playing) { cancelRef.current(); setPlaying(false); setIdx(-1); setLoading(false); return; }
     setPlaying(true);
-    cancelRef.current = speakSequence(
+    cancelRef.current = aiSpeakSequence(
       dialogue.map((d) => ({ text: d.text, speaker: d.speaker })),
-      { onProgress: setIdx, onDone: () => { setPlaying(false); setIdx(-1); } },
+      {
+        onLoading: setLoading,
+        onProgress: setIdx,
+        onDone: () => { setPlaying(false); setIdx(-1); setLoading(false); },
+      },
     );
   };
   return (
     <button onClick={start} className="btn-accent text-sm">
-      {playing ? <><Volume2 className="h-4 w-4 animate-pulse" /> Stop ({idx + 1}/{dialogue.length})</> : <><Play className="h-4 w-4" /> Play full conversation</>}
+      {playing
+        ? <><Volume2 className="h-4 w-4 animate-pulse" /> {loading ? 'Loading…' : `Stop (${idx + 1}/${dialogue.length})`}</>
+        : <><Play className="h-4 w-4" /> Play full conversation</>}
     </button>
   );
 }
