@@ -5,6 +5,7 @@ import { AudioPlayer } from '../components/AudioPlayer';
 import { useAuthStore } from '../store/authStore';
 import { generateListening, type ListeningExercise } from '../lib/listening';
 import { TopicPicker, LISTENING_TOPICS } from '../components/TopicPicker';
+import { CompletionCard } from '../components/CompletionCard';
 
 type Mode = 'practice' | 'news' | 'dictation';
 
@@ -154,15 +155,21 @@ function PracticeMode({ level, topic, topicLabel }: { level: string; topic: stri
               );
             })}
           </div>
-          {!submitted ? (
+          {!submitted && (
             <button onClick={() => setSubmitted(true)} disabled={Object.keys(answers).length !== exercise.questions!.length} className="btn-primary mt-6 w-full">Submit answers</button>
-          ) : (
-            <div className="mt-6 rounded-xl bg-teal/10 p-4 text-center">
-              <p className="font-display text-2xl font-bold text-teal">Score: {score}/{exercise.questions.length}</p>
-              <button onClick={load} className="btn-secondary mt-3">Try another</button>
-            </div>
           )}
         </div>
+      )}
+
+      {submitted && exercise.questions && exercise.questions.length > 0 && (
+        <CompletionCard
+          skill="listening"
+          topic={topicLabel || topic}
+          score={score}
+          total={exercise.questions.length}
+          onNext={load}
+          nextLabel="Next listening exercise"
+        />
       )}
 
       {exercise.transcript && (

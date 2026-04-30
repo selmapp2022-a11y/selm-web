@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { PenLine, Sparkles, FileText, RefreshCcw } from 'lucide-react';
 import clsx from 'clsx';
 import { checkGrammar, rewriteText, assessWriting, type GrammarCheck, type WritingAssessment } from '../lib/writing';
+import { CompletionCard } from '../components/CompletionCard';
 
 type Mode = 'live' | 'rewrite' | 'templates';
 
@@ -209,31 +210,40 @@ function TemplatesMode() {
           </button>
         </div>
         {assessment && (
-          <div className="card p-6">
-            <div className="mb-4 text-center">
-              <div className="font-display text-5xl font-bold text-teal">{assessment.overall_score}</div>
-              <div className="text-xs uppercase tracking-wider text-ink-secondary">Overall score</div>
-            </div>
-            <div className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
-              {assessment.grammar_score != null && <SubScore label="Grammar" v={assessment.grammar_score} />}
-              {assessment.vocabulary_score != null && <SubScore label="Vocab" v={assessment.vocabulary_score} />}
-              {assessment.coherence_score != null && <SubScore label="Coherence" v={assessment.coherence_score} />}
-              {assessment.task_response_score != null && <SubScore label="Task" v={assessment.task_response_score} />}
-            </div>
-            {assessment.feedback && <div className="mt-4 rounded-xl bg-surface-muted p-4 text-sm">{assessment.feedback}</div>}
-            {assessment.strengths && assessment.strengths.length > 0 && (
-              <div className="mt-4">
-                <h5 className="mb-2 text-xs font-bold uppercase text-teal">Strengths</h5>
-                <ul className="space-y-1 text-sm">{assessment.strengths.map((s, i) => <li key={i}>• {s}</li>)}</ul>
+          <>
+            <div className="card p-6">
+              <div className="mb-4 text-center">
+                <div className="font-display text-5xl font-bold text-teal">{assessment.overall_score}</div>
+                <div className="text-xs uppercase tracking-wider text-ink-secondary">Overall score</div>
               </div>
-            )}
-            {assessment.weaknesses && assessment.weaknesses.length > 0 && (
-              <div className="mt-4">
-                <h5 className="mb-2 text-xs font-bold uppercase text-amber-700">To improve</h5>
-                <ul className="space-y-1 text-sm">{assessment.weaknesses.map((s, i) => <li key={i}>• {s}</li>)}</ul>
+              <div className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
+                {assessment.grammar_score != null && <SubScore label="Grammar" v={assessment.grammar_score} />}
+                {assessment.vocabulary_score != null && <SubScore label="Vocab" v={assessment.vocabulary_score} />}
+                {assessment.coherence_score != null && <SubScore label="Coherence" v={assessment.coherence_score} />}
+                {assessment.task_response_score != null && <SubScore label="Task" v={assessment.task_response_score} />}
               </div>
-            )}
-          </div>
+              {assessment.feedback && <div className="mt-4 rounded-xl bg-surface-muted p-4 text-sm">{assessment.feedback}</div>}
+              {assessment.strengths && assessment.strengths.length > 0 && (
+                <div className="mt-4">
+                  <h5 className="mb-2 text-xs font-bold uppercase text-teal">Strengths</h5>
+                  <ul className="space-y-1 text-sm">{assessment.strengths.map((s, i) => <li key={i}>• {s}</li>)}</ul>
+                </div>
+              )}
+              {assessment.weaknesses && assessment.weaknesses.length > 0 && (
+                <div className="mt-4">
+                  <h5 className="mb-2 text-xs font-bold uppercase text-amber-700">To improve</h5>
+                  <ul className="space-y-1 text-sm">{assessment.weaknesses.map((s, i) => <li key={i}>• {s}</li>)}</ul>
+                </div>
+              )}
+            </div>
+            <CompletionCard
+              skill="writing"
+              topic={tpl.title}
+              score={assessment.overall_score}
+              onNext={() => { setTpl(null); setText(''); setAssessment(null); }}
+              nextLabel="Try another template"
+            />
+          </>
         )}
       </div>
       <div className="card sticky top-6 h-fit p-6">

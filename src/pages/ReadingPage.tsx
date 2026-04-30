@@ -3,6 +3,7 @@ import { ClipboardPaste, Newspaper, Timer, RefreshCcw, CheckCircle2, XCircle } f
 import clsx from 'clsx';
 import { useAuthStore } from '../store/authStore';
 import { enhanceText, generateText, type ReadingText } from '../lib/reading';
+import { CompletionCard } from '../components/CompletionCard';
 
 type Mode = 'paste' | 'daily' | 'speed';
 
@@ -209,14 +210,21 @@ function ReaderView({ text, onRetry }: { text: ReadingText; onRetry: () => void 
               </div>
             ))}
           </div>
-          {!submitted ? (
+          {!submitted && (
             <button onClick={() => setSubmitted(true)} disabled={Object.keys(answers).length !== text.questions!.length} className="btn-primary mt-6 w-full">Check answers</button>
-          ) : (
-            <div className="mt-6 rounded-xl bg-teal/10 p-4 text-center">
-              <p className="font-display text-2xl font-bold text-teal">Score: {score}/{text.questions!.length}</p>
-            </div>
           )}
         </div>
+      )}
+
+      {submitted && text.questions && text.questions.length > 0 && (
+        <CompletionCard
+          skill="reading"
+          topic={text.title}
+          score={score}
+          total={text.questions.length}
+          onNext={onRetry}
+          nextLabel="Read another article"
+        />
       )}
     </div>
   );
@@ -303,12 +311,21 @@ function SpeedMode({ level }: { level: string }) {
       </div>
 
       {done && (
-        <div className="card p-6 text-center">
-          <div className="font-display text-4xl font-bold text-teal">{wpm} WPM</div>
-          <p className="mt-2 text-sm text-ink-secondary">
-            {wpm < 150 ? 'Steady — keep practicing for fluency' : wpm < 250 ? 'Good — close to native speed' : 'Excellent — fluent reader speed'}
-          </p>
-        </div>
+        <CompletionCard
+          skill="reading"
+          topic={`Speed read · ${wpm} WPM`}
+          score={Math.min(100, wpm)}
+          onNext={load}
+          nextLabel="Try another passage"
+          extra={
+            <div className="text-center">
+              <div className="font-display text-3xl font-bold text-teal">{wpm} WPM</div>
+              <p className="mt-1 text-sm text-ink-secondary">
+                {wpm < 150 ? 'Steady — keep practicing for fluency' : wpm < 250 ? 'Good — close to native speed' : 'Excellent — fluent reader speed'}
+              </p>
+            </div>
+          }
+        />
       )}
     </div>
   );

@@ -7,6 +7,7 @@ import { assessRealtime, audioConversation, generateConversation, type SpeechAss
 import { aiTTS, browserTTS, stopBrowserTTS, aiSpeakSequence, genderForSpeaker } from '../lib/tts';
 import { TopicPicker, SPEAKING_TOPICS } from '../components/TopicPicker';
 import { useAuthStore } from '../store/authStore';
+import { CompletionCard } from '../components/CompletionCard';
 
 type Mode = 'pronunciation' | 'conversation' | 'ielts';
 
@@ -157,10 +158,19 @@ function PronunciationMode({ level }: { level: string }) {
         <AudioRecorder onComplete={onRecorded} maxSeconds={45} label="Read the sentence aloud" />
       </div>
 
-      <div>
+      <div className="space-y-4">
         {loading && <Loading text="Analyzing pronunciation…" />}
         {err && <ErrorBox msg={err} />}
         {result && <SpeechResults result={result} />}
+        {result && (
+          <CompletionCard
+            skill="speaking"
+            topic={`Pronunciation · ${prompt.level}`}
+            score={Math.round(result.overall_score)}
+            onNext={newPrompt}
+            nextLabel="Try a new sentence"
+          />
+        )}
         {!loading && !err && !result && (
           <div className="card p-8 text-center text-ink-disabled">
             <Mic className="mx-auto mb-2 h-10 w-10 opacity-40" />
@@ -308,10 +318,19 @@ function IELTSMode() {
         </div>
         <AudioRecorder onComplete={onRecorded} maxSeconds={120} label="Tap to start your 2-minute response" />
       </div>
-      <div>
+      <div className="space-y-4">
         {loading && <Loading text="Scoring your response…" />}
         {err && <ErrorBox msg={err} />}
         {result && <SpeechResults result={result} />}
+        {result && (
+          <CompletionCard
+            skill="speaking"
+            topic="IELTS Part 2"
+            score={Math.round(result.overall_score)}
+            onNext={newPrompt}
+            nextLabel="Try the next IELTS prompt"
+          />
+        )}
         {!loading && !err && !result && (
           <div className="card p-8 text-center text-ink-disabled">
             <Trophy className="mx-auto mb-2 h-10 w-10 opacity-40" />
