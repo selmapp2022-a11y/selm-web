@@ -19,11 +19,6 @@ type Question = {
   points: number;
 };
 
-type Quiz = {
-  quiz_metadata: { title: string; total_questions: number };
-  questions: Question[];
-};
-
 const LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'] as const;
 
 function pickAdaptive(remaining: Question[], currentLevelIdx: number) {
@@ -35,6 +30,33 @@ function pickAdaptive(remaining: Question[], currentLevelIdx: number) {
     return da - db;
   });
   return sorted[0];
+}
+
+function FillInBlank({ disabled, onSubmit }: { disabled: boolean; onSubmit: (v: string) => void }) {
+  const [value, setValue] = useState('');
+  return (
+    <form
+      onSubmit={(e) => { e.preventDefault(); if (!disabled && value.trim()) onSubmit(value); }}
+      className="space-y-3"
+    >
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        disabled={disabled}
+        autoFocus
+        placeholder="Type your answer…"
+        className="w-full rounded-xl border-2 border-surface-divider bg-white dark:bg-white/10 px-5 py-4 text-base text-ink-primary dark:text-white placeholder:text-ink-secondary/60 focus:border-navy dark:focus:border-teal focus:outline-none"
+      />
+      <button
+        type="submit"
+        disabled={disabled || !value.trim()}
+        className="btn-primary w-full disabled:opacity-50"
+      >
+        Submit answer
+      </button>
+    </form>
+  );
 }
 
 export default function AssessmentPage() {
@@ -81,14 +103,13 @@ export default function AssessmentPage() {
           setProgress(status.progress || 0);
           setStatusMsg(status.message || 'Generating questions…');
           if (status.status === 'completed') {
-            const r: any = status.result || {};
-            // The backend may return one of several shapes — accept all
+            // The backend returns quiz_data at the top level of the status object,
+            // not inside `result`. Accept several shapes defensively.
             const qs: Question[] =
-              r?.quiz_data?.questions ||
-              r?.questions ||
-              r?.quiz?.questions ||
-              r?.data?.questions ||
-              (Array.isArray(r) ? r : []) ||
+              status?.quiz_data?.questions ||
+              status?.result?.quiz_data?.questions ||
+              status?.result?.questions ||
+              status?.questions ||
               [];
             if (!Array.isArray(qs) || qs.length === 0) {
               throw new Error('No questions returned. Please try again.');
@@ -112,6 +133,7 @@ export default function AssessmentPage() {
 
   const handleAnswer = (opt: string) => {
     if (showFeedback) return;
+    if (!opt || !opt.trim()) return;
     setSelected(opt);
     setShowFeedback(true);
     const isCorrect = opt.trim().toLowerCase() === current!.correct_answer.trim().toLowerCase();
@@ -242,14 +264,35 @@ export default function AssessmentPage() {
             {current.passage}
           </div>
         )}
-        {current.audio_text && (
-          <div className="mb-6 rounded-xl bg-navy/5 p-4 text-sm italic text-ink-secondary">
+        {current.audio_url && (
+          <div className="mb-6 rounded-xl bg-navy/5 dark:bg-white/5 p-4">
+            <audio
+              key={current.audio_url}
+              controls
+              preload="auto"
+              className="w-full"
+              src={current.audio_url}
+            >
+              Your browser does not support audio playback.
+            </audio>
+            <p className="mt-2 text-xs text-ink-secondary">Listen carefully — you can replay the audio.</p>
+          </div>
+        )}
+        {!current.audio_url && current.audio_text && (
+          <div className="mb-6 rounded-xl bg-navy/5 dark:bg-white/5 p-4 text-sm italic text-ink-secondary dark:text-white/80">
             🔊 "{current.audio_text}"
           </div>
         )}
 
-        <h3 className="mb-6 font-display text-xl font-semibold text-navy">{current.question}</h3>
+        <h3 className="mb-6 font-display text-xl font-semibold text-navy dark:text-white">{current.question}</h3>
 
+        {current.question_type === 'fill_in_blank' && current.options.length === 0 ? (
+          <FillInBlank
+            key={current.id}
+            disabled={showFeedback}
+            onSubmit={handleAnswer}
+          />
+        ) : (
         <div className="space-y-3">
           {(current.options.length > 0 ? current.options : ['True', 'False']).map((opt) => {
             const isSelected = selected === opt;
@@ -280,10 +323,11 @@ export default function AssessmentPage() {
             );
           })}
         </div>
+        )}
 
         {showFeedback && (
-          <div className="mt-6 rounded-xl bg-surface-muted p-4 text-sm text-ink-secondary">
-            <strong className="text-navy">Explanation: </strong>{current.explanation}
+          <div className="mt-6 rounded-xl bg-surface-muted p-4 text-sm text-ink-secondary dark:text-white/80">
+            <strong className="text-navy dark:text-teal">Explanation: </strong>{current.explanation}
           </div>
         )}
 
