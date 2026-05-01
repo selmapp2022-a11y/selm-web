@@ -81,8 +81,18 @@ export default function AssessmentPage() {
           setProgress(status.progress || 0);
           setStatusMsg(status.message || 'Generating questions…');
           if (status.status === 'completed') {
-            const quiz: Quiz = status.result?.quiz_data || status.result;
-            const qs = quiz.questions || [];
+            const r: any = status.result || {};
+            // The backend may return one of several shapes — accept all
+            const qs: Question[] =
+              r?.quiz_data?.questions ||
+              r?.questions ||
+              r?.quiz?.questions ||
+              r?.data?.questions ||
+              (Array.isArray(r) ? r : []) ||
+              [];
+            if (!Array.isArray(qs) || qs.length === 0) {
+              throw new Error('No questions returned. Please try again.');
+            }
             setPool(qs);
             setStage('asking');
             const first = pickAdaptive(qs, 2);
@@ -150,16 +160,37 @@ export default function AssessmentPage() {
   };
 
   if (stage === 'starting' || stage === 'loading') {
+    const isError = stage === 'starting' && !!statusMsg && (
+      statusMsg.toLowerCase().includes('error') ||
+      statusMsg.toLowerCase().includes('fail') ||
+      statusMsg.toLowerCase().includes('undefined') ||
+      statusMsg.toLowerCase().includes('timeout') ||
+      statusMsg.toLowerCase().includes('no questions')
+    );
     return (
       <div className="mx-auto max-w-xl">
         <div className="card p-10 text-center">
-          <Loader2 className="mx-auto mb-4 h-10 w-10 animate-spin text-teal" />
-          <h2 className="mb-2 font-display text-2xl font-bold text-navy">Building your assessment</h2>
-          <p className="text-ink-secondary">{statusMsg}</p>
-          {progress > 0 && (
-            <div className="mt-6 h-2 w-full overflow-hidden rounded-full bg-surface-muted">
-              <div className="h-full rounded-full bg-teal transition-all" style={{ width: `${progress}%` }} />
-            </div>
+          {!isError ? (
+            <>
+              <Loader2 className="mx-auto mb-4 h-10 w-10 animate-spin text-teal" />
+              <h2 className="mb-2 font-display text-2xl font-bold text-navy">Building your assessment</h2>
+              <p className="text-ink-secondary">{statusMsg}</p>
+              {progress > 0 && (
+                <div className="mt-6 h-2 w-full overflow-hidden rounded-full bg-surface-muted">
+                  <div className="h-full rounded-full bg-teal transition-all" style={{ width: `${progress}%` }} />
+                </div>
+              )}
+            </>
+          ) : (
+            <>
+              <h2 className="mb-2 font-display text-2xl font-bold text-navy">We couldn't build your assessment</h2>
+              <p className="mb-6 text-ink-secondary">Sometimes the AI model takes a moment to warm up. Please try again — it usually works on the second try.</p>
+              <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+                <button onClick={() => window.location.reload()} className="btn-primary">Try again</button>
+                <button onClick={() => navigate('/dashboard')} className="btn-ghost">Skip for now</button>
+              </div>
+              <p className="mt-6 text-xs text-ink-disabled">Technical detail: {statusMsg}</p>
+            </>
           )}
         </div>
       </div>
