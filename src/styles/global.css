@@ -129,3 +129,41 @@ html.dark .text-teal-600   { color: #5BD4C8 !important; }
 /* Selection contrast in dark */
 html.dark ::selection { background: var(--c-teal); color: #0B1929; }
 
+/* === Reading text & long-form content (Tailwind Typography "prose") ===
+   The .prose plugin hard-codes near-black colors for body/headings/links/etc.
+   Force them to follow our --c-ink token in dark so passages stay readable. */
+html.dark .prose,
+html.dark .prose p,
+html.dark .prose li,
+html.dark .prose blockquote,
+html.dark .prose ul,
+html.dark .prose ol,
+html.dark .prose figcaption,
+html.dark .prose strong,
+html.dark .prose em,
+html.dark .prose code,
+html.dark .prose pre,
+html.dark .prose h1,
+html.dark .prose h2,
+html.dark .prose h3,
+html.dark .prose h4,
+html.dark .prose h5,
+html.dark .prose h6 {
+  color: var(--c-ink) !important;
+}
+html.dark .prose a { color: #5BD4C8 !important; }
+html.dark .prose hr,
+html.dark .prose thead,
+html.dark .prose tbody tr { border-color: var(--c-divider) !important; }
+html.dark .prose code { background-color: var(--c-muted) !important; }
+html.dark .prose blockquote { border-left-color: var(--c-teal) !important; }
+
+/* Textareas (.input is shared, but extra safety for raw <textarea>) */
+html.dark textarea,
+html.dark textarea.input {
+  background-color: var(--c-card) !important;
+  color: var(--c-ink) !important;
+  caret-color: var(--c-navy) !important;
+}
+html.dark textarea::placeholder { color: var(--c-ink-3) !important; }
+
