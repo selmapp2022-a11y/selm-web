@@ -180,3 +180,20 @@ html.dark .border-2.border-surface-divider:hover { border-color: rgba(91, 212, 2
 html.dark .border-navy { border-color: #5BD4C8 !important; }
 html.dark .bg-navy\/5 { background-color: rgba(91, 212, 200, 0.10) !important; }
 
+/* === ULTIMATE catch-all: any text inside a dark card/button must be readable === */
+/* Force every text-navy to bright teal in dark, with attribute-selector specificity */
+html[class~="dark"] .text-navy,
+html[class~="dark"] .text-navy * {
+  color: #5BD4C8 !important;
+}
+/* Force every text-ink-* to readable in dark with high specificity */
+html[class~="dark"] .text-ink-primary { color: #EDF2F7 !important; }
+html[class~="dark"] .text-ink-secondary { color: #B8C2D0 !important; }
+html[class~="dark"] .text-ink-disabled { color: #8693A6 !important; }
+
+/* Any descendant text inside a card/button on dark, if not already colored, becomes light */
+html.dark .card,
+html.dark button.bg-surface-card,
+html.dark a.bg-surface-card,
+html.dark div.bg-surface-card { color: var(--c-ink); }
+
