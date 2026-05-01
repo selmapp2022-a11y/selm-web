@@ -167,3 +167,16 @@ html.dark textarea.input {
 }
 html.dark textarea::placeholder { color: var(--c-ink-3) !important; }
 
+/* Make sure unstyled <button>s inherit a readable color in dark
+   (some browsers paint default button text in --c-app otherwise) */
+html.dark button:not([class*="text-"]):not(.btn):not(.btn-primary):not(.btn-secondary):not(.btn-accent):not(.btn-ghost) {
+  color: var(--c-ink);
+}
+
+/* Make the divider border visible enough in dark mode */
+html.dark .border-surface-divider { border-color: var(--c-divider) !important; }
+html.dark .border-2.border-surface-divider { border-color: rgba(155, 175, 200, 0.30) !important; }
+html.dark .border-2.border-surface-divider:hover { border-color: rgba(91, 212, 200, 0.55) !important; }
+html.dark .border-navy { border-color: #5BD4C8 !important; }
+html.dark .bg-navy\/5 { background-color: rgba(91, 212, 200, 0.10) !important; }
+

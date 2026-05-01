@@ -181,7 +181,7 @@ function ReaderView({ text, onRetry }: { text: ReadingText; onRetry: () => void 
           <div className="space-y-5">
             {text.questions.map((q, idx) => (
               <div key={idx}>
-                <p className="mb-3 font-medium">{idx + 1}. {q.question}</p>
+                <p className="mb-3 font-medium text-ink-primary">{idx + 1}. {q.question}</p>
                 <div className="space-y-2">
                   {(q.options || (q.question_type === 'true_false_ng' ? ['True', 'False', 'Not Given'] : ['True', 'False'])).map((opt) => {
                     const selected = answers[idx] === opt;
@@ -192,7 +192,7 @@ function ReaderView({ text, onRetry }: { text: ReadingText; onRetry: () => void 
                         onClick={() => !submitted && setAnswers((a) => ({ ...a, [idx]: opt }))}
                         disabled={submitted}
                         className={clsx(
-                          'w-full rounded-xl border-2 px-4 py-2.5 text-left text-sm transition',
+                          'w-full rounded-xl border-2 px-4 py-2.5 text-left text-sm font-medium text-ink-primary transition',
                           submitted && isRight && 'border-teal bg-teal/10 text-navy',
                           submitted && selected && !isRight && 'border-red-400 bg-red-50 text-red-700',
                           !submitted && selected && 'border-navy bg-navy/5',

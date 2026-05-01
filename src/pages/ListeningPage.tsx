@@ -136,7 +136,7 @@ function PracticeMode({ level, topic, topicLabel }: { level: string; topic: stri
                         onClick={() => !submitted && setAnswers((a) => ({ ...a, [qid]: opt }))}
                         disabled={submitted}
                         className={clsx(
-                          'w-full rounded-xl border-2 px-4 py-2.5 text-left text-sm transition',
+                          'w-full rounded-xl border-2 px-4 py-2.5 text-left text-sm font-medium text-ink-primary transition',
                           submitted && isRight && 'border-teal bg-teal/10 text-navy',
                           submitted && selected && !isRight && 'border-red-400 bg-red-50 text-red-700',
                           !submitted && selected && 'border-navy bg-navy/5',
