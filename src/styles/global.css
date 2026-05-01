@@ -61,7 +61,19 @@
   .btn-ghost { @apply btn text-navy hover:bg-surface-muted; }
 
   .input {
-    @apply w-full rounded-xl border border-surface-divider bg-white px-4 py-3 text-ink-primary placeholder:text-ink-disabled focus:border-navy focus:outline-none focus:ring-2 focus:ring-teal/30 transition;
+    @apply w-full rounded-xl border border-surface-divider bg-white px-4 py-3 placeholder:text-ink-disabled focus:border-navy focus:outline-none focus:ring-2 focus:ring-teal/30 transition;
+    color: var(--c-ink);
+    caret-color: var(--c-navy);
+  }
+  .input:-webkit-autofill,
+  .input:-webkit-autofill:hover,
+  .input:-webkit-autofill:focus,
+  .input:-webkit-autofill:active {
+    -webkit-text-fill-color: var(--c-ink) !important;
+    -webkit-box-shadow: 0 0 0 1000px var(--c-card) inset !important;
+    box-shadow: 0 0 0 1000px var(--c-card) inset !important;
+    transition: background-color 9999s ease-in-out 0s;
+    caret-color: var(--c-navy) !important;
   }
 
   .card { @apply bg-surface-card rounded-2xl shadow-card border border-surface-muted/40 transition-shadow hover:shadow-cardHover animate-slideUp; }
