@@ -82,3 +82,50 @@
 
   .label { @apply text-sm font-medium text-ink-secondary mb-1.5 block; }
 }
+
+/* === Dark mode safety net === */
+/* Make sure body text is light in dark, even on elements that don't set color */
+html.dark body { color: var(--c-ink); }
+html.dark { color-scheme: dark; }
+
+/* Fix page-level light gradients that don't naturally flip in dark mode */
+html.dark .bg-gradient-to-br.from-surface-app,
+html.dark .bg-gradient-to-br.from-surface-app.via-white,
+html.dark .bg-gradient-to-br.from-surface-app.via-white.to-teal\/5 {
+  background-image: linear-gradient(to bottom right, var(--c-app), var(--c-card), rgba(46, 196, 182, 0.10)) !important;
+}
+html.dark .bg-gradient-to-br.from-white,
+html.dark .bg-gradient-to-br.from-white.to-teal\/5 {
+  background-image: linear-gradient(to bottom right, var(--c-card), rgba(46, 196, 182, 0.10)) !important;
+}
+
+/* Translucent white overlays inside dark cards: lighten them so they show */
+html.dark .bg-white\/80 { background-color: color-mix(in srgb, var(--c-card) 80%, transparent) !important; }
+html.dark .bg-white\/15 { background-color: rgba(255, 255, 255, 0.10) !important; }
+html.dark .bg-white\/10 { background-color: rgba(255, 255, 255, 0.08) !important; }
+html.dark .bg-white\/20 { background-color: rgba(255, 255, 255, 0.14) !important; }
+html.dark .bg-white\/25 { background-color: rgba(255, 255, 255, 0.18) !important; }
+
+/* Pastel alert/badge backgrounds: make them dark-friendly tinted */
+html.dark .bg-red-50    { background-color: rgba(239, 68, 68, 0.14) !important; }
+html.dark .bg-amber-50  { background-color: rgba(245, 158, 11, 0.14) !important; }
+html.dark .bg-amber-100 { background-color: rgba(245, 158, 11, 0.18) !important; }
+html.dark .bg-orange-50 { background-color: rgba(249, 115, 22, 0.14) !important; }
+html.dark .bg-purple-100{ background-color: rgba(168, 85, 247, 0.18) !important; }
+html.dark .border-red-200    { border-color: rgba(239, 68, 68, 0.40) !important; }
+html.dark .border-amber-200  { border-color: rgba(245, 158, 11, 0.40) !important; }
+html.dark .border-amber-400  { border-color: rgba(245, 158, 11, 0.60) !important; }
+
+/* Pastel-on-pastel TEXT colors: brighten them for dark mode */
+html.dark .text-red-700    { color: #FCA5A5 !important; }
+html.dark .text-red-600    { color: #FCA5A5 !important; }
+html.dark .text-red-500    { color: #FCA5A5 !important; }
+html.dark .text-amber-700  { color: #FCD34D !important; }
+html.dark .text-orange-700 { color: #FDBA74 !important; }
+html.dark .text-orange-600 { color: #FDBA74 !important; }
+html.dark .text-purple-600 { color: #C4B5FD !important; }
+html.dark .text-teal-600   { color: #5BD4C8 !important; }
+
+/* Selection contrast in dark */
+html.dark ::selection { background: var(--c-teal); color: #0B1929; }
+
