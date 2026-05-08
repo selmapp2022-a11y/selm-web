@@ -92,7 +92,6 @@ function normalizeAssessment(raw: any): SpeechAssessment {
   if (raw && (raw.overallScore != null || raw.detailedWordFeedback || raw.pronunciation?.score != null)) {
     const detailedWords: any[] = raw.detailedWordFeedback || [];
     const wordScoresObj: Record<string, number> = raw.wordScores || {};
-    const phonemeScoresObj: Record<string, number> = raw.phonemeScores || {};
 
     // Build word_scores array, preferring the rich detailedWordFeedback list.
     const words = detailedWords.length > 0
