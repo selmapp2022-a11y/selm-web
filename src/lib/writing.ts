@@ -60,11 +60,26 @@ export async function rewriteText(text: string, style: string): Promise<string> 
   return text;
 }
 
+// Map a template prompt to a backend writing_type so the assessor can apply
+// genre-appropriate criteria (cover letters → persuasion + structure,
+// stories → narrative coherence, etc). Without this the backend defaults
+// to "general" and the AI ignores what the user was asked to write.
+function inferWritingType(prompt: string | undefined): string {
+  const p = (prompt || '').toLowerCase();
+  if (p.includes('email')) return 'email';
+  if (p.includes('cover letter')) return 'cover_letter';
+  if (p.includes('opinion') || p.includes('essay')) return 'opinion_essay';
+  if (p.includes('short story') || p.includes('story')) return 'story';
+  if (p.includes('letter')) return 'letter';
+  if (p.includes('description') || p.includes('describe')) return 'description';
+  return 'general';
+}
+
 export async function assessWriting(text: string, prompt?: string): Promise<WritingAssessment> {
   const { data } = await api.post('/writing/assess', {
     text,
     prompt: prompt || '',
-    assessment_type: 'comprehensive',
+    writing_type: inferWritingType(prompt),
   });
   const a: any = unwrap(data, 'assessment');
   const scores = a?.scores || {};
