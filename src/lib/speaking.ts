@@ -16,11 +16,18 @@ export type SpeechAssessment = {
   pause_count?: number;
 };
 
-// Submit recorded audio for assessment (multipart)
-export async function assessRealtime(blob: Blob, _prompt?: string): Promise<SpeechAssessment> {
+// Submit recorded audio for assessment (multipart).
+//
+// Routed to /speech/evaluate which actually runs Google STT + Speechace.
+// The previous endpoint (/speaking/real-time-assessment) was a placeholder
+// that returned mock data and required a session_id, so the UI silently
+// failed with 422 errors. (Fixed 2026-05-08.)
+export async function assessRealtime(blob: Blob, prompt?: string): Promise<SpeechAssessment> {
   const fd = new FormData();
-  fd.append('audio_data', blob, 'recording.webm');
-  const { data } = await api.post('/speaking/real-time-assessment', fd);
+  fd.append('audio', blob, 'recording.webm');
+  fd.append('reference_text', prompt || '');
+  fd.append('language', 'en-US');
+  const { data } = await api.post('/speech/evaluate', fd);
   return normalizeAssessment(data);
 }
 
