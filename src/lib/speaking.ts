@@ -67,7 +67,62 @@ export async function audioConversation(blob: Blob): Promise<{ transcript?: stri
 }
 
 function normalizeAssessment(raw: any): SpeechAssessment {
-  // Try common shapes
+  // ───────────────────────────────────────────────────────────
+  // /speech/evaluate response (camelCase, current backend shape)
+  // ───────────────────────────────────────────────────────────
+  if (raw && (raw.overallScore != null || raw.detailedWordFeedback || raw.pronunciation?.score != null)) {
+    const detailedWords: any[] = raw.detailedWordFeedback || [];
+    const wordScoresObj: Record<string, number> = raw.wordScores || {};
+    const phonemeScoresObj: Record<string, number> = raw.phonemeScores || {};
+
+    // Build word_scores array, preferring the rich detailedWordFeedback list.
+    const words = detailedWords.length > 0
+      ? detailedWords.map((w: any) => ({
+          word: w.word ?? w.text ?? '',
+          quality_score: Number(w.score ?? w.quality_score ?? w.quality ?? 0),
+          phonemes: (w.phonemes || w.phoneme_scores || []).map((p: any) => ({
+            phoneme: p.phoneme ?? p.phone ?? '',
+            quality_score: Number(p.score ?? p.quality_score ?? 0),
+            ipa: p.ipa,
+          })),
+        }))
+      : Object.entries(wordScoresObj).map(([word, score]) => ({
+          word,
+          quality_score: typeof score === 'number' ? score : 0,
+          phonemes: [],
+        }));
+
+    // Synthesize a feedback line from tips + pronunciation.issues so the
+    // user actually sees coaching text, not silence.
+    const tips: string[] = Array.isArray(raw.tips) ? raw.tips.filter(Boolean) : [];
+    const issuesArr: any[] = raw.pronunciation?.issues || [];
+    const issueWords = issuesArr
+      .map((i: any) => (typeof i === 'string' ? i : (i?.word || i?.text)))
+      .filter(Boolean);
+    const feedbackParts: string[] = [];
+    if (tips.length) feedbackParts.push(...tips);
+    if (issueWords.length) feedbackParts.push(`Practice these words: ${issueWords.join(', ')}.`);
+    const feedback = feedbackParts.join(' ') || undefined;
+
+    const wpm = raw.fluency?.wpm;
+    const overall = Number(raw.overallScore ?? raw.pronunciation?.score ?? 0);
+    const pron = Number(raw.pronunciation?.score ?? raw.overallScore ?? 0);
+
+    return {
+      overall_score: Math.round(overall),
+      pronunciation_score: Math.round(pron),
+      fluency_score: raw.fluency?.score != null ? Math.round(Number(raw.fluency.score)) : undefined,
+      pace_score: typeof wpm === 'number' ? Math.round(wpm) : undefined,
+      word_scores: words,
+      feedback,
+      filler_words: [],
+      pause_count: Array.isArray(raw.fluency?.longPauses) ? raw.fluency.longPauses.length : undefined,
+    };
+  }
+
+  // ───────────────────────────────────────────────────────────
+  // Legacy / Speechace-direct response shape (snake_case)
+  // ───────────────────────────────────────────────────────────
   let body: any = raw;
   if (raw?.success && raw?.assessment) body = raw.assessment;
   if (raw?.success && raw?.result) body = raw.result;
