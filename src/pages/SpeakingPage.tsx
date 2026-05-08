@@ -3,7 +3,7 @@ import { Mic, MessageSquare, Trophy, RefreshCcw, Volume2, Play } from 'lucide-re
 import clsx from 'clsx';
 import { AudioRecorder } from '../components/AudioRecorder';
 import { SpeechResults } from '../components/SpeechResults';
-import { assessRealtime, audioConversation, generateConversation, type SpeechAssessment, type ConversationDialogue } from '../lib/speaking';
+import { assessRealtime, assessFreeform, audioConversation, generateConversation, type SpeechAssessment, type ConversationDialogue } from '../lib/speaking';
 import { aiTTS, browserTTS, stopBrowserTTS, aiSpeakSequence, genderForSpeaker } from '../lib/tts';
 import { TopicPicker, SPEAKING_TOPICS } from '../components/TopicPicker';
 import { useAuthStore } from '../store/authStore';
@@ -201,7 +201,10 @@ function ConversationMode({ level }: { level: string }) {
   const onUserAudio = async (blob: Blob) => {
     setLoading(true); setErr(null);
     try {
-      const data = await audioConversation(blob);
+      // Pass the active topic as conversation_context so the backend gives a
+      // relevant reply (and so the request actually validates — without this
+      // the FastAPI endpoint returns 422 and we get no transcript back).
+      const data = await audioConversation(blob, topicLabel || topic || 'general conversation');
       setUserTurns((u) => [...u, data]);
       setTurnIdx((i) => i + 1);
     } catch (e: any) { setErr(e?.response?.data?.detail || e?.message || 'Could not process audio.'); }
@@ -295,7 +298,9 @@ function IELTSMode() {
 
   const onRecorded = async (blob: Blob) => {
     setLoading(true); setErr(null); setResult(null);
-    try { setResult(await assessRealtime(blob, prompt)); }
+    // IELTS uses free-form scoring (no reference_text) so SpeechAce doesn't
+    // penalise the user for speaking ABOUT the topic rather than reading it.
+    try { setResult(await assessFreeform(blob)); }
     catch (e: any) { setErr(e?.response?.data?.detail || e?.message || 'Assessment failed.'); }
     finally { setLoading(false); }
   };

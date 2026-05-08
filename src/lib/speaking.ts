@@ -31,6 +31,20 @@ export async function assessRealtime(blob: Blob, prompt?: string): Promise<Speec
   return normalizeAssessment(data);
 }
 
+// Free-form speaking assessment for IELTS-style prompts where the user is
+// asked to TALK ABOUT a topic (not read it aloud). Sends an empty
+// reference_text so SpeechAce doesn't penalise the user for not matching
+// the topic description word-for-word; the backend then falls back to STT
+// transcription + Gemini-based fluency/coherence feedback. (Added 2026-05-08.)
+export async function assessFreeform(blob: Blob): Promise<SpeechAssessment> {
+  const fd = new FormData();
+  fd.append('audio', blob, 'recording.webm');
+  fd.append('reference_text', '');
+  fd.append('language', 'en-US');
+  const { data } = await api.post('/speech/evaluate', fd);
+  return normalizeAssessment(data);
+}
+
 export type ConversationDialogue = {
   scenario: string;
   dialogue: Array<{ speaker: string; text: string }>;
@@ -50,20 +64,25 @@ export async function generateConversation(topic: string, level: string, turns =
   };
 }
 
-// Submit user's audio reply during conversation
-export async function audioConversation(blob: Blob): Promise<{ transcript?: string; ai_response?: string; ai_audio_url?: string }> {
+// Submit user's audio reply during conversation.
+//
+// Backend (`POST /speaking/audio-conversation`) requires `conversation_context`
+// as a QUERY param and returns `transcription` (not `transcript`). Without the
+// query param the call 422s and the user sees nothing. Fixed 2026-05-08.
+export async function audioConversation(
+  blob: Blob,
+  context: string = 'general conversation',
+): Promise<{ transcript?: string; ai_response?: string; ai_audio_url?: string }> {
   const fd = new FormData();
   fd.append('audio_file', blob, 'recording.webm');
-  try {
-    const { data } = await api.post('/speaking/audio-conversation', fd);
-    return {
-      transcript: data?.transcript || data?.user_text,
-      ai_response: data?.ai_response || data?.response || data?.message,
-      ai_audio_url: data?.ai_audio_url || data?.audio_url,
-    };
-  } catch {
-    return {};
-  }
+  const { data } = await api.post('/speaking/audio-conversation', fd, {
+    params: { conversation_context: context },
+  });
+  return {
+    transcript: data?.transcription || data?.transcript || data?.user_text,
+    ai_response: data?.ai_response || data?.response || data?.message,
+    ai_audio_url: data?.ai_audio_url || data?.audio_url,
+  };
 }
 
 function normalizeAssessment(raw: any): SpeechAssessment {
