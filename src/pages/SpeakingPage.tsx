@@ -3,8 +3,8 @@ import { Mic, MessageSquare, Trophy, RefreshCcw, Volume2, Play } from 'lucide-re
 import clsx from 'clsx';
 import { AudioRecorder } from '../components/AudioRecorder';
 import { SpeechResults } from '../components/SpeechResults';
-import { assessRealtime, assessFreeform, audioConversation, generateConversation, type SpeechAssessment, type ConversationDialogue } from '../lib/speaking';
-import { aiTTS, browserTTS, stopBrowserTTS, aiSpeakSequence, genderForSpeaker } from '../lib/tts';
+import { assessRealtime, assessFreeform, audioConversation, type SpeechAssessment } from '../lib/speaking';
+import { aiTTS, browserTTS, stopBrowserTTS } from '../lib/tts';
 import { TopicPicker, SPEAKING_TOPICS } from '../components/TopicPicker';
 import { useAuthStore } from '../store/authStore';
 import { CompletionCard } from '../components/CompletionCard';
@@ -95,32 +95,6 @@ function PlayButton({ text, speaker }: { text: string; speaker?: string }) {
   );
 }
 
-function PlayAllButton({ dialogue }: { dialogue: Array<{ speaker: string; text: string }> }) {
-  const [playing, setPlaying] = useState(false);
-  const [idx, setIdx] = useState(-1);
-  const [loading, setLoading] = useState(false);
-  const cancelRef = useRef<() => void>(() => {});
-  const start = () => {
-    if (playing) { cancelRef.current(); setPlaying(false); setIdx(-1); setLoading(false); return; }
-    setPlaying(true);
-    cancelRef.current = aiSpeakSequence(
-      dialogue.map((d) => ({ text: d.text, speaker: d.speaker })),
-      {
-        onLoading: setLoading,
-        onProgress: setIdx,
-        onDone: () => { setPlaying(false); setIdx(-1); setLoading(false); },
-      },
-    );
-  };
-  return (
-    <button onClick={start} className="btn-accent text-sm">
-      {playing
-        ? <><Volume2 className="h-4 w-4 animate-pulse" /> {loading ? 'Loading…' : `Stop (${idx + 1}/${dialogue.length})`}</>
-        : <><Play className="h-4 w-4" /> Play full conversation</>}
-    </button>
-  );
-}
-
 function PronunciationMode({ level }: { level: string }) {
   const [prompt, setPrompt] = useState(() => PRACTICE_PROMPTS.find((p) => p.level === level) || PRACTICE_PROMPTS[2]);
   const [result, setResult] = useState<SpeechAssessment | null>(null);
@@ -180,35 +154,61 @@ function PronunciationMode({ level }: { level: string }) {
   );
 }
 
-function ConversationMode({ level }: { level: string }) {
+// Topic-specific opener so the user has something concrete to respond to. No
+// scripted dialogue any more — just one greeting + question, then the user
+// drives the conversation by speaking freely.
+const CONVERSATION_OPENERS: Record<string, string> = {
+  travel: "Hi! Tell me about a trip you really enjoyed. Where did you go and what made it memorable?",
+  food: "Hi! What's a meal you love cooking or eating? Tell me about it.",
+  work: "Hi! Tell me about your job — or a job you'd love to do. What's a typical day like?",
+  movies: "Hi! What's the last movie or show you watched? Did you enjoy it? Why?",
+  hobbies: "Hi! What do you like to do in your free time? How did you get into it?",
+  daily_routine: "Hi! Walk me through your typical day, from morning until evening.",
+  shopping: "Hi! Tell me about the last thing you bought. Why did you choose it?",
+  health: "Hi! What do you do to stay healthy? Tell me about your routine.",
+  family: "Hi! Tell me a little about your family or the people closest to you.",
+  music: "Hi! What kind of music do you love? Who's an artist you'd recommend?",
+  sports: "Hi! Do you play or follow any sports? Tell me about it.",
+  school: "Hi! What's a subject you've enjoyed studying — or are studying now? Tell me why.",
+};
+
+function ConversationMode({ level: _level }: { level: string }) {
   const [topic, setTopic] = useState<string | null>(null);
   const [topicLabel, setTopicLabel] = useState<string>('');
-  const [convo, setConvo] = useState<ConversationDialogue | null>(null);
-  const [turnIdx, setTurnIdx] = useState(0);
-  const [userTurns, setUserTurns] = useState<Array<{ transcript?: string; ai_response?: string }>>([]);
+  // Each turn: AI opener / AI follow-up, then user transcript, then AI reply.
+  const [turns, setTurns] = useState<Array<{ kind: 'ai' | 'user'; text: string }>>([]);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
-  const startTopic = async (value: string, label: string) => {
-    setTopic(value); setTopicLabel(label); setConvo(null); setTurnIdx(0); setUserTurns([]); setErr(null); setLoading(true);
-    try {
-      const c = await generateConversation(value, level, 6);
-      setConvo(c);
-    } catch (e: any) { setErr(e?.response?.data?.detail || e?.message || 'Could not start conversation.'); }
-    finally { setLoading(false); }
+  const startTopic = (value: string, label: string) => {
+    const opener =
+      CONVERSATION_OPENERS[value] ||
+      `Hi! Let's chat about ${label.toLowerCase()}. What comes to mind first?`;
+    setTopic(value);
+    setTopicLabel(label);
+    setTurns([{ kind: 'ai', text: opener }]);
+    setErr(null);
   };
 
   const onUserAudio = async (blob: Blob) => {
     setLoading(true); setErr(null);
     try {
-      // Pass the active topic as conversation_context so the backend gives a
-      // relevant reply (and so the request actually validates — without this
-      // the FastAPI endpoint returns 422 and we get no transcript back).
-      const data = await audioConversation(blob, topicLabel || topic || 'general conversation');
-      setUserTurns((u) => [...u, data]);
-      setTurnIdx((i) => i + 1);
-    } catch (e: any) { setErr(e?.response?.data?.detail || e?.message || 'Could not process audio.'); }
-    finally { setLoading(false); }
+      const ctx = `${topicLabel || topic || 'general conversation'} — friendly free-form practice`;
+      const data = await audioConversation(blob, ctx);
+      const userText = (data.transcript || '').trim();
+      const aiText = (data.ai_response || '').trim();
+      setTurns((t) => {
+        const next = [...t];
+        if (userText) next.push({ kind: 'user', text: userText });
+        else next.push({ kind: 'user', text: '(We could not hear you clearly — try again.)' });
+        if (aiText) next.push({ kind: 'ai', text: aiText });
+        return next;
+      });
+    } catch (e: any) {
+      setErr(e?.response?.data?.detail || e?.message || 'Could not process audio.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!topic) {
@@ -216,70 +216,59 @@ function ConversationMode({ level }: { level: string }) {
       <TopicPicker
         topics={SPEAKING_TOPICS}
         title="Pick a conversation topic"
-        subtitle="A short scripted scene opens, then you join in and reply with your voice."
+        subtitle="Chat freely with your AI coach. No script — just speak in your own words and you'll get a transcript, a reply, and gentle corrections."
         onPick={(value, t) => startTopic(value, t.label)}
       />
     );
   }
-
-  if (loading && !convo) return <Loading text="Preparing conversation…" />;
-  if (err && !convo) return <ErrorBox msg={err} onRetry={() => setTopic(null)} />;
-  if (!convo) return null;
 
   return (
     <div className="space-y-4">
       <div className="card p-6">
         <div className="mb-3 flex items-center justify-between">
           <span className="chip">Topic: {topicLabel || topic}</span>
-          <button onClick={() => { setTopic(null); setConvo(null); }} className="btn-ghost text-sm">Change</button>
+          <button
+            onClick={() => { setTopic(null); setTurns([]); setErr(null); }}
+            className="btn-ghost text-sm"
+          >
+            Change topic
+          </button>
         </div>
-        <p className="text-sm italic text-ink-secondary">{convo.scenario}</p>
+        <p className="text-sm italic text-ink-secondary">
+          Speak naturally — your AI coach will reply, ask follow-ups, and quietly correct any mistakes.
+        </p>
       </div>
 
       <div className="card p-6">
         <div className="mb-4 flex items-center justify-between">
           <h4 className="font-display font-bold text-navy">Conversation</h4>
-          <PlayAllButton dialogue={convo.dialogue.slice(0, turnIdx + 1)} />
         </div>
         <div className="space-y-3">
-          {convo.dialogue.slice(0, turnIdx + 1).map((d, i) => {
-            const g = genderForSpeaker(d.speaker);
-            return (
-              <div key={i} className="rounded-xl bg-surface-muted p-3">
-                <div className="mb-1 flex items-center justify-between">
-                  <span className="text-xs font-bold uppercase text-teal">
-                    {g === 'female' ? '♀' : '♂'} {d.speaker}
-                  </span>
-                  <PlayButton text={d.text} speaker={d.speaker} />
+          {turns.map((t, i) => {
+            if (t.kind === 'ai') {
+              return (
+                <div key={i} className="rounded-xl border-l-4 border-teal bg-teal/5 p-3">
+                  <div className="mb-1 flex items-center justify-between">
+                    <span className="text-xs font-bold uppercase text-teal">Coach</span>
+                    <PlayButton text={t.text} />
+                  </div>
+                  <p className="text-sm text-ink-primary">{t.text}</p>
                 </div>
-                <p className="text-sm text-ink-primary">{d.text}</p>
+              );
+            }
+            return (
+              <div key={i} className="ml-8 rounded-xl bg-navy p-3 text-white">
+                <div className="mb-1 text-xs font-bold uppercase opacity-70">You said</div>
+                <p className="text-sm">{t.text}</p>
               </div>
             );
           })}
-          {userTurns.map((u, i) => (
-            <div key={`u${i}`} className="space-y-2">
-              {u.transcript && (
-                <div className="ml-8 rounded-xl bg-navy p-3 text-white">
-                  <div className="mb-1 text-xs font-bold uppercase opacity-70">You said</div>
-                  <p className="text-sm">{u.transcript}</p>
-                </div>
-              )}
-              {u.ai_response && (
-                <div className="rounded-xl border-l-4 border-teal bg-teal/5 p-3">
-                  <div className="mb-1 flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase text-teal">Coach</span>
-                    <PlayButton text={u.ai_response} />
-                  </div>
-                  <p className="text-sm text-ink-primary">{u.ai_response}</p>
-                </div>
-              )}
-            </div>
-          ))}
+          {loading && <Loading text="Listening and thinking…" />}
         </div>
         {err && <div className="mt-3 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">{err}</div>}
       </div>
 
-      <AudioRecorder onComplete={onUserAudio} maxSeconds={30} label="Tap to respond in your own words" />
+      <AudioRecorder onComplete={onUserAudio} maxSeconds={30} label="Tap and speak your reply" />
     </div>
   );
 }
