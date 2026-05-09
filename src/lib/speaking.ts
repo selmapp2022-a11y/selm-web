@@ -32,15 +32,19 @@ export async function assessRealtime(blob: Blob, prompt?: string): Promise<Speec
 }
 
 // Free-form speaking assessment for IELTS-style prompts where the user is
-// asked to TALK ABOUT a topic (not read it aloud). Sends an empty
-// reference_text so SpeechAce doesn't penalise the user for not matching
-// the topic description word-for-word; the backend then falls back to STT
-// transcription + Gemini-based fluency/coherence feedback. (Added 2026-05-08.)
-export async function assessFreeform(blob: Blob): Promise<SpeechAssessment> {
+// asked to TALK ABOUT a topic (not read it aloud).
+//
+// Sends `mode=ielts` so the backend not only runs SpeechAce for pronunciation
+// but ALSO runs a Gemini IELTS examiner over the transcript and merges back
+// fluency, lexical resource, grammar, and task-response feedback into `tips`
+// and a new `ielts` band breakdown. (Added 2026-05-08.)
+export async function assessFreeform(blob: Blob, prompt?: string): Promise<SpeechAssessment> {
   const fd = new FormData();
   fd.append('audio', blob, 'recording.webm');
   fd.append('reference_text', '');
   fd.append('language', 'en-US');
+  fd.append('mode', 'ielts');
+  fd.append('prompt', prompt || '');
   const { data } = await api.post('/speech/evaluate', fd);
   return normalizeAssessment(data);
 }

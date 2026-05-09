@@ -298,9 +298,10 @@ function IELTSMode() {
 
   const onRecorded = async (blob: Blob) => {
     setLoading(true); setErr(null); setResult(null);
-    // IELTS uses free-form scoring (no reference_text) so SpeechAce doesn't
-    // penalise the user for speaking ABOUT the topic rather than reading it.
-    try { setResult(await assessFreeform(blob)); }
+    // IELTS uses free-form scoring (mode=ielts) so the backend runs SpeechAce
+    // for pronunciation AND Gemini for fluency / lexical / grammar / task
+    // response, and we pass the topic so Task Response can be graded.
+    try { setResult(await assessFreeform(blob, prompt)); }
     catch (e: any) { setErr(e?.response?.data?.detail || e?.message || 'Assessment failed.'); }
     finally { setLoading(false); }
   };
