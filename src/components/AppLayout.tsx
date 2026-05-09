@@ -1,7 +1,9 @@
+import { useEffect } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { Logo } from './Logo';
 import { ThemeToggle } from './ThemeToggle';
 import { useAuthStore } from '../store/authStore';
+import { syncProgressFromBackend } from '../lib/progress';
 import { LayoutDashboard, Mic, Headphones, BookOpen, PenLine, Brain, Trophy, LogOut } from 'lucide-react';
 import clsx from 'clsx';
 
@@ -19,6 +21,13 @@ export function AppLayout() {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
   const handleLogout = () => { logout(); navigate('/login'); };
+
+  // Pull XP/streak/achievements from the backend once the user is signed in,
+  // so cleared cache or a fresh device shows the user's real progress instead
+  // of an empty slate.
+  useEffect(() => {
+    if (user) { void syncProgressFromBackend(); }
+  }, [user?.id]);
 
   return (
     <div className="min-h-screen bg-surface-app">

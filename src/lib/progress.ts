@@ -1,8 +1,15 @@
 /**
- * Client-side progression: XP, level, streak, per-skill levels, achievements.
- * Stored in localStorage so the user feels real progress between sessions
- * without depending on backend bookkeeping.
+ * User progression: XP, level, streak, per-skill levels, achievements.
+ *
+ * Backend is the source of truth (Redis-backed `/users/me/client-state`),
+ * mirrored to localStorage as a fast cache. On app load we pull the server
+ * state and seed localStorage; on every event we write to localStorage
+ * immediately and push to the backend in the background. Clearing the
+ * browser cache or switching device no longer wipes progress.
+ * (Migrated 2026-05-08.)
  */
+
+import { api } from './api';
 
 export type SkillKey = 'listening' | 'reading' | 'speaking' | 'writing' | 'vocabulary';
 
@@ -50,6 +57,69 @@ function writeUnlocked(map: Record<string, number>) {
   try { localStorage.setItem(ACH_KEY, JSON.stringify(map)); } catch { /* */ }
 }
 
+// ──────────────────────────────────────────────────────────────────────
+// Backend sync — keep localStorage as cache, server as source of truth.
+// ──────────────────────────────────────────────────────────────────────
+
+let pushTimer: ReturnType<typeof setTimeout> | null = null;
+let lastPullDone = false;
+
+async function pushToBackend() {
+  try {
+    await api.put('/users/me/client-state', {
+      events: read(),
+      unlocked: readUnlocked(),
+    });
+  } catch { /* offline / unauthenticated — keep going with localStorage */ }
+}
+
+function schedulePush() {
+  if (pushTimer) clearTimeout(pushTimer);
+  // Debounce — many events in a row only trigger one PUT.
+  pushTimer = setTimeout(pushToBackend, 1500);
+}
+
+/** Pull saved state from backend and merge into localStorage. Idempotent. */
+export async function syncProgressFromBackend(): Promise<void> {
+  try {
+    const { data } = await api.get('/users/me/client-state');
+    const remoteEvents: ProgressEvent[] = Array.isArray(data?.events) ? data.events : [];
+    const remoteUnlocked: Record<string, number> =
+      data?.unlocked && typeof data.unlocked === 'object' ? data.unlocked : {};
+    const localEvents = read();
+    // Merge by timestamp — keep events from both sides, dedupe.
+    const seen = new Set<string>();
+    const merged: ProgressEvent[] = [];
+    for (const ev of [...remoteEvents, ...localEvents]) {
+      const k = `${ev.skill}|${ev.topic ?? ''}|${ev.ts}`;
+      if (!seen.has(k)) { seen.add(k); merged.push(ev); }
+    }
+    merged.sort((a, b) => a.ts - b.ts);
+    if (merged.length > 500) merged.splice(0, merged.length - 500);
+    write(merged);
+    // Achievements: newer unlock-time wins per achievement key.
+    const localUnlocked = readUnlocked();
+    const mergedUnlocked: Record<string, number> = { ...localUnlocked };
+    for (const [k, t] of Object.entries(remoteUnlocked)) {
+      const existing = mergedUnlocked[k];
+      if (!existing || t < existing) mergedUnlocked[k] = t;
+    }
+    writeUnlocked(mergedUnlocked);
+    lastPullDone = true;
+    // If localStorage had data the server didn't, push it back up.
+    if (localEvents.length > remoteEvents.length || Object.keys(localUnlocked).length > Object.keys(remoteUnlocked).length) {
+      schedulePush();
+    }
+    try {
+      window.dispatchEvent(new CustomEvent(PROGRESS_EVENT));
+    } catch { /* */ }
+  } catch {
+    // Couldn't reach backend — stay on localStorage. Will retry on next event.
+  }
+}
+
+void lastPullDone;  // currently unused; reserved for future "stale cache" UI cue
+
 export function getEvents(): ProgressEvent[] {
   return read();
 }
@@ -84,6 +154,8 @@ export function recordProgress(input: Omit<ProgressEvent, 'ts' | 'xp'> & { xp?: 
   try {
     window.dispatchEvent(new CustomEvent(PROGRESS_EVENT, { detail: ev }));
   } catch { /* */ }
+  // Persist to backend so progress survives cache clears and roams across devices.
+  schedulePush();
   return ev;
 }
 
