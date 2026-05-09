@@ -1,13 +1,18 @@
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Brain, Eye, EyeOff } from 'lucide-react';
-import { dueWords, recordReview } from '../lib/vocab';
+import { Brain, Eye, EyeOff, Plus } from 'lucide-react';
+import { dueWords, recordReview, addWord } from '../lib/vocab';
 
 export default function VocabularyPage() {
   const { data, isLoading, refetch } = useQuery({ queryKey: ['vocab', 'due'], queryFn: dueWords });
   const [idx, setIdx] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const [done, setDone] = useState(false);
+  const [showAdd, setShowAdd] = useState(false);
+  const [newWord, setNewWord] = useState('');
+  const [adding, setAdding] = useState(false);
+  const [addMsg, setAddMsg] = useState<string | null>(null);
+  const [addErr, setAddErr] = useState<string | null>(null);
 
   const words = data || [];
   const current = words[idx];
@@ -25,12 +30,63 @@ export default function VocabularyPage() {
     }
   };
 
+  const submitNewWord = async () => {
+    setAdding(true); setAddErr(null); setAddMsg(null);
+    const res = await addWord(newWord);
+    setAdding(false);
+    if (res.success) {
+      setAddMsg(`Added "${res.word}" — ${res.definition || 'definition lookup pending'}`);
+      setNewWord('');
+      // Reload the review queue so the new word appears.
+      void refetch();
+    } else {
+      setAddErr(res.error || 'Could not add word.');
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-3xl font-bold text-navy">Vocabulary review</h1>
-        <p className="mt-1 text-ink-secondary">Spaced repetition keeps words in your long-term memory.</p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="font-display text-3xl font-bold text-navy">Vocabulary review</h1>
+          <p className="mt-1 text-ink-secondary">Spaced repetition keeps words in your long-term memory.</p>
+        </div>
+        <button
+          onClick={() => { setShowAdd((s) => !s); setAddMsg(null); setAddErr(null); }}
+          className="btn-secondary flex items-center gap-2"
+        >
+          <Plus className="h-4 w-4" /> Add word
+        </button>
       </div>
+
+      {showAdd && (
+        <div className="card p-5">
+          <label className="label">Add a word to your list</label>
+          <p className="mb-3 text-xs text-ink-secondary">
+            Type any English word. We'll look it up (or have your AI coach define it) and add it to your daily review.
+          </p>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={newWord}
+              onChange={(e) => setNewWord(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter' && newWord.trim()) submitNewWord(); }}
+              placeholder="e.g. resilient"
+              className="input flex-1"
+              disabled={adding}
+            />
+            <button
+              onClick={submitNewWord}
+              disabled={!newWord.trim() || adding}
+              className="btn-primary"
+            >
+              {adding ? 'Adding…' : 'Add'}
+            </button>
+          </div>
+          {addMsg && <div className="mt-3 rounded-xl border-l-4 border-teal bg-teal/5 p-3 text-sm text-ink-primary">{addMsg}</div>}
+          {addErr && <div className="mt-3 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">{addErr}</div>}
+        </div>
+      )}
 
       {isLoading && <div className="card p-10 text-center"><div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-teal/30 border-t-teal" /></div>}
 
@@ -38,7 +94,7 @@ export default function VocabularyPage() {
         <div className="card p-10 text-center">
           <Brain className="mx-auto mb-4 h-12 w-12 text-teal" />
           <h3 className="mb-2 font-display text-xl font-bold text-navy">All caught up</h3>
-          <p className="text-ink-secondary">No words due for review right now. Read or listen to add new words.</p>
+          <p className="text-ink-secondary">No words due for review right now. Tap <strong>Add word</strong> above to start your own list, or read and listen to pick up new ones.</p>
         </div>
       )}
 

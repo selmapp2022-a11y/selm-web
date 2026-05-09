@@ -35,3 +35,32 @@ export async function recordReview(vocabId: number, quality: 0 | 1 | 2 | 3 | 4 |
     });
   } catch { /* */ }
 }
+
+// Add a custom word to the user's vocabulary list. The backend will look up
+// the word (or generate a learner-friendly definition with Gemini if it's
+// new) and enrol the user; the word is then immediately available in the
+// daily review queue.
+export async function addWord(word: string): Promise<{
+  success: boolean;
+  word?: string;
+  definition?: string;
+  example?: string;
+  error?: string;
+}> {
+  const trimmed = word.trim();
+  if (!trimmed) return { success: false, error: 'Please type a word.' };
+  try {
+    const { data } = await api.post('/vocabulary/my/add', { word: trimmed });
+    return {
+      success: true,
+      word: data.word,
+      definition: data.definition,
+      example: data.example,
+    };
+  } catch (e: any) {
+    return {
+      success: false,
+      error: e?.response?.data?.detail || e?.message || 'Could not add word.',
+    };
+  }
+}
