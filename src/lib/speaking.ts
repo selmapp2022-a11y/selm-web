@@ -5,6 +5,32 @@ import { variantOfTopic } from './topicVariants';
 export type PhonemeScore = { phoneme: string; quality_score: number; ipa?: string };
 export type WordScore = { word: string; quality_score: number; phonemes?: PhonemeScore[] };
 
+// IELTS-style enrichment fields. Only populated when the backend ran the
+// SpeechAce open-ended scorer (mode=ielts on /speech/evaluate). The IELTS UI
+// shows these inline; the basic Pronunciation tab ignores them.
+export type IELTSBands = {
+  overall_band?: number | null;
+  ielts_score_estimate?: number | null;
+  toefl_score_estimate?: number | null;
+  pte_score_estimate?: number | null;
+  cefr_level?: string | null;
+  bands?: {
+    fluencyCoherence?: { band?: number | null; comment?: string | null };
+    lexicalResource?: { band?: number | null; comment?: string | null };
+    grammarAccuracy?: { band?: number | null; comment?: string | null };
+    pronunciation?: { band?: number | null; comment?: string | null };
+    taskResponse?: { band?: number | null; comment?: string | null };
+  } | null;
+};
+
+export type GrammarFix = { original?: string; suggestion?: string; type?: string };
+export type VocabUpgrade = { word?: string; suggestions?: Array<{ word: string }> };
+export type PronunciationIssue = {
+  phoneme?: string;
+  count?: number;
+  examples?: Array<{ text?: string }>;
+};
+
 export type SpeechAssessment = {
   overall_score: number;
   pronunciation_score: number;
@@ -14,6 +40,13 @@ export type SpeechAssessment = {
   feedback?: string;
   filler_words?: string[];
   pause_count?: number;
+  // IELTS-only enrichments
+  transcript?: string;
+  tips?: string[];
+  ielts?: IELTSBands;
+  grammar_items?: GrammarFix[];
+  vocabulary_suggestions?: VocabUpgrade[];
+  pronunciation_top_errors?: PronunciationIssue[];
 };
 
 // Submit recorded audio for assessment (multipart).
@@ -139,6 +172,14 @@ function normalizeAssessment(raw: any): SpeechAssessment {
       feedback,
       filler_words: [],
       pause_count: Array.isArray(raw.fluency?.longPauses) ? raw.fluency.longPauses.length : undefined,
+      // IELTS-only enrichments — populated when the backend ran
+      // /speech/evaluate with mode=ielts. Pronunciation tab leaves these empty.
+      transcript: raw.transcript?.text || raw.transcript || undefined,
+      tips: tips.length ? tips : undefined,
+      ielts: raw.ielts || undefined,
+      grammar_items: Array.isArray(raw.grammarItems) ? raw.grammarItems : undefined,
+      vocabulary_suggestions: Array.isArray(raw.vocabularySuggestions) ? raw.vocabularySuggestions : undefined,
+      pronunciation_top_errors: undefined,
     };
   }
 
