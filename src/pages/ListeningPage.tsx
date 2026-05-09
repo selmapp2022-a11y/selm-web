@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Headphones, Newspaper, PenLine, RefreshCcw, CheckCircle2, XCircle } from 'lucide-react';
+import { Headphones, PenLine, RefreshCcw, CheckCircle2, XCircle } from 'lucide-react';
 import clsx from 'clsx';
 import { AudioPlayer } from '../components/AudioPlayer';
 import { useAuthStore } from '../store/authStore';
@@ -7,7 +7,11 @@ import { generateListening, type ListeningExercise } from '../lib/listening';
 import { TopicPicker, LISTENING_TOPICS } from '../components/TopicPicker';
 import { CompletionCard } from '../components/CompletionCard';
 
-type Mode = 'practice' | 'news' | 'dictation';
+// Two tabs only — "Adaptive Practice" and "Dictation". The previous "News &
+// Stories" tab called the same backend with the same params as Adaptive
+// Practice (just a different label), so it was just a duplicate confusing
+// the UI. (Merged 2026-05-08.)
+type Mode = 'practice' | 'dictation';
 
 export default function ListeningPage() {
   const { user } = useAuthStore();
@@ -18,17 +22,15 @@ export default function ListeningPage() {
     <div className="space-y-6">
       <div>
         <h1 className="font-display text-3xl font-bold text-navy">Listening</h1>
-        <p className="mt-1 text-ink-secondary">Adaptive playback, real-world content, and dictation training.</p>
+        <p className="mt-1 text-ink-secondary">Adaptive playback and dictation training.</p>
       </div>
 
       <div className="flex gap-2 rounded-2xl bg-surface-muted p-1.5">
         <ModeBtn active={mode === 'practice'} onClick={() => setMode('practice')} icon={Headphones}>Adaptive Practice</ModeBtn>
-        <ModeBtn active={mode === 'news'} onClick={() => setMode('news')} icon={Newspaper}>News & Stories</ModeBtn>
         <ModeBtn active={mode === 'dictation'} onClick={() => setMode('dictation')} icon={PenLine}>Dictation</ModeBtn>
       </div>
 
       {mode === 'practice' && <PracticeWithPicker level={level} />}
-      {mode === 'news' && <PracticeWithPicker level={level} forceNews />}
       {mode === 'dictation' && <DictationMode level={level} />}
     </div>
   );
@@ -42,16 +44,14 @@ function ModeBtn({ active, onClick, icon: Icon, children }: any) {
   );
 }
 
-function PracticeWithPicker({ level, forceNews }: { level: string; forceNews?: boolean }) {
+function PracticeWithPicker({ level }: { level: string }) {
   const [picked, setPicked] = useState<{ value: string; label: string } | null>(null);
   if (!picked) {
     return (
       <TopicPicker
         topics={LISTENING_TOPICS}
-        title={forceNews ? 'Pick a news topic' : 'Pick a listening topic'}
-        subtitle={forceNews
-          ? 'A short audio piece on today\'s topic, graded for your level.'
-          : 'A fresh audio passage at your level, with comprehension questions.'}
+        title="Pick a listening topic"
+        subtitle="A fresh audio passage at your level, with comprehension questions."
         onPick={(value, t) => setPicked({ value, label: t.label })}
       />
     );
