@@ -33,6 +33,15 @@
     color: var(--c-ink);
     @apply font-body antialiased;
     font-feature-settings: 'cv11', 'ss01';
+    /* Push content below the iPhone notch / Dynamic Island and above the
+       home-indicator so the React UI doesn't collide with system chrome
+       when the app runs inside Capacitor's full-screen WebView. The
+       env() insets are 0 on web/desktop so nothing changes there. */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    box-sizing: border-box;
   }
   h1, h2, h3, h4, h5 { @apply font-display tracking-tight; }
   ::selection { background: #2EC4B6; color: #fff; }

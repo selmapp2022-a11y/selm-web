@@ -4,3 +4,11 @@ dist
 *.local
 .env
 .env.local
+
+# Android signing — never commit
+android/keystore.properties
+android/app/*.keystore
+android/app/*.jks
+*.keystore
+*.jks
+

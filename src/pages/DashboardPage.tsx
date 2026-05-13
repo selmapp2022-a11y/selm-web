@@ -45,10 +45,10 @@ export default function DashboardPage() {
     return 'Good evening';
   })();
 
-  // Suggested next skill: lowest count, fall back to speaking
-  const suggested = [...skills].sort((a, b) =>
-    progress.bySkill[a.key].count - progress.bySkill[b.key].count
-  )[0];
+  // (The "Suggested for you" gradient card was removed 2026-05-09 because it
+  //  visibly duplicated content on Android Capacitor. The four skill cards
+  //  below are the primary "what to do next" surface, so a separate suggested
+  //  card is unnecessary anyway.)
 
   return (
     <div className="mx-auto max-w-5xl space-y-8">
@@ -86,24 +86,12 @@ export default function DashboardPage() {
         <ChevronRight className="h-5 w-5 text-ink-disabled transition-transform group-hover:translate-x-1 group-hover:text-teal" />
       </Link>
 
-      {/* 3 — Suggested next */}
-      {suggested && (
-        <Link
-          to={suggested.to}
-          className="group block overflow-hidden rounded-3xl bg-gradient-to-br from-navy via-navy-700 to-teal p-6 text-white shadow-cardHover transition hover:-translate-y-0.5 sm:p-8"
-        >
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <div className="text-[11px] font-semibold uppercase tracking-widest opacity-80">Suggested for you</div>
-              <h2 className="mt-1 font-display text-2xl font-bold sm:text-3xl">Practice {suggested.label}</h2>
-              <p className="mt-1 text-sm opacity-90">{suggested.desc}</p>
-            </div>
-            <div className="flex items-center gap-3 rounded-2xl bg-white/15 px-5 py-3 font-semibold backdrop-blur transition group-hover:bg-white/25">
-              Start <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </div>
-          </div>
-        </Link>
-      )}
+      {/* "Suggested for you" gradient card removed 2026-05-09 — on Android
+          Capacitor it visibly duplicated the level-progress strip above (a
+          WebView rendering quirk we couldn't pin down). The four skill cards
+          below already let the user pick their next practice, and the level
+          card up top still tells them where they're at — the gradient was
+          mostly visual sugar. */}
 
       {/* 4 — Four skills (the focus) */}
       <section>
