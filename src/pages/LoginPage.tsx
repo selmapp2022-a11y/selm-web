@@ -29,6 +29,12 @@ export default function LoginPage() {
     }
   };
 
+  // Heuristic: if the backend rejected the credentials (vs. e.g. a network
+  // failure), surface a "Forgot password?" shortcut inside the error banner.
+  // We don't gate on status code here because the auth client throws axios
+  // errors before we get clean access to one — string matching is enough.
+  const looksLikeCredentialError = !!error && /password|credential|invalid|incorrect|unauthor/i.test(error);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-surface-app via-white to-teal/5 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -71,11 +77,36 @@ export default function LoginPage() {
                   {showPw ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
+              {/* Static Forgot Password link — always visible, right-aligned under
+                  the password field. Mirrors the placement used by every major
+                  auth form so returning users find it without thinking. */}
+              <div className="mt-2 flex justify-end">
+                <Link
+                  to="/forgot-password"
+                  className="text-sm font-semibold text-teal-600 hover:underline"
+                >
+                  Forgot password?
+                </Link>
+              </div>
             </div>
 
             {error && (
               <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                {error}
+                <div>{error}</div>
+                {/* When the failure looks like a wrong-credentials error, give
+                    the user a one-click path to recovery right inside the
+                    banner — many users miss the static link above and just
+                    stare at the message. */}
+                {looksLikeCredentialError && (
+                  <div className="mt-2">
+                    <Link
+                      to="/forgot-password"
+                      className="font-semibold text-red-800 underline hover:text-red-900"
+                    >
+                      Reset your password →
+                    </Link>
+                  </div>
+                )}
               </div>
             )}
 
