@@ -70,6 +70,30 @@ export const auth = {
     const { data } = await api.get('/auth/me');
     return data;
   },
+  // Request a password-reset email. Backend always returns 200 with a generic
+  // success message (anti-enumeration), so we don't read the email back; the
+  // UI just tells the user to check their inbox if an account exists.
+  async forgotPassword(email: string) {
+    const r = await fetch(`${API_BASE}/auth/forgot-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(data?.detail || 'Could not send reset email');
+    return data;
+  },
+  // Submit a new password using the token from the reset-email link.
+  async resetPassword(token: string, newPassword: string) {
+    const r = await fetch(`${API_BASE}/auth/reset-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token, new_password: newPassword }),
+    });
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(data?.detail || 'Could not reset password');
+    return data;
+  },
 };
 
 // Many backend endpoints wrap their payload as { success: true, <key>: ..., metadata: ... }
