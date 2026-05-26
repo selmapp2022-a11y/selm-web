@@ -40,9 +40,21 @@ export default function SpeakingPage() {
       </div>
 
       <div className="flex gap-2 rounded-2xl bg-surface-muted p-1.5">
+        {/* Labels were "Pronunciation" / "Live Conversation" / "IELTS Speaking"
+            which overflowed the three-up flex row on narrow phones. Shortened
+            to one-word labels everywhere except a slightly fuller "Conversation"
+            via sm-and-up. Each button also gets min-w-0 so flex can actually
+            shrink children, plus whitespace-nowrap + truncate as a belt-and-
+            suspenders guard against icon-fonts widening past their box. */}
         <ModeBtn active={mode === 'pronunciation'} onClick={() => setMode('pronunciation')} icon={Mic}>Pronunciation</ModeBtn>
-        <ModeBtn active={mode === 'conversation'} onClick={() => setMode('conversation')} icon={MessageSquare}>Live Conversation</ModeBtn>
-        <ModeBtn active={mode === 'ielts'} onClick={() => setMode('ielts')} icon={Trophy}>IELTS Speaking</ModeBtn>
+        <ModeBtn active={mode === 'conversation'} onClick={() => setMode('conversation')} icon={MessageSquare}>
+          <span className="sm:hidden">Conversation</span>
+          <span className="hidden sm:inline">Live Conversation</span>
+        </ModeBtn>
+        <ModeBtn active={mode === 'ielts'} onClick={() => setMode('ielts')} icon={Trophy}>
+          <span className="sm:hidden">IELTS</span>
+          <span className="hidden sm:inline">IELTS Speaking</span>
+        </ModeBtn>
       </div>
 
       {mode === 'pronunciation' && <PronunciationMode level={level} />}
@@ -54,8 +66,19 @@ export default function SpeakingPage() {
 
 function ModeBtn({ active, onClick, icon: Icon, children }: any) {
   return (
-    <button onClick={onClick} className={clsx('flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition', active ? 'bg-white text-navy shadow-card' : 'text-ink-secondary hover:text-navy')}>
-      <Icon className="h-4 w-4" /> {children}
+    <button
+      onClick={onClick}
+      className={clsx(
+        // min-w-0 lets the flex child shrink below its content; px reduced on
+        // mobile (px-2 sm:px-4) so three tabs comfortably fit a 360-class
+        // viewport. truncate is the last line of defence for any oversized
+        // children that slip past the responsive labels.
+        'flex flex-1 min-w-0 items-center justify-center gap-1.5 sm:gap-2 rounded-xl px-2 sm:px-4 py-2.5 text-sm font-medium transition',
+        active ? 'bg-white text-navy shadow-card' : 'text-ink-secondary hover:text-navy'
+      )}
+    >
+      <Icon className="h-4 w-4 shrink-0" />
+      <span className="truncate">{children}</span>
     </button>
   );
 }
