@@ -106,15 +106,29 @@ export async function generateConversation(topic: string, level: string, turns =
 // Backend (`POST /speaking/audio-conversation`) requires `conversation_context`
 // as a QUERY param and returns `transcription` (not `transcript`). Without the
 // query param the call 422s and the user sees nothing. Fixed 2026-05-08.
+//
+// `history` is the conversation so far in the backend's expected shape:
+// {type:'user_audio', transcription:'...'} | {type:'ai_response', response:'...'}.
+// Sending it makes the AI remember prior turns and actually continue the
+// dialogue instead of restarting from "Hi!" every time. Added 2026-05-25.
+export type ConvHistoryItem =
+  | { type: 'user_audio'; transcription: string }
+  | { type: 'ai_response'; response: string };
+
 export async function audioConversation(
   blob: Blob,
   context: string = 'general conversation',
+  history?: ConvHistoryItem[],
 ): Promise<{ transcript?: string; ai_response?: string; ai_audio_url?: string }> {
   const fd = new FormData();
   fd.append('audio_file', blob, 'recording.webm');
-  const { data } = await api.post('/speaking/audio-conversation', fd, {
-    params: { conversation_context: context },
-  });
+  const params: Record<string, string> = { conversation_context: context };
+  if (history && history.length > 0) {
+    // Cap at last 8 turns so the query string doesn't grow unbounded for
+    // long sessions — the backend already trims to the last 6 anyway.
+    params.conversation_history = JSON.stringify(history.slice(-8));
+  }
+  const { data } = await api.post('/speaking/audio-conversation', fd, { params });
   return {
     transcript: data?.transcription || data?.transcript || data?.user_text,
     ai_response: data?.ai_response || data?.response || data?.message,

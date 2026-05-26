@@ -194,7 +194,15 @@ function ConversationMode({ level: _level }: { level: string }) {
     setLoading(true); setErr(null);
     try {
       const ctx = `${topicLabel || topic || 'general conversation'} — friendly free-form practice`;
-      const data = await audioConversation(blob, ctx);
+      // Send the conversation so far back to the backend so the AI remembers
+      // what was said and continues the dialogue. Without this, every turn
+      // was treated as the first turn and the AI restarted from a greeting.
+      const history = turns.map((t) =>
+        t.kind === 'user'
+          ? ({ type: 'user_audio', transcription: t.text } as const)
+          : ({ type: 'ai_response', response: t.text } as const)
+      );
+      const data = await audioConversation(blob, ctx, history);
       const userText = (data.transcript || '').trim();
       const aiText = (data.ai_response || '').trim();
       setTurns((t) => {
