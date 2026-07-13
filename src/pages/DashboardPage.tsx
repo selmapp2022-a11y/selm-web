@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '../store/authStore';
 import { api } from '../lib/api';
-import { Mic, Headphones, BookOpen, PenLine, Flame, ChevronRight, Brain, Trophy } from 'lucide-react';
+import { Mic, Headphones, BookOpen, PenLine, Flame, ChevronRight, Brain, Trophy, Crown } from 'lucide-react';
 import { getSummary, type ProgressSummary, PROGRESS_EVENT } from '../lib/progress';
 
 const skills = [
@@ -134,6 +134,24 @@ export default function DashboardPage() {
           </div>
         </div>
         <ChevronRight className="h-5 w-5 text-ink-disabled" />
+      </Link>
+
+      {/* 6 — Upgrade to SELM Pro card. This is the primary in-app entry
+          point to the paywall. Kept as a prominent card at the bottom of
+          Dashboard so both users and App Review can find the In-App
+          Purchases without hunting through settings menus. */}
+      <Link
+        to="/upgrade"
+        className="card flex items-center gap-4 overflow-hidden bg-gradient-to-br from-teal-500 to-teal-700 p-5 text-white shadow-cardHover"
+      >
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/20 backdrop-blur">
+          <Crown className="h-6 w-6" />
+        </div>
+        <div className="flex-1">
+          <div className="font-display text-lg font-bold">Upgrade to SELM Pro</div>
+          <div className="text-xs text-white/80">Unlimited AI coaching · 7-day free trial</div>
+        </div>
+        <ChevronRight className="h-5 w-5 text-white/90" />
       </Link>
     </div>
   );

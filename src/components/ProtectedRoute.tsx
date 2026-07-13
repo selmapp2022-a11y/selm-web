@@ -3,6 +3,7 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { auth, tokenStore } from '../lib/api';
 import { useAuthStore } from '../store/authStore';
+import { hasPrivacyConsent } from '../pages/ConsentPage';
 
 export function ProtectedRoute() {
   const { setUser } = useAuthStore();
@@ -17,6 +18,15 @@ export function ProtectedRoute() {
   useEffect(() => {
     if (data) setUser(data);
   }, [data, setUser]);
+
+  // App Store Guideline 5.1.1(i) / 5.1.2(i) — the user must give
+  // informed consent to AI data sharing BEFORE any personal data is
+  // sent to Gemini / Google Speech / ElevenLabs. Users who updated
+  // from Build 34/35 still have a valid auth token in localStorage
+  // but have NOT seen the new consent screen, so we send them there
+  // first. Fresh install users are already routed through /consent
+  // by the ConsentGate wrapper on /login and /register in App.tsx.
+  if (!hasPrivacyConsent()) return <Navigate to="/consent" replace />;
 
   if (!hasToken) return <Navigate to="/login" replace />;
   if (isLoading) {

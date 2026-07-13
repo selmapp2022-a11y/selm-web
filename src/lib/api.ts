@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { CapacitorHttp, Capacitor } from '@capacitor/core';
 
 export const API_BASE = 'https://selmapp.com/api/v1';
 
@@ -31,6 +32,40 @@ export const tokenStore = {
   set: (t: string) => localStorage.setItem('selm_token', t),
   clear: () => localStorage.removeItem('selm_token'),
 };
+
+// Account deletion — required by App Store Guideline 5.1.1(v).
+// Calls the backend's DELETE /users/account?confirm_deletion=true which
+// soft-deletes the account (anonymises email/username, preserves audit
+// hash, frees the email for reuse). Caller must clear localStorage and
+// route the user out afterwards.
+export async function deleteAccount(): Promise<{ success: boolean; message: string }> {
+  const token = tokenStore.get();
+  const url = `${API_BASE}/users/account?confirm_deletion=true`;
+  let data: any;
+  let ok: boolean;
+  if (Capacitor.isNativePlatform()) {
+    const res = await CapacitorHttp.request({
+      url,
+      method: 'DELETE',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      responseType: 'json',
+    });
+    data = res.data;
+    ok = res.status >= 200 && res.status < 300;
+  } else {
+    const r = await fetch(url, {
+      method: 'DELETE',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+    data = await r.json().catch(() => ({}));
+    ok = r.ok;
+  }
+  if (!ok) {
+    const detail = data?.detail || (typeof data === 'string' ? data : JSON.stringify(data));
+    throw new Error(detail || 'Account deletion failed');
+  }
+  return { success: true, message: data?.message || 'Account deleted.' };
+}
 
 export const auth = {
   async login(email: string, password: string) {
@@ -93,6 +128,86 @@ export const auth = {
     const data = await r.json().catch(() => ({}));
     if (!r.ok) throw new Error(data?.detail || 'Could not reset password');
     return data;
+  },
+  // Sign in with Apple — sends the identity token from the native Apple flow
+  // to the backend, which verifies it against Apple's public keys (JWKS) and
+  // either creates or logs in the user. Endpoint: /auth/oauth/apple/native.
+  // Backend expects only { identity_token, full_name?, email? }; the extra
+  // fields the plugin returns (authorization_code, user, given_name,
+  // family_name) are collapsed into full_name here.
+  async appleLogin(payload: {
+    identity_token: string;
+    authorization_code?: string;
+    user?: string;
+    email?: string;
+    given_name?: string;
+    family_name?: string;
+  }) {
+    const full_name = [payload.given_name, payload.family_name]
+      .filter(Boolean)
+      .join(' ')
+      .trim() || undefined;
+    const body = {
+      identity_token: payload.identity_token,
+      full_name,
+      email: payload.email,
+    };
+    // Inside Capacitor use the native HTTP plugin — WKWebView's fetch has
+    // been flaky on iOS 26 simulators for large JSON bodies (Apple identity
+    // tokens are ~1.5 KB JWTs), throwing "Load failed" TypeError before the
+    // request even reaches the network. CapacitorHttp routes the call
+    // through native NSURLSession which bypasses WebKit's fetch entirely.
+    let data: any;
+    let ok: boolean;
+    if (Capacitor.isNativePlatform()) {
+      const res = await CapacitorHttp.request({
+        url: `${API_BASE}/auth/oauth/apple/native`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: body,
+        responseType: 'json',
+      });
+      data = res.data;
+      ok = res.status >= 200 && res.status < 300;
+      if (!ok && typeof data === 'string') {
+        try { data = JSON.parse(data); } catch { /* keep string */ }
+      }
+    } else {
+      const r = await fetch(`${API_BASE}/auth/oauth/apple/native`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      data = await r.json().catch(() => ({}));
+      ok = r.ok;
+    }
+    if (!ok) {
+      const detail = data?.detail || (typeof data === 'string' ? data : JSON.stringify(data));
+      throw new Error(detail || 'Apple sign-in failed');
+    }
+    const token = data.access_token || data.token;
+    if (token) tokenStore.set(token);
+    // The backend returns the JWT; user info is fetched separately via /auth/me.
+    let user = data.user || null;
+    if (token && !user) {
+      try {
+        if (Capacitor.isNativePlatform()) {
+          const meRes = await CapacitorHttp.request({
+            url: `${API_BASE}/auth/me`,
+            method: 'GET',
+            headers: { Authorization: `Bearer ${token}` },
+            responseType: 'json',
+          });
+          if (meRes.status >= 200 && meRes.status < 300) user = meRes.data;
+        } else {
+          const me = await fetch(`${API_BASE}/auth/me`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (me.ok) user = await me.json();
+        }
+      } catch { /* silent — caller falls back */ }
+    }
+    return { token, user };
   },
 };
 

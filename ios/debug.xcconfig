@@ -1,1 +1,6 @@
+// Include the CocoaPods debug xcconfig so RevenueCat headers/framework
+// paths are wired into the Debug build. Without this the pod install
+// step warns and Xcode won't find the RevenueCat symbols.
+#include "App/Pods/Target Support Files/Pods-App/Pods-App.debug.xcconfig"
+
 CAPACITOR_DEBUG = true
