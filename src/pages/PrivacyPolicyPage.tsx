@@ -1,3 +1,5 @@
+import { Capacitor } from '@capacitor/core';
+
 // Public privacy policy page — served at /privacy.
 //
 // Apple's Build 36 rejection under Guideline 3.1.2(c) noted:
@@ -11,7 +13,24 @@
 // requiring authentication, so Apple's reviewer (and any user) can read
 // the policy directly from the URL in App Store Connect.
 
-const UPDATED = 'July 13, 2026';
+const UPDATED = 'July 15, 2026';
+
+// Apple 2.3.10 rejected Build 38 because the iOS binary mentioned
+// "Google Play". We show ONLY the platform of the current binary
+// (Apple on iOS, Google Play on Android, or both on the web page).
+const PLATFORM = Capacitor.getPlatform(); // 'ios' | 'android' | 'web'
+const IS_ANDROID = PLATFORM === 'android';
+const IS_IOS = PLATFORM === 'ios';
+const PAYMENT_STORE = IS_ANDROID
+  ? 'Google Play'
+  : IS_IOS
+    ? 'Apple'
+    : 'Apple or Google Play';
+const MANAGE_SUB = IS_ANDROID
+  ? 'your Google account settings on Google Play'
+  : IS_IOS
+    ? 'your Apple ID account settings on the App Store'
+    : 'your Apple ID or Google account subscription settings';
 
 export default function PrivacyPolicyPage() {
   return (
@@ -69,8 +88,8 @@ export default function PrivacyPolicyPage() {
               </li>
               <li>
                 <strong>Purchase data</strong> — an anonymous receipt token
-                from Apple/Google that confirms your subscription. We do not
-                receive your credit-card number.
+                from {PAYMENT_STORE} that confirms your subscription. We do
+                not receive your credit-card number.
               </li>
               <li>
                 <strong>Diagnostics</strong> — anonymous crash reports and
@@ -111,7 +130,14 @@ export default function PrivacyPolicyPage() {
               </li>
               <li>
                 <strong>Google Cloud Speech-to-Text</strong> — receives the
-                audio you record in Speaking so we can transcribe it.
+                audio you record in Speaking so we can transcribe your
+                speech into text.
+              </li>
+              <li>
+                <strong>SpeechAce</strong> — receives the same audio you
+                record in Speaking so we can score your pronunciation,
+                stress, fluency, and intonation and return CEFR- and
+                IELTS-style feedback.
               </li>
               <li>
                 <strong>ElevenLabs</strong> — synthesises the model voices
@@ -119,11 +145,11 @@ export default function PrivacyPolicyPage() {
                 receive your personal recordings.
               </li>
               <li>
-                <strong>RevenueCat</strong> — validates your Apple/Google
+                <strong>RevenueCat</strong> — validates your {PAYMENT_STORE}
                 subscription receipt on our behalf.
               </li>
               <li>
-                <strong>Apple and Google</strong> — process the actual
+                <strong>{PAYMENT_STORE}</strong> — process{IS_ANDROID || IS_IOS ? 'es' : ''} the actual
                 payment when you subscribe.
               </li>
             </ul>
@@ -175,8 +201,8 @@ export default function PrivacyPolicyPage() {
                 requires deleting your account (above).
               </li>
               <li>
-                <strong>Manage your subscription</strong> in your Apple ID
-                (iOS) or Google Play (Android) account settings at any time.
+                <strong>Manage your subscription</strong> in {MANAGE_SUB} at
+                any time.
               </li>
             </ul>
           </section>

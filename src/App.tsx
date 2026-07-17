@@ -18,6 +18,7 @@ import ProgressPage from './pages/ProgressPage';
 import PaywallPage from './pages/PaywallPage';
 import SettingsPage from './pages/SettingsPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import TermsPage from './pages/TermsPage';
 import ConsentPage, { hasPrivacyConsent } from './pages/ConsentPage';
 import { initTheme } from './lib/theme';
 
@@ -54,6 +55,16 @@ export default function App() {
           and bounced to /login, which caused rejection. */}
       <Route path="/privacy" element={<PrivacyPolicyPage />} />
       <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+
+      {/* Public Terms of Use / EULA page — required by App Store
+          Guideline 3.1.2(c) for auto-renewable subscription apps.
+          Build 38 v2.0.7 was rejected because no functional Terms
+          of Use link was included in the app. Kept public so the
+          reviewer can open it from the paywall link without needing
+          to sign in first. */}
+      <Route path="/terms" element={<TermsPage />} />
+      <Route path="/terms-of-use" element={<TermsPage />} />
+      <Route path="/eula" element={<TermsPage />} />
 
       {/* Public auth routes — wrapped in the ConsentGate so the user
           can't reach the login/register form until they've read the AI

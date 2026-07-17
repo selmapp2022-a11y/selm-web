@@ -4,7 +4,7 @@ import { Logo } from './Logo';
 import { ThemeToggle } from './ThemeToggle';
 import { useAuthStore } from '../store/authStore';
 import { syncProgressFromBackend } from '../lib/progress';
-import { LayoutDashboard, Mic, Headphones, BookOpen, PenLine, Brain, Trophy, LogOut } from 'lucide-react';
+import { LayoutDashboard, Mic, Headphones, BookOpen, PenLine, Brain, Trophy, LogOut, Settings } from 'lucide-react';
 import clsx from 'clsx';
 
 const navItems = [
@@ -60,7 +60,20 @@ export function AppLayout() {
               )}
             </div>
             <div className="mb-2 px-2"><ThemeToggle /></div>
-            <button onClick={handleLogout} className="flex w-full items-center gap-2 rounded-xl px-4 py-2 text-sm text-ink-secondary hover:bg-surface-muted">
+            {/* Settings entry — required so users (and Apple's App Review)
+                can reach the Delete Account flow. Apple 5.1.1(v) rejected
+                Build 38 because the sidebar had no visible way to open
+                Settings. */}
+            <NavLink
+              to="/settings"
+              className={({ isActive }) => clsx(
+                'flex w-full items-center gap-2 rounded-xl px-4 py-2 text-sm hover:bg-surface-muted',
+                isActive ? 'text-navy font-semibold' : 'text-ink-secondary'
+              )}
+            >
+              <Settings className="h-4 w-4" /> Settings
+            </NavLink>
+            <button onClick={handleLogout} className="mt-1 flex w-full items-center gap-2 rounded-xl px-4 py-2 text-sm text-ink-secondary hover:bg-surface-muted">
               <LogOut className="h-4 w-4" /> Sign out
             </button>
           </div>
@@ -71,7 +84,15 @@ export function AppLayout() {
         <Logo />
         <div className="flex items-center gap-2">
           <ThemeToggle />
-          <button onClick={handleLogout} className="text-ink-secondary"><LogOut className="h-5 w-5" /></button>
+          {/* Gear icon → Settings → Delete Account. Required so
+              iPhone users (Apple's phone reviewers) can reach the
+              account deletion flow without an obscure gesture. */}
+          <NavLink to="/settings" className="text-ink-secondary" aria-label="Settings">
+            <Settings className="h-5 w-5" />
+          </NavLink>
+          <button onClick={handleLogout} className="text-ink-secondary" aria-label="Sign out">
+            <LogOut className="h-5 w-5" />
+          </button>
         </div>
       </header>
 
