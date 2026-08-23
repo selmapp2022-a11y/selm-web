@@ -61,7 +61,7 @@ function currentPlatformApiKey(): string {
 }
 
 // Product identifiers configured in App Store Connect.
-const PRODUCT_MONTHLY = 'selm_pro_monthly';
+const PRODUCT_MONTHLY = 'selm_pro_monthly2';
 const PRODUCT_YEARLY  = 'selm_pro_yearly';
 const ALL_PRODUCTS = [PRODUCT_MONTHLY, PRODUCT_YEARLY];
 
