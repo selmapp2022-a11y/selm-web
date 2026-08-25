@@ -175,7 +175,8 @@ function TemplatesMode() {
   const submit = async () => {
     if (!text.trim()) return;
     setLoading(true); setAssessment(null);
-    try { setAssessment(await assessWriting(text, tpl?.prompt)); }
+    if (!tpl) return;
+    try { setAssessment(await assessWriting(text, tpl.prompt)); }
     finally { setLoading(false); }
   };
 

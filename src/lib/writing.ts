@@ -75,10 +75,21 @@ function inferWritingType(prompt: string | undefined): string {
   return 'general';
 }
 
-export async function assessWriting(text: string, prompt?: string): Promise<WritingAssessment> {
+// `prompt` is required, not optional.
+//
+// The bound assessor scores a response AGAINST A TASK — task achievement is
+// one of its four criteria — and rejects a submission that carries none.
+// This function used to paper over a missing prompt with '', the backend
+// swallowed the vendor's rejection, and the caller got a fabricated score.
+// Making it required means a caller with no task fails to compile rather
+// than failing silently at run time.
+export async function assessWriting(text: string, prompt: string): Promise<WritingAssessment> {
+  if (!prompt.trim()) {
+    throw new Error('assessWriting needs the task the response was written for.');
+  }
   const { data } = await api.post('/writing/assess', {
     text,
-    prompt: prompt || '',
+    prompt,
     writing_type: inferWritingType(prompt),
   });
   const a: any = unwrap(data, 'assessment');
