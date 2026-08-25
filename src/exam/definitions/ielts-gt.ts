@@ -51,8 +51,26 @@ export const IELTS_GT: ExamDefinition = {
     // recorded on the writing judge below is a different measurement and
     // does not count toward this gate.
     samples: 0,
+    byLevel: {},
     mae: null,
-    gate: { minSamples: 150, maxMae: 0.75, coverage: [0.88, 0.93] },
+    gate: {
+      minSamples: 150,
+      // The CLB range the product serves. A report at CLB 11 or 12 is
+      // welcome and counts toward `samples`, but it is not required: nobody
+      // at that level is asking whether they are ready to book.
+      levels: [4, 5, 6, 7, 8, 9, 10],
+      minPerLevel: 10,
+      maxMae: 0.75,
+      coverage: [0.88, 0.93],
+    },
+  },
+  predictionTarget: {
+    unit: 'skill_at_sitting',
+    window: { days: 30, minResponses: 3 },
+    claim: {
+      en: 'The CLB level this candidate would be awarded for this skill if they sat IELTS General Training now, estimated from their practice responses of the last 30 days.',
+      fr: "Le niveau CLB que ce candidat obtiendrait pour cette compétence s'il passait l'IELTS General Training maintenant, estimé à partir de ses réponses d'entraînement des 30 derniers jours.",
+    },
   },
   sections: [
     {

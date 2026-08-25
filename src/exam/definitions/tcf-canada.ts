@@ -56,9 +56,30 @@ export const TCF_CANADA: ExamDefinition = {
     ],
   },
   calibration: {
+    // Zero, and for French there is a second problem behind the first: no
+    // published set of examiner-rated French scripts exists to check against
+    // in the meantime. English has official sample scripts with awarded
+    // bands; French has commercial prep-site corrections, which are somebody's
+    // opinion rather than an awarded level. Every French number therefore has
+    // to wait for real attestations. There is no free external anchor.
     samples: 0,
+    byLevel: {},
     mae: null,
-    gate: { minSamples: 150, maxMae: 0.75, coverage: [0.88, 0.93] },
+    gate: {
+      minSamples: 150,
+      levels: [4, 5, 6, 7, 8, 9, 10],
+      minPerLevel: 10,
+      maxMae: 0.75,
+      coverage: [0.88, 0.93],
+    },
+  },
+  predictionTarget: {
+    unit: 'skill_at_sitting',
+    window: { days: 30, minResponses: 3 },
+    claim: {
+      en: 'The NCLC level this candidate would be awarded for this skill if they sat TCF Canada now, estimated from their practice responses of the last 30 days.',
+      fr: "Le niveau NCLC que ce candidat obtiendrait pour cette compétence s'il passait le TCF Canada maintenant, estimé à partir de ses réponses d'entraînement des 30 derniers jours.",
+    },
   },
   sections: [
     {

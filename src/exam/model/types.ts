@@ -254,11 +254,61 @@ export type ExamDefinition = {
    */
   calibration: {
     samples: number;
+    /**
+     * Collected reports broken down by the benchmark level the candidate
+     * actually got, keyed by level.
+     *
+     * A total on its own is not evidence. 150 reports of which 130 sit at
+     * CLB 8 and 9 say nothing about a candidate at CLB 5, and an interval
+     * fitted on that sample is unsupported exactly where a candidate is most
+     * likely to be told they are not ready. The gate reads this map, not
+     * just `samples`.
+     */
+    byLevel: Record<string, number>;
     /** Published mean absolute error, in benchmark levels. Null until measured. */
     mae: number | null;
     /** Thresholds this exam must meet before a number may be published. */
-    gate: { minSamples: number; maxMae: number; coverage: [number, number] };
+    gate: {
+      minSamples: number;
+      /** Levels that must each be covered before any number is published. */
+      levels: number[];
+      /** Reports required at every one of those levels. */
+      minPerLevel: number;
+      maxMae: number;
+      coverage: [number, number];
+    };
   };
+  /**
+   * What this exam claims to predict, stated before anything is measured.
+   *
+   * This was undefined until 2026-08-25, and everything downstream depended
+   * on it. An official attestation reports one level per skill for one
+   * sitting. SELM scores one practice response. They are not the same object,
+   * and "how accurate is SELM" has no answer until it is written down which
+   * of the two is being predicted from which.
+   */
+  predictionTarget: PredictionTarget;
+};
+
+export type PredictionTarget = {
+  /**
+   * The unit being predicted. `skill_at_sitting` — one benchmark level for
+   * one skill at one sitting — because that is what the attestation reports
+   * and what an immigration officer reads. Not a per-response score.
+   */
+  unit: 'skill_at_sitting';
+  /**
+   * Which of the candidate's responses may inform an estimate.
+   *
+   * `days` — practice older than this describes a different candidate and is
+   * excluded. `minResponses` — below this, no number is published for the
+   * skill, however good the responses are. Both are parameters to be fitted
+   * once reports exist, not constants; they are declared here so that the
+   * value in force is visible rather than buried in an aggregation function.
+   */
+  window: { days: number; minResponses: number };
+  /** The claim in the words the candidate is shown. */
+  claim: Localised;
 };
 
 // ── a sitting ───────────────────────────────────────────────────────────

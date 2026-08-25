@@ -38,12 +38,52 @@ export type ReleaseDecision = {
   publishNumeric: boolean;
   reason: Localised;
   /** What is missing, in the exam's own numbers, so the claim is checkable. */
-  evidence: { samples: number; minSamples: number; mae: number | null; maxMae: number };
+  evidence: {
+    samples: number;
+    minSamples: number;
+    mae: number | null;
+    maxMae: number;
+    /** Benchmark levels still short of `minPerLevel`, and by how much. */
+    levelsShort: Array<{ level: number; have: number; need: number }>;
+  };
 };
+
+/**
+ * Levels that do not yet have enough reports behind them.
+ *
+ * Added 2026-08-25. Counting reports alone lets a sample cluster at the
+ * middle of the range and still open the gate, and the place a clustered
+ * sample is weakest is the low end — which is exactly where the product
+ * tells someone they are not ready to book. That is the sentence that has
+ * to be supported before any of them is published.
+ */
+export function levelsShort(exam: ExamDefinition): Array<{ level: number; have: number; need: number }> {
+  const c = exam.calibration;
+  return c.gate.levels
+    .map((level) => ({ level, have: c.byLevel[String(level)] ?? 0, need: c.gate.minPerLevel }))
+    .filter((r) => r.have < r.need);
+}
 
 export function releaseGate(exam: ExamDefinition): ReleaseDecision {
   const c = exam.calibration;
-  const evidence = { samples: c.samples, minSamples: c.gate.minSamples, mae: c.mae, maxMae: c.gate.maxMae };
+  const short = levelsShort(exam);
+  const evidence = {
+    samples: c.samples,
+    minSamples: c.gate.minSamples,
+    mae: c.mae,
+    maxMae: c.gate.maxMae,
+    levelsShort: short,
+  };
+  if (short.length && c.samples >= c.gate.minSamples) {
+    return {
+      publishNumeric: false,
+      reason: {
+        en: `No predicted score is shown. ${c.samples} reports have been collected, but ${short.length} benchmark level${short.length > 1 ? 's' : ''} still have fewer than ${c.gate.minPerLevel} behind them, so the estimate would be unsupported there.`,
+        fr: `Aucune note prédite n'est affichée. ${c.samples} attestations ont été recueillies, mais ${short.length} niveau${short.length > 1 ? 'x' : ''} en compte${short.length > 1 ? 'nt' : ''} encore moins de ${c.gate.minPerLevel}, l'estimation y serait sans appui.`,
+      },
+      evidence,
+    };
+  }
   if (c.samples < c.gate.minSamples) {
     return {
       publishNumeric: false,
