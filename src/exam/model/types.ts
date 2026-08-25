@@ -123,6 +123,34 @@ export type SignalBinding =
       fields?: Record<string, string>;
     };
 
+/**
+ * What repeated calls to the same judge, on the same text, actually did.
+ *
+ * This is REPEATABILITY, not accuracy. It says how much the judge disagrees
+ * with itself; it says nothing about whether it agrees with a human examiner.
+ * `ExamDefinition.calibration` is the accuracy record and is a different
+ * thing — a judge can be perfectly stable and consistently wrong.
+ *
+ * It lives on the binding rather than on the exam because it is a property
+ * of the judge, and rebinding a different judge invalidates it.
+ */
+export type StabilityRecord = {
+  /** ISO date the measurement was taken. */
+  measuredAt: string;
+  /** Distinct responses the judge was shown. */
+  responses: number;
+  /** Identical calls made per response. */
+  callsPerResponse: number;
+  /** Scale the two spreads below are expressed on — the judge's own. */
+  scaleId: string;
+  /** Largest spread on the overall value across identical calls. */
+  worstOverallSpread: number;
+  /** Largest spread on any single criterion across identical calls. */
+  worstCriterionSpread: number;
+  /** What was measured, and what it does not establish. */
+  note: Localised;
+};
+
 export type JudgeBinding =
   | { kind: 'none'; reason: Localised }
   | {
@@ -163,6 +191,12 @@ export type JudgeBinding =
        * rather than averaging away.
        */
       samples?: number;
+      /**
+       * The last measured repeatability of this judge. Absent means it has
+       * never been measured, which the result screen must say rather than
+       * imply stability by silence.
+       */
+      stability?: StabilityRecord;
     };
 
 export type TaskDefinition = {

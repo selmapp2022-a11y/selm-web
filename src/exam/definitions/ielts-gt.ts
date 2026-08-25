@@ -46,6 +46,10 @@ export const IELTS_GT: ExamDefinition = {
     ],
   },
   calibration: {
+    // Accuracy against real Test Report Forms. Still zero: no official score
+    // report has been collected and matched. The repeatability figure
+    // recorded on the writing judge below is a different measurement and
+    // does not count toward this gate.
     samples: 0,
     mae: null,
     gate: { minSamples: 150, maxMae: 0.75, coverage: [0.88, 0.93] },
@@ -149,7 +153,14 @@ export const IELTS_GT: ExamDefinition = {
             kind: 'remote',
             adapter: 'writing_assess',
             endpoint: '/writing/assess',
-            payload: { writing_type: 'letter' },
+            // Exam data, not a code constant. The bound assessor takes a
+            // task_type of chat-writing | essay-writing | short-writing and
+            // marks against a different expectation for each. A 150-word
+            // Task 1 letter is short-writing; a 250-word Task 2 essay is
+            // essay-writing. It was hard-coded in the backend until
+            // 2026-08-25, which meant every task in every exam was silently
+            // marked as the same kind of writing.
+            payload: { writing_type: 'letter', task_type: 'short-writing' },
             // The bound judge is a general writing assessor answering 0-100.
             // It is not an IELTS examiner and it has never seen a Test Report
             // Form, so its numbers are reported on its own scale.
@@ -171,6 +182,18 @@ export const IELTS_GT: ExamDefinition = {
             // Asked twice on purpose: the spread between two answers to the
             // same text is reported rather than averaged away.
             samples: 2,
+            stability: {
+              measuredAt: '2026-08-25',
+              responses: 5,
+              callsPerResponse: 10,
+              scaleId: 'writing_assess_100',
+              worstOverallSpread: 5,
+              worstCriterionSpread: 11,
+              note: {
+                en: 'Fifty identical calls, ten each over five English responses written to span weak to very strong. Four of the five returned the same overall value on all ten calls; the fifth moved 5 points. The worst single criterion moved 11 points on the judge\u2019s 0\u2013100 scale. This is the judge agreeing with itself. It is not evidence that it agrees with an examiner, and no such measurement exists yet.',
+                fr: "Cinquante appels identiques, dix par r\u00e9ponse sur cinq r\u00e9ponses anglaises couvrant du faible au tr\u00e8s fort. Quatre r\u00e9ponses sur cinq ont re\u00e7u la m\u00eame note globale aux dix appels ; la cinqui\u00e8me a vari\u00e9 de 5 points. Le pire crit\u00e8re isol\u00e9 a vari\u00e9 de 11 points sur l\u2019\u00e9chelle 0\u2013100 du correcteur. Cela mesure l\u2019accord du correcteur avec lui-m\u00eame, pas avec un examinateur.",
+              },
+            },
           },
         },
       ],
