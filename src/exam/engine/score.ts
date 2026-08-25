@@ -1,9 +1,11 @@
 /**
  * The one entry point. Everything a scored response goes through, in order,
- * for every exam. Nothing below asks which exam it is running.
+ * for every exam and every skill. Nothing below asks which exam it is
+ * running or which language it is in.
  */
 import type { ExamDefinition, Localised, Response, Scale, TaskDefinition } from '../model/types';
 import { runGate, type GateResult } from './gate';
+import { runSignal, type SignalResult } from './signal';
 import { runJudge, type JudgeOutcome } from './judge';
 import { aggregate, releaseGate, toBenchmark, type Aggregate, type ReleaseDecision } from './aggregate';
 
@@ -12,15 +14,16 @@ export type ScoreResult = {
   task: TaskDefinition;
   /** The exam's own scale. */
   scale: Scale;
+  signal: SignalResult;
   gate: GateResult;
   judges: JudgeOutcome[];
   /**
-   * Aggregate across judges, ON THE JUDGE'S SCALE. It is deliberately not
-   * the exam's scale: no mapping between the two has been fitted, and
-   * inventing one would produce a number no examiner would recognise.
+   * Aggregate across judges, ON THE JUDGE'S SCALE. Deliberately not the
+   * exam's scale unless a judge answers there: inventing a conversion would
+   * produce a number no examiner would recognise.
    */
   judgeAggregate: (Aggregate & { scale: Scale; unmappedReason: Localised }) | null;
-  /** Only set when a judge answers on the exam's own scale. Null today. */
+  /** Only set when a judge answers on the exam's own scale. */
   examScaleAggregate: Aggregate | null;
   benchmarkLevel: number | null;
   release: ReleaseDecision;
@@ -42,40 +45,44 @@ export async function scoreResponse(
   const lang = exam.language;
   const scale = scaleFor(exam, task.scaleId);
   const promptText = task.prompt[lang];
-
-  // Layer 1 — deterministic. Runs for every exam, costs nothing.
-  const gate = runGate(task, response, promptText);
   const release = releaseGate(exam);
   const overtimeSec = Math.max(0, response.elapsedSec - task.timeLimitSec);
 
+  // Layer 2 first for spoken answers — the gate counts words, and a
+  // recording has none until something transcribes it. For typed answers
+  // this returns the text unchanged and costs nothing.
+  const signal = await runSignal(task.signal, response);
+
+  // Layer 1 — deterministic, on whatever words the signal layer produced.
+  const gate = runGate(task, signal.transcript, promptText);
+
+  const base = { exam, task, scale, signal, gate, release, overtimeSec };
+
   // A response the official scheme awards nothing to is not sent to a judge.
-  // Paying a model to grade an automatic zero would buy a number the exam
-  // board would never award.
   if (gate.zeroed) {
     const first = gate.findings.find((f) => f.kind === 'zero')!;
-    return {
-      exam, task, scale, gate, judges: [],
-      judgeAggregate: null, examScaleAggregate: null, benchmarkLevel: null,
-      release, zeroedBy: first.label, overtimeSec,
-    };
+    return { ...base, judges: [], judgeAggregate: null, examScaleAggregate: null, benchmarkLevel: null, zeroedBy: first.label };
   }
 
-  // Layer 4 — judging. An exam with no judge bound returns `unavailable`
-  // and the pipeline continues; it does not throw and it does not invent.
-  const judges = await runJudge(task.judge, task, response.text, promptText);
+  // Layer 4 — judging. An exam with no judge bound returns `unavailable`;
+  // the pipeline continues, does not throw, and does not invent.
+  const judges = await runJudge(task.judge, task, signal.transcript, promptText, signal.raw);
   const scored = judges.filter((j) => j.kind === 'scored') as Extract<JudgeOutcome, { kind: 'scored' }>[];
 
-  // Layers 5–7. Aggregation happens on whatever scale the judges answered on.
+  // Layers 5-7, on whatever scale the judges answered on.
   let judgeAggregate: ScoreResult['judgeAggregate'] = null;
   if (scored.length) {
     const agg = aggregate(scored.map((j) => j.scores), scored[0].scale);
     if (agg) judgeAggregate = { ...agg, scale: scored[0].scale, unmappedReason: scored[0].unmappedReason };
   }
 
-  // Nothing reaches the exam's scale until a mapping is fitted, so the
-  // benchmark level stays null and the release gate has nothing to release.
-  const examScaleAggregate: Aggregate | null = null;
-  const benchmarkLevel = examScaleAggregate ? toBenchmark((examScaleAggregate as Aggregate).point, exam.benchmark) : null;
+  // A judge that answers on the exam's own scale reaches the benchmark
+  // conversion; one that does not, does not.
+  const answersOnExamScale = scored.length > 0 && scored[0].scale.id === scale.id;
+  const examScaleAggregate = answersOnExamScale && judgeAggregate
+    ? { point: judgeAggregate.point, judgeSpread: judgeAggregate.judgeSpread, judgeCount: judgeAggregate.judgeCount }
+    : null;
+  const benchmarkLevel = examScaleAggregate ? toBenchmark(examScaleAggregate.point, exam.benchmark) : null;
 
-  return { exam, task, scale, gate, judges, judgeAggregate, examScaleAggregate, benchmarkLevel, release, zeroedBy: null, overtimeSec };
+  return { ...base, judges, judgeAggregate, examScaleAggregate, benchmarkLevel, zeroedBy: null };
 }

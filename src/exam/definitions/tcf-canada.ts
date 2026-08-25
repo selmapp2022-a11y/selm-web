@@ -70,6 +70,7 @@ export const TCF_CANADA: ExamDefinition = {
         {
           id: 'tcf-ee-t1',
           skill: 'writing',
+          responseMode: 'text',
           name: { en: 'Tâche 1', fr: 'Tâche 1' },
           instruction: {
             en: 'Write a short message. 60 to 120 words.',
@@ -171,6 +172,93 @@ export const TCF_CANADA: ExamDefinition = {
             reason: {
               en: 'No calibrated judge is bound to TCF Canada yet. The deterministic checks above are real; the criterion grid below is what a judge would fill in, and it is empty because the French engine has not been built.',
               fr: "Aucun correcteur étalonné n'est encore rattaché au TCF Canada. Les vérifications déterministes ci-dessus sont réelles ; la grille de critères ci-dessous est ce qu'un correcteur remplirait, et elle est vide parce que le moteur français n'est pas construit.",
+            },
+          },
+        },
+      ],
+    },
+    {
+      id: 'expression-orale',
+      skill: 'speaking',
+      name: { en: 'Spoken expression', fr: 'Expression orale' },
+      allowReplay: false,
+      tasks: [
+        {
+          id: 'tcf-eo-t1',
+          skill: 'speaking',
+          responseMode: 'audio',
+          name: { en: 'Tâche 1', fr: 'Tâche 1' },
+          instruction: {
+            en: 'Introduce yourself to the examiner. About two minutes, without preparation.',
+            fr: "Présentez-vous à l'examinateur. Environ deux minutes, sans préparation.",
+          },
+          prompt: {
+            en: 'Introduce yourself: who you are, what you do, and what brought you to learn French.',
+            fr: "Présentez-vous : qui vous êtes, ce que vous faites, et ce qui vous a amené à apprendre le français.",
+          },
+          timeLimitSec: 120,
+          wordGuidance: { en: 'About two minutes', fr: 'Environ deux minutes' },
+          scaleId: 'sur20',
+          criteria: [
+            { id: 'respect_consigne', label: { en: 'Compliance with the instruction', fr: 'Respect de la consigne' } },
+            { id: 'capacite_interagir', label: { en: 'Ability to interact', fr: 'Capacité à interagir' } },
+            { id: 'lexique', label: { en: 'Lexis', fr: 'Lexique' } },
+            { id: 'morphosyntaxe', label: { en: 'Morphosyntax', fr: 'Morphosyntaxe' } },
+          ],
+          gate: [
+            {
+              id: 'empty',
+              verdict: {
+                kind: 'zero',
+                label: { en: 'Nothing was heard', fr: "Rien n'a été entendu" },
+                detail: {
+                  en: 'The recording produced no transcript.',
+                  fr: "L'enregistrement n'a produit aucune transcription.",
+                },
+              },
+            },
+            {
+              id: 'min_words',
+              words: 80,
+              verdict: {
+                kind: 'zero',
+                label: { en: 'Too short — "A1 non atteint"', fr: 'Trop court — « A1 non atteint »' },
+                detail: {
+                  en: 'A response too short to show the level is scored as not reaching A1, whatever its quality.',
+                  fr: "Une réponse trop courte pour montrer le niveau est notée « A1 non atteint », quelle que soit sa qualité.",
+                },
+              },
+            },
+            {
+              id: 'off_topic',
+              minKeywordHits: 1,
+              verdict: {
+                kind: 'zero',
+                label: { en: 'Off topic', fr: 'Hors sujet' },
+                detail: {
+                  en: 'Off-topic is one of the official automatic-zero triggers.',
+                  fr: "Le hors-sujet fait partie des déclencheurs officiels du zéro automatique.",
+                },
+              },
+            },
+          ],
+          topicKeywords: ['je', 'suis', 'travaille', 'français', 'appelle'],
+          // The transcriber is bound: SpeechAce and the STT chain both
+          // support fr-CA, so a French recording yields a real transcript and
+          // real acoustic measures. The judge is not bound, because nothing
+          // scores the TCF grid.
+          signal: {
+            kind: 'remote',
+            adapter: 'speech_evaluate',
+            endpoint: '/speech/evaluate',
+            language: 'fr-CA',
+            fields: { reference_text: '' },
+          },
+          judge: {
+            kind: 'none',
+            reason: {
+              en: 'No judge scores the TCF speaking grid. The transcript and the acoustic measures above are real; the four criteria below are what an examiner would fill in, and they are empty.',
+              fr: "Aucun correcteur n'évalue la grille d'expression orale du TCF. La transcription et les mesures acoustiques ci-dessus sont réelles ; les quatre critères ci-dessous sont ce qu'un examinateur remplirait, et ils sont vides.",
             },
           },
         },

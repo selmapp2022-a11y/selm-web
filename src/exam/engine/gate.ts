@@ -6,7 +6,7 @@
  * task definition. That is the whole reason the TCF automatic-zero triggers
  * and the IELTS under-length penalty share this file instead of forking.
  */
-import type { GateRule, Localised, Response, TaskDefinition } from '../model/types';
+import type { GateRule, Localised, TaskDefinition } from '../model/types';
 import { keywordHits, longestCommonRun, overlapRatio, wordCount } from './text';
 
 export type GateFinding = {
@@ -26,14 +26,14 @@ export type GateResult = {
   measurements: { wordCount: number; promptOverlap: number; scaffoldRatio: number; longestLiftedRun: number; topicHits: number };
 };
 
-export function runGate(task: TaskDefinition, response: Response, promptText: string): GateResult {
+export function runGate(task: TaskDefinition, text: string, promptText: string): GateResult {
   const scaffold = (task.suppliedScaffold ?? []).join(' ');
   const m = {
-    wordCount: wordCount(response.text),
-    promptOverlap: overlapRatio(response.text, promptText),
-    scaffoldRatio: scaffold ? overlapRatio(response.text, scaffold) : 0,
-    longestLiftedRun: longestCommonRun(response.text, promptText),
-    topicHits: keywordHits(response.text, task.topicKeywords),
+    wordCount: wordCount(text),
+    promptOverlap: overlapRatio(text, promptText),
+    scaffoldRatio: scaffold ? overlapRatio(text, scaffold) : 0,
+    longestLiftedRun: longestCommonRun(text, promptText),
+    topicHits: keywordHits(text, task.topicKeywords),
   };
 
   const findings: GateFinding[] = [];

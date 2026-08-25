@@ -60,6 +60,7 @@ export const IELTS_GT: ExamDefinition = {
         {
           id: 'gt-w-t1',
           skill: 'writing',
+          responseMode: 'text',
           name: { en: 'Task 1', fr: 'Task 1' },
           instruction: {
             en: 'Write a letter. You should spend about 20 minutes on this task. Write at least 150 words. You do NOT need to write any addresses.',
@@ -170,6 +171,109 @@ export const IELTS_GT: ExamDefinition = {
             // Asked twice on purpose: the spread between two answers to the
             // same text is reported rather than averaged away.
             samples: 2,
+          },
+        },
+      ],
+    },
+    {
+      id: 'speaking',
+      skill: 'speaking',
+      name: { en: 'Speaking', fr: 'Expression orale' },
+      allowReplay: false,
+      tasks: [
+        {
+          id: 'gt-s-p2',
+          skill: 'speaking',
+          responseMode: 'audio',
+          name: { en: 'Part 2', fr: 'Part 2' },
+          instruction: {
+            en: 'You have one minute to think about what you are going to say. Then speak for one to two minutes.',
+            fr: "Vous avez une minute pour préparer, puis parlez pendant une à deux minutes.",
+          },
+          prompt: {
+            en: 'Describe a skill you learned that turned out to be more useful than you expected. You should say: what the skill is, how and when you learned it, why you did not expect it to be useful, and explain how you have used it since.',
+            fr: "Décrivez une compétence que vous avez apprise et qui s'est révélée plus utile que prévu.",
+          },
+          timeLimitSec: 120,
+          wordGuidance: { en: 'Speak for one to two minutes', fr: 'Parlez une à deux minutes' },
+          scaleId: 'band',
+          criteria: [
+            // The four official IELTS SPEAKING criteria. Note the fourth:
+            // Speaking is marked on Pronunciation, not on Task Response.
+            // Task Response is a Writing criterion, and listing it here — as
+            // the backend's own examiner prompt still does — asks for a mark
+            // the test does not award.
+            { id: 'fluency_coherence', label: { en: 'Fluency and Coherence', fr: 'Aisance et cohérence' } },
+            { id: 'lexical_resource', label: { en: 'Lexical Resource', fr: 'Étendue lexicale' } },
+            { id: 'grammar_accuracy', label: { en: 'Grammatical Range and Accuracy', fr: 'Morphosyntaxe' } },
+            { id: 'pronunciation', label: { en: 'Pronunciation', fr: 'Prononciation' } },
+          ],
+          gate: [
+            {
+              id: 'empty',
+              verdict: {
+                kind: 'zero',
+                label: { en: 'Nothing was heard', fr: "Rien n'a été entendu" },
+                detail: {
+                  en: 'The recording produced no transcript. An examiner scores what was said, and nothing was.',
+                  fr: "L'enregistrement n'a produit aucune transcription.",
+                },
+              },
+            },
+            {
+              id: 'min_words',
+              words: 90,
+              verdict: {
+                kind: 'penalty',
+                label: { en: 'Too short for the task', fr: 'Trop court pour la tâche' },
+                detail: {
+                  en: 'A Part 2 answer that stops early gives the examiner too little language to place at the higher bands.',
+                  fr: "Une réponse qui s'arrête trop tôt ne donne pas assez de matière pour les bandes supérieures.",
+                },
+              },
+            },
+            {
+              id: 'off_topic',
+              minKeywordHits: 2,
+              verdict: {
+                kind: 'zero',
+                label: { en: 'Off topic', fr: 'Hors sujet' },
+                detail: {
+                  en: 'Task Response is scored against the cue card that was set, not the one that was answered.',
+                  fr: "La réalisation de la tâche est évaluée par rapport à la consigne donnée.",
+                },
+              },
+            },
+          ],
+          topicKeywords: ['skill', 'learned', 'useful', 'expected', 'used'],
+          // One upload, two uses: the transcript and the acoustic measures
+          // are the signal layer, and the band block in the same payload is
+          // the judge.
+          signal: {
+            kind: 'remote',
+            adapter: 'speech_evaluate',
+            endpoint: '/speech/evaluate',
+            language: 'en-US',
+            fields: { mode: 'ielts', reference_text: '' },
+          },
+          judge: {
+            kind: 'from_signal',
+            adapter: 'ielts_speaking',
+            judgeScale: {
+              id: 'band',
+              label: { en: 'IELTS band, single automated examiner', fr: 'Bande IELTS, un seul correcteur automatique' },
+              min: 0,
+              max: 9,
+              step: 1,
+              display: { prefix: { en: 'Band', fr: 'Bande' }, decimals: 0 },
+            },
+            toExamScale: {
+              kind: 'none',
+              reason: {
+                en: 'One automated examiner, asked once, with no measurement of its error against a real Test Report Form. The bands are on the exam\u2019s scale but they are not a calibrated prediction of it.',
+                fr: "Un seul correcteur automatique, interrog\u00e9 une fois, sans mesure de son erreur face \u00e0 une vraie attestation.",
+              },
+            },
           },
         },
       ],

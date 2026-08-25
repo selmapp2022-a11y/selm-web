@@ -1,12 +1,13 @@
 import { useNavigate } from 'react-router-dom';
-import { useExam, firstTask } from '../state';
+import { useExam, allTasks, sectionOf } from '../state';
 import { GOALS } from '../definitions';
 import { t } from '../model/format';
 
 export default function GoalPage() {
-  const { exam, goal, setGoal, ui } = useExam();
+  const { exam, goal, setGoal, ui, taskId, setTaskId } = useExam();
   const nav = useNavigate();
-  const task = firstTask(exam);
+  const tasks = allTasks(exam);
+  const task = tasks.find((t) => t.id === taskId) ?? tasks[0];
   const sameSystem = goal.system === exam.benchmark.system;
 
   return (
@@ -70,10 +71,27 @@ export default function GoalPage() {
         <div className="text-[11px] font-semibold uppercase tracking-wide text-ink-disabled">
           {ui === 'en' ? 'The task' : 'La tâche'}
         </div>
-        <div className="mt-1 font-display text-base font-semibold">
-          {t(exam.sections[0].name, ui)} · {t(task.name, ui)}
+        <div className="mt-2 flex flex-wrap gap-2">
+          {tasks.map((x) => (
+            <button
+              key={x.id}
+              onClick={() => setTaskId(x.id)}
+              className={`rounded-lg border px-3 py-1.5 text-sm font-medium ${
+                x.id === task.id ? 'border-teal bg-teal-50 text-navy' : 'border-surface-divider bg-surface-app'
+              }`}
+            >
+              {t(sectionOf(exam, x.id).name, ui)} · {t(x.name, ui)}
+            </button>
+          ))}
         </div>
-        <p className="mt-1 text-sm text-ink-secondary">{t(task.instruction, ui)}</p>
+        <p className="mt-3 text-sm text-ink-secondary">{t(task.instruction, ui)}</p>
+        <p className="mt-1 text-xs text-ink-disabled">
+          {task.responseMode === 'audio'
+            ? ui === 'en' ? 'Spoken response · recorded' : 'Réponse orale · enregistrée'
+            : ui === 'en' ? 'Written response' : 'Réponse écrite'}
+          {' · '}
+          {Math.round(task.timeLimitSec / 60)} {ui === 'en' ? 'min' : 'min'}
+        </p>
         <button
           onClick={() => nav('/task')}
           className="mt-4 w-full rounded-xl bg-navy px-4 py-3 text-sm font-semibold text-white"

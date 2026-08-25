@@ -102,8 +102,40 @@ export type GateVerdict = {
  * with no judge bound yet is a normal state of the system, not an error, and
  * it is what keeps an unbuilt exam honest instead of fabricated.
  */
+/**
+ * Layer 2 — the signal layer.
+ *
+ * For a spoken response the deterministic gate cannot run until there are
+ * words to count, and the words come from transcription. So the signal layer
+ * runs BEFORE the gate for audio tasks, not after it as the seven-layer
+ * diagram in the business plan implies. The diagram's order holds for
+ * written responses only.
+ */
+export type SignalBinding =
+  | { kind: 'none' }
+  | {
+      kind: 'remote';
+      adapter: 'speech_evaluate';
+      endpoint: string;
+      /** BCP-47 tag sent to the transcriber. */
+      language: Locale;
+      /** Extra multipart fields, e.g. `mode: 'ielts'`. */
+      fields?: Record<string, string>;
+    };
+
 export type JudgeBinding =
   | { kind: 'none'; reason: Localised }
+  | {
+      /**
+       * Reads the payload the signal layer already fetched, instead of
+       * making a second call. Uploading the same recording twice to score it
+       * twice would be paying twice for one answer.
+       */
+      kind: 'from_signal';
+      adapter: 'ielts_speaking';
+      judgeScale: Scale;
+      toExamScale: { kind: 'none'; reason: Localised };
+    }
   | {
       kind: 'remote';
       /** Adapter name — see `engine/judge.ts`. */
@@ -144,9 +176,12 @@ export type TaskDefinition = {
   timeLimitSec: number;
   /** Word guidance shown to the candidate, if the exam publishes one. */
   wordGuidance?: Localised;
+  /** What the candidate produces. Decides which runner renders the task. */
+  responseMode: 'text' | 'audio';
   scaleId: string;
   criteria: Criterion[];
   gate: GateRule[];
+  signal?: SignalBinding;
   judge: JudgeBinding;
   /** Content words the response is expected to engage with, for `off_topic`. */
   topicKeywords: string[];
@@ -202,10 +237,22 @@ export type Goal = {
   system: BenchmarkSystem;
 };
 
-export type Response = {
-  taskId: string;
-  text: string;
-  /** Seconds actually spent, measured, not reported. */
-  elapsedSec: number;
-  submittedAt: string;
-};
+export type Response =
+  | {
+      kind: 'text';
+      taskId: string;
+      text: string;
+      /** Seconds actually spent, measured, not reported. */
+      elapsedSec: number;
+      submittedAt: string;
+    }
+  | {
+      kind: 'audio';
+      taskId: string;
+      blob: Blob;
+      /** Length of the recording itself, from the recorder. */
+      durationSec: number;
+      /** Seconds from the task appearing to the response being submitted. */
+      elapsedSec: number;
+      submittedAt: string;
+    };

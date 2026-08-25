@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useExam, firstTask } from '../state';
+import { useExam, allTasks } from '../state';
+import { AudioRecorder } from '../../components/AudioRecorder';
 import { t } from '../model/format';
 import { wordCount } from '../engine/text';
 import { scoreResponse } from '../engine/score';
+import type { Response } from '../model/types';
 
 /**
  * One task runner. It reads the task definition and nothing else — the clock,
@@ -11,9 +13,9 @@ import { scoreResponse } from '../engine/score';
  * same component runs the IELTS letter and the TCF message without a branch.
  */
 export default function TaskPage() {
-  const { exam, ui, setResult } = useExam();
+  const { exam, ui, setResult, taskId } = useExam();
   const nav = useNavigate();
-  const task = useMemo(() => firstTask(exam), [exam]);
+  const task = useMemo(() => allTasks(exam).find((t) => t.id === taskId) ?? allTasks(exam)[0], [exam, taskId]);
 
   const [text, setText] = useState('');
   const [elapsed, setElapsed] = useState(0);
@@ -37,18 +39,33 @@ export default function TaskPage() {
   const clock = `${Math.floor(Math.abs(remaining) / 60)}:${String(Math.abs(remaining) % 60).padStart(2, '0')}`;
   const wc = wordCount(text);
 
-  async function submit() {
+  async function run(response: Response) {
     setBusy(true);
-    const response = {
-      taskId: task.id,
-      text,
-      elapsedSec: Math.floor((Date.now() - started.current) / 1000),
-      submittedAt: new Date().toISOString(),
-    };
     const result = await scoreResponse(exam, task, response);
     setResult(response, result);
     setBusy(false);
     nav('/result');
+  }
+
+  function submitText() {
+    return run({
+      kind: 'text',
+      taskId: task.id,
+      text,
+      elapsedSec: Math.floor((Date.now() - started.current) / 1000),
+      submittedAt: new Date().toISOString(),
+    });
+  }
+
+  function submitAudio(blob: Blob, durationMs: number) {
+    return run({
+      kind: 'audio',
+      taskId: task.id,
+      blob,
+      durationSec: Math.round(durationMs / 1000),
+      elapsedSec: Math.floor((Date.now() - started.current) / 1000),
+      submittedAt: new Date().toISOString(),
+    });
   }
 
   return (
@@ -77,6 +94,27 @@ export default function TaskPage() {
         )}
       </div>
 
+      {task.responseMode === 'audio' ? (
+        <div className="rounded-xl border border-surface-divider bg-surface-card p-5">
+          <AudioRecorder
+            maxSeconds={task.timeLimitSec}
+            disabled={busy}
+            label={ui === 'en' ? 'Record your answer' : 'Enregistrez votre réponse'}
+            onComplete={(blob, durationMs) => submitAudio(blob, durationMs)}
+          />
+          <p className="mt-4 text-xs leading-relaxed text-ink-secondary">
+            {ui === 'en'
+              ? 'The recording stops itself at the task limit, as the exam does. It is transcribed before anything else happens to it.'
+              : "L'enregistrement s'arrête de lui-même à la limite de la tâche, comme à l'examen. Il est transcrit avant toute autre étape."}
+          </p>
+          {busy && (
+            <p className="mt-3 text-sm font-medium">
+              {ui === 'en' ? 'Transcribing and scoring…' : 'Transcription et correction en cours…'}
+            </p>
+          )}
+        </div>
+      ) : (
+        <>
       <textarea
         value={text}
         onChange={(e) => setText(e.target.value)}
@@ -86,6 +124,7 @@ export default function TaskPage() {
         className="h-72 w-full resize-none rounded-xl border border-surface-divider bg-surface-card p-4 text-sm leading-relaxed outline-none focus:border-teal"
       />
 
+      {task.responseMode === 'text' && (
       <div className="flex items-center justify-between text-xs text-ink-secondary">
         <span className="tabular-nums">
           {wc} {ui === 'en' ? 'words' : 'mots'}
@@ -98,6 +137,7 @@ export default function TaskPage() {
           </button>
         )}
       </div>
+      )}
 
       {showScaffold && task.suppliedScaffold && (
         <div className="rounded-xl border border-amber-500/40 bg-amber-500/5 p-4">
@@ -116,16 +156,19 @@ export default function TaskPage() {
           </p>
         </div>
       )}
-
+        </>
+      )}
+      {task.responseMode === 'text' && (
       <button
         disabled={busy}
-        onClick={submit}
+        onClick={submitText}
         className="w-full rounded-xl bg-navy px-4 py-3 text-sm font-semibold text-white disabled:opacity-60"
       >
         {busy
           ? ui === 'en' ? 'Scoring…' : 'Correction en cours…'
           : ui === 'en' ? 'Submit' : 'Remettre'}
       </button>
+      )}
     </div>
   );
 }

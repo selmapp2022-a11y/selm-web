@@ -15,7 +15,7 @@ export default function ResultPage() {
     nav('/');
     return null;
   }
-  const { exam, task, gate, judges, judgeAggregate, examScaleAggregate, benchmarkLevel, release, zeroedBy, overtimeSec } = result;
+  const { exam, task, signal, gate, judges, judgeAggregate, examScaleAggregate, benchmarkLevel, release, zeroedBy, overtimeSec } = result;
   const scored = judges.filter((j) => j.kind === 'scored') as Extract<(typeof judges)[number], { kind: 'scored' }>[];
   const judge = judges[0];
   const sameSystem = goal.system === exam.benchmark.system;
@@ -30,6 +30,51 @@ export default function ResultPage() {
           {ui === 'en' ? 'What this response actually did' : 'Ce que cette réponse a réellement fait'}
         </h1>
       </div>
+
+      {/* ── 0. the signal layer — spoken responses only ──────────────── */}
+      {task.responseMode === 'audio' && (
+        <section className="space-y-2">
+          <h2 className="text-sm font-semibold">
+            {ui === 'en' ? 'What was heard' : "Ce qui a été entendu"}
+            <span className="ml-2 rounded-full bg-teal-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-teal-600">
+              {ui === 'en' ? 'measured' : 'mesuré'}
+            </span>
+          </h2>
+          {signal.error ? (
+            <p className="rounded-xl border border-surface-divider bg-surface-card px-4 py-3 text-sm text-ink-secondary">
+              {t(signal.error, ui)}
+            </p>
+          ) : (
+            <div className="space-y-2">
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                {[
+                  [ui === 'en' ? 'Recording' : 'Enregistrement', signal.durationSec ? `${signal.durationSec}s` : '—'],
+                  [ui === 'en' ? 'Words per minute' : 'Mots par minute', signal.wpm !== null ? String(signal.wpm) : '—'],
+                  ...signal.measures.map((m) => [t(m.label, ui), `${Math.round(m.value)} / ${m.outOf}`] as [string, string]),
+                ].map(([k, v]) => (
+                  <div key={k} className="rounded-xl border border-surface-divider bg-surface-card p-3">
+                    <div className="font-display text-lg font-bold tabular-nums">{v}</div>
+                    <div className="text-[11px] leading-tight text-ink-secondary">{k}</div>
+                  </div>
+                ))}
+              </div>
+              <div className="rounded-xl border border-surface-divider bg-surface-card px-4 py-3">
+                <div className="text-[11px] font-semibold uppercase tracking-wide text-ink-disabled">
+                  {ui === 'en' ? 'Transcript' : 'Transcription'}
+                </div>
+                <p className="mt-1 text-sm leading-relaxed" lang={exam.locale}>
+                  {signal.transcript || (ui === 'en' ? '(nothing transcribed)' : '(rien de transcrit)')}
+                </p>
+                <p className="mt-3 text-xs leading-relaxed text-ink-secondary">
+                  {ui === 'en'
+                    ? 'Everything below is measured against this transcript, not against the audio. A spoken response has no words to count until something transcribes it, so this step runs before the deterministic checks rather than after them.'
+                    : "Tout ce qui suit est mesuré sur cette transcription, non sur l'audio. Une réponse orale n'a pas de mots à compter tant que rien ne la transcrit : cette étape précède donc les vérifications déterministes."}
+                </p>
+              </div>
+            </div>
+          )}
+        </section>
+      )}
 
       {/* ── 1. the deterministic layer — real for every exam ────────────── */}
       <section className="space-y-2">
@@ -142,7 +187,19 @@ export default function ResultPage() {
       <section className="space-y-2">
         <h2 className="text-sm font-semibold">{ui === 'en' ? 'Predicted score' : 'Note prédite'}</h2>
         <div className="rounded-xl border border-surface-divider bg-surface-card p-5">
-          {release.publishNumeric && examScaleAggregate ? (
+          {examScaleAggregate && !release.publishNumeric ? (
+            <>
+              <div className="font-display text-2xl font-bold text-ink-secondary">
+                {ui === 'en' ? 'Withheld' : 'Non communiquée'}
+              </div>
+              <p className="mt-2 text-sm leading-relaxed text-ink-secondary">
+                {ui === 'en'
+                  ? `The judge did answer on this exam's own scale — ${formatScale(examScaleAggregate.point, result.scale, ui)} — but that answer is not published as a prediction. `
+                  : `Le correcteur a bien répondu sur le barème de cet examen — ${formatScale(examScaleAggregate.point, result.scale, ui)} — mais cette réponse n'est pas publiée comme prédiction. `}
+                {t(release.reason, ui)}
+              </p>
+            </>
+          ) : release.publishNumeric && examScaleAggregate ? (
             <>
               <div className="font-display text-3xl font-bold">{formatScale(examScaleAggregate.point, result.scale, ui)}</div>
               {benchmarkLevel !== null && (
