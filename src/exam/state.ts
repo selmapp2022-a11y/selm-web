@@ -11,6 +11,48 @@ import type {
 import type { ScoreResult } from './engine/score';
 import { EXAMS, GOALS } from './definitions';
 
+/**
+ * A sitting in progress.
+ *
+ * Persisted, and that is not a nicety. A candidate who loses their connection
+ * forty minutes into a mock exam and loses the mock will not come back, and
+ * this population is concentrated in places with unreliable connectivity —
+ * the same reason the offline exam exists in the plan.
+ */
+export type Sitting = {
+  examId: string;
+  /** Section ids in the exam's own order. */
+  order: string[];
+  /** Index into `order`. A section once left cannot be returned to. */
+  at: number;
+  /** Epoch ms the current section started, for the section clock. */
+  sectionStartedAt: number;
+  /** Answers by section id, then by item id. */
+  answers: Record<string, Record<string, number | null>>;
+  /** Section ids already submitted. */
+  submitted: string[];
+};
+
+const SITTING_KEY = 'selm_exam_sitting_v1';
+
+const loadSitting = (): Sitting | null => {
+  try {
+    const raw = localStorage.getItem(SITTING_KEY);
+    return raw ? (JSON.parse(raw) as Sitting) : null;
+  } catch {
+    return null;
+  }
+};
+
+const saveSitting = (s: Sitting | null) => {
+  try {
+    if (s) localStorage.setItem(SITTING_KEY, JSON.stringify(s));
+    else localStorage.removeItem(SITTING_KEY);
+  } catch {
+    /* a sitting that cannot be saved still runs; it just will not survive a reload */
+  }
+};
+
 type ExamState = {
   exam: ExamDefinition;
   taskId: string;
@@ -26,6 +68,12 @@ type ExamState = {
   setUi: (l: LanguageCode) => void;
   setResult: (r: Response, s: ScoreResult) => void;
   reset: () => void;
+  /** The sitting in progress, if any. */
+  sitting: Sitting | null;
+  startSitting: (e: ExamDefinition) => void;
+  answerItem: (sectionId: string, itemId: string, chose: number | null) => void;
+  submitSection: (sectionId: string) => void;
+  endSitting: () => void;
 };
 
 /** The production sections — the ones with tasks a judge could score. */
@@ -44,9 +92,15 @@ export const firstTask = (e: ExamDefinition): TaskDefinition => allTasks(e)[0];
 export const sectionOf = (e: ExamDefinition, taskId: string): ProductionSection =>
   productionSections(e).find((s) => s.tasks.some((t) => t.id === taskId))!;
 
+// A restored sitting names its own exam. Without this, reloading the page
+// forty minutes into a TCF sitting renders the IELTS sections instead —
+// which is exactly the failure the persistence exists to prevent.
+const RESTORED = loadSitting();
+const START = (RESTORED && EXAMS.find((e) => e.id === RESTORED.examId)) || EXAMS[0];
+
 export const useExam = create<ExamState>((set) => ({
-  exam: EXAMS[0],
-  taskId: firstTask(EXAMS[0]).id,
+  exam: START,
+  taskId: firstTask(START).id,
   goal: GOALS[1],
   ui: 'en',
   response: null,
@@ -57,4 +111,52 @@ export const useExam = create<ExamState>((set) => ({
   setUi: (ui) => set({ ui }),
   setResult: (response, result) => set({ response, result }),
   reset: () => set({ response: null, result: null }),
+
+  sitting: RESTORED,
+  startSitting: (exam) => {
+    const sitting: Sitting = {
+      examId: exam.id,
+      order: exam.sections.map((s) => s.id),
+      at: 0,
+      sectionStartedAt: Date.now(),
+      answers: {},
+      submitted: [],
+    };
+    saveSitting(sitting);
+    set({ exam, sitting });
+  },
+  answerItem: (sectionId, itemId, chose) =>
+    set((st) => {
+      if (!st.sitting) return st;
+      // Answers stay changeable until the section is submitted — a delivery
+      // rule, enforced here rather than in a component.
+      if (st.sitting.submitted.includes(sectionId)) return st;
+      const answers = {
+        ...st.sitting.answers,
+        [sectionId]: { ...(st.sitting.answers[sectionId] ?? {}), [itemId]: chose },
+      };
+      const sitting = { ...st.sitting, answers };
+      saveSitting(sitting);
+      return { sitting };
+    }),
+  submitSection: (sectionId) =>
+    set((st) => {
+      if (!st.sitting) return st;
+      const submitted = st.sitting.submitted.includes(sectionId)
+        ? st.sitting.submitted
+        : [...st.sitting.submitted, sectionId];
+      // A section boundary cannot be crossed backwards.
+      const sitting = {
+        ...st.sitting,
+        submitted,
+        at: Math.min(st.sitting.at + 1, st.sitting.order.length),
+        sectionStartedAt: Date.now(),
+      };
+      saveSitting(sitting);
+      return { sitting };
+    }),
+  endSitting: () => {
+    saveSitting(null);
+    set({ sitting: null });
+  },
 }));

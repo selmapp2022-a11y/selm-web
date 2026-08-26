@@ -4,7 +4,7 @@ import { GOALS } from '../definitions';
 import { t } from '../model/format';
 
 export default function GoalPage() {
-  const { exam, goal, setGoal, ui, taskId, setTaskId } = useExam();
+  const { exam, goal, setGoal, ui, taskId, setTaskId, startSitting } = useExam();
   const nav = useNavigate();
   const tasks = allTasks(exam);
   const task = tasks.find((t) => t.id === taskId) ?? tasks[0];
@@ -115,8 +115,26 @@ export default function GoalPage() {
           onClick={() => nav('/task')}
           className="mt-4 w-full rounded-xl bg-navy px-4 py-3 text-sm font-semibold text-white"
         >
-          {ui === 'en' ? 'Start under exam conditions' : "Commencer en conditions d'examen"}
+          {ui === 'en' ? 'Start this task' : 'Commencer cette tâche'}
         </button>
+
+        {/* A whole sitting, not a task: four épreuves in the official order,
+            with section boundaries that cannot be crossed backwards. It is
+            the only thing that answers "am I ready to book", which is the
+            question the candidate actually arrived with. */}
+        {exam.sections.some((s) => s.kind === 'comprehension') && (
+          <button
+            onClick={() => {
+              startSitting(exam);
+              nav('/section');
+            }}
+            className="mt-2 w-full rounded-xl border border-navy px-4 py-3 text-sm font-semibold text-navy"
+          >
+            {ui === 'en'
+              ? `Sit the whole exam — ${exam.sections.length} sections`
+              : `Passer l'examen complet — ${exam.sections.length} épreuves`}
+          </button>
+        )}
       </section>
     </div>
   );
