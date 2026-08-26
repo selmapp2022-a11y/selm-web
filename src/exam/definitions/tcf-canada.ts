@@ -19,8 +19,27 @@
  *   source. They are used to render the target line only, and no predicted
  *   score is published for this exam, so nothing user-facing rests on them
  *   yet. Verify before that changes.
- * - Tâche 1 timing is taken as a third of the 60-minute épreuve. The exact
- *   per-tâche split is an open item and is marked as such in the UI.
+ *
+ * VERIFIED 2026-08-26 against France Éducation international, read through a
+ * browser because the site refuses this project's network:
+ *   - "Manuel du candidat TCF", Version P, avril 2026, p. 20 — expression
+ *     écrite is three tâches, and for TCF tout public, Québec and Canada the
+ *     expected length is: Tâche 1, 60–120 mots; Tâche 2, 120–150 mots;
+ *     Tâche 3, 120–180 mots. Tâche 3 is described there as comparing two
+ *     points of view on a fait de société expressed in two documents, with
+ *     the candidate's own opinion — which is what this file already models.
+ *   - france-education-international.fr/test/tcf-canada — "Expression
+ *     écrite : Épreuve collective : 3 exercices. Durée : 60 minutes."
+ *
+ * So the word bands below are the exam's. The per-tâche times are not: FEI
+ * publishes 60 minutes for the whole épreuve and no split at all. Ours is an
+ * equal third, carried as `timeLimitApportioned` and shown to the candidate
+ * as ours.
+ *
+ * Still open: Tâche 2 is not defined in this file. Its band is now known
+ * (120–150 mots); its task wording is not, because the manual's description
+ * of it did not survive text extraction. It needs a primary-source read
+ * before it is written, not a guess.
  */
 import type { ExamDefinition } from '../model/types';
 
@@ -87,21 +106,21 @@ export const TCF_CANADA: ExamDefinition = {
       skill: 'writing',
       name: { en: 'Written expression', fr: 'Expression écrite' },
       allowReplay: false,
+      // Published: 60 minutes for the three tâches together. FEI, TCF Canada
+      // page, read 2026-08-26.
+      timeLimitSec: 60 * 60,
       tasks: [
         {
           id: 'tcf-ee-t1',
           skill: 'writing',
           responseMode: 'text',
-          // NUMBERS UNVERIFIED, 2026-08-27. The file header claims every
-          // figure is taken from the published specification. These were
-          // not: France Éducation international's site returns ERR-BOT-403
-          // to this network, and every other source for TCF word bands is a
-          // commercial preparation site — which this project has already
-          // ruled out as authoritative for French, in step 05.
+          // 60–120 mots: VERIFIED 2026-08-26 against the Manuel du candidat
+          // TCF, Version P, avril 2026, p. 20. The earlier note here said
+          // these were unconfirmed guesses; the band turns out to be right.
           //
-          // 60/120 and 15 minutes are plausible and unconfirmed. Someone
-          // with a browser should read the specification and either confirm
-          // them or correct them. Flagged rather than left to look sourced.
+          // The time is a different matter. 15 minutes was invented. FEI
+          // publishes 60 minutes for the whole épreuve and no per-tâche
+          // split, so this is an equal third and is labelled as ours.
           name: { en: 'Tâche 1', fr: 'Tâche 1' },
           instruction: {
             en: 'Write a short message. 60 to 120 words.',
@@ -111,7 +130,8 @@ export const TCF_CANADA: ExamDefinition = {
             en: 'You have just finished a training course paid for by your employer. Write a message to your colleagues describing the course and what you learned.',
             fr: "Vous venez de terminer une formation payée par votre employeur. Vous écrivez un message à vos collègues pour décrire cette formation et expliquer ce que vous avez appris.",
           },
-          timeLimitSec: 15 * 60,
+          timeLimitSec: 20 * 60,
+          timeLimitApportioned: true,
           wordGuidance: { en: '60 to 120 words', fr: 'De 60 à 120 mots' },
           scaleId: 'sur20',
           criteria: [
@@ -210,10 +230,12 @@ export const TCF_CANADA: ExamDefinition = {
           id: 'tcf-ee-t3',
           skill: 'writing',
           responseMode: 'text',
-          // NUMBERS UNVERIFIED. See the note on tcf-ee-t1: the word band and
-          // the time below could not be checked against France Éducation
-          // international, whose site refuses this network. Treat both as
-          // placeholders until someone reads the published specification.
+          // 120–180 mots: VERIFIED 2026-08-26, Manuel du candidat TCF,
+          // Version P, avril 2026, p. 20, which also confirms the shape of
+          // this tâche — two documents, two points of view on a fait de
+          // société, the candidate's own opinion.
+          //
+          // The time is ours: an equal third of the published 60 minutes.
           name: { en: 'Tâche 3', fr: 'Tâche 3' },
           instruction: {
             en: 'Compare the two documents below and give your own reasoned opinion. 120 to 180 words.',
@@ -223,7 +245,8 @@ export const TCF_CANADA: ExamDefinition = {
             en: 'Document 1 — a municipal notice announcing that the town centre will be closed to cars on Saturdays, to reduce pollution and make room for markets and cycling.\n\nDocument 2 — a letter from a shopkeepers\u2019 association arguing that the closure will cut takings, that deliveries have nowhere to stop, and that customers with reduced mobility will stay away.\n\nCompare the two positions and give your own reasoned opinion.',
             fr: "Document 1 — un avis municipal annonçant la fermeture du centre-ville aux voitures le samedi, afin de réduire la pollution et de laisser la place aux marchés et au vélo.\n\nDocument 2 — une lettre d'une association de commerçants soutenant que cette fermeture fera baisser le chiffre d'affaires, que les livraisons n'auront plus où s'arrêter, et que la clientèle à mobilité réduite ne viendra plus.\n\nComparez les deux positions et donnez votre avis argumenté.",
           },
-          timeLimitSec: 25 * 60,
+          timeLimitSec: 20 * 60,
+          timeLimitApportioned: true,
           wordGuidance: { en: '120 to 180 words', fr: 'De 120 à 180 mots' },
           scaleId: 'sur20',
           criteria: [

@@ -92,6 +92,13 @@ export default function TaskPage() {
         {task.wordGuidance && (
           <p className="mt-3 text-xs font-medium text-ink-secondary">{t(task.wordGuidance, ui)}</p>
         )}
+        {task.timeLimitApportioned && (
+          <p className="mt-2 text-xs text-ink-secondary">
+            {ui === 'en'
+              ? 'The clock above is our own split of the section time. The exam times the section, not this task.'
+              : "Le chronomètre ci-dessus correspond à notre propre répartition du temps de l'épreuve. L'examen chronomètre l'épreuve, pas cette tâche."}
+          </p>
+        )}
       </div>
 
       {task.responseMode === 'audio' ? (

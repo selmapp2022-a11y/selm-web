@@ -253,8 +253,20 @@ export type TaskDefinition = {
   name: Localised;
   instruction: Localised;
   prompt: Localised;
-  /** Seconds. Taken from the published specification, never approximated. */
+  /**
+   * Seconds. Taken from the published specification wherever the instrument
+   * publishes a per-task time. Where it publishes only a time for the whole
+   * section — TCF's expression écrite is 60 minutes for three tâches, with no
+   * per-tâche split anywhere in the candidate manual — this figure is ours,
+   * `timeLimitApportioned` says so, and everything that shows it must repeat
+   * that to the candidate rather than let it read as the exam's own rule.
+   */
   timeLimitSec: number;
+  /**
+   * True when `timeLimitSec` is our division of the section time rather than
+   * a published per-task limit. Absent means published.
+   */
+  timeLimitApportioned?: true;
   /** Word guidance shown to the candidate, if the exam publishes one. */
   wordGuidance?: Localised;
   /** What the candidate produces. Decides which runner renders the task. */
@@ -280,6 +292,12 @@ export type SectionDefinition = {
   name: Localised;
   /** Whether audio may be replayed. Listening sections in every exam: false. */
   allowReplay: boolean;
+  /**
+   * Seconds for the whole section, when that is the constraint the exam
+   * actually publishes. Present on TCF expression écrite: 60 minutes across
+   * three tâches. Absent where the exam times each task instead.
+   */
+  timeLimitSec?: number;
   tasks: TaskDefinition[];
 };
 

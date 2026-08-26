@@ -92,6 +92,13 @@ export default function GoalPage() {
           {' · '}
           {Math.round(task.timeLimitSec / 60)} {ui === 'en' ? 'min' : 'min'}
         </p>
+        {task.timeLimitApportioned && (
+          <p className="mt-1 text-xs text-ink-secondary">
+            {ui === 'en'
+              ? `This exam publishes ${Math.round((sectionOf(exam, task.id).timeLimitSec ?? 0) / 60)} minutes for the whole section and no time per task. The figure above is our own even split, not the exam's rule.`
+              : `Cet examen publie ${Math.round((sectionOf(exam, task.id).timeLimitSec ?? 0) / 60)} minutes pour l'ensemble de l'épreuve et aucun temps par tâche. La durée ci-dessus est notre propre répartition, et non une règle de l'examen.`}
+          </p>
+        )}
         <button
           onClick={() => nav('/task')}
           className="mt-4 w-full rounded-xl bg-navy px-4 py-3 text-sm font-semibold text-white"
