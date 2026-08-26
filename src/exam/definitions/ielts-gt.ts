@@ -197,6 +197,9 @@ export const IELTS_GT: ExamDefinition = {
                 fr: "Ce sont les notes propres du correcteur sur 100. Ce ne sont pas des bandes IELTS et elles n\u2019y sont pas converties, faute d\u2019une correspondance mesur\u00e9e sur de vraies attestations.",
               },
             },
+            // This exam does report a band scale, so the judge may return
+            // one. TCF and TEF do not, and their bindings leave this false.
+            reportsBand: true,
             // Asked twice on purpose: the spread between two answers to the
             // same text is reported rather than averaged away.
             samples: 2,

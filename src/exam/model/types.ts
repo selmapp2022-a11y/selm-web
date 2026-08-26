@@ -170,7 +170,7 @@ export type JudgeBinding =
       adapter: 'writing_assess';
       endpoint: string;
       /** Extra fields merged into the request body. */
-      payload?: Record<string, string>;
+      payload?: Record<string, string | number | boolean>;
       /**
        * The scale the judge itself answers on. This is NOT the exam's scale
        * unless `toExamScale` says a measured mapping exists. A general
@@ -185,6 +185,17 @@ export type JudgeBinding =
        * labelled as such.
        */
       toExamScale: { kind: 'none'; reason: Localised };
+      /**
+       * Whether this judge should report the exam's band scale alongside its
+       * own numbers.
+       *
+       * False by default, and false is the honest default: the IELTS band
+       * scale belongs to one English examination, and the bound assessor
+       * returned one for a French script until 2026-08-27. There is no such
+       * thing, and on a French page it would be read as real by exactly the
+       * candidate least able to know otherwise.
+       */
+      reportsBand?: boolean;
       /**
        * How many times to ask the same judge. More than one measures the
        * judge's agreement with itself, which layer 5 then reports as spread

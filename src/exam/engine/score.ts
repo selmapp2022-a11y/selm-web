@@ -66,7 +66,7 @@ export async function scoreResponse(
 
   // Layer 4 — judging. An exam with no judge bound returns `unavailable`;
   // the pipeline continues, does not throw, and does not invent.
-  const judges = await runJudge(task.judge, task, signal.transcript, promptText, signal.raw);
+  const judges = await runJudge(task.judge, task, signal.transcript, promptText, signal.raw, exam.locale);
   const scored = judges.filter((j) => j.kind === 'scored') as Extract<JudgeOutcome, { kind: 'scored' }>[];
 
   // Layers 5-7, on whatever scale the judges answered on.

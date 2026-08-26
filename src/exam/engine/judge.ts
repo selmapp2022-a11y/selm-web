@@ -102,7 +102,17 @@ export async function runJudge(
   text: string,
   promptText: string,
   /** The signal layer's raw payload, for judges that read it. */
-  signalRaw?: unknown
+  signalRaw?: unknown,
+  /**
+   * The exam's own locale, sent to the judge as its dialect.
+   *
+   * Taken from `ExamDefinition.locale` rather than repeated in a payload,
+   * because the definition already declares it and two copies of the same
+   * fact drift. Until 2026-08-27 the backend hard-coded en-us and ignored
+   * this field entirely, which is why every French response the product
+   * scored was scored as English.
+   */
+  locale?: string
 ): Promise<JudgeOutcome[]> {
   if (binding.kind === 'none') return [{ kind: 'unavailable', reason: binding.reason }];
 
@@ -132,6 +142,8 @@ export async function runJudge(
       const { data } = await api.post(binding.endpoint, {
         text,
         prompt: promptText,
+        ...(locale ? { dialect: locale.toLowerCase() } : {}),
+        report_band: binding.reportsBand === true,
         ...(binding.payload ?? {}),
       });
       const scores = adapters[binding.adapter](data, task.criteria);
