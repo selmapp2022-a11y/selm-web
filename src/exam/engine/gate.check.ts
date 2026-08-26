@@ -56,7 +56,7 @@ sans doute discuter davantage avec les habitants avant de décider quoi que ce s
 c'est toujours mieux quand tout le monde participe à ce genre de décision publique.`],
 ];
 
-const task = TCF_CANADA.sections.flatMap((s) => s.tasks).find((t) => t.id === 'tcf-ee-t3')!;
+const task = TCF_CANADA.sections.flatMap((s) => (s.kind === 'production' ? s.tasks : [])).find((t) => t.id === 'tcf-ee-t3')!;
 console.log('TCF Tache 3 — deterministic gate only, no judge, no network\n');
 for (const [name, text] of CASES) {
   const r = runGate(task, text, task.prompt.fr);

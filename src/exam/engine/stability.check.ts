@@ -56,4 +56,4 @@ console.log(
 );
 
 console.log(bad === 0 ? '\nAll stability-reader cases pass.' : `\n${bad} FAILURES`);
-process.exit(bad === 0 ? 0 : 1);
+if (bad !== 0) throw new Error(`${bad} stability-reader cases failed`);

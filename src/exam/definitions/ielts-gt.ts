@@ -74,6 +74,7 @@ export const IELTS_GT: ExamDefinition = {
   },
   sections: [
     {
+      kind: 'production',
       id: 'writing',
       skill: 'writing',
       name: { en: 'Writing', fr: 'Expression écrite' },
@@ -225,6 +226,7 @@ export const IELTS_GT: ExamDefinition = {
       ],
     },
     {
+      kind: 'production',
       id: 'speaking',
       skill: 'speaking',
       name: { en: 'Speaking', fr: 'Expression orale' },

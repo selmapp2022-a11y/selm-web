@@ -1,5 +1,13 @@
 import { create } from 'zustand';
-import type { ExamDefinition, Goal, LanguageCode, Response, TaskDefinition } from './model/types';
+import type {
+  ComprehensionSection,
+  ExamDefinition,
+  Goal,
+  LanguageCode,
+  ProductionSection,
+  Response,
+  TaskDefinition,
+} from './model/types';
 import type { ScoreResult } from './engine/score';
 import { EXAMS, GOALS } from './definitions';
 
@@ -20,13 +28,21 @@ type ExamState = {
   reset: () => void;
 };
 
+/** The production sections — the ones with tasks a judge could score. */
+export const productionSections = (e: ExamDefinition): ProductionSection[] =>
+  e.sections.filter((s): s is ProductionSection => s.kind === 'production');
+
+/** The comprehension sections — 39 items each, no judge, no vendor. */
+export const comprehensionSections = (e: ExamDefinition): ComprehensionSection[] =>
+  e.sections.filter((s): s is ComprehensionSection => s.kind === 'comprehension');
+
 export const allTasks = (e: ExamDefinition): TaskDefinition[] =>
-  e.sections.flatMap((s) => s.tasks);
+  productionSections(e).flatMap((s) => s.tasks);
 
 export const firstTask = (e: ExamDefinition): TaskDefinition => allTasks(e)[0];
 
-export const sectionOf = (e: ExamDefinition, taskId: string) =>
-  e.sections.find((s) => s.tasks.some((t) => t.id === taskId))!;
+export const sectionOf = (e: ExamDefinition, taskId: string): ProductionSection =>
+  productionSections(e).find((s) => s.tasks.some((t) => t.id === taskId))!;
 
 export const useExam = create<ExamState>((set) => ({
   exam: EXAMS[0],

@@ -54,6 +54,12 @@ if (shared !== 1) bad++;
 
 // Every task's scale must have a band table that can produce a level.
 for (const s of TCF_CANADA.sections) {
+  if (s.kind !== 'production') {
+    const has = !!TCF_CANADA.benchmark.byScale?.[s.scaleId];
+    console.log(`  ${has ? 'ok  ' : 'FAIL'} ${s.id} scale=${s.scaleId} has a band table`);
+    if (!has) bad++;
+    continue;
+  }
   for (const t of s.tasks) {
     const has = t.scaleId === 'sur20' || !!TCF_CANADA.benchmark.byScale?.[t.scaleId];
     console.log(`  ${has ? 'ok  ' : 'FAIL'} ${t.id} scale=${t.scaleId} has a band table`);
@@ -62,4 +68,4 @@ for (const s of TCF_CANADA.sections) {
 }
 
 console.log(bad === 0 ? '\nAll rows match the published table.' : `\n${bad} FAILURES`);
-process.exit(bad === 0 ? 0 : 1);
+if (bad !== 0) throw new Error(`${bad} benchmark rows do not match the published table`);

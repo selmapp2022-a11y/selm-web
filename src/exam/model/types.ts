@@ -330,7 +330,73 @@ export type TaskDefinition = {
   suppliedScaffold?: string[];
 };
 
-export type SectionDefinition = {
+/**
+ * One question in a comprehension section: a stem, options, one key.
+ *
+ * `content` and `stem` are plain strings in the exam's own language, not
+ * `Localised`. A production prompt is translated because an English-speaking
+ * candidate sitting the TCF still needs to know what the tâche asks. **A
+ * comprehension item is not translated, because translating it destroys the
+ * thing being measured** — a French reading item rendered in English tests
+ * nothing about reading French. The UI language may differ from the exam
+ * language everywhere else in this model; here it may not.
+ */
+export type ComprehensionItem = {
+  id: string;
+  /**
+   * The CEFR band this item is written to. **Ours, not the exam's.** TCF
+   * publishes that its comprehension épreuves run "selon un principe de
+   * difficulté progressive" and publishes nothing about which item sits at
+   * which level, so this banding is our authoring decision and is labelled as
+   * one wherever it is shown.
+   */
+  level: 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2';
+  /** Listening: the words spoken. Reading: the passage read. */
+  content: string;
+  /** Listening only: how many voices the script has. */
+  speakers?: number;
+  stem: string;
+  options: string[];
+  /** Index into `options`. Exactly one key per item. */
+  answer: number;
+  /** What the item tests. Never shown during the section. */
+  rationale?: string;
+  /**
+   * Where the rendered audio lives. Authored once, stored, served — never
+   * generated per user and never generated at request time. Absent means not
+   * yet rendered, which is the state French audio stays in until the dialect
+   * question is settled.
+   */
+  audioUrl?: string;
+};
+
+/**
+ * What "exam conditions" actually means, as data rather than as behaviour
+ * buried in a component.
+ *
+ * These are not presentation details. They are the difference between a
+ * practice app and a simulation, and the second rule below is the one
+ * candidates find hardest and that no competing product enforces.
+ */
+export type DeliveryRules = {
+  /** The audio plays once. Not pausable, not rewindable, no scrub bar. */
+  audioPlaysOnce: boolean;
+  /** The question appears after the audio, not during it. */
+  questionAfterAudio: boolean;
+  /** A transcript at any point during the section. False in every exam here. */
+  transcriptDuringSection: boolean;
+  /** Reading shows the whole section at once; listening moves item by item. */
+  presentation: 'all_at_once' | 'one_at_a_time';
+  /** A section clock, not a per-item clock. */
+  clock: 'section' | 'item';
+  /** Answers stay changeable until the section is submitted. */
+  answersLockedOnAnswer: boolean;
+  /** Per-item feedback during the section. Feedback is a results-page concern. */
+  feedbackDuringSection: boolean;
+};
+
+export type ProductionSection = {
+  kind: 'production';
   id: string;
   skill: SkillId;
   name: Localised;
@@ -344,6 +410,25 @@ export type SectionDefinition = {
   timeLimitSec?: number;
   tasks: TaskDefinition[];
 };
+
+export type ComprehensionSection = {
+  kind: 'comprehension';
+  id: string;
+  skill: SkillId;
+  name: Localised;
+  /** Seconds for the whole épreuve, as published. */
+  timeLimitSec: number;
+  /** True when the figure above is our division rather than a published one. */
+  timeLimitApportioned?: true;
+  /** The scale this section is reported on, e.g. `co699`. */
+  scaleId: string;
+  delivery: DeliveryRules;
+  /** Where the items came from. Always ours, and always said so. */
+  provenance: Localised;
+  items: ComprehensionItem[];
+};
+
+export type SectionDefinition = ProductionSection | ComprehensionSection;
 
 export type ExamDefinition = {
   id: string;
