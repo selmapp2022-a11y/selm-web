@@ -190,9 +190,26 @@ export type SignalBinding =
  * It lives on the binding rather than on the exam because it is a property
  * of the judge, and rebinding a different judge invalidates it.
  */
+/**
+ * What a judge's repeatability was, on one day.
+ *
+ * The date is not decoration. `D-fort` scored 83.0 with zero spread on 25
+ * August and 83/89/83 on the 27th — a third-party scorer changed underneath
+ * the product inside two days, without telling anyone. A figure from before
+ * such a change is not a smaller truth, it is a false one, so this record
+ * carries an expiry and anything reading it past that expiry must report the
+ * stability as UNKNOWN rather than as the recorded number.
+ */
 export type StabilityRecord = {
   /** ISO date the measurement was taken. */
   measuredAt: string;
+  /**
+   * Days after `measuredAt` for which this figure may be quoted. Past it the
+   * figure is stale and `readStability` returns `unknown`. 30 unless a
+   * definition states otherwise — chosen because the one change we have
+   * observed happened in two days, so a month is already generous.
+   */
+  validForDays?: number;
   /** Distinct responses the judge was shown. */
   responses: number;
   /** Identical calls made per response. */

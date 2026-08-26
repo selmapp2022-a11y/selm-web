@@ -205,6 +205,11 @@ export const IELTS_GT: ExamDefinition = {
             samples: 2,
             stability: {
               measuredAt: '2026-08-25',
+              // Read through `readStability`, which returns `unknown` past
+              // this window rather than quoting the numbers below. They were
+              // measured on the 25th and this judge was observed behaving
+              // differently on the 27th.
+              validForDays: 30,
               responses: 5,
               callsPerResponse: 10,
               scaleId: 'writing_assess_100',

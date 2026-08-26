@@ -62,10 +62,15 @@ export const TCF_CANADA: ExamDefinition = {
       step: 1,
       display: { suffix: { en: '/ 20', fr: '/ 20' }, decimals: 0 },
     },
+    // 331 and 342 are NOT the floors of these scales. They are the NCLC 4
+    // thresholds in IRCC's chart, which starts at NCLC 4 because that is the
+    // lowest level it converts. FEI reports comprehension on 100–699. Encoded
+    // as 331/342 on 26 August and corrected the same day, before anything
+    // rendered them.
     {
       id: 'co699',
       label: { en: 'Listening score', fr: 'Score de compréhension orale' },
-      min: 331,
+      min: 100,
       max: 699,
       step: 1,
       display: { suffix: { en: '/ 699', fr: '/ 699' }, decimals: 0 },
@@ -73,7 +78,7 @@ export const TCF_CANADA: ExamDefinition = {
     {
       id: 'ce699',
       label: { en: 'Reading score', fr: 'Score de compréhension écrite' },
-      min: 342,
+      min: 100,
       max: 699,
       step: 1,
       display: { suffix: { en: '/ 699', fr: '/ 699' }, decimals: 0 },

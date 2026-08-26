@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useExam } from '../state';
+import { readStability } from '../engine/stability';
 import { formatScale, t } from '../model/format';
 
 const TONE: Record<string, string> = {
@@ -158,6 +159,26 @@ export default function ResultPage() {
             <p className="border-t border-surface-divider px-4 py-3 text-xs leading-relaxed text-ink-secondary">
               {t(scored[0].unmappedReason, ui)}
             </p>
+            {(() => {
+              // What this judge's repeatability was, and whether that figure
+              // is still allowed to be quoted. A stale one reads as unknown.
+              const reading = readStability(task.judge.kind === 'remote' ? task.judge.stability : undefined);
+              if (reading.kind === 'valid') {
+                return (
+                  <p className="border-t border-surface-divider px-4 py-3 text-xs leading-relaxed text-ink-secondary">
+                    {ui === 'en'
+                      ? `Repeatability, measured ${reading.ageDays} days ago on ${reading.measuredAt}: across ${reading.record.responses} responses asked ${reading.record.callsPerResponse}× each, the worst single criterion moved ${reading.record.worstCriterionSpread} points. `
+                      : `Répétabilité, mesurée il y a ${reading.ageDays} jours le ${reading.measuredAt} : sur ${reading.record.responses} réponses interrogées ${reading.record.callsPerResponse} fois chacune, le pire critère isolé a varié de ${reading.record.worstCriterionSpread} points. `}
+                    {t(reading.record.note, ui)}
+                  </p>
+                );
+              }
+              return (
+                <p className="border-t border-surface-divider bg-amber-500/5 px-4 py-3 text-xs leading-relaxed text-ink-secondary">
+                  {t(reading.label, ui)}
+                </p>
+              );
+            })()}
             {judgeAggregate && judgeAggregate.judgeSpread > 0 && (
               <p className="border-t border-surface-divider bg-amber-500/5 px-4 py-3 text-xs leading-relaxed text-ink-secondary">
                 {ui === 'en'
