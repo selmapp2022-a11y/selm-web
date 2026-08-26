@@ -23,7 +23,15 @@ export type GateResult = {
   /** True when at least one rule with `kind: 'zero'` fired. */
   zeroed: boolean;
   /** Measurements shown whether or not a rule fired. */
-  measurements: { wordCount: number; promptOverlap: number; scaffoldRatio: number; longestLiftedRun: number; topicHits: number };
+  measurements: {
+    wordCount: number;
+    promptOverlap: number;
+    scaffoldRatio: number;
+    longestLiftedRun: number;
+    topicHits: number;
+    /** Hits per declared source, when the task declares any. */
+    sourceHits: Array<{ id: string; label: Localised; hits: number; need: number }>;
+  };
 };
 
 export function runGate(task: TaskDefinition, text: string, promptText: string): GateResult {
@@ -34,7 +42,25 @@ export function runGate(task: TaskDefinition, text: string, promptText: string):
     scaffoldRatio: scaffold ? overlapRatio(text, scaffold) : 0,
     longestLiftedRun: longestCommonRun(text, promptText),
     topicHits: keywordHits(text, task.topicKeywords),
+    sourceHits: [] as GateResult['measurements']['sourceHits'],
   };
+
+  // Measured whether or not a rule reads it, so the candidate can see which
+  // document they under-served even when the response was long enough to
+  // pass. Half an answer that is not quite half enough to fail is the case
+  // worth showing.
+  for (const rule of task.gate) {
+    if (rule.id === 'source_coverage') {
+      for (const src of rule.sources) {
+        m.sourceHits.push({
+          id: src.id,
+          label: src.label,
+          hits: keywordHits(text, src.keywords),
+          need: rule.minHitsPerSource,
+        });
+      }
+    }
+  }
 
   const findings: GateFinding[] = [];
   const fire = (rule: GateRule, measured: string) =>
@@ -51,10 +77,15 @@ export function runGate(task: TaskDefinition, text: string, promptText: string):
       case 'max_words':
         if (m.wordCount > rule.words) fire(rule, `${m.wordCount} / ${rule.words}`);
         break;
-      case 'prompt_copy':
-        if (m.promptOverlap > rule.maxOverlapRatio || m.longestLiftedRun >= 8)
-          fire(rule, `${Math.round(m.promptOverlap * 100)}% · run ${m.longestLiftedRun}`);
+      case 'prompt_copy': {
+        // The run threshold comes from the rule. It used to be the literal 8
+        // below, which was the last exam-specific number left in this file
+        // and it was wrong for any task whose prompt carries source material.
+        const maxRun = rule.maxLiftedRun ?? 8;
+        if (m.promptOverlap > rule.maxOverlapRatio || m.longestLiftedRun >= maxRun)
+          fire(rule, `${Math.round(m.promptOverlap * 100)}% · run ${m.longestLiftedRun}/${maxRun}`);
         break;
+      }
       case 'template_ratio':
         if (m.scaffoldRatio > rule.maxRatio) fire(rule, `${Math.round(m.scaffoldRatio * 100)}% / ${Math.round(rule.maxRatio * 100)}%`);
         break;
@@ -62,6 +93,15 @@ export function runGate(task: TaskDefinition, text: string, promptText: string):
         if (m.wordCount > 0 && m.topicHits < rule.minKeywordHits)
           fire(rule, `${m.topicHits} / ${rule.minKeywordHits}`);
         break;
+      case 'source_coverage': {
+        if (m.wordCount === 0) break;
+        const short = m.sourceHits.filter(
+          (h) => rule.sources.some((s) => s.id === h.id) && h.hits < rule.minHitsPerSource
+        );
+        if (short.length)
+          fire(rule, short.map((h) => `${h.id} ${h.hits}/${h.need}`).join(' · '));
+        break;
+      }
     }
   }
 

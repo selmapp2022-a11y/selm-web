@@ -81,10 +81,46 @@ export type Criterion = {
 export type GateRule =
   | { id: 'min_words'; words: number; verdict: GateVerdict }
   | { id: 'max_words'; words: number; verdict: GateVerdict }
-  | { id: 'prompt_copy'; maxOverlapRatio: number; verdict: GateVerdict }
+  | {
+      id: 'prompt_copy';
+      maxOverlapRatio: number;
+      /**
+       * Longest run of consecutive tokens the response may share with the
+       * prompt before it counts as lifting. Defaults to 8.
+       *
+       * Declared here rather than fixed in the engine because the right
+       * value depends on what the prompt IS. Against a one-line instruction,
+       * eight consecutive words is plagiarism. Against TCF Tâche 3, whose
+       * prompt contains the two documents being compared, naming the subject
+       * costs eight words on its own — "la fermeture du centre-ville aux
+       * voitures le samedi" — and a correct answer was zeroed for it on the
+       * first test run.
+       */
+      maxLiftedRun?: number;
+      verdict: GateVerdict;
+    }
   | { id: 'template_ratio'; maxRatio: number; verdict: GateVerdict }
   | { id: 'off_topic'; minKeywordHits: number; verdict: GateVerdict }
-  | { id: 'empty'; verdict: GateVerdict };
+  | { id: 'empty'; verdict: GateVerdict }
+  /**
+   * The response must engage with EVERY source the task puts in front of it.
+   *
+   * TCF Tâche 3 gives the candidate two documents and asks for a comparison
+   * and a reasoned opinion. A response that discusses only one of them is a
+   * known score-killer, and it is deterministic to detect: the two documents
+   * are known in advance, so the words that belong to each are known too.
+   *
+   * Generic on purpose. It is not "the tâche 3 rule" — it is "answer all the
+   * parts you were given", which is also IELTS General Training Task 1 with
+   * its three bullets, and TEF section B. The engine does not know which.
+   */
+  | {
+      id: 'source_coverage';
+      sources: Array<{ id: string; label: Localised; keywords: string[] }>;
+      /** Keyword hits required from each source individually. */
+      minHitsPerSource: number;
+      verdict: GateVerdict;
+    };
 
 export type GateVerdict = {
   /**

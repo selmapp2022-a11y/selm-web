@@ -92,6 +92,16 @@ export const TCF_CANADA: ExamDefinition = {
           id: 'tcf-ee-t1',
           skill: 'writing',
           responseMode: 'text',
+          // NUMBERS UNVERIFIED, 2026-08-27. The file header claims every
+          // figure is taken from the published specification. These were
+          // not: France Éducation international's site returns ERR-BOT-403
+          // to this network, and every other source for TCF word bands is a
+          // commercial preparation site — which this project has already
+          // ruled out as authoritative for French, in step 05.
+          //
+          // 60/120 and 15 minutes are plausible and unconfirmed. Someone
+          // with a browser should read the specification and either confirm
+          // them or correct them. Flagged rather than left to look sourced.
           name: { en: 'Tâche 1', fr: 'Tâche 1' },
           instruction: {
             en: 'Write a short message. 60 to 120 words.',
@@ -193,6 +203,170 @@ export const TCF_CANADA: ExamDefinition = {
             reason: {
               en: 'No calibrated judge is bound to TCF Canada yet. The deterministic checks above are real; the criterion grid below is what a judge would fill in, and it is empty because the French engine has not been built.',
               fr: "Aucun correcteur étalonné n'est encore rattaché au TCF Canada. Les vérifications déterministes ci-dessus sont réelles ; la grille de critères ci-dessous est ce qu'un correcteur remplirait, et elle est vide parce que le moteur français n'est pas construit.",
+            },
+          },
+        },
+        {
+          id: 'tcf-ee-t3',
+          skill: 'writing',
+          responseMode: 'text',
+          // NUMBERS UNVERIFIED. See the note on tcf-ee-t1: the word band and
+          // the time below could not be checked against France Éducation
+          // international, whose site refuses this network. Treat both as
+          // placeholders until someone reads the published specification.
+          name: { en: 'Tâche 3', fr: 'Tâche 3' },
+          instruction: {
+            en: 'Compare the two documents below and give your own reasoned opinion. 120 to 180 words.',
+            fr: "Comparez les deux documents ci-dessous et donnez votre avis argumenté. De 120 à 180 mots.",
+          },
+          prompt: {
+            en: 'Document 1 — a municipal notice announcing that the town centre will be closed to cars on Saturdays, to reduce pollution and make room for markets and cycling.\n\nDocument 2 — a letter from a shopkeepers\u2019 association arguing that the closure will cut takings, that deliveries have nowhere to stop, and that customers with reduced mobility will stay away.\n\nCompare the two positions and give your own reasoned opinion.',
+            fr: "Document 1 — un avis municipal annonçant la fermeture du centre-ville aux voitures le samedi, afin de réduire la pollution et de laisser la place aux marchés et au vélo.\n\nDocument 2 — une lettre d'une association de commerçants soutenant que cette fermeture fera baisser le chiffre d'affaires, que les livraisons n'auront plus où s'arrêter, et que la clientèle à mobilité réduite ne viendra plus.\n\nComparez les deux positions et donnez votre avis argumenté.",
+          },
+          timeLimitSec: 25 * 60,
+          wordGuidance: { en: '120 to 180 words', fr: 'De 120 à 180 mots' },
+          scaleId: 'sur20',
+          criteria: [
+            { id: 'respect_consigne', label: { en: 'Compliance with the instruction', fr: 'Respect de la consigne' } },
+            { id: 'capacite_argumenter', label: { en: 'Ability to compare and argue', fr: 'Capacité à comparer et à argumenter' } },
+            { id: 'lexique', label: { en: 'Lexis', fr: 'Lexique' } },
+            { id: 'morphosyntaxe', label: { en: 'Morphosyntax', fr: 'Morphosyntaxe' } },
+          ],
+          gate: [
+            {
+              id: 'empty',
+              verdict: {
+                kind: 'zero',
+                label: { en: 'Nothing submitted', fr: 'Aucune réponse remise' },
+                detail: { en: 'An empty response cannot be marked.', fr: "Une réponse vide ne peut pas être corrigée." },
+              },
+            },
+            {
+              id: 'min_words',
+              words: 120,
+              verdict: {
+                kind: 'zero',
+                label: { en: 'Under length — "A1 non atteint"', fr: 'Trop court — « A1 non atteint »' },
+                detail: {
+                  en: 'TCF awards "A1 non atteint" to a response below the required length, whatever its quality.',
+                  fr: "Le TCF attribue « A1 non atteint » à une réponse trop courte, quelle que soit sa qualité.",
+                },
+              },
+            },
+            {
+              id: 'max_words',
+              words: 180,
+              verdict: {
+                kind: 'warn',
+                label: { en: 'Over the upper bound', fr: 'Au-dessus de la borne haute' },
+                detail: {
+                  en: 'Tâche 3 is the last task and the one candidates run out of time on. Words past the bound earn nothing.',
+                  fr: "La tâche 3 est la dernière et celle où le temps manque. Les mots au-delà de la borne ne rapportent rien.",
+                },
+              },
+            },
+            {
+              // The comparison rule. This is the one that distinguishes
+              // tâche 3 from every other written task in either exam.
+              id: 'source_coverage',
+              minHitsPerSource: 2,
+              sources: [
+                {
+                  id: 'doc1',
+                  label: { en: 'Document 1 — the municipal notice', fr: 'Document 1 — l\u2019avis municipal' },
+                  // DISTINCTIVE words only. 'voiture', 'centre-ville' and
+                  // 'samedi' were removed after the first test run: they are
+                  // the shared subject of both documents, so an answer that
+                  // discussed only the shopkeepers still scored hits against
+                  // document 1 and passed. A coverage keyword has to be one
+                  // the OTHER document would not naturally produce.
+                  keywords: ['pollution', 'vélo', 'marché', 'piéton', 'municipal', 'mairie', 'air'],
+                },
+                {
+                  id: 'doc2',
+                  label: { en: 'Document 2 — the shopkeepers\u2019 letter', fr: 'Document 2 — la lettre des commerçants' },
+                  keywords: ['commerçant', 'chiffre', 'livraison', 'clientèle', 'mobilité', 'affaires', 'boutique', 'vente'],
+                },
+              ],
+              verdict: {
+                kind: 'zero',
+                label: { en: 'Only one document was addressed', fr: "Un seul document a été traité" },
+                detail: {
+                  en: 'Tâche 3 asks for a comparison. A response that engages with only one of the two documents has not performed the task, however well it is written — and the criterion it fails first is respect de la consigne.',
+                  fr: "La tâche 3 demande une comparaison. Une réponse qui ne traite qu'un des deux documents n'a pas réalisé la tâche, aussi bien écrite soit-elle — et le premier critère qu'elle manque est le respect de la consigne.",
+                },
+              },
+            },
+            {
+              // Token overlap is NOT a valid copy measure on this task, and
+              // the first test run proved it: a genuine, well-argued
+              // comparison was zeroed at 0.5 because the prompt here IS the
+              // source material. A response that discusses two documents
+              // must reuse their content words — that is the task.
+              //
+              // So the ratio is set high enough to be inert and the work is
+              // done by the run detector in engine/gate.ts, which fires on
+              // eight consecutive lifted tokens. That catches a copied
+              // sentence and ignores shared vocabulary, which is the
+              // distinction that actually matters here.
+              id: 'prompt_copy',
+              maxOverlapRatio: 0.85,
+              // Naming what the two documents are about costs eight
+              // consecutive words by itself. Fourteen is the point where a
+              // response is reproducing a clause rather than a subject.
+              maxLiftedRun: 14,
+              verdict: {
+                kind: 'zero',
+                label: { en: 'Copied from the documents', fr: 'Recopié des documents' },
+                detail: {
+                  en: 'Tâche 3 supplies two texts, so it is the task where lifting is easiest and most penalised. Reusing their vocabulary is expected; reproducing their sentences is not.',
+                  fr: "La tâche 3 fournit deux textes : c'est donc la tâche où le recopiage est le plus facile et le plus sanctionné. Réutiliser leur vocabulaire est attendu ; reproduire leurs phrases ne l'est pas.",
+                },
+              },
+            },
+            {
+              // Also raised after the first test run. The scaffold for this
+              // task is the connective phrasing a correct comparison uses —
+              // "les deux documents", "le premier soutient que" — so at 0.2
+              // it fired on the model answer. A candidate who structures a
+              // comparison properly is not cheating.
+              id: 'template_ratio',
+              maxRatio: 0.4,
+              verdict: {
+                kind: 'zero',
+                label: { en: 'Memorised text', fr: 'Texte appris par cœur' },
+                detail: {
+                  en: 'TCF awards no score to memorised text.',
+                  fr: "Le TCF n'accorde aucune note à un texte appris par cœur.",
+                },
+              },
+            },
+            {
+              id: 'off_topic',
+              minKeywordHits: 2,
+              verdict: {
+                kind: 'zero',
+                label: { en: 'Off topic', fr: 'Hors sujet' },
+                detail: {
+                  en: 'An off-topic response is one of the official automatic-zero triggers.',
+                  fr: "Le hors-sujet fait partie des déclencheurs officiels du zéro automatique.",
+                },
+              },
+            },
+          ],
+          topicKeywords: ['centre-ville', 'voiture', 'commerçant', 'pollution', 'avis', 'samedi'],
+          suppliedScaffold: [
+            'Les deux documents abordent',
+            "Le premier document soutient que",
+            "Le second, en revanche, met en avant",
+            "Pour ma part, je pense que",
+            'En conclusion,',
+          ],
+          judge: {
+            kind: 'none',
+            reason: {
+              en: 'No judge is bound. The bound writing assessor refuses French outright — fr-fr and fr-ca both return error_feature_unavailable — so the deterministic checks above are the only real output for this task today, and they are real.',
+              fr: "Aucun correcteur n'est rattaché. Le correcteur d'écrit refuse le français — fr-fr et fr-ca renvoient tous deux error_feature_unavailable — de sorte que les vérifications déterministes ci-dessus sont aujourd'hui le seul résultat réel de cette tâche, et elles sont réelles.",
             },
           },
         },
