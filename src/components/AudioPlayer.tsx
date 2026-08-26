@@ -157,7 +157,7 @@ export function AudioPlayer({ src, fallbackText, onEnd }: Props) {
   return (
     <div className="rounded-2xl bg-navy p-6 text-white shadow-card">
       <div className="flex items-center gap-4">
-        <button onClick={togglePlay} className="flex h-14 w-14 items-center justify-center rounded-full bg-teal text-white transition hover:bg-teal-600">
+        <button onClick={togglePlay} className="flex h-14 w-14 items-center justify-center rounded-full bg-navy text-white transition hover:bg-navy-700">
           {playing ? <Pause className="h-6 w-6" /> : <Play className="ml-1 h-6 w-6" />}
         </button>
         <div className="flex-1">
@@ -168,7 +168,7 @@ export function AudioPlayer({ src, fallbackText, onEnd }: Props) {
                 <span>{fmt(duration)}</span>
               </div>
               <div className="h-2 overflow-hidden rounded-full bg-white/20">
-                <div className="h-full bg-teal transition-all" style={{ width: `${pct}%` }} />
+                <div className="h-full bg-navy transition-all" style={{ width: `${pct}%` }} />
               </div>
             </>
           ) : (
@@ -207,7 +207,7 @@ export function AudioPlayer({ src, fallbackText, onEnd }: Props) {
             onClick={() => setRate(r)}
             className={clsx(
               'rounded-full px-3 py-1 text-xs font-bold transition',
-              rate === r ? 'bg-teal text-white' : 'bg-white/10 text-white/70 hover:bg-white/20'
+              rate === r ? 'bg-navy text-white' : 'bg-white/10 text-white/70 hover:bg-white/20'
             )}
           >
             {r}×

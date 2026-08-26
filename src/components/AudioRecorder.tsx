@@ -82,7 +82,7 @@ export function AudioRecorder({ onComplete, maxSeconds = 60, disabled, label }: 
             key={i}
             className={clsx(
               'w-1.5 rounded-full transition-all duration-75',
-              isActive ? 'bg-teal' : 'bg-surface-divider'
+              isActive ? 'bg-navy' : 'bg-surface-divider'
             )}
             style={{ height: `${Math.max(4, v * 64)}px` }}
           />
@@ -91,7 +91,7 @@ export function AudioRecorder({ onComplete, maxSeconds = 60, disabled, label }: 
 
       <div className="mt-4 text-center font-mono text-2xl text-navy">
         {String(Math.floor(seconds / 60)).padStart(2, '0')}:{String(seconds % 60).padStart(2, '0')}
-        <span className="ml-2 text-sm text-ink-disabled">/ {String(Math.floor(maxSeconds / 60)).padStart(2, '0')}:{String(maxSeconds % 60).padStart(2, '0')}</span>
+        <span className="ml-2 text-sm text-ink-secondary">/ {String(Math.floor(maxSeconds / 60)).padStart(2, '0')}:{String(maxSeconds % 60).padStart(2, '0')}</span>
       </div>
 
       <div className="mt-6 flex justify-center">

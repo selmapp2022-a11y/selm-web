@@ -41,7 +41,7 @@ export default function GoalPage() {
       </section>
 
       <section className="rounded-xl border border-surface-divider bg-surface-card p-5">
-        <div className="text-[11px] font-semibold uppercase tracking-wide text-ink-disabled">
+        <div className="text-[11px] font-semibold uppercase tracking-wide text-ink-secondary">
           {ui === 'en' ? 'Selected exam' : 'Examen choisi'}
         </div>
         <div className="mt-1 font-display text-lg font-semibold">{t(exam.name, ui)}</div>
@@ -68,7 +68,7 @@ export default function GoalPage() {
       </section>
 
       <section className="rounded-xl border border-surface-divider bg-surface-card p-5">
-        <div className="text-[11px] font-semibold uppercase tracking-wide text-ink-disabled">
+        <div className="text-[11px] font-semibold uppercase tracking-wide text-ink-secondary">
           {ui === 'en' ? 'The task' : 'La tâche'}
         </div>
         <div className="mt-2 flex flex-wrap gap-2">
@@ -85,7 +85,7 @@ export default function GoalPage() {
           ))}
         </div>
         <p className="mt-3 text-sm text-ink-secondary">{t(task.instruction, ui)}</p>
-        <p className="mt-1 text-xs text-ink-disabled">
+        <p className="mt-1 text-xs text-ink-secondary">
           {task.responseMode === 'audio'
             ? ui === 'en' ? 'Spoken response · recorded' : 'Réponse orale · enregistrée'
             : ui === 'en' ? 'Written response' : 'Réponse écrite'}

@@ -155,7 +155,7 @@ function ReaderView({ text, onRetry }: { text: ReadingText; onRetry: () => void 
                 <p className="mt-1 text-sm text-ink-primary">{vocabSelDef.definition}</p>
                 {vocabSelDef.example && <p className="mt-2 text-sm italic text-ink-secondary">e.g. "{vocabSelDef.example}"</p>}
               </div>
-              <button onClick={() => setVocabSel(null)} className="text-ink-disabled">×</button>
+              <button onClick={() => setVocabSel(null)} className="text-ink-secondary">×</button>
             </div>
           </div>
         )}

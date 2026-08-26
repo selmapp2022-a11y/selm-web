@@ -167,7 +167,7 @@ function PronunciationMode({ level }: { level: string }) {
           />
         )}
         {!loading && !err && !result && (
-          <div className="card p-8 text-center text-ink-disabled">
+          <div className="card p-8 text-center text-ink-secondary">
             <Mic className="mx-auto mb-2 h-10 w-10 opacity-40" />
             <p className="text-sm">Record yourself to see word-by-word and phoneme scores.</p>
           </div>
@@ -356,7 +356,7 @@ function IELTSMode() {
           />
         )}
         {!loading && !err && !result && (
-          <div className="card p-8 text-center text-ink-disabled">
+          <div className="card p-8 text-center text-ink-secondary">
             <Trophy className="mx-auto mb-2 h-10 w-10 opacity-40" />
             <p className="text-sm">Your IELTS-style score will appear here.</p>
           </div>

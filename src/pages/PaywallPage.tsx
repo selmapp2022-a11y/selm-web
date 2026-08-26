@@ -447,7 +447,7 @@ export default function PaywallPage() {
         }
       >
         {plan.tag && (
-          <span className="absolute -top-3 right-4 rounded-full bg-teal-500 px-3 py-0.5 text-xs font-bold text-white">
+          <span className="absolute -top-3 right-4 rounded-full bg-navy px-3 py-0.5 text-xs font-bold text-white">
             {plan.tag}
           </span>
         )}
@@ -493,7 +493,7 @@ export default function PaywallPage() {
       <ul className="mb-6 space-y-2">
         {PERKS.map((perk) => (
           <li key={perk} className="flex items-start gap-2">
-            <Check className="mt-0.5 h-5 w-5 flex-none text-teal-500" />
+            <Check className="mt-0.5 h-5 w-5 flex-none text-navy" />
             <span className="text-sm text-navy dark:text-slate-200">{perk}</span>
           </li>
         ))}
@@ -544,7 +544,7 @@ export default function PaywallPage() {
       <button
         onClick={handleSubscribe}
         disabled={subscribeDisabled}
-        className="w-full rounded-2xl bg-teal-500 py-3.5 text-base font-bold text-white shadow-md transition hover:bg-teal-600 disabled:opacity-60"
+        className="w-full rounded-2xl bg-navy py-3.5 text-base font-bold text-white shadow-md transition hover:bg-navy-700 disabled:opacity-60"
       >
         {busy ? 'Processing…' : 'Start 7-day free trial'}
       </button>
@@ -552,12 +552,12 @@ export default function PaywallPage() {
       <button
         onClick={handleRestore}
         disabled={busy}
-        className="mt-3 w-full py-2 text-sm text-teal-600 hover:underline disabled:opacity-60 dark:text-teal-300"
+        className="mt-3 w-full py-2 text-sm text-navy hover:underline disabled:opacity-60 dark:text-teal-300"
       >
         Restore purchases
       </button>
 
-      <p className="mt-6 text-center text-xs text-ink-disabled dark:text-slate-500">
+      <p className="mt-6 text-center text-xs text-ink-secondary dark:text-slate-500">
         Payment will be charged to your Apple ID account at the end of the
         7-day free trial. Subscription automatically renews at {selectedPrice}/{selectedPlan.cadence}
         {' '}unless cancelled at least 24 hours before the end of the current period.
@@ -570,12 +570,12 @@ export default function PaywallPage() {
           Guideline 3.1.2(c) for apps offering auto-renewable
           subscriptions. Must be functional (both routes are public
           in App.tsx). */}
-      <p className="mt-3 text-center text-xs text-ink-disabled dark:text-slate-500">
+      <p className="mt-3 text-center text-xs text-ink-secondary dark:text-slate-500">
         By subscribing you agree to our{' '}
-        <a href="https://selmapp.com/terms" target="_blank" rel="noreferrer noopener" className="font-semibold text-teal-600 hover:underline dark:text-teal-300">
+        <a href="https://selmapp.com/terms" target="_blank" rel="noreferrer noopener" className="font-semibold text-navy hover:underline dark:text-teal-300">
           Terms of Use
         </a>{' '}and{' '}
-        <a href="https://selmapp.com/privacy" target="_blank" rel="noreferrer noopener" className="font-semibold text-teal-600 hover:underline dark:text-teal-300">
+        <a href="https://selmapp.com/privacy" target="_blank" rel="noreferrer noopener" className="font-semibold text-navy hover:underline dark:text-teal-300">
           Privacy Policy
         </a>
         .

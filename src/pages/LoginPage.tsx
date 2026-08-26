@@ -112,7 +112,7 @@ export default function LoginPage() {
                   placeholder="••••••••"
                   autoComplete="current-password"
                 />
-                <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-disabled hover:text-navy">
+                <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-secondary hover:text-navy">
                   {showPw ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
@@ -122,7 +122,7 @@ export default function LoginPage() {
               <div className="mt-2 flex justify-end">
                 <Link
                   to="/forgot-password"
-                  className="text-sm font-semibold text-teal-600 hover:underline"
+                  className="text-sm font-semibold text-navy hover:underline"
                 >
                   Forgot password?
                 </Link>
@@ -155,7 +155,7 @@ export default function LoginPage() {
           </form>
 
           {/* Divider — separates traditional login from third-party providers. */}
-          <div className="my-5 flex items-center gap-3 text-xs uppercase tracking-wider text-ink-disabled">
+          <div className="my-5 flex items-center gap-3 text-xs uppercase tracking-wider text-ink-secondary">
             <div className="h-px flex-1 bg-slate-200" />
             <span>or</span>
             <div className="h-px flex-1 bg-slate-200" />
@@ -183,7 +183,7 @@ export default function LoginPage() {
 
           <p className="mt-6 text-center text-sm text-ink-secondary">
             New to SELM?{' '}
-            <Link to="/register" className="font-semibold text-teal-600 hover:underline">
+            <Link to="/register" className="font-semibold text-navy hover:underline">
               Create an account
             </Link>
           </p>

@@ -199,7 +199,7 @@ export default function AssessmentPage() {
               <p className="text-ink-secondary">{statusMsg}</p>
               {progress > 0 && (
                 <div className="mt-6 h-2 w-full overflow-hidden rounded-full bg-surface-muted">
-                  <div className="h-full rounded-full bg-teal transition-all" style={{ width: `${progress}%` }} />
+                  <div className="h-full rounded-full bg-navy transition-all" style={{ width: `${progress}%` }} />
                 </div>
               )}
             </>
@@ -211,7 +211,7 @@ export default function AssessmentPage() {
                 <button onClick={() => window.location.reload()} className="btn-primary">Try again</button>
                 <button onClick={() => navigate('/dashboard')} className="btn-ghost">Skip for now</button>
               </div>
-              <p className="mt-6 text-xs text-ink-disabled">Technical detail: {statusMsg}</p>
+              <p className="mt-6 text-xs text-ink-secondary">Technical detail: {statusMsg}</p>
             </>
           )}
         </div>
@@ -254,7 +254,7 @@ export default function AssessmentPage() {
           <span className="chip">{current.skill} · {current.difficulty_level}</span>
         </div>
         <div className="h-2 w-full overflow-hidden rounded-full bg-surface-muted">
-          <div className="h-full rounded-full bg-teal transition-all duration-300" style={{ width: `${(qNum / 10) * 100}%` }} />
+          <div className="h-full rounded-full bg-navy transition-all duration-300" style={{ width: `${(qNum / 10) * 100}%` }} />
         </div>
       </div>
 

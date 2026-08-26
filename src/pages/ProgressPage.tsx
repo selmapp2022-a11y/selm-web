@@ -98,16 +98,16 @@ export default function ProgressPage() {
                     <span className="font-semibold text-navy">{stats.xpThisLevel}/120</span>
                   </div>
                   <div className="h-2 overflow-hidden rounded-full bg-surface-muted">
-                    <div className="h-full rounded-full bg-teal transition-all" style={{ width: `${pct}%` }} />
+                    <div className="h-full rounded-full bg-navy transition-all" style={{ width: `${pct}%` }} />
                   </div>
                   {stats.bestPct != null && (
                     <div className="mt-2 text-xs text-ink-secondary">Best score: <span className="font-semibold text-navy">{Math.round(stats.bestPct)}%</span></div>
                   )}
                   {stats.count === 0 && (
-                    <div className="mt-2 text-xs text-ink-disabled">No exercises yet — get started!</div>
+                    <div className="mt-2 text-xs text-ink-secondary">No exercises yet — get started!</div>
                   )}
                 </div>
-                <ChevronRight className="absolute right-5 top-5 h-5 w-5 text-ink-disabled transition-transform group-hover:translate-x-1 group-hover:text-teal" />
+                <ChevronRight className="absolute right-5 top-5 h-5 w-5 text-ink-secondary transition-transform group-hover:translate-x-1 group-hover:text-teal" />
               </Link>
             );
           })}
@@ -120,7 +120,7 @@ export default function ProgressPage() {
               <div className="font-display font-bold text-navy">Vocabulary</div>
               <div className="text-xs text-ink-secondary">{summary.bySkill.vocabulary.count} reviews · {summary.bySkill.vocabulary.xp} XP</div>
             </div>
-            <ChevronRight className="h-5 w-5 text-ink-disabled" />
+            <ChevronRight className="h-5 w-5 text-ink-secondary" />
           </Link>
         )}
       </section>
@@ -138,7 +138,7 @@ export default function ProgressPage() {
               a.unlocked ? 'border-teal/30 bg-gradient-to-br from-white to-teal/5' : 'opacity-60',
             )}>
               <div className={clsx('flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-2xl', a.unlocked ? 'bg-amber-100' : 'bg-surface-muted')}>
-                {a.unlocked ? a.emoji : <Lock className="h-5 w-5 text-ink-disabled" />}
+                {a.unlocked ? a.emoji : <Lock className="h-5 w-5 text-ink-secondary" />}
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2">
@@ -147,7 +147,7 @@ export default function ProgressPage() {
                 </div>
                 <p className="text-xs text-ink-secondary">{a.description}</p>
                 {a.unlocked && a.unlockedAt && (
-                  <div className="mt-1 text-[11px] text-ink-disabled">Earned {new Date(a.unlockedAt).toLocaleDateString()}</div>
+                  <div className="mt-1 text-[11px] text-ink-secondary">Earned {new Date(a.unlockedAt).toLocaleDateString()}</div>
                 )}
               </div>
             </div>

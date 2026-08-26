@@ -61,7 +61,7 @@ export default function SettingsPage() {
       {/* Account details */}
       <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
         <h2 className="mb-4 flex items-center gap-2 text-lg font-bold text-navy dark:text-white">
-          <UserIcon className="h-5 w-5 text-teal-500" />
+          <UserIcon className="h-5 w-5 text-navy" />
           Account
         </h2>
         <div className="space-y-3 text-sm">
@@ -89,7 +89,7 @@ export default function SettingsPage() {
       {/* Privacy */}
       <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
         <h2 className="mb-3 flex items-center gap-2 text-lg font-bold text-navy dark:text-white">
-          <Shield className="h-5 w-5 text-teal-500" />
+          <Shield className="h-5 w-5 text-navy" />
           Privacy
         </h2>
         <p className="mb-3 text-sm text-ink-secondary dark:text-slate-400">
@@ -99,7 +99,7 @@ export default function SettingsPage() {
           href="https://selmapp.com/privacy"
           target="_blank"
           rel="noreferrer noopener"
-          className="inline-flex items-center gap-1 text-sm font-semibold text-teal-600 hover:underline dark:text-teal-300"
+          className="inline-flex items-center gap-1 text-sm font-semibold text-navy hover:underline dark:text-teal-300"
         >
           Read Privacy Policy →
         </a>

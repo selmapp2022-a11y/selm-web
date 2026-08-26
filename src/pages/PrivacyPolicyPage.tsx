@@ -232,7 +232,7 @@ export default function PrivacyPolicyPage() {
             <p>
               Questions or requests about this policy or your data?
               <br />
-              Email: <a href="mailto:admin@selmapp.com" className="text-teal-600 hover:underline">admin@selmapp.com</a>
+              Email: <a href="mailto:admin@selmapp.com" className="text-navy hover:underline">admin@selmapp.com</a>
               <br />
               Selm Mobile Application Inc., Vancouver, BC, Canada.
             </p>
@@ -240,7 +240,7 @@ export default function PrivacyPolicyPage() {
         </div>
 
         <footer className="mt-16 border-t border-slate-200 pt-6 text-sm text-ink-secondary dark:border-slate-800 dark:text-slate-400">
-          © 2026 Selm Mobile Application Inc. — <a href="/" className="text-teal-600 hover:underline">Return to SELM</a>
+          © 2026 Selm Mobile Application Inc. — <a href="/" className="text-navy hover:underline">Return to SELM</a>
         </footer>
       </main>
     </div>

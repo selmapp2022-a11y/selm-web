@@ -77,7 +77,7 @@ export function TopicPicker({ topics, onPick, title = 'Pick a topic', subtitle }
             onClick={() => onPick(t.value, t)}
             className="group flex items-start gap-3 rounded-2xl border-2 border-surface-divider bg-surface-card p-4 text-left transition hover:border-teal hover:shadow-card focus:outline-none focus:ring-2 focus:ring-teal dark:border-white/10 dark:bg-white/5 dark:hover:border-teal dark:hover:bg-white/10"
           >
-            <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-teal/10 text-teal transition group-hover:bg-teal group-hover:text-white">
+            <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-teal/10 text-teal transition group-hover:bg-navy group-hover:text-white">
               <t.icon className="h-5 w-5" />
             </div>
             <div className="min-w-0 flex-1">

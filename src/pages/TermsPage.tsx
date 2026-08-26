@@ -111,7 +111,7 @@ export default function TermsPage() {
               professional advice. You retain ownership of what you write
               or record; SELM only uses that content to run the Service
               features you invoke, as described in our{' '}
-              <a href="/privacy" className="text-teal-600 hover:underline">Privacy Policy</a>.
+              <a href="/privacy" className="text-navy hover:underline">Privacy Policy</a>.
             </p>
           </section>
 
@@ -182,13 +182,13 @@ export default function TermsPage() {
               <br />
               Vancouver, British Columbia, Canada
               <br />
-              Email: <a href="mailto:admin@selmapp.com" className="text-teal-600 hover:underline">admin@selmapp.com</a>
+              Email: <a href="mailto:admin@selmapp.com" className="text-navy hover:underline">admin@selmapp.com</a>
             </p>
           </section>
         </div>
 
         <footer className="mt-16 border-t border-slate-200 pt-6 text-sm text-ink-secondary dark:border-slate-800 dark:text-slate-400">
-          © 2026 Selm Mobile Application Inc. — <a href="/" className="text-teal-600 hover:underline">Return to SELM</a>
+          © 2026 Selm Mobile Application Inc. — <a href="/" className="text-navy hover:underline">Return to SELM</a>
         </footer>
       </main>
     </div>

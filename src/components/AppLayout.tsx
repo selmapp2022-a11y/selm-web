@@ -54,7 +54,7 @@ export function AppLayout() {
               <div className="text-sm font-semibold text-navy">{user?.full_name || user?.username || 'Learner'}</div>
               <div className="truncate text-xs text-ink-secondary">{user?.email}</div>
               {user?.current_level && (
-                <span className="mt-2 inline-flex items-center rounded-full bg-teal/10 px-2.5 py-0.5 text-xs font-bold text-teal-600">
+                <span className="mt-2 inline-flex items-center rounded-full bg-teal/10 px-2.5 py-0.5 text-xs font-bold text-navy">
                   Level {user.current_level}
                 </span>
               )}

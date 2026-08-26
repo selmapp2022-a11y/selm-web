@@ -72,7 +72,7 @@ export default function TaskPage() {
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <div className="text-[11px] font-semibold uppercase tracking-wide text-ink-disabled">
+          <div className="text-[11px] font-semibold uppercase tracking-wide text-ink-secondary">
             {t(exam.name, ui)} · {t(exam.sections[0].name, ui)}
           </div>
           <h1 className="font-display text-xl font-bold tracking-tight">{t(task.name, ui)}</h1>
@@ -81,7 +81,7 @@ export default function TaskPage() {
           <div className={`font-display text-xl font-bold tabular-nums ${over ? 'text-red-500' : ''}`}>
             {over ? '+' : ''}{clock}
           </div>
-          <div className="text-[10px] uppercase tracking-wide text-ink-disabled">
+          <div className="text-[10px] uppercase tracking-wide text-ink-secondary">
             {over ? (ui === 'en' ? 'over' : 'dépassé') : (ui === 'en' ? 'left' : 'restant')}
           </div>
         </div>

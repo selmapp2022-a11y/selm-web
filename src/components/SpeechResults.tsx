@@ -14,7 +14,7 @@ export function SpeechResults({ result }: { result: SpeechAssessment }) {
           <div>
             <div className="text-xs font-medium uppercase tracking-wider text-ink-secondary">Overall</div>
             <div className={clsx('font-display text-5xl font-bold', overall.text)}>
-              {result.overall_score}<span className="text-2xl text-ink-disabled">/100</span>
+              {result.overall_score}<span className="text-2xl text-ink-secondary">/100</span>
             </div>
             {result.ielts?.overall_band != null && (
               <div className="mt-1 text-sm text-ink-secondary">
@@ -202,7 +202,7 @@ export function SpeechResults({ result }: { result: SpeechAssessment }) {
               );
             })}
           </div>
-          <p className="mt-3 text-xs text-ink-disabled">Hover any word to see phoneme-level scores.</p>
+          <p className="mt-3 text-xs text-ink-secondary">Hover any word to see phoneme-level scores.</p>
         </div>
       )}
     </div>

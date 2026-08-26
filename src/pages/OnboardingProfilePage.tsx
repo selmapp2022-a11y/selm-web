@@ -71,13 +71,13 @@ export default function OnboardingProfilePage() {
           <span className="font-medium text-ink-secondary">About you</span>
         </div>
         <div className="h-2 w-full overflow-hidden rounded-full bg-surface-muted">
-          <div className="h-full rounded-full bg-teal transition-all duration-500" style={{ width: `${progress}%` }} />
+          <div className="h-full rounded-full bg-navy transition-all duration-500" style={{ width: `${progress}%` }} />
         </div>
       </div>
 
       <div className="card p-8">
         <div className="mb-8 flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-teal/10 text-teal-600">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-teal/10 text-navy">
             <Icon className="h-6 w-6" />
           </div>
           <div>

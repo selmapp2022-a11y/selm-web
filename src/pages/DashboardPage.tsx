@@ -75,7 +75,7 @@ export default function DashboardPage() {
             <span>{progress.xpToNext} to level {progress.level + 1}</span>
           </div>
           <div className="h-2 overflow-hidden rounded-full bg-surface-muted">
-            <div className="h-full rounded-full bg-teal transition-all" style={{ width: `${(progress.xpThisLevel / 200) * 100}%` }} />
+            <div className="h-full rounded-full bg-navy transition-all" style={{ width: `${(progress.xpThisLevel / 200) * 100}%` }} />
           </div>
         </div>
         <div className="flex items-center gap-2 rounded-xl bg-orange-50 px-3 py-2 text-orange-700">
@@ -83,7 +83,7 @@ export default function DashboardPage() {
           <span className="font-display font-bold">{progress.streak}</span>
           <span className="text-xs">day{progress.streak === 1 ? '' : 's'}</span>
         </div>
-        <ChevronRight className="h-5 w-5 text-ink-disabled transition-transform group-hover:translate-x-1 group-hover:text-teal" />
+        <ChevronRight className="h-5 w-5 text-ink-secondary transition-transform group-hover:translate-x-1 group-hover:text-teal" />
       </Link>
 
       {/* "Suggested for you" gradient card removed 2026-05-09 — on Android
@@ -115,7 +115,7 @@ export default function DashboardPage() {
                     <p className="text-sm text-ink-secondary">{s.desc}</p>
                   </div>
                 </div>
-                <ChevronRight className="absolute right-5 top-5 h-5 w-5 text-ink-disabled transition-transform group-hover:translate-x-1 group-hover:text-teal" />
+                <ChevronRight className="absolute right-5 top-5 h-5 w-5 text-ink-secondary transition-transform group-hover:translate-x-1 group-hover:text-teal" />
               </Link>
             );
           })}
@@ -133,7 +133,7 @@ export default function DashboardPage() {
             {vocab?.dueCount ? `${vocab.dueCount} cards due for review` : 'Review and add new words'}
           </div>
         </div>
-        <ChevronRight className="h-5 w-5 text-ink-disabled" />
+        <ChevronRight className="h-5 w-5 text-ink-secondary" />
       </Link>
 
       {/* 6 — Upgrade to SELM Pro card. This is the primary in-app entry

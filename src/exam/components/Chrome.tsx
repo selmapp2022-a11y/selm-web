@@ -52,12 +52,12 @@ export default function Chrome({ children }: { children: ReactNode }) {
             </button>
           </div>
         </div>
-        <div className="h-1 bg-teal" />
+        <div className="h-1 bg-navy" />
       </header>
 
       <main className="mx-auto max-w-3xl px-5 py-7">{children}</main>
 
-      <footer className="mx-auto max-w-3xl px-5 pb-10 text-xs leading-relaxed text-ink-disabled">
+      <footer className="mx-auto max-w-3xl px-5 pb-10 text-xs leading-relaxed text-ink-secondary">
         {ui === 'en'
           ? 'A working slice of the exam engine. One code path, two exam definitions. Nothing here publishes a predicted score — the result screen says why.'
           : "Une tranche fonctionnelle du moteur d'examen. Un seul code, deux définitions d'examen. Aucune note prédite n'est publiée ici — l'écran de résultat en donne la raison."}

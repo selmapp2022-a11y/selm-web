@@ -76,7 +76,7 @@ function LiveMode() {
 
       <div className="space-y-4">
         {!check && (
-          <div className="card p-6 text-center text-ink-disabled">
+          <div className="card p-6 text-center text-ink-secondary">
             <PenLine className="mx-auto mb-2 h-10 w-10 opacity-40" />
             <p className="text-sm">Suggestions appear here as you write.</p>
           </div>
@@ -101,9 +101,9 @@ function LiveMode() {
                 <div key={i} className="rounded-xl border-l-4 border-amber-400 bg-surface-muted p-3 text-sm">
                   <div className="mb-1 text-xs font-bold uppercase text-ink-secondary">{e.type}</div>
                   {e.text && <div className="line-through text-red-600">{e.text}</div>}
-                  {e.suggestion && <div className="font-medium text-teal-600">→ {e.suggestion}</div>}
+                  {e.suggestion && <div className="font-medium text-navy">→ {e.suggestion}</div>}
                   {e.explanation && <div className="mt-1 text-xs text-ink-secondary">{e.explanation}</div>}
-                  {e.rule && <div className="mt-1 text-xs italic text-ink-disabled">Rule: {e.rule}</div>}
+                  {e.rule && <div className="mt-1 text-xs italic text-ink-secondary">Rule: {e.rule}</div>}
                 </div>
               ))}
             </div>

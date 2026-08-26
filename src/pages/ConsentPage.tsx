@@ -144,7 +144,7 @@ export default function ConsentPage() {
 
         <div className="card p-6 sm:p-8">
           <div className="mb-4 flex justify-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-50 text-teal-600 dark:bg-teal-900/30 dark:text-teal-300">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-50 text-navy dark:bg-teal-900/30 dark:text-teal-300">
               <Shield className="h-7 w-7" />
             </div>
           </div>
@@ -198,7 +198,7 @@ export default function ConsentPage() {
               href="https://selmapp.com/privacy"
               target="_blank"
               rel="noreferrer noopener"
-              className="inline-flex items-center gap-1 font-semibold text-teal-600 hover:underline dark:text-teal-300"
+              className="inline-flex items-center gap-1 font-semibold text-navy hover:underline dark:text-teal-300"
             >
               Privacy Policy
               <ExternalLink className="h-3 w-3" />
@@ -208,7 +208,7 @@ export default function ConsentPage() {
               href="https://selmapp.com/terms"
               target="_blank"
               rel="noreferrer noopener"
-              className="inline-flex items-center gap-1 font-semibold text-teal-600 hover:underline dark:text-teal-300"
+              className="inline-flex items-center gap-1 font-semibold text-navy hover:underline dark:text-teal-300"
             >
               Terms of Use
               <ExternalLink className="h-3 w-3" />
@@ -229,7 +229,7 @@ export default function ConsentPage() {
               type="checkbox"
               checked={agreed}
               onChange={(e) => setAgreed(e.target.checked)}
-              className="mt-0.5 h-5 w-5 flex-none rounded border-slate-400 text-teal-600 focus:ring-teal-500"
+              className="mt-0.5 h-5 w-5 flex-none rounded border-slate-400 text-navy focus:ring-teal-500"
             />
             <span className="text-sm text-navy dark:text-slate-100">
               I have read the above and I agree to SELM sharing the
@@ -248,13 +248,13 @@ export default function ConsentPage() {
             <button
               onClick={handleAgree}
               disabled={!agreed}
-              className="flex-[2] rounded-xl bg-teal-500 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-teal-600 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex-[2] rounded-xl bg-navy py-3 text-sm font-bold text-white shadow-sm transition hover:bg-navy-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
               Agree & continue
             </button>
           </div>
 
-          <p className="mt-3 text-center text-xs text-ink-disabled dark:text-slate-500">
+          <p className="mt-3 text-center text-xs text-ink-secondary dark:text-slate-500">
             You can revoke this consent by deleting your account in
             Settings. Withdrawal of consent for AI processing requires
             account deletion because the AI features are the core of

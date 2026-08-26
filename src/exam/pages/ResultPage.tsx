@@ -23,7 +23,7 @@ export default function ResultPage() {
   return (
     <div className="space-y-5">
       <div>
-        <div className="text-[11px] font-semibold uppercase tracking-wide text-ink-disabled">
+        <div className="text-[11px] font-semibold uppercase tracking-wide text-ink-secondary">
           {t(exam.name, ui)} · {t(task.name, ui)}
         </div>
         <h1 className="font-display text-2xl font-bold tracking-tight">
@@ -36,7 +36,7 @@ export default function ResultPage() {
         <section className="space-y-2">
           <h2 className="text-sm font-semibold">
             {ui === 'en' ? 'What was heard' : "Ce qui a été entendu"}
-            <span className="ml-2 rounded-full bg-teal-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-teal-600">
+            <span className="ml-2 rounded-full bg-teal-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-navy">
               {ui === 'en' ? 'measured' : 'mesuré'}
             </span>
           </h2>
@@ -59,7 +59,7 @@ export default function ResultPage() {
                 ))}
               </div>
               <div className="rounded-xl border border-surface-divider bg-surface-card px-4 py-3">
-                <div className="text-[11px] font-semibold uppercase tracking-wide text-ink-disabled">
+                <div className="text-[11px] font-semibold uppercase tracking-wide text-ink-secondary">
                   {ui === 'en' ? 'Transcript' : 'Transcription'}
                 </div>
                 <p className="mt-1 text-sm leading-relaxed" lang={exam.locale}>
@@ -80,7 +80,7 @@ export default function ResultPage() {
       <section className="space-y-2">
         <h2 className="text-sm font-semibold">
           {ui === 'en' ? 'Deterministic checks' : 'Vérifications déterministes'}
-          <span className="ml-2 rounded-full bg-teal-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-teal-600">
+          <span className="ml-2 rounded-full bg-teal-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-navy">
             {ui === 'en' ? 'measured' : 'mesuré'}
           </span>
         </h2>

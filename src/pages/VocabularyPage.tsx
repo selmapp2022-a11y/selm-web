@@ -105,7 +105,7 @@ export default function VocabularyPage() {
             <button onClick={() => refetch()} className="btn-ghost text-sm">Refresh</button>
           </div>
           <div className="h-2 overflow-hidden rounded-full bg-surface-muted">
-            <div className="h-full rounded-full bg-teal transition-all" style={{ width: `${((idx + 1) / words.length) * 100}%` }} />
+            <div className="h-full rounded-full bg-navy transition-all" style={{ width: `${((idx + 1) / words.length) * 100}%` }} />
           </div>
 
           <div className="card overflow-hidden p-10">

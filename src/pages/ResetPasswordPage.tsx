@@ -97,7 +97,7 @@ export default function ResetPasswordPage() {
                   <button
                     type="button"
                     onClick={() => setShowPw(!showPw)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-disabled hover:text-navy"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-secondary hover:text-navy"
                   >
                     {showPw ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
@@ -145,7 +145,7 @@ export default function ResetPasswordPage() {
           )}
 
           <p className="mt-6 text-center text-sm text-ink-secondary">
-            <Link to="/login" className="font-semibold text-teal-600 hover:underline">
+            <Link to="/login" className="font-semibold text-navy hover:underline">
               Back to sign in
             </Link>
           </p>

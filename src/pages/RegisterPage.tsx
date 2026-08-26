@@ -98,7 +98,7 @@ export default function RegisterPage() {
             </button>
           </form>
 
-          <div className="my-5 flex items-center gap-3 text-xs uppercase tracking-wider text-ink-disabled">
+          <div className="my-5 flex items-center gap-3 text-xs uppercase tracking-wider text-ink-secondary">
             <div className="h-px flex-1 bg-slate-200" />
             <span>or</span>
             <div className="h-px flex-1 bg-slate-200" />
@@ -123,7 +123,7 @@ export default function RegisterPage() {
 
           <p className="mt-6 text-center text-sm text-ink-secondary">
             Already have an account?{' '}
-            <Link to="/login" className="font-semibold text-teal-600 hover:underline">Sign in</Link>
+            <Link to="/login" className="font-semibold text-navy hover:underline">Sign in</Link>
           </p>
         </div>
       </div>
