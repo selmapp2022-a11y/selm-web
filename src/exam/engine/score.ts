@@ -82,7 +82,7 @@ export async function scoreResponse(
   const examScaleAggregate = answersOnExamScale && judgeAggregate
     ? { point: judgeAggregate.point, judgeSpread: judgeAggregate.judgeSpread, judgeCount: judgeAggregate.judgeCount }
     : null;
-  const benchmarkLevel = examScaleAggregate ? toBenchmark(examScaleAggregate.point, exam.benchmark) : null;
+  const benchmarkLevel = examScaleAggregate ? toBenchmark(examScaleAggregate.point, exam.benchmark, task.scaleId) : null;
 
   return { ...base, judges, judgeAggregate, examScaleAggregate, benchmarkLevel, zeroedBy: null };
 }

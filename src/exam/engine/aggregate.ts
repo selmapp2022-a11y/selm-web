@@ -28,8 +28,9 @@ export function aggregate(scoresByJudge: CriterionScore[][], scale: Scale): Aggr
   return { point: Math.min(scale.max, Math.max(scale.min, stepped)), judgeSpread: spread, judgeCount: means.length };
 }
 
-export function toBenchmark(value: number, map: BenchmarkMap): number | null {
-  const sorted = [...map.bands].sort((a, b) => b.from - a.from);
+export function toBenchmark(value: number, map: BenchmarkMap, scaleId?: string): number | null {
+  const bands = (scaleId && map.byScale?.[scaleId]) || map.bands;
+  const sorted = [...bands].sort((a, b) => b.from - a.from);
   for (const b of sorted) if (value >= b.from) return b.level;
   return null;
 }

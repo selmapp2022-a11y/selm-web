@@ -56,9 +56,29 @@ export type Scale = {
  */
 export type BenchmarkSystem = string;
 
+export type BenchmarkBand = {
+  from: number;
+  level: number;
+  /**
+   * The CEFR level the awarding body prints alongside this benchmark level,
+   * where it prints one. Recorded because it is the only bridge between a
+   * corpus labelled in CEFR and a benchmark expressed in NCLC or CLB; it is
+   * not used to compute anything.
+   */
+  cefr?: string;
+};
+
 export type BenchmarkMap = {
   system: BenchmarkSystem;
-  bands: Array<{ from: number; level: number }>;
+  /** Bands on the exam's primary scale — the one its production tasks use. */
+  bands: BenchmarkBand[];
+  /**
+   * Further band tables for exams that report different sections on different
+   * scales, keyed by scale id. TCF Canada is the reason this exists: its two
+   * comprehension sections are scored 331–699 and 342–699 and their bands
+   * differ at every boundary except the top, so one table cannot serve both.
+   */
+  byScale?: Record<string, BenchmarkBand[]>;
 };
 
 // ── the exam tree ───────────────────────────────────────────────────────
@@ -269,6 +289,13 @@ export type TaskDefinition = {
   timeLimitApportioned?: true;
   /** Word guidance shown to the candidate, if the exam publishes one. */
   wordGuidance?: Localised;
+  /**
+   * Published preparation time before the response begins, in seconds.
+   * `0` means the exam publishes that there is none — TCF expression orale
+   * tâches 1 and 3 are explicitly *sans préparation*, and that is a fact
+   * about the exam, not a missing value. Absent means the exam says nothing.
+   */
+  preparationSec?: number;
   /** What the candidate produces. Decides which runner renders the task. */
   responseMode: 'text' | 'audio';
   scaleId: string;

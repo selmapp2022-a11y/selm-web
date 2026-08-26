@@ -91,6 +91,18 @@ export default function GoalPage() {
             : ui === 'en' ? 'Written response' : 'Réponse écrite'}
           {' · '}
           {Math.round(task.timeLimitSec / 60)} {ui === 'en' ? 'min' : 'min'}
+          {task.preparationSec !== undefined && (
+            <>
+              {' · '}
+              {task.preparationSec > 0
+                ? ui === 'en'
+                  ? `${Math.round(task.preparationSec / 60)} min to prepare`
+                  : `${Math.round(task.preparationSec / 60)} min de préparation`
+                : ui === 'en'
+                  ? 'no preparation'
+                  : 'sans préparation'}
+            </>
+          )}
         </p>
         {task.timeLimitApportioned && (
           <p className="mt-1 text-xs text-ink-secondary">

@@ -15,10 +15,10 @@
  * Sources and open items:
  * - Expression écrite is scored 0–20 and NCLC 7 requires 10/20. Stated in
  *   the business plan and consistent with the published equivalency.
- * - The score→NCLC rows below are recorded as UNVERIFIED against a primary
- *   source. They are used to render the target line only, and no predicted
- *   score is published for this exam, so nothing user-facing rests on them
- *   yet. Verify before that changes.
+ * - The score→NCLC rows below are VERIFIED, 2026-08-26, against IRCC's own
+ *   test equivalency chart and against France Éducation international's
+ *   correspondence table, which agree on every row. Three rows below NCLC 7
+ *   were wrong and are corrected; see the note on `benchmark`.
  *
  * VERIFIED 2026-08-26 against France Éducation international, read through a
  * browser because the site refuses this project's network:
@@ -36,10 +36,11 @@
  * equal third, carried as `timeLimitApportioned` and shown to the candidate
  * as ours.
  *
- * Still open: Tâche 2 is not defined in this file. Its band is now known
- * (120–150 mots); its task wording is not, because the manual's description
- * of it did not survive text extraction. It needs a primary-source read
- * before it is written, not a guess.
+ * Expression écrite tâche 2 and expression orale tâches 2 and 3 were added
+ * on 2026-08-26 from the Manuel du candidat TCF, Version P, avril 2026, p.
+ * 19–20. The word bands, the task types and the speaking durations are the
+ * exam's; the subjects are ours and say so; the written per-tâche times are
+ * ours and are flagged `timeLimitApportioned`.
  */
 import type { ExamDefinition } from '../model/types';
 
@@ -61,18 +62,77 @@ export const TCF_CANADA: ExamDefinition = {
       step: 1,
       display: { suffix: { en: '/ 20', fr: '/ 20' }, decimals: 0 },
     },
+    {
+      id: 'co699',
+      label: { en: 'Listening score', fr: 'Score de compréhension orale' },
+      min: 331,
+      max: 699,
+      step: 1,
+      display: { suffix: { en: '/ 699', fr: '/ 699' }, decimals: 0 },
+    },
+    {
+      id: 'ce699',
+      label: { en: 'Reading score', fr: 'Score de compréhension écrite' },
+      min: 342,
+      max: 699,
+      step: 1,
+      display: { suffix: { en: '/ 699', fr: '/ 699' }, decimals: 0 },
+    },
   ],
+  // VERIFIED 2026-08-26 against two independent published sources that agree
+  // on every row: IRCC's own test equivalency chart — the department that
+  // reads the attestation and converts it — and France Éducation
+  // international's "Correspondance entre les résultats au TCF Canada et les
+  // niveaux de compétence linguistique canadiens".
+  //
+  // Three rows below 7 were WRONG before this. The table said 9→6, 7→5, 6→4;
+  // the published table is 7→6, 6→5, 4→4. A candidate marked 6 was being told
+  // NCLC 4 when the awarding body would say NCLC 5. The error was entirely in
+  // the low half of the range, which is also the half this project has the
+  // least evidence for.
+  //
+  // Note the shape, because it decides how accuracy may ever be published:
+  // NCLC 7 spans two marks (10 and 11) and NCLC 5 spans exactly one (6). A
+  // scorer with ±1 mark of error crosses a whole level in the middle of the
+  // range and not at the bottom, so a single aggregate accuracy figure would
+  // be a lie by averaging. `calibration.byLevel` and the gate's `minPerLevel`
+  // are what make a per-level statement possible.
   benchmark: {
     system: 'NCLC',
+    // Expression écrite and expression orale, mark out of 20.
     bands: [
-      { from: 16, level: 10 },
-      { from: 14, level: 9 },
-      { from: 12, level: 8 },
-      { from: 10, level: 7 },
-      { from: 9, level: 6 },
-      { from: 7, level: 5 },
-      { from: 6, level: 4 },
+      { from: 16, level: 10, cefr: 'C1-C2' },
+      { from: 14, level: 9, cefr: 'C1' },
+      { from: 12, level: 8, cefr: 'B2' },
+      { from: 10, level: 7, cefr: 'B2' },
+      { from: 7, level: 6, cefr: 'B1' },
+      { from: 6, level: 5, cefr: 'B1' },
+      { from: 4, level: 4, cefr: 'A2' },
     ],
+    // The two comprehension scales. No section uses them yet — compréhension
+    // orale and compréhension écrite are not modelled — but they are verified
+    // and they differ at every boundary except the top, so they are recorded
+    // separately rather than left to be guessed at when those sections exist.
+    byScale: {
+      co699: [
+        { from: 549, level: 10, cefr: 'C1-C2' },
+        { from: 523, level: 9, cefr: 'C1' },
+        { from: 503, level: 8, cefr: 'B2' },
+        { from: 458, level: 7, cefr: 'B2' },
+        { from: 398, level: 6, cefr: 'B1' },
+        { from: 369, level: 5, cefr: 'B1' },
+        { from: 331, level: 4, cefr: 'A2' },
+      ],
+      ce699: [
+        { from: 549, level: 10, cefr: 'C1-C2' },
+        { from: 524, level: 9, cefr: 'C1' },
+        { from: 499, level: 8, cefr: 'B2' },
+        { from: 453, level: 7, cefr: 'B2' },
+        { from: 406, level: 6, cefr: 'B1' },
+        { from: 375, level: 5, cefr: 'B1' },
+        { from: 342, level: 4, cefr: 'A2' },
+      ],
+    },
   },
   calibration: {
     // Zero, and for French there is a second problem behind the first: no
@@ -217,6 +277,123 @@ export const TCF_CANADA: ExamDefinition = {
             "Ce que j'ai le plus retenu, c'est",
             "Je pense que cela nous sera utile pour",
             'À bientôt,',
+          ],
+          judge: {
+            kind: 'none',
+            reason: {
+              en: 'No calibrated judge is bound to TCF Canada yet. The deterministic checks above are real; the criterion grid below is what a judge would fill in, and it is empty because the French engine has not been built.',
+              fr: "Aucun correcteur étalonné n'est encore rattaché au TCF Canada. Les vérifications déterministes ci-dessus sont réelles ; la grille de critères ci-dessous est ce qu'un correcteur remplirait, et elle est vide parce que le moteur français n'est pas construit.",
+            },
+          },
+        },
+        {
+          id: 'tcf-ee-t2',
+          skill: 'writing',
+          responseMode: 'text',
+          // 120–150 mots: VERIFIED against the Manuel du candidat TCF,
+          // Version P, avril 2026, p. 20, which also gives the task type —
+          // "raconter ou rédiger un court article": a narrative or short
+          // article, an account of experience or a testimonial for a blog or
+          // a publication, structured, with connectives guiding the reader.
+          //
+          // The subject below is OURS. The manual gives the task type, never
+          // a subject, and this project does not reproduce real exam items.
+          // The time is ours too: an equal third of the published 60 minutes.
+          name: { en: 'Tâche 2', fr: 'Tâche 2' },
+          instruction: {
+            en: 'Write a short article or account for a blog or a publication. 120 to 150 words.',
+            fr: "Rédigez un court article ou un récit destiné à un blog ou à une publication. De 120 à 150 mots.",
+          },
+          prompt: {
+            en: 'A magazine for newcomers is collecting accounts of a day that changed something for its readers. Write your account: what happened, in what order, and what it changed for you. Your reader does not know you and was not there.',
+            fr: "Un magazine destiné aux personnes nouvellement arrivées réunit des récits d'une journée qui a changé quelque chose. Rédigez le vôtre : ce qui s'est passé, dans quel ordre, et ce que cela a changé pour vous. Votre lecteur ne vous connaît pas et n'était pas présent.",
+          },
+          timeLimitSec: 20 * 60,
+          timeLimitApportioned: true,
+          wordGuidance: { en: '120 to 150 words', fr: 'De 120 à 150 mots' },
+          scaleId: 'sur20',
+          criteria: [
+            { id: 'respect_consigne', label: { en: 'Compliance with the instruction', fr: 'Respect de la consigne' } },
+            { id: 'capacite_raconter', label: { en: 'Ability to narrate and describe', fr: 'Capacité à raconter et à décrire' } },
+            { id: 'lexique', label: { en: 'Lexis', fr: 'Lexique' } },
+            { id: 'morphosyntaxe', label: { en: 'Morphosyntax', fr: 'Morphosyntaxe' } },
+          ],
+          gate: [
+            {
+              id: 'empty',
+              verdict: {
+                kind: 'zero',
+                label: { en: 'Nothing submitted', fr: 'Aucune réponse remise' },
+                detail: { en: 'An empty response cannot be marked.', fr: "Une réponse vide ne peut pas être corrigée." },
+              },
+            },
+            {
+              id: 'min_words',
+              words: 120,
+              verdict: {
+                kind: 'zero',
+                label: { en: 'Under length — "A1 non atteint"', fr: 'Trop court — « A1 non atteint »' },
+                detail: {
+                  en: 'TCF awards "A1 non atteint" — effectively zero — to a response below the required length, whatever its quality.',
+                  fr: "Le TCF attribue « A1 non atteint » — soit zéro — à une réponse trop courte, quelle que soit sa qualité.",
+                },
+              },
+            },
+            {
+              id: 'max_words',
+              words: 150,
+              verdict: {
+                kind: 'warn',
+                label: { en: 'Over the upper bound', fr: 'Au-dessus de la borne haute' },
+                detail: {
+                  en: 'Past 150 words the extra sentences earn nothing and cost time tâche 3 needs.',
+                  fr: "Au-delà de 150 mots, les phrases supplémentaires ne rapportent rien et coûtent du temps à la tâche 3.",
+                },
+              },
+            },
+            {
+              id: 'prompt_copy',
+              maxOverlapRatio: 0.5,
+              verdict: {
+                kind: 'zero',
+                label: { en: 'Copied from the instruction', fr: 'Recopié de la consigne' },
+                detail: {
+                  en: 'Sentences lifted from the consigne are one of the official automatic-zero triggers.',
+                  fr: "Les phrases recopiées de la consigne font partie des déclencheurs officiels du zéro automatique.",
+                },
+              },
+            },
+            {
+              id: 'template_ratio',
+              maxRatio: 0.2,
+              verdict: {
+                kind: 'zero',
+                label: { en: 'Memorised text', fr: 'Texte appris par cœur' },
+                detail: {
+                  en: 'TCF awards no score to memorised text. A narrative is the easiest tâche to arrive with pre-written, which is why the threshold is not relaxed here.',
+                  fr: "Le TCF n'accorde aucune note à un texte appris par cœur. Le récit est la tâche la plus facile à préparer d'avance, et c'est pourquoi le seuil n'est pas assoupli ici.",
+                },
+              },
+            },
+            {
+              id: 'off_topic',
+              minKeywordHits: 2,
+              verdict: {
+                kind: 'zero',
+                label: { en: 'Off topic', fr: 'Hors sujet' },
+                detail: {
+                  en: 'An off-topic response is one of the official automatic-zero triggers.',
+                  fr: "Le hors-sujet fait partie des déclencheurs officiels du zéro automatique.",
+                },
+              },
+            },
+          ],
+          topicKeywords: ['journée', 'jour', 'changé', 'arrivé', 'ensuite', 'raconte', 'souvenir', 'depuis'],
+          suppliedScaffold: [
+            "Ce jour-là,",
+            "Tout a commencé quand",
+            "Ensuite,",
+            "Depuis, je",
           ],
           judge: {
             kind: 'none',
@@ -415,6 +592,10 @@ export const TCF_CANADA: ExamDefinition = {
             fr: "Présentez-vous : qui vous êtes, ce que vous faites, et ce qui vous a amené à apprendre le français.",
           },
           timeLimitSec: 120,
+          // "Entretien dirigé sans préparation" — Manuel du candidat TCF,
+          // Version P, avril 2026, p. 19. Zero here is the exam's published
+          // answer, not a missing value.
+          preparationSec: 0,
           wordGuidance: { en: 'About two minutes', fr: 'Environ deux minutes' },
           scaleId: 'sur20',
           criteria: [
@@ -465,6 +646,181 @@ export const TCF_CANADA: ExamDefinition = {
           // support fr-CA, so a French recording yields a real transcript and
           // real acoustic measures. The judge is not bound, because nothing
           // scores the TCF grid.
+          signal: {
+            kind: 'remote',
+            adapter: 'speech_evaluate',
+            endpoint: '/speech/evaluate',
+            language: 'fr-CA',
+            fields: { reference_text: '' },
+          },
+          judge: {
+            kind: 'none',
+            reason: {
+              en: 'No judge scores the TCF speaking grid. The transcript and the acoustic measures above are real; the four criteria below are what an examiner would fill in, and they are empty.',
+              fr: "Aucun correcteur n'évalue la grille d'expression orale du TCF. La transcription et les mesures acoustiques ci-dessus sont réelles ; les quatre critères ci-dessous sont ce qu'un examinateur remplirait, et ils sont vides.",
+            },
+          },
+        },
+        {
+          id: 'tcf-eo-t2',
+          skill: 'speaking',
+          responseMode: 'audio',
+          // "Exercice en interaction AVEC préparation" — Manuel du candidat
+          // TCF, Version P, avril 2026, p. 19: 3 min 30 of dialogue plus 2
+          // minutes of preparation, for TCF tout public, Québec and Canada.
+          //
+          // This settles the conflict recorded in step 05 §C2, where one
+          // source claimed there is no preparation at all and called that
+          // absence the task's main trap. There is preparation, and it is two
+          // minutes. Every figure on this task is published; none is ours.
+          //
+          // The manual also states, among the assessed capabilities for
+          // expression orale, "poser des questions adaptées à la situation de
+          // communication proposée". That is the task: the candidate obtains
+          // information, and the status of both parties is given in the
+          // instruction. It is also the source for the teaching-boundary rule
+          // that the business plan and the website both carry — previously
+          // supported only by preparation sites.
+          name: { en: 'Tâche 2', fr: 'Tâche 2' },
+          instruction: {
+            en: 'Obtain the information you need from your examiner, who plays the role given below. Two minutes to prepare, then about three and a half minutes of dialogue.',
+            fr: "Obtenez auprès de votre examinateur, qui joue le rôle indiqué ci-dessous, les informations dont vous avez besoin. Deux minutes de préparation, puis environ trois minutes trente de dialogue.",
+          },
+          prompt: {
+            en: 'You have just moved into a flat and the heating does not work. Your examiner is the building manager. Find out what is wrong, when it will be repaired, and what you should do in the meantime. Ask the questions you need to ask.',
+            fr: "Vous venez d'emménager dans un appartement et le chauffage ne fonctionne pas. Votre examinateur est le gestionnaire de l'immeuble. Renseignez-vous sur l'origine du problème, sur la date de la réparation, et sur ce que vous devez faire en attendant. Posez les questions nécessaires.",
+          },
+          timeLimitSec: 210,
+          preparationSec: 120,
+          wordGuidance: { en: 'About three and a half minutes', fr: 'Environ trois minutes trente' },
+          scaleId: 'sur20',
+          criteria: [
+            { id: 'respect_consigne', label: { en: 'Compliance with the instruction', fr: 'Respect de la consigne' } },
+            { id: 'capacite_interagir', label: { en: 'Ability to interact', fr: 'Capacité à interagir' } },
+            { id: 'lexique', label: { en: 'Lexis', fr: 'Lexique' } },
+            { id: 'morphosyntaxe', label: { en: 'Morphosyntax', fr: 'Morphosyntaxe' } },
+          ],
+          gate: [
+            {
+              id: 'empty',
+              verdict: {
+                kind: 'zero',
+                label: { en: 'Nothing was heard', fr: "Rien n'a été entendu" },
+                detail: {
+                  en: 'The recording produced no transcript.',
+                  fr: "L'enregistrement n'a produit aucune transcription.",
+                },
+              },
+            },
+            {
+              id: 'min_words',
+              words: 100,
+              verdict: {
+                kind: 'zero',
+                label: { en: 'Too short — "A1 non atteint"', fr: 'Trop court — « A1 non atteint »' },
+                detail: {
+                  en: 'A response too short to show the level is scored as not reaching A1, whatever its quality.',
+                  fr: "Une réponse trop courte pour montrer le niveau est notée « A1 non atteint », quelle que soit sa qualité.",
+                },
+              },
+            },
+            {
+              id: 'off_topic',
+              minKeywordHits: 2,
+              verdict: {
+                kind: 'zero',
+                label: { en: 'Off topic', fr: 'Hors sujet' },
+                detail: {
+                  en: 'Off-topic is one of the official automatic-zero triggers.',
+                  fr: "Le hors-sujet fait partie des déclencheurs officiels du zéro automatique.",
+                },
+              },
+            },
+          ],
+          topicKeywords: ['chauffage', 'appartement', 'réparation', 'quand', 'est-ce', 'pourquoi', 'combien'],
+          signal: {
+            kind: 'remote',
+            adapter: 'speech_evaluate',
+            endpoint: '/speech/evaluate',
+            language: 'fr-CA',
+            fields: { reference_text: '' },
+          },
+          judge: {
+            kind: 'none',
+            reason: {
+              en: 'No judge scores the TCF speaking grid. The transcript and the acoustic measures above are real; the four criteria below are what an examiner would fill in, and they are empty.',
+              fr: "Aucun correcteur n'évalue la grille d'expression orale du TCF. La transcription et les mesures acoustiques ci-dessus sont réelles ; les quatre critères ci-dessous sont ce qu'un examinateur remplirait, et ils sont vides.",
+            },
+          },
+        },
+        {
+          id: 'tcf-eo-t3',
+          skill: 'speaking',
+          responseMode: 'audio',
+          // "Expression d'un point de vue, sans préparation" — 4 min 30 for
+          // TCF tout public, Québec and Canada. Manual, p. 19.
+          //
+          // 2 + 3.5 + 4.5 = 10 minutes of speaking, plus the 2 minutes of
+          // preparation on tâche 2, is exactly the 12 minutes FEI publishes
+          // for the épreuve. Unlike expression écrite, nothing here is
+          // apportioned by us.
+          name: { en: 'Tâche 3', fr: 'Tâche 3' },
+          instruction: {
+            en: 'Give and defend your point of view. About four and a half minutes, without preparation.',
+            fr: "Exprimez et défendez votre point de vue. Environ quatre minutes trente, sans préparation.",
+          },
+          prompt: {
+            en: 'Some people say that a city should be built for those who live in it, others that it should be built for those who work in it. What do you think? Give your view, support it, and say what you would answer to someone who disagreed.',
+            fr: "Certains disent qu'une ville doit être conçue pour ceux qui l'habitent, d'autres pour ceux qui y travaillent. Qu'en pensez-vous ? Donnez votre avis, appuyez-le, et dites ce que vous répondriez à quelqu'un qui ne serait pas d'accord.",
+          },
+          timeLimitSec: 270,
+          preparationSec: 0,
+          wordGuidance: { en: 'About four and a half minutes', fr: 'Environ quatre minutes trente' },
+          scaleId: 'sur20',
+          criteria: [
+            { id: 'respect_consigne', label: { en: 'Compliance with the instruction', fr: 'Respect de la consigne' } },
+            { id: 'capacite_argumenter', label: { en: 'Ability to argue a point of view', fr: 'Capacité à argumenter' } },
+            { id: 'lexique', label: { en: 'Lexis', fr: 'Lexique' } },
+            { id: 'morphosyntaxe', label: { en: 'Morphosyntax', fr: 'Morphosyntaxe' } },
+          ],
+          gate: [
+            {
+              id: 'empty',
+              verdict: {
+                kind: 'zero',
+                label: { en: 'Nothing was heard', fr: "Rien n'a été entendu" },
+                detail: {
+                  en: 'The recording produced no transcript.',
+                  fr: "L'enregistrement n'a produit aucune transcription.",
+                },
+              },
+            },
+            {
+              id: 'min_words',
+              words: 140,
+              verdict: {
+                kind: 'zero',
+                label: { en: 'Too short — "A1 non atteint"', fr: 'Trop court — « A1 non atteint »' },
+                detail: {
+                  en: 'A response too short to show the level is scored as not reaching A1, whatever its quality.',
+                  fr: "Une réponse trop courte pour montrer le niveau est notée « A1 non atteint », quelle que soit sa qualité.",
+                },
+              },
+            },
+            {
+              id: 'off_topic',
+              minKeywordHits: 2,
+              verdict: {
+                kind: 'zero',
+                label: { en: 'Off topic', fr: 'Hors sujet' },
+                detail: {
+                  en: 'Off-topic is one of the official automatic-zero triggers.',
+                  fr: "Le hors-sujet fait partie des déclencheurs officiels du zéro automatique.",
+                },
+              },
+            },
+          ],
+          topicKeywords: ['ville', 'habitants', 'travail', 'pense', 'avis', 'parce', 'exemple'],
           signal: {
             kind: 'remote',
             adapter: 'speech_evaluate',
