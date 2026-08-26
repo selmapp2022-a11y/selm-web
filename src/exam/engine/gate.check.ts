@@ -9,7 +9,7 @@
  *
  *   npx tsc src/exam/engine/gate.check.ts --outDir /tmp/gc --module commonjs \
  *     --target es2020 --moduleResolution node --skipLibCheck --esModuleInterop
- *   node /tmp/gc/src/exam/engine/gate.check.js
+ *   node /tmp/gc/engine/gate.check.js
  */
 import { runGate } from './gate';
 import { TCF_CANADA } from '../definitions/tcf-canada';
