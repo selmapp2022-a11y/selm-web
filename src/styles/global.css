@@ -206,6 +206,18 @@ html[class~="dark"] .text-ink-primary { color: #EDF2F7 !important; }
 html[class~="dark"] .text-ink-secondary { color: #B8C2D0 !important; }
 html[class~="dark"] .text-ink-disabled { color: #8693A6 !important; }
 
+/* `.card` and `.chip` @apply the surface tokens as *utilities*, and the
+   component overrides at the top of this file do not reach them: both came out
+   with their LIGHT value in dark mode — a white card carrying exactly the light
+   text the rule below already assumes, and a pale-grey chip with pale-grey text
+   on it. `.btn-secondary`, `.btn-primary` and `.input` were never affected;
+   these two were. No new colour is introduced: both tokens already exist and
+   are already what the rest of this file assumes a card is painted with.
+   (Found in step 13, while moving the exam engine onto the app's own `.card`.
+   It is the component that is fixed, so it is fixed everywhere it is used.) */
+html.dark .card { background-color: var(--c-card) !important; }
+html.dark .chip { background-color: var(--c-muted) !important; }
+
 /* Any descendant text inside a card/button on dark, if not already colored, becomes light */
 html.dark .card,
 html.dark button.bg-surface-card,
