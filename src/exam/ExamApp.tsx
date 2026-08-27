@@ -5,6 +5,7 @@ import TaskPage from './pages/TaskPage';
 import ResultPage from './pages/ResultPage';
 import SectionPage from './pages/SectionPage';
 import SittingResultPage from './pages/SittingResultPage';
+import HistoryPage from './pages/HistoryPage';
 
 export default function ExamApp() {
   return (
@@ -15,6 +16,7 @@ export default function ExamApp() {
         <Route path="/result" element={<ResultPage />} />
         <Route path="/section" element={<SectionPage />} />
         <Route path="/sitting-result" element={<SittingResultPage />} />
+        <Route path="/history" element={<HistoryPage />} />
         <Route path="*" element={<GoalPage />} />
       </Routes>
     </Chrome>

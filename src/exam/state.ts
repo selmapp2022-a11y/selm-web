@@ -33,7 +33,41 @@ export type Sitting = {
   submitted: string[];
 };
 
+/**
+ * A finished sitting, kept so the line can be seen to move.
+ *
+ * Deliberately small: per-skill counts and the band held, no answers, no
+ * transcripts, no free text. A history record is the easiest place in a
+ * product to accumulate more than it needs.
+ */
+export type SittingRecord = {
+  examId: string;
+  /** ISO timestamp the sitting finished. */
+  finishedAt: string;
+  /** By section id. `null` for a skill with no result — never a zero. */
+  skills: Record<string, { correct: number; total: number; held: string | null } | null>;
+};
+
 const SITTING_KEY = 'selm_exam_sitting_v1';
+const HISTORY_KEY = 'selm_exam_history_v1';
+
+const loadHistory = (): SittingRecord[] => {
+  try {
+    const raw = localStorage.getItem(HISTORY_KEY);
+    const v = raw ? JSON.parse(raw) : [];
+    return Array.isArray(v) ? (v as SittingRecord[]) : [];
+  } catch {
+    return [];
+  }
+};
+
+const saveHistory = (h: SittingRecord[]) => {
+  try {
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(h));
+  } catch {
+    /* a history that cannot be saved is a lost history, not a broken app */
+  }
+};
 
 const loadSitting = (): Sitting | null => {
   try {
@@ -70,6 +104,9 @@ type ExamState = {
   reset: () => void;
   /** The sitting in progress, if any. */
   sitting: Sitting | null;
+  history: SittingRecord[];
+  recordSitting: (r: SittingRecord) => void;
+  clearHistory: () => void;
   startSitting: (e: ExamDefinition) => void;
   answerItem: (sectionId: string, itemId: string, chose: number | null) => void;
   submitSection: (sectionId: string) => void;
@@ -113,6 +150,19 @@ export const useExam = create<ExamState>((set) => ({
   reset: () => set({ response: null, result: null }),
 
   sitting: RESTORED,
+  history: loadHistory(),
+  recordSitting: (r) =>
+    set((st) => {
+      // Keep the last 50. A history longer than that is storage, not a
+      // feature, and this lives in the candidate's own browser.
+      const history = [...st.history, r].slice(-50);
+      saveHistory(history);
+      return { history };
+    }),
+  clearHistory: () => {
+    saveHistory([]);
+    set({ history: [] });
+  },
   startSitting: (exam) => {
     const sitting: Sitting = {
       examId: exam.id,

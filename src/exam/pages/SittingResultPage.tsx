@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useExam } from '../state';
 import { scoreComprehension, governingLevel } from '../engine/comprehension';
@@ -18,7 +19,7 @@ import type { ComprehensionSection, ProductionSection } from '../model/types';
  * is showing the candidate a better result than they hold.
  */
 export default function SittingResultPage() {
-  const { exam, ui, sitting, endSitting } = useExam();
+  const { exam, ui, sitting, endSitting, recordSitting } = useExam();
   const nav = useNavigate();
 
   if (!sitting) {
@@ -49,6 +50,24 @@ export default function SittingResultPage() {
     ...production.map(() => null),
   ];
   const governing = governingLevel(levels);
+
+  // Record the sitting once, when the page first shows it. Recording on
+  // "Finish" would lose the sitting of every candidate who closes the tab
+  // after reading their result, which is most of them.
+  const recorded = useRef(false);
+  useEffect(() => {
+    if (recorded.current || !sitting) return;
+    recorded.current = true;
+    const skills: Record<string, { correct: number; total: number; held: string | null } | null> = {};
+    for (const r of comprehension) {
+      skills[r.section.id] = { correct: r.correct, total: r.total, held: r.held };
+    }
+    // A production section has no result to record. It is stored as null
+    // rather than omitted, so the history page can say "no result" instead of
+    // silently leaving a gap that reads as a missing sitting.
+    for (const s of production) skills[s.id] = null;
+    recordSitting({ examId: exam.id, finishedAt: new Date().toISOString(), skills });
+  }, [sitting, comprehension, production, exam.id, recordSitting]);
 
   return (
     <div className="space-y-6">
@@ -153,15 +172,23 @@ export default function SittingResultPage() {
         </div>
       </section>
 
-      <button
-        onClick={() => {
-          endSitting();
-          nav('/');
-        }}
-        className="w-full rounded-xl border border-surface-divider px-4 py-3 text-sm font-semibold"
-      >
-        {ui === 'en' ? 'Finish' : 'Terminer'}
-      </button>
+      <div className="flex gap-2">
+        <button
+          onClick={() => nav('/history')}
+          className="flex-1 rounded-xl border border-surface-divider px-4 py-3 text-sm font-semibold"
+        >
+          {ui === 'en' ? 'See your history' : 'Voir votre historique'}
+        </button>
+        <button
+          onClick={() => {
+            endSitting();
+            nav('/');
+          }}
+          className="flex-1 rounded-xl bg-navy px-4 py-3 text-sm font-semibold text-white"
+        >
+          {ui === 'en' ? 'Finish' : 'Terminer'}
+        </button>
+      </div>
     </div>
   );
 }
