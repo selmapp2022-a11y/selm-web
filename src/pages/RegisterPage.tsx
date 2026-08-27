@@ -4,6 +4,7 @@ import { SignInWithApple, SignInWithAppleOptions } from '@capacitor-community/ap
 import { auth } from '../lib/api';
 import { useAuthStore } from '../store/authStore';
 import { Logo } from '../components/Logo';
+import { Capacitor } from '@capacitor/core';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -98,28 +99,48 @@ export default function RegisterPage() {
             </button>
           </form>
 
-          <div className="my-5 flex items-center gap-3 text-xs uppercase tracking-wider text-ink-secondary">
-            <div className="h-px flex-1 bg-slate-200" />
-            <span>or</span>
-            <div className="h-px flex-1 bg-slate-200" />
-          </div>
+          {/* Sign in with Apple is a NATIVE-only path, and it is gated here.
 
-          <button
-            type="button"
-            onClick={handleAppleSignIn}
-            disabled={appleLoading}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-black px-4 py-3 text-sm font-semibold text-white transition hover:bg-neutral-800 disabled:opacity-60"
-          >
-            <svg
-              className="h-5 w-5"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              aria-hidden="true"
+              The plugin's web implementation calls AppleID.auth.signIn(), which
+              needs three things this site does not have: Apple's appleid.auth.js
+              loaded on the page, a Services ID as clientId (com.selmapp.app is
+              the iOS bundle ID and Apple rejects it on the web endpoint), and a
+              route at the redirectURI. Without them the button threw on every
+              click in a browser — a visible, permanent error on a live product.
+
+              Guideline 4.8 governs the app, where this works. Hiding it on the
+              web removes a control that could not do anything. Turning it back
+              on for the web means all three of the above plus APPLE_SERVICE_ID
+              in the backend environment, so the token's audience is accepted.
+
+              The divider is inside the guard because Apple is the only
+              third-party provider — with it hidden there is nothing to divide. */}
+          {Capacitor.isNativePlatform() && (
+            <>
+            <div className="my-5 flex items-center gap-3 text-xs uppercase tracking-wider text-ink-secondary">
+              <div className="h-px flex-1 bg-slate-200" />
+              <span>or</span>
+              <div className="h-px flex-1 bg-slate-200" />
+            </div>
+
+            <button
+              type="button"
+              onClick={handleAppleSignIn}
+              disabled={appleLoading}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-black px-4 py-3 text-sm font-semibold text-white transition hover:bg-neutral-800 disabled:opacity-60"
             >
-              <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
-            </svg>
-            {appleLoading ? 'Continuing…' : 'Continue with Apple'}
-          </button>
+              <svg
+                className="h-5 w-5"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
+              </svg>
+              {appleLoading ? 'Continuing…' : 'Continue with Apple'}
+            </button>
+            </>
+          )}
 
           <p className="mt-6 text-center text-sm text-ink-secondary">
             Already have an account?{' '}
