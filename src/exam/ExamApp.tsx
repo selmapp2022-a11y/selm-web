@@ -1,5 +1,5 @@
 import { Route, Routes } from 'react-router-dom';
-import Chrome from './components/Chrome';
+import ExamLayout from './components/ExamLayout';
 import GoalPage from './pages/GoalPage';
 import TaskPage from './pages/TaskPage';
 import ResultPage from './pages/ResultPage';
@@ -9,7 +9,7 @@ import HistoryPage from './pages/HistoryPage';
 
 export default function ExamApp() {
   return (
-    <Chrome>
+    <ExamLayout>
       <Routes>
         <Route path="/" element={<GoalPage />} />
         <Route path="/task" element={<TaskPage />} />
@@ -19,6 +19,6 @@ export default function ExamApp() {
         <Route path="/history" element={<HistoryPage />} />
         <Route path="*" element={<GoalPage />} />
       </Routes>
-    </Chrome>
+    </ExamLayout>
   );
 }

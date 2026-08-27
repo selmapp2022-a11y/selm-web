@@ -1,8 +1,12 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AlertTriangle } from 'lucide-react';
+import clsx from 'clsx';
 import { useExam } from '../state';
 import { t } from '../model/format';
 import { resolveAudio } from '../engine/audio';
+import { SectionClock, ProgressBar } from '../components/SectionClock';
+import { PlayOnce } from '../components/PlayOnce';
 import type { ComprehensionItem, ComprehensionSection, LanguageCode } from '../model/types';
 
 /**
@@ -30,9 +34,11 @@ export default function SectionPage() {
 
   if (!sitting) {
     return (
-      <p className="rounded-xl border border-surface-divider bg-surface-card px-4 py-3 text-sm">
-        {ui === 'en' ? 'No sitting in progress.' : 'Aucune session en cours.'}
-      </p>
+      <div className="card p-6">
+        <p className="text-sm text-ink-primary">
+          {ui === 'en' ? 'No sitting in progress.' : 'Aucune session en cours.'}
+        </p>
+      </div>
     );
   }
   if (!section) return null;
@@ -83,39 +89,45 @@ function Section({ section }: { section: ComprehensionSection }) {
   const audioMissing = missing.length > 0;
 
   return (
-    <div className="space-y-4">
-      <header className="flex items-baseline justify-between gap-3">
-        <h1 className="font-display text-lg font-bold">{t(section.name, ui)}</h1>
-        <span
-          className={`tabular-nums text-sm font-semibold ${
-            left < 60 ? 'text-red-600' : 'text-ink-secondary'
-          }`}
-        >
-          {Math.floor(Math.max(0, left) / 60)}:{String(Math.max(0, left) % 60).padStart(2, '0')}
-        </span>
+    <div className="space-y-6">
+      <header className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h1 className="font-display text-3xl font-bold text-navy">{t(section.name, ui)}</h1>
+          <p className="mt-1 text-sm text-ink-secondary">
+            {ui === 'en'
+              ? `${section.items.length} questions · ${Math.round(section.timeLimitSec / 60)} minutes for the whole section · ${answeredCount} answered`
+              : `${section.items.length} questions · ${Math.round(section.timeLimitSec / 60)} minutes pour l'ensemble · ${answeredCount} répondues`}
+          </p>
+        </div>
+        <SectionClock
+          seconds={left}
+          tone={left < 60 ? 'warn' : 'normal'}
+          label={ui === 'en' ? 'left' : 'restant'}
+        />
       </header>
 
-      <p className="text-xs text-ink-secondary">
-        {ui === 'en'
-          ? `${section.items.length} questions · ${Math.round(section.timeLimitSec / 60)} minutes for the whole section · ${answeredCount} answered`
-          : `${section.items.length} questions · ${Math.round(section.timeLimitSec / 60)} minutes pour l'ensemble · ${answeredCount} répondues`}
-      </p>
+      <ProgressBar value={answeredCount} total={section.items.length} />
 
       {audioMissing ? (
-        <div className="rounded-xl border border-amber-500/40 bg-amber-500/5 px-4 py-3 text-sm leading-relaxed">
-          <p className="font-semibold">
-            {ui === 'en' ? 'This section cannot be sat yet' : "Cette épreuve n'est pas encore praticable"}
-          </p>
-          <p className="mt-1 text-xs text-ink-secondary">
-            {ui === 'en'
-              ? `${missing.length} of ${section.items.length} items have no recording: ${missing.slice(0, 6).join(', ')}${missing.length > 6 ? '…' : ''}`
-              : `${missing.length} items sur ${section.items.length} n'ont pas d'enregistrement : ${missing.slice(0, 6).join(', ')}${missing.length > 6 ? '…' : ''}`}
-          </p>
-          <p className="mt-1 text-ink-secondary">
-            {ui === 'en'
-              ? 'The audio for these items has not been recorded yet. It is rendered once and stored, never generated while you wait — and the French recordings are held until the dialect question is settled, because recording them in a variety that turns out to be wrong would mean recording every item again. The written text of the items is deliberately not shown instead: reading a listening item is a different test.'
-              : "L'audio de ces items n'est pas encore enregistré. Il est produit une fois puis stocké, jamais généré pendant votre attente — et les enregistrements français attendent que la question de la variété de français soit tranchée. Le texte des items n'est volontairement pas affiché à la place : lire un item d'écoute, c'est un autre test."}
-          </p>
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-5">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-700" />
+            <div>
+              <p className="font-display font-bold text-amber-700">
+                {ui === 'en' ? 'This section cannot be sat yet' : "Cette épreuve n'est pas encore praticable"}
+              </p>
+              <p className="mt-1 text-xs text-ink-secondary">
+                {ui === 'en'
+                  ? `${missing.length} of ${section.items.length} items have no recording: ${missing.slice(0, 6).join(', ')}${missing.length > 6 ? '…' : ''}`
+                  : `${missing.length} items sur ${section.items.length} n'ont pas d'enregistrement : ${missing.slice(0, 6).join(', ')}${missing.length > 6 ? '…' : ''}`}
+              </p>
+              <p className="mt-2 text-sm leading-relaxed text-ink-secondary">
+                {ui === 'en'
+                  ? 'The audio for these items has not been recorded yet. It is rendered once and stored, never generated while you wait — and the French recordings are held until the dialect question is settled, because recording them in a variety that turns out to be wrong would mean recording every item again. The written text of the items is deliberately not shown instead: reading a listening item is a different test.'
+                  : "L'audio de ces items n'est pas encore enregistré. Il est produit une fois puis stocké, jamais généré pendant votre attente — et les enregistrements français attendent que la question de la variété de français soit tranchée. Le texte des items n'est volontairement pas affiché à la place : lire un item d'écoute, c'est un autre test."}
+              </p>
+            </div>
+          </div>
         </div>
       ) : section.delivery.presentation === 'all_at_once' ? (
         <ol className="space-y-4">
@@ -143,14 +155,14 @@ function Section({ section }: { section: ComprehensionSection }) {
         />
       )}
 
-      <div className="rounded-xl border border-surface-divider bg-surface-card px-4 py-3 text-xs leading-relaxed text-ink-secondary">
-        {t(section.provenance, ui)}
+      <div className="card p-6">
+        <p className="text-xs leading-relaxed text-ink-secondary">{t(section.provenance, ui)}</p>
       </div>
 
-      <button onClick={done} className="w-full rounded-xl bg-navy px-4 py-3 text-sm font-semibold text-white">
+      <button onClick={done} className="btn-primary w-full">
         {ui === 'en' ? 'Submit this section' : 'Remettre cette épreuve'}
       </button>
-      <p className="text-center text-[11px] text-ink-secondary">
+      <p className="text-center text-xs text-ink-secondary">
         {ui === 'en'
           ? 'Answers can be changed until you submit. A submitted section cannot be reopened.'
           : "Les réponses restent modifiables jusqu'à la remise. Une épreuve remise ne peut pas être rouverte."}
@@ -176,46 +188,38 @@ function OneAtATime({
 }) {
   const item = section.items[cursor];
   const [played, setPlayed] = useState(false);
-  const audio = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => setPlayed(false), [cursor]);
 
   return (
-    <div className="space-y-3">
-      <div className="rounded-xl border border-surface-divider bg-surface-card p-4">
-        <span className="text-xs font-semibold text-ink-secondary">
+    <div className="space-y-4">
+      <div className="card p-6">
+        <span className="chip">
           {ui === 'en'
             ? `Question ${cursor + 1} of ${section.items.length}`
             : `Question ${cursor + 1} sur ${section.items.length}`}
         </span>
-        <audio ref={audio} src={resolveAudio(item.audioPath)} onEnded={() => setPlayed(true)} className="hidden" preload="auto" />
-        <button
-          disabled={played}
-          onClick={() => {
+        <div className="mt-4">
+          <PlayOnce
+            src={resolveAudio(item.audioPath)}
+            played={played}
             // One play. The flag is set before the audio starts, so a reload,
             // a second click or a failed play does not buy a second listen.
-            setPlayed(true);
-            void audio.current?.play();
-          }}
-          className={`mt-3 w-full rounded-xl px-4 py-3 text-sm font-semibold ${
-            played ? 'bg-surface-muted text-ink-secondary' : 'bg-navy text-white'
-          }`}
-        >
-          {played
-            ? ui === 'en'
-              ? 'Played'
-              : 'Écouté'
-            : ui === 'en'
-              ? 'Play — once only'
-              : 'Écouter — une seule fois'}
-        </button>
-        {section.delivery.questionAfterAudio && !played && (
-          <p className="mt-3 text-xs text-ink-secondary">
-            {ui === 'en'
-              ? 'The question appears after the recording, as it does in the exam.'
-              : "La question apparaît après l'enregistrement, comme à l'examen."}
-          </p>
-        )}
+            onPlayed={() => setPlayed(true)}
+            label={
+              played
+                ? ui === 'en' ? 'Played' : 'Écouté'
+                : ui === 'en' ? 'Play — once only' : 'Écouter — une seule fois'
+            }
+            note={
+              section.delivery.questionAfterAudio && !played
+                ? ui === 'en'
+                  ? 'The question appears after the recording, as it does in the exam.'
+                  : "La question apparaît après l'enregistrement, comme à l'examen."
+                : undefined
+            }
+          />
+        </div>
       </div>
 
       {(!section.delivery.questionAfterAudio || played) && (
@@ -233,14 +237,14 @@ function OneAtATime({
         <button
           disabled={cursor === 0}
           onClick={() => setCursor(cursor - 1)}
-          className="flex-1 rounded-xl border border-surface-divider px-4 py-2 text-sm disabled:opacity-40"
+          className="btn-secondary flex-1"
         >
           {ui === 'en' ? 'Previous' : 'Précédent'}
         </button>
         <button
           disabled={cursor >= section.items.length - 1}
           onClick={() => setCursor(cursor + 1)}
-          className="flex-1 rounded-xl border border-surface-divider px-4 py-2 text-sm disabled:opacity-40"
+          className="btn-secondary flex-1"
         >
           {ui === 'en' ? 'Next' : 'Suivant'}
         </button>
@@ -265,20 +269,23 @@ function Item({
   showContent: boolean;
 }) {
   return (
-    <div className="rounded-xl border border-surface-divider bg-surface-card p-4">
-      {showContent && <p className="whitespace-pre-line text-sm leading-relaxed">{item.content}</p>}
-      <p className={`text-sm font-medium ${showContent ? 'mt-3' : ''}`}>
+    <div className="card p-6">
+      {showContent && <p className="whitespace-pre-line text-sm leading-relaxed text-ink-primary">{item.content}</p>}
+      <p className={clsx('font-medium text-ink-primary', showContent && 'mt-4')}>
         <span className="mr-2 text-ink-secondary">{n + 1}.</span>
         {item.stem}
       </p>
-      <div className="mt-2 space-y-1">
+      <div className="mt-3 space-y-2">
         {item.options.map((o, i) => (
           <button
             key={i}
             onClick={() => onChoose(sectionId, item.id, chose === i ? null : i)}
-            className={`w-full rounded-lg border px-3 py-2 text-left text-sm ${
-              chose === i ? 'border-teal bg-teal-50 text-navy' : 'border-surface-divider bg-surface-app'
-            }`}
+            className={clsx(
+              'w-full rounded-xl border-2 px-5 py-3 text-left text-sm font-medium transition-all',
+              chose === i
+                ? 'border-teal bg-teal/10 text-navy'
+                : 'border-surface-divider bg-white text-ink-secondary hover:border-navy/40 hover:bg-surface-muted'
+            )}
           >
             {o}
           </button>

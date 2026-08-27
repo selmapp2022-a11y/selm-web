@@ -16,3 +16,7 @@ android/app/*.jks
 # App Store Connect API keys - never commit
 AuthKey_*.p8
 *.p8
+
+# session scratch — files the sandbox cannot delete
+_to_delete/
+vite.config.ts.timestamp-*.mjs

@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AlertTriangle } from 'lucide-react';
 import { useExam, allTasks, sectionOf } from '../state';
 import { AudioRecorder } from '../../components/AudioRecorder';
+import { SectionClock } from '../components/SectionClock';
 import { t } from '../model/format';
 import { wordCount } from '../engine/text';
 import { scoreResponse } from '../engine/score';
@@ -52,7 +54,6 @@ export default function TaskPage() {
 
   const remaining = task.timeLimitSec - elapsed;
   const over = remaining < 0;
-  const clock = `${Math.floor(Math.abs(remaining) / 60)}:${String(Math.abs(remaining) % 60).padStart(2, '0')}`;
   const wc = wordCount(text);
 
   async function run(response: Response) {
@@ -98,7 +99,7 @@ export default function TaskPage() {
   }
 
   const sittingCrumb = sittingSection ? (
-    <p className="text-xs text-ink-secondary">
+    <p className="mt-1 text-xs text-ink-secondary">
       {ui === 'en'
         ? `${t(sittingSection.name, ui)} · task ${inSectionAt + 1} of ${sittingSection.tasks.length} · section ${(sitting?.at ?? 0) + 1} of ${sitting?.order.length}`
         : `${t(sittingSection.name, ui)} · tâche ${inSectionAt + 1} sur ${sittingSection.tasks.length} · épreuve ${(sitting?.at ?? 0) + 1} sur ${sitting?.order.length}`}
@@ -106,32 +107,29 @@ export default function TaskPage() {
   ) : null;
 
   return (
-    <div className="space-y-5">
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="text-[11px] font-semibold uppercase tracking-wide text-ink-secondary">
+    <div className="space-y-6">
+      <header className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0">
+          <span className="chip">
             {/* The task's own section, not sections[0]. It was sections[0]
                 until 2026-08-27, which was invisible while writing was the
                 first section and became wrong the moment comprehension was
                 added in front of it: a tâche of expression écrite was
                 labelled "compréhension orale". */}
             {t(exam.name, ui)} · {t(sectionOf(exam, task.id).name, ui)}
-          </div>
-          <h1 className="font-display text-xl font-bold tracking-tight">{t(task.name, ui)}</h1>
+          </span>
+          <h1 className="mt-3 font-display text-3xl font-bold text-navy">{t(task.name, ui)}</h1>
           {sittingCrumb}
         </div>
-        <div className={`rounded-xl px-3 py-2 text-right ${over ? 'bg-red-500/10' : 'bg-surface-muted'}`}>
-          <div className={`font-display text-xl font-bold tabular-nums ${over ? 'text-red-500' : ''}`}>
-            {over ? '+' : ''}{clock}
-          </div>
-          <div className="text-[10px] uppercase tracking-wide text-ink-secondary">
-            {over ? (ui === 'en' ? 'over' : 'dépassé') : (ui === 'en' ? 'left' : 'restant')}
-          </div>
-        </div>
-      </div>
+        <SectionClock
+          seconds={remaining}
+          tone={over ? 'over' : remaining < 60 ? 'warn' : 'normal'}
+          label={over ? (ui === 'en' ? 'over' : 'dépassé') : (ui === 'en' ? 'left' : 'restant')}
+        />
+      </header>
 
-      <div className="rounded-xl border border-surface-divider bg-surface-card p-4">
-        <p className="text-sm leading-relaxed">{t(task.prompt, ui)}</p>
+      <div className="card p-6">
+        <p className="leading-relaxed text-ink-primary">{t(task.prompt, ui)}</p>
         {task.wordGuidance && (
           <p className="mt-3 text-xs font-medium text-ink-secondary">{t(task.wordGuidance, ui)}</p>
         )}
@@ -145,7 +143,7 @@ export default function TaskPage() {
       </div>
 
       {task.responseMode === 'audio' ? (
-        <div className="rounded-xl border border-surface-divider bg-surface-card p-5">
+        <div className="card p-6">
           <AudioRecorder
             maxSeconds={task.timeLimitSec}
             disabled={busy}
@@ -158,70 +156,72 @@ export default function TaskPage() {
               : "L'enregistrement s'arrête de lui-même à la limite de la tâche, comme à l'examen. Il est transcrit avant toute autre étape."}
           </p>
           {busy && (
-            <p className="mt-3 text-sm font-medium">
+            <p className="mt-3 text-sm font-medium text-ink-primary">
               {ui === 'en' ? 'Transcribing and scoring…' : 'Transcription et correction en cours…'}
             </p>
           )}
         </div>
       ) : (
         <>
-      <textarea
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        spellCheck={false}
-        lang={exam.locale}
-        placeholder={ui === 'en' ? 'Write your response here.' : 'Rédigez votre réponse ici.'}
-        className="h-72 w-full resize-none rounded-xl border border-surface-divider bg-surface-card p-4 text-sm leading-relaxed outline-none focus:border-teal"
-      />
+          <textarea
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            spellCheck={false}
+            lang={exam.locale}
+            rows={14}
+            placeholder={ui === 'en' ? 'Write your response here.' : 'Rédigez votre réponse ici.'}
+            className="input"
+          />
 
-      {task.responseMode === 'text' && (
-      <div className="flex items-center justify-between text-xs text-ink-secondary">
-        <span className="tabular-nums">
-          {wc} {ui === 'en' ? 'words' : 'mots'}
-        </span>
-        {task.suppliedScaffold && (
-          <button className="underline underline-offset-2" onClick={() => setShowScaffold((s) => !s)}>
-            {showScaffold
-              ? ui === 'en' ? 'Hide the structure' : 'Masquer la trame'
-              : ui === 'en' ? 'Show the structure' : 'Afficher la trame'}
-          </button>
-        )}
-      </div>
-      )}
+          {task.responseMode === 'text' && (
+            <div className="flex items-center justify-between text-xs text-ink-secondary">
+              <span className="tabular-nums">
+                {wc} {ui === 'en' ? 'words' : 'mots'}
+              </span>
+              {task.suppliedScaffold && (
+                <button className="btn-ghost text-sm" onClick={() => setShowScaffold((s) => !s)}>
+                  {showScaffold
+                    ? ui === 'en' ? 'Hide the structure' : 'Masquer la trame'
+                    : ui === 'en' ? 'Show the structure' : 'Afficher la trame'}
+                </button>
+              )}
+            </div>
+          )}
 
-      {showScaffold && task.suppliedScaffold && (
-        <div className="rounded-xl border border-amber-500/40 bg-amber-500/5 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-amber-600">
-            {ui === 'en' ? 'Structure, not content' : 'Une trame, pas un contenu'}
-          </p>
-          <ul className="mt-2 space-y-1 text-sm text-ink-secondary">
-            {task.suppliedScaffold.map((s, i) => (
-              <li key={i}>· {s}</li>
-            ))}
-          </ul>
-          <p className="mt-3 text-xs leading-relaxed text-ink-secondary">
-            {ui === 'en'
-              ? 'How much of this you lean on is measured, and it is reported back to you on the result screen.'
-              : "La part que vous en reprenez est mesurée et vous est rapportée sur l'écran de résultat."}
-          </p>
-        </div>
-      )}
+          {showScaffold && task.suppliedScaffold && (
+            <div className="rounded-xl border border-amber-200 bg-amber-50 p-5">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-700" />
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-amber-700">
+                    {ui === 'en' ? 'Structure, not content' : 'Une trame, pas un contenu'}
+                  </p>
+                  <ul className="mt-2 space-y-1 text-sm text-ink-secondary">
+                    {task.suppliedScaffold.map((s, i) => (
+                      <li key={i}>· {s}</li>
+                    ))}
+                  </ul>
+                  <p className="mt-3 text-xs leading-relaxed text-ink-secondary">
+                    {ui === 'en'
+                      ? 'How much of this you lean on is measured, and it is reported back to you on the result screen.'
+                      : "La part que vous en reprenez est mesurée et vous est rapportée sur l'écran de résultat."}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </>
       )}
       {task.responseMode === 'text' && (
-      <button
-        disabled={busy}
-        onClick={submitText}
-        className="w-full rounded-xl bg-navy px-4 py-3 text-sm font-semibold text-white disabled:opacity-60"
-      >
-        {busy
-          ? ui === 'en' ? 'Scoring…' : 'Correction en cours…'
-          : sittingSection
-            ? inSectionAt + 1 < sittingSection.tasks.length
-              ? ui === 'en' ? 'Submit and go to the next tâche' : 'Remettre et passer à la tâche suivante'
-              : ui === 'en' ? 'Submit and finish this section' : "Remettre et terminer l'épreuve"
-            : ui === 'en' ? 'Submit' : 'Remettre'}
-      </button>
+        <button disabled={busy} onClick={submitText} className="btn-primary w-full">
+          {busy
+            ? ui === 'en' ? 'Scoring…' : 'Correction en cours…'
+            : sittingSection
+              ? inSectionAt + 1 < sittingSection.tasks.length
+                ? ui === 'en' ? 'Submit and go to the next tâche' : 'Remettre et passer à la tâche suivante'
+                : ui === 'en' ? 'Submit and finish this section' : "Remettre et terminer l'épreuve"
+              : ui === 'en' ? 'Submit' : 'Remettre'}
+        </button>
       )}
     </div>
   );
