@@ -8,6 +8,7 @@ import { aiTTS, browserTTS, stopBrowserTTS } from '../lib/tts';
 import { TopicPicker, SPEAKING_TOPICS } from '../components/TopicPicker';
 import { useAuthStore } from '../store/authStore';
 import { CompletionCard } from '../components/CompletionCard';
+import { ErrorBox } from '../components/States';
 
 type Mode = 'pronunciation' | 'conversation' | 'ielts';
 
@@ -373,14 +374,6 @@ function Loading({ text }: { text: string }) {
         <div className="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-2 border-teal/30 border-t-teal" />
         <p className="text-sm text-ink-secondary">{text}</p>
       </div>
-    </div>
-  );
-}
-function ErrorBox({ msg, onRetry }: { msg: string; onRetry?: () => void }) {
-  return (
-    <div className="card p-6 text-center">
-      <p className="mb-4 text-red-700">{typeof msg === 'string' ? msg : 'Something went wrong.'}</p>
-      {onRetry && <button onClick={onRetry} className="btn-secondary">Try again</button>}
     </div>
   );
 }

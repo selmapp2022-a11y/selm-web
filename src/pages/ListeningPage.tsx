@@ -6,6 +6,7 @@ import { useAuthStore } from '../store/authStore';
 import { generateListening, type ListeningExercise } from '../lib/listening';
 import { TopicPicker, LISTENING_TOPICS } from '../components/TopicPicker';
 import { CompletionCard } from '../components/CompletionCard';
+import { Loader, ErrorBox } from '../components/States';
 
 // Two tabs only — "Adaptive Practice" and "Dictation". The previous "News &
 // Stories" tab called the same backend with the same params as Adaptive
@@ -268,21 +269,3 @@ function wordAccuracy(a: string, b: string) {
   return Math.round((matches / wb.length) * 100);
 }
 
-function Loader({ text }: { text: string }) {
-  return (
-    <div className="card flex h-64 items-center justify-center">
-      <div className="text-center">
-        <div className="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-2 border-teal/30 border-t-teal" />
-        <p className="text-sm text-ink-secondary">{text}</p>
-      </div>
-    </div>
-  );
-}
-function ErrorBox({ msg, onRetry }: { msg: string; onRetry: () => void }) {
-  return (
-    <div className="card p-6 text-center">
-      <p className="mb-4 text-red-700">{msg}</p>
-      <button onClick={onRetry} className="btn-secondary">Try again</button>
-    </div>
-  );
-}
