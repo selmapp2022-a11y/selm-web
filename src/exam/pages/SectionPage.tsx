@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useExam } from '../state';
 import { t } from '../model/format';
+import { resolveAudio } from '../engine/audio';
 import type { ComprehensionItem, ComprehensionSection, LanguageCode } from '../model/types';
 
 /**
@@ -72,7 +73,14 @@ function Section({ section }: { section: ComprehensionSection }) {
   // has not been rendered and stored, the section cannot be sat under exam
   // conditions — and showing the script instead would turn a listening test
   // into a reading test, which is worse than showing nothing.
-  const audioMissing = section.delivery.audioPlaysOnce && section.items.some((i) => !i.audioUrl);
+  // Per item, not per section. A section whose bank is complete runs; an item
+  // whose audio is missing stops the section rather than being skipped, which
+  // is the one behaviour worse than refusing outright — the candidate would
+  // never know a question had been dropped.
+  const missing = section.delivery.audioPlaysOnce
+    ? section.items.filter((i) => !i.audioPath).map((i) => i.id)
+    : [];
+  const audioMissing = missing.length > 0;
 
   return (
     <div className="space-y-4">
@@ -97,6 +105,11 @@ function Section({ section }: { section: ComprehensionSection }) {
         <div className="rounded-xl border border-amber-500/40 bg-amber-500/5 px-4 py-3 text-sm leading-relaxed">
           <p className="font-semibold">
             {ui === 'en' ? 'This section cannot be sat yet' : "Cette épreuve n'est pas encore praticable"}
+          </p>
+          <p className="mt-1 text-xs text-ink-secondary">
+            {ui === 'en'
+              ? `${missing.length} of ${section.items.length} items have no recording: ${missing.slice(0, 6).join(', ')}${missing.length > 6 ? '…' : ''}`
+              : `${missing.length} items sur ${section.items.length} n'ont pas d'enregistrement : ${missing.slice(0, 6).join(', ')}${missing.length > 6 ? '…' : ''}`}
           </p>
           <p className="mt-1 text-ink-secondary">
             {ui === 'en'
@@ -175,7 +188,7 @@ function OneAtATime({
             ? `Question ${cursor + 1} of ${section.items.length}`
             : `Question ${cursor + 1} sur ${section.items.length}`}
         </span>
-        <audio ref={audio} src={item.audioUrl} onEnded={() => setPlayed(true)} className="hidden" />
+        <audio ref={audio} src={resolveAudio(item.audioPath)} onEnded={() => setPlayed(true)} className="hidden" preload="auto" />
         <button
           disabled={played}
           onClick={() => {

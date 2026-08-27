@@ -194,6 +194,7 @@ export const TCF_CANADA: ExamDefinition = {
       items: [
         {
           id: "tcf-co-01",
+          audioPath: "tcf-co/tcf-co-01.mp3",
           level: "A1",
           speakers: 1,
           content: "Bonjour, je voudrais un café, s'il vous plaît.",
@@ -204,6 +205,7 @@ export const TCF_CANADA: ExamDefinition = {
         },
         {
           id: "tcf-co-02",
+          audioPath: "tcf-co/tcf-co-02.mp3",
           level: "A1",
           speakers: 1,
           content: "Le magasin ferme à dix-huit heures.",
@@ -214,6 +216,7 @@ export const TCF_CANADA: ExamDefinition = {
         },
         {
           id: "tcf-co-03",
+          audioPath: "tcf-co/tcf-co-03.mp3",
           level: "A1",
           speakers: 1,
           content: "Excusez-moi, où sont les toilettes ?",
@@ -224,6 +227,7 @@ export const TCF_CANADA: ExamDefinition = {
         },
         {
           id: "tcf-co-04",
+          audioPath: "tcf-co/tcf-co-04.mp3",
           level: "A1",
           speakers: 1,
           content: "Il pleut beaucoup aujourd'hui, prends ton parapluie.",
@@ -234,6 +238,7 @@ export const TCF_CANADA: ExamDefinition = {
         },
         {
           id: "tcf-co-05",
+          audioPath: "tcf-co/tcf-co-05.mp3",
           level: "A2",
           speakers: 2,
           content: "— Bonjour, je cherche un appartement pour deux personnes.\n— Nous en avons un au troisième étage, mais il n'y a pas d'ascenseur.",
@@ -244,6 +249,7 @@ export const TCF_CANADA: ExamDefinition = {
         },
         {
           id: "tcf-co-06",
+          audioPath: "tcf-co/tcf-co-06.mp3",
           level: "A2",
           speakers: 1,
           content: "Mesdames et messieurs, en raison de travaux, l'autobus numéro 12 ne s'arrête pas devant l'hôpital ce matin. Merci de descendre à l'arrêt suivant.",
@@ -254,6 +260,7 @@ export const TCF_CANADA: ExamDefinition = {
         },
         {
           id: "tcf-co-07",
+          audioPath: "tcf-co/tcf-co-07.mp3",
           level: "A2",
           speakers: 1,
           content: "Pour vous inscrire au cours, remplissez d'abord le formulaire en ligne, puis apportez une pièce d'identité au bureau, le jeudi.",
@@ -264,6 +271,7 @@ export const TCF_CANADA: ExamDefinition = {
         },
         {
           id: "tcf-co-08",
+          audioPath: "tcf-co/tcf-co-08.mp3",
           level: "A2",
           speakers: 2,
           content: "— Le rendez-vous chez le dentiste est à quelle heure ?\n— À neuf heures quinze, mais il faut arriver dix minutes avant.",
@@ -274,6 +282,7 @@ export const TCF_CANADA: ExamDefinition = {
         },
         {
           id: "tcf-co-09",
+          audioPath: "tcf-co/tcf-co-09.mp3",
           level: "A2",
           speakers: 1,
           content: "Bonjour, ici le garage. Votre voiture est prête, mais nous fermons à midi le samedi. Venez plutôt lundi matin.",
@@ -284,6 +293,7 @@ export const TCF_CANADA: ExamDefinition = {
         },
         {
           id: "tcf-co-10",
+          audioPath: "tcf-co/tcf-co-10.mp3",
           level: "A2",
           speakers: 2,
           content: "— Tu prends le métro pour aller au travail ?\n— Non, je marche. C'est seulement quinze minutes.",
@@ -294,6 +304,7 @@ export const TCF_CANADA: ExamDefinition = {
         },
         {
           id: "tcf-co-11",
+          audioPath: "tcf-co/tcf-co-11.mp3",
           level: "B1",
           speakers: 2,
           content: "— Alors, cette formation en informatique, tu la commences quand ?\n— En principe en septembre. Mais je dois d'abord trouver quelqu'un pour garder les enfants le soir. Sinon, j'attendrai la session de janvier.",
@@ -304,6 +315,7 @@ export const TCF_CANADA: ExamDefinition = {
         },
         {
           id: "tcf-co-12",
+          audioPath: "tcf-co/tcf-co-12.mp3",
           level: "B1",
           speakers: 1,
           content: "Bonjour Madame, je vous appelle au sujet de votre demande de logement. Votre dossier est presque complet : il ne manque que la preuve de revenus. Sans ce document, nous ne pourrons pas l'examiner avant la fin du mois.",
@@ -314,6 +326,7 @@ export const TCF_CANADA: ExamDefinition = {
         },
         {
           id: "tcf-co-13",
+          audioPath: "tcf-co/tcf-co-13.mp3",
           level: "B1",
           speakers: 2,
           content: "— Tu as l'air fatigué.\n— J'ai changé d'horaire au travail. Je commence à cinq heures du matin maintenant. Le salaire est meilleur, mais je m'endors devant la télévision à huit heures du soir.",
@@ -324,6 +337,7 @@ export const TCF_CANADA: ExamDefinition = {
         },
         {
           id: "tcf-co-14",
+          audioPath: "tcf-co/tcf-co-14.mp3",
           level: "B1",
           speakers: 1,
           content: "Chers usagers, la bibliothèque restera ouverte pendant toute la durée des travaux. En revanche, l'entrée principale sera fermée : utilisez la porte située du côté du parc. Les retours de livres se font toujours à l'accueil.",
@@ -334,6 +348,7 @@ export const TCF_CANADA: ExamDefinition = {
         },
         {
           id: "tcf-co-15",
+          audioPath: "tcf-co/tcf-co-15.mp3",
           level: "B1",
           speakers: 2,
           content: "— Vous avez déjà travaillé dans la vente ?\n— Pas exactement. J'ai été serveur pendant trois ans, donc j'ai l'habitude du contact avec les clients, mais je n'ai jamais tenu une caisse.",
@@ -344,6 +359,7 @@ export const TCF_CANADA: ExamDefinition = {
         },
         {
           id: "tcf-co-16",
+          audioPath: "tcf-co/tcf-co-16.mp3",
           level: "B1",
           speakers: 2,
           content: "— Le colis devait arriver hier.\n— Je vois qu'il est passé par notre centre de tri ce matin. Il sera livré demain avant midi. Si personne n'est présent, il sera déposé au bureau de poste du quartier.",
@@ -354,6 +370,7 @@ export const TCF_CANADA: ExamDefinition = {
         },
         {
           id: "tcf-co-17",
+          audioPath: "tcf-co/tcf-co-17.mp3",
           level: "B1",
           speakers: 1,
           content: "Voici mon message pour l'équipe : la réunion de vendredi est déplacée à mardi prochain, même heure, même salle. Ceux qui ne pourront pas venir sont invités à envoyer leurs commentaires par écrit avant lundi soir.",
@@ -364,6 +381,7 @@ export const TCF_CANADA: ExamDefinition = {
         },
         {
           id: "tcf-co-18",
+          audioPath: "tcf-co/tcf-co-18.mp3",
           level: "B1",
           speakers: 2,
           content: "— Tu as trouvé un médecin de famille ?\n— Non, je suis sur une liste d'attente depuis huit mois. En attendant, quand j'ai un problème, je vais dans une clinique sans rendez-vous. On y attend longtemps, mais au moins on est vu le jour même.",
@@ -374,6 +392,7 @@ export const TCF_CANADA: ExamDefinition = {
         },
         {
           id: "tcf-co-19",
+          audioPath: "tcf-co/tcf-co-19.mp3",
           level: "B1",
           speakers: 2,
           content: "— J'hésite encore entre les deux logements.\n— Le premier est plus grand et moins cher, mais il est à quarante minutes du centre. Le deuxième est petit, plus cher, et tu descends au travail à pied. À toi de voir ce que tu préfères perdre : du temps ou de l'argent.",
@@ -384,6 +403,7 @@ export const TCF_CANADA: ExamDefinition = {
         },
         {
           id: "tcf-co-20",
+          audioPath: "tcf-co/tcf-co-20.mp3",
           level: "B2",
           speakers: 1,
           content: "Selon une étude publiée cette semaine, le télétravail n'a pas fait baisser la productivité des entreprises interrogées. Ce sont plutôt les réunions qui se sont multipliées. Les auteurs relèvent que les employés déclarent travailler autant qu'avant, mais se plaignent davantage d'un sentiment d'isolement.",
@@ -394,6 +414,7 @@ export const TCF_CANADA: ExamDefinition = {
         },
         {
           id: "tcf-co-21",
+          audioPath: "tcf-co/tcf-co-21.mp3",
           level: "B2",
           speakers: 2,
           content: "— On m'a demandé de reprendre le dossier de Sofia pendant son congé.\n— Tu vas t'en sortir ?\n— Le travail lui-même, oui, je le connais. Ce qui m'ennuie, c'est qu'on ne m'a rien dit sur la date de son retour, et j'ai mes propres échéances en novembre.",
@@ -404,6 +425,7 @@ export const TCF_CANADA: ExamDefinition = {
         },
         {
           id: "tcf-co-22",
+          audioPath: "tcf-co/tcf-co-22.mp3",
           level: "B2",
           speakers: 1,
           content: "Personnellement, je ne suis pas contre l'idée d'augmenter le prix des transports. Ce qui me dérange, c'est qu'on nous annonce cette hausse en même temps qu'une réduction du nombre d'autobus le soir. Payer plus pour un meilleur service, d'accord. Payer plus pour attendre plus longtemps, non.",
@@ -414,6 +436,7 @@ export const TCF_CANADA: ExamDefinition = {
         },
         {
           id: "tcf-co-23",
+          audioPath: "tcf-co/tcf-co-23.mp3",
           level: "B2",
           speakers: 1,
           content: "Le nouveau règlement municipal oblige les propriétaires à déclarer les logements loués à court terme. Les associations de locataires saluent la mesure. Elles rappellent toutefois qu'un règlement sans inspecteurs pour le faire appliquer reste une déclaration d'intention.",
@@ -424,6 +447,7 @@ export const TCF_CANADA: ExamDefinition = {
         },
         {
           id: "tcf-co-24",
+          audioPath: "tcf-co/tcf-co-24.mp3",
           level: "B2",
           speakers: 2,
           content: "— Votre candidature nous a intéressés, mais le poste suppose de se déplacer une semaine par mois.\n— Ce n'est pas un obstacle en soi. En revanche, j'aimerais savoir si ces déplacements sont planifiés à l'avance, parce que j'ai des obligations familiales fixes le mercredi.",
@@ -434,6 +458,7 @@ export const TCF_CANADA: ExamDefinition = {
         },
         {
           id: "tcf-co-25",
+          audioPath: "tcf-co/tcf-co-25.mp3",
           level: "B2",
           speakers: 2,
           content: "— Alors, ce cours du soir ?\n— Le contenu est excellent, vraiment. Mais franchement, trois heures de cours après une journée de travail, j'ai fini par remarquer que je ne retiens à peu près que la première heure. Je vais peut-être passer au format du samedi matin.",
@@ -444,6 +469,7 @@ export const TCF_CANADA: ExamDefinition = {
         },
         {
           id: "tcf-co-26",
+          audioPath: "tcf-co/tcf-co-26.mp3",
           level: "B2",
           speakers: 1,
           content: "On répète souvent que les jeunes lisent de moins en moins. Les chiffres montrent surtout qu'ils lisent autrement : moins de livres imprimés, beaucoup plus de textes en ligne. Ce qui recule, ce n'est donc pas la lecture, c'est un certain support.",
@@ -454,6 +480,7 @@ export const TCF_CANADA: ExamDefinition = {
         },
         {
           id: "tcf-co-27",
+          audioPath: "tcf-co/tcf-co-27.mp3",
           level: "B2",
           speakers: 1,
           content: "J'ai relu ton rapport hier soir. C'est solide, les données tiennent, et la méthode est claire. Je te dirai simplement une chose : ta recommandation arrive à la page onze. Personne, au comité, ne lira jusque-là.",
@@ -464,6 +491,7 @@ export const TCF_CANADA: ExamDefinition = {
         },
         {
           id: "tcf-co-28",
+          audioPath: "tcf-co/tcf-co-28.mp3",
           level: "B2",
           speakers: 1,
           content: "La ville a inauguré hier sa première piste cyclable protégée. Le maire y voit un signal fort en faveur des déplacements actifs. Les commerçants du quartier, eux, comptent surtout les places de stationnement disparues. Un premier bilan de fréquentation est attendu au printemps.",
@@ -474,6 +502,7 @@ export const TCF_CANADA: ExamDefinition = {
         },
         {
           id: "tcf-co-29",
+          audioPath: "tcf-co/tcf-co-29.mp3",
           level: "B2",
           speakers: 2,
           content: "— Vous nous dites donc que le délai de six semaines ne pose pas de problème.\n— Je dis que ce délai est tenable si les pièces arrivent en une seule livraison. Avec deux livraisons séparées, je ne m'engage sur rien.",
@@ -484,6 +513,7 @@ export const TCF_CANADA: ExamDefinition = {
         },
         {
           id: "tcf-co-30",
+          audioPath: "tcf-co/tcf-co-30.mp3",
           level: "C1",
           speakers: 1,
           content: "Quand on me demande si l'automatisation va supprimer des emplois, je réponds toujours par une autre question : lesquels, et pour qui ? Historiquement, les métiers ne disparaissent pas d'un bloc ; ce sont des tâches qui migrent, d'un poste à un autre, parfois d'un secteur à un autre. Le problème n'est donc pas l'ampleur du changement, mais sa vitesse. Une génération peut absorber une transformation de cette nature. Un trimestre ne le peut pas.",
@@ -494,6 +524,7 @@ export const TCF_CANADA: ExamDefinition = {
         },
         {
           id: "tcf-co-31",
+          audioPath: "tcf-co/tcf-co-31.mp3",
           level: "C1",
           speakers: 1,
           content: "Je vous remercie de cette proposition, qui témoigne d'une réelle réflexion et d'un vrai travail de terrain. Vous comprendrez néanmoins que le conseil, à ce stade de l'exercice budgétaire, ne puisse retenir un projet dont le financement repose sur des recettes encore hypothétiques. Revenez nous voir en janvier.",
@@ -504,6 +535,7 @@ export const TCF_CANADA: ExamDefinition = {
         },
         {
           id: "tcf-co-32",
+          audioPath: "tcf-co/tcf-co-32.mp3",
           level: "C1",
           speakers: 1,
           content: "Ce que j'entends dans ce débat, ce sont deux définitions du mot intégration qui ne se rencontrent jamais. Pour les uns, c'est un résultat que l'on mesure : l'emploi, la langue, le logement. Pour les autres, c'est un processus, qui suppose que la société d'accueil bouge elle aussi. Tant que nous ne dirons pas de quoi nous parlons, nous continuerons à nous indigner en croyant nous répondre.",
@@ -514,6 +546,7 @@ export const TCF_CANADA: ExamDefinition = {
         },
         {
           id: "tcf-co-33",
+          audioPath: "tcf-co/tcf-co-33.mp3",
           level: "C1",
           speakers: 2,
           content: "— Vous avez passé dix ans dans ce service. Vous partez sans regret ?\n— Sans regret, ce serait beaucoup dire. Disons que j'ai fini par comprendre que ce qui me retenait n'était plus le travail, mais les gens. Et cela, on peut le garder en partant.",
@@ -524,6 +557,7 @@ export const TCF_CANADA: ExamDefinition = {
         },
         {
           id: "tcf-co-34",
+          audioPath: "tcf-co/tcf-co-34.mp3",
           level: "C1",
           speakers: 1,
           content: "On oppose volontiers la formation courte, qui rendrait immédiatement employable, et la formation longue, accusée d'être trop théorique. L'expérience des dix dernières années invite à la prudence : les compétences très ciblées se périment vite, précisément parce qu'elles collent au marché du moment. Ce qui résiste, au fond, ce n'est pas le savoir technique lui-même, c'est la capacité à en réapprendre un autre.",
@@ -534,6 +568,7 @@ export const TCF_CANADA: ExamDefinition = {
         },
         {
           id: "tcf-co-35",
+          audioPath: "tcf-co/tcf-co-35.mp3",
           level: "C1",
           speakers: 1,
           content: "Le rapport annuel se félicite d'une baisse des plaintes de dix-huit pour cent. On aimerait sincèrement partager cet enthousiasme. Encore faudrait-il savoir si les usagers se plaignent moins parce que le service s'est amélioré, ou parce que le formulaire de plainte a changé d'adresse trois fois en un an.",
@@ -544,6 +579,7 @@ export const TCF_CANADA: ExamDefinition = {
         },
         {
           id: "tcf-co-36",
+          audioPath: "tcf-co/tcf-co-36.mp3",
           level: "C2",
           speakers: 1,
           content: "Il y a une élégance certaine dans la manière dont ce ministère annonce ses réformes : jamais un mot plus haut que l'autre, jamais un chiffre qui fâche, et toujours cette formule, à moyens constants, qui a le mérite de tout dire à ceux qui savent l'entendre. On nous promet donc davantage de services, dans les mêmes locaux, avec les mêmes équipes, et sans doute la même patience de la part des usagers. Le vocabulaire, lui, s'est considérablement enrichi.",
@@ -554,6 +590,7 @@ export const TCF_CANADA: ExamDefinition = {
         },
         {
           id: "tcf-co-37",
+          audioPath: "tcf-co/tcf-co-37.mp3",
           level: "C2",
           speakers: 1,
           content: "Mon voisin m'explique chaque samedi que les jeunes ne veulent plus travailler. Il tient cette certitude de son père, qui la tenait déjà du sien. Ce qui me trouble, ce n'est pas qu'il ait tort — sur un point ou deux, il a d'ailleurs moins tort qu'il ne le croit lui-même — c'est qu'une phrase transmise sur trois générations continue d'être présentée comme le fruit d'une observation personnelle.",
@@ -564,6 +601,7 @@ export const TCF_CANADA: ExamDefinition = {
         },
         {
           id: "tcf-co-38",
+          audioPath: "tcf-co/tcf-co-38.mp3",
           level: "C2",
           speakers: 1,
           content: "Nous avons évalué ce programme selon les critères que le programme s'était lui-même fixés. Il les remplit, naturellement. La question que personne n'a posée en commission est de savoir si ces critères mesuraient autre chose que la capacité de l'administration à produire les documents attendus dans les délais attendus. On me dira que c'est déjà quelque chose ; je veux bien le croire. Ce n'est pas ce que nous avions promis aux familles.",
@@ -574,6 +612,7 @@ export const TCF_CANADA: ExamDefinition = {
         },
         {
           id: "tcf-co-39",
+          audioPath: "tcf-co/tcf-co-39.mp3",
           level: "C2",
           speakers: 1,
           content: "On célèbre le retour de l'usine comme on célébrerait un fils prodigue. Trois cents emplois, annonce le communiqué ; deux cents, précise la note en bas de page, pour la première année. J'ajoute, sans malice, que la même municipalité expliquait il y a huit ans que l'avenir de la région ne passait plus par l'industrie. Je ne lui reproche pas d'avoir changé d'avis. Je lui reproche de n'avoir jamais changé de ton.",

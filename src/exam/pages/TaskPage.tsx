@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useExam, allTasks } from '../state';
+import { useExam, allTasks, sectionOf } from '../state';
 import { AudioRecorder } from '../../components/AudioRecorder';
 import { t } from '../model/format';
 import { wordCount } from '../engine/text';
@@ -13,9 +13,25 @@ import type { Response } from '../model/types';
  * same component runs the IELTS letter and the TCF message without a branch.
  */
 export default function TaskPage() {
-  const { exam, ui, setResult, taskId } = useExam();
+  const { exam, ui, setResult, taskId, sitting, submitSection } = useExam();
   const nav = useNavigate();
-  const task = useMemo(() => allTasks(exam).find((t) => t.id === taskId) ?? allTasks(exam)[0], [exam, taskId]);
+
+  // Inside a sitting this page runs the production section's tasks in order.
+  // Outside one it runs the single task the goal page picked. The two were
+  // never joined until a full sitting was actually run end to end, and the
+  // sitting stalled here: it reached expression écrite and stopped, because
+  // nothing advanced it. Found by running it, not by reading it.
+  const sittingSection = useMemo(() => {
+    if (!sitting) return null;
+    const s = exam.sections.find((x) => x.id === sitting.order[sitting.at]);
+    return s && s.kind === 'production' ? s : null;
+  }, [exam, sitting]);
+  const [inSectionAt, setInSectionAt] = useState(0);
+
+  const task = useMemo(() => {
+    if (sittingSection) return sittingSection.tasks[Math.min(inSectionAt, sittingSection.tasks.length - 1)];
+    return allTasks(exam).find((t) => t.id === taskId) ?? allTasks(exam)[0];
+  }, [exam, taskId, sittingSection, inSectionAt]);
 
   const [text, setText] = useState('');
   const [elapsed, setElapsed] = useState(0);
@@ -44,6 +60,19 @@ export default function TaskPage() {
     const result = await scoreResponse(exam, task, response);
     setResult(response, result);
     setBusy(false);
+    if (sittingSection) {
+      // Inside a sitting the per-task result screen is not shown: it would
+      // hand the candidate feedback in the middle of an exam. The next task
+      // starts, and when the section is finished the sitting moves on.
+      if (inSectionAt + 1 < sittingSection.tasks.length) {
+        setInSectionAt(inSectionAt + 1);
+      } else {
+        setInSectionAt(0);
+        submitSection(sittingSection.id);
+        nav('/section');
+      }
+      return;
+    }
     nav('/result');
   }
 
@@ -68,14 +97,28 @@ export default function TaskPage() {
     });
   }
 
+  const sittingCrumb = sittingSection ? (
+    <p className="text-xs text-ink-secondary">
+      {ui === 'en'
+        ? `${t(sittingSection.name, ui)} · task ${inSectionAt + 1} of ${sittingSection.tasks.length} · section ${(sitting?.at ?? 0) + 1} of ${sitting?.order.length}`
+        : `${t(sittingSection.name, ui)} · tâche ${inSectionAt + 1} sur ${sittingSection.tasks.length} · épreuve ${(sitting?.at ?? 0) + 1} sur ${sitting?.order.length}`}
+    </p>
+  ) : null;
+
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <div>
           <div className="text-[11px] font-semibold uppercase tracking-wide text-ink-secondary">
-            {t(exam.name, ui)} · {t(exam.sections[0].name, ui)}
+            {/* The task's own section, not sections[0]. It was sections[0]
+                until 2026-08-27, which was invisible while writing was the
+                first section and became wrong the moment comprehension was
+                added in front of it: a tâche of expression écrite was
+                labelled "compréhension orale". */}
+            {t(exam.name, ui)} · {t(sectionOf(exam, task.id).name, ui)}
           </div>
           <h1 className="font-display text-xl font-bold tracking-tight">{t(task.name, ui)}</h1>
+          {sittingCrumb}
         </div>
         <div className={`rounded-xl px-3 py-2 text-right ${over ? 'bg-red-500/10' : 'bg-surface-muted'}`}>
           <div className={`font-display text-xl font-bold tabular-nums ${over ? 'text-red-500' : ''}`}>
@@ -173,7 +216,11 @@ export default function TaskPage() {
       >
         {busy
           ? ui === 'en' ? 'Scoring…' : 'Correction en cours…'
-          : ui === 'en' ? 'Submit' : 'Remettre'}
+          : sittingSection
+            ? inSectionAt + 1 < sittingSection.tasks.length
+              ? ui === 'en' ? 'Submit and go to the next tâche' : 'Remettre et passer à la tâche suivante'
+              : ui === 'en' ? 'Submit and finish this section' : "Remettre et terminer l'épreuve"
+            : ui === 'en' ? 'Submit' : 'Remettre'}
       </button>
       )}
     </div>

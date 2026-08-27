@@ -105,5 +105,22 @@ console.log(
     '\n      That would show the candidate a better result than they hold.'
 );
 
+
+// ── The audio bank ────────────────────────────────────────────────────────
+console.log('\n5. The audio bank\n');
+for (const s of sections) {
+  if (!s.delivery.audioPlaysOnce) continue;
+  const withAudio = s.items.filter((i) => i.audioPath).length;
+  ok(withAudio === s.items.length, `${s.id}: every item has a recording`, `${withAudio}/${s.items.length}`);
+  ok(
+    s.items.every((i) => !i.audioPath || /^tcf-co\/tcf-co-\d\d\.mp3$/.test(i.audioPath)),
+    `${s.id}: every path is a store path, not a hardcoded URL`
+  );
+  ok(
+    new Set(s.items.map((i) => i.audioPath)).size === s.items.length,
+    `${s.id}: no two items share a recording`
+  );
+}
+
 console.log(bad === 0 ? '\nAll comprehension cases pass.' : `\n${bad} FAILURES`);
 if (bad !== 0) throw new Error(`${bad} comprehension cases failed`);

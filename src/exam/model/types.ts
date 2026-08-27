@@ -362,12 +362,17 @@ export type ComprehensionItem = {
   /** What the item tests. Never shown during the section. */
   rationale?: string;
   /**
-   * Where the rendered audio lives. Authored once, stored, served — never
-   * generated per user and never generated at request time. Absent means not
-   * yet rendered, which is the state French audio stays in until the dialect
-   * question is settled.
+   * Path to the rendered audio **within the audio store**, e.g.
+   * `tcf-co/tcf-co-01.mp3` — not a full URL. `resolveAudio()` joins it with
+   * the configured base, so the same bank can be served from the app bundle
+   * today and from the CDN later without editing a single item.
+   *
+   * Authored once, stored, served — never generated per user and never
+   * generated at request time. Absent means not yet rendered, and a section
+   * whose items are missing audio refuses to run rather than falling back to
+   * showing the script.
    */
-  audioUrl?: string;
+  audioPath?: string;
 };
 
 /**
