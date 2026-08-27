@@ -1,6 +1,6 @@
 import { ReactNode, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
-import { ClipboardList, LineChart } from 'lucide-react';
+import { ArrowLeft, ClipboardList, LineChart } from 'lucide-react';
 import clsx from 'clsx';
 import { Logo } from '../../components/Logo';
 import { ThemeToggle } from '../../components/ThemeToggle';
@@ -27,6 +27,17 @@ import { t } from '../model/format';
  *      is in progress*. The old shell offered no way out of a section and this
  *      one must not either — adopting the chrome must not hand the candidate a
  *      door mid-épreuve.
+ *
+ *      One door is exempt, and it was missing entirely until 2026-08-27: the
+ *      way back to the application. The engine is a separate Vite entry point,
+ *      so `/dashboard` is not a route in this router and cannot be a NavLink —
+ *      it is a plain anchor, and a full page load. **It is never disabled.**
+ *      Locking the two exam destinations keeps a candidate inside the épreuve
+ *      they are sitting; leaving them with no way back to their own dashboard
+ *      is not the same thing, it is a trap. The sitting survives the trip —
+ *      it is in `localStorage` and restores on return — but the section clock
+ *      is wall-clock, so the label says so during a sitting rather than
+ *      letting someone find out afterwards.
  *   3. `initTheme()` runs here. The app calls it in App.tsx; the exam entry
  *      point never did, so dark mode was simply dead in the exam engine.
  */
@@ -40,6 +51,15 @@ export default function ExamLayout({ children }: { children: ReactNode }) {
     { to: '/history', label: ui === 'en' ? 'History' : 'Historique', icon: LineChart },
   ];
   const locked = !!sitting;
+
+  /** The way back to the application. A different Vite entry point, so an
+   *  anchor rather than a NavLink, and never disabled. */
+  const backLabel = ui === 'en' ? 'Dashboard' : 'Tableau de bord';
+  const backTitle = locked
+    ? ui === 'en'
+      ? 'Your sitting is saved and will be waiting. The section clock keeps running.'
+      : "Votre session est enregistrée et vous attendra. Le chronomètre de l'épreuve continue."
+    : undefined;
 
   const controls = (
     <>
@@ -70,6 +90,14 @@ export default function ExamLayout({ children }: { children: ReactNode }) {
         <div className="flex h-full flex-col">
           <div className="px-6 py-6"><Logo lang={ui} /></div>
           <nav className="flex-1 space-y-1 px-3">
+            <a
+              href="/dashboard"
+              title={backTitle}
+              className="mb-2 flex items-center gap-3 rounded-xl border border-surface-divider px-4 py-2.5 text-sm font-medium text-ink-secondary transition hover:border-navy/40 hover:bg-surface-muted hover:text-navy"
+            >
+              <ArrowLeft className="h-5 w-5" />
+              {backLabel}
+            </a>
             {nav.map((item) => (
               <NavLink
                 key={item.to}
@@ -113,6 +141,14 @@ export default function ExamLayout({ children }: { children: ReactNode }) {
       </header>
 
       <nav className="fixed bottom-0 left-0 right-0 z-30 flex border-t border-surface-divider bg-white md:hidden">
+        <a
+          href="/dashboard"
+          title={backTitle}
+          className="flex flex-1 flex-col items-center gap-0.5 py-2.5 text-xs text-ink-secondary"
+        >
+          <ArrowLeft className="h-5 w-5" />
+          {backLabel}
+        </a>
         {nav.map((item) => (
           <NavLink
             key={item.to}
