@@ -512,12 +512,67 @@ export type PredictionTarget = {
 
 // ── a sitting ───────────────────────────────────────────────────────────
 
+/**
+ * A surface that belongs to a destination rather than to the product.
+ *
+ * The Comprehensive Ranking System calculator and the NCLC conversion table
+ * are Canadian instruments. On the dashboard of a candidate bound for
+ * Melbourne they are not merely irrelevant, they are misleading — they imply
+ * a points system that destination does not run. So the dashboard implements
+ * a small closed set of surfaces and **a destination declares which of them
+ * it has**. Nothing in the engine or the dashboard decides this by country.
+ */
+export type DestinationSurface = {
+  id: 'points_calculator' | 'benchmark_conversion';
+  label: Localised;
+  /** Where it lives. Absolute for anything outside the application. */
+  href: string;
+};
+
+/**
+ * Where the candidate is going, and how that place reads a language result.
+ *
+ * `country` is an ISO 3166-1 alpha-2 tag and it is DATA. No branch anywhere
+ * reads it to decide what to render — `surfaces` and `requirement` do that.
+ * It is carried so a record can say which destination a sitting was aimed at
+ * without parsing a label.
+ */
+export type Destination = {
+  id: string;
+  label: Localised;
+  country: string;
+  /**
+   * `per_skill` — every skill must reach the required level, and the lowest
+   * one governs. Canadian immigration, and most skilled-migration routes.
+   * `overall` — an aggregate is read and a weak skill can be carried.
+   * `both` — an overall AND a per-skill floor, which many universities set.
+   */
+  requirement: 'per_skill' | 'overall' | 'both';
+  surfaces: DestinationSurface[];
+};
+
 export type Goal = {
   id: string;
   label: Localised;
   /** Benchmark level the candidate needs, per skill. */
   requiredLevel: number;
   system: BenchmarkSystem;
+  /**
+   * Present when the requirement is set on one of the EXAM's own scales
+   * rather than on a government benchmark. An Australian skilled-migration
+   * route asks for IELTS 6 in each skill; it does not ask for a CLB level,
+   * and showing "CLB" beside that 6 would be inventing a conversion the
+   * destination never made. When this is set, `system` is only a label.
+   */
+  scaleId?: string;
+  /** Where the candidate is going. */
+  destination: Destination;
+  /**
+   * Exam ids that actually serve this goal. The destination decides the
+   * required score and the exam is chosen from that, not the other way
+   * round — this is that sentence, as data.
+   */
+  exams: string[];
 };
 
 export type Response =

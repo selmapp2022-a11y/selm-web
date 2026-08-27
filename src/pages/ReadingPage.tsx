@@ -1,10 +1,19 @@
 import { useEffect, useRef, useState } from 'react';
-import { ClipboardPaste, Newspaper, Timer, RefreshCcw, CheckCircle2, XCircle } from 'lucide-react';
+import { ClipboardPaste, Timer, RefreshCcw, CheckCircle2, XCircle } from 'lucide-react';
 import clsx from 'clsx';
 import { useAuthStore } from '../store/authStore';
 import { enhanceText, generateText, type ReadingText } from '../lib/reading';
 import { CompletionCard } from '../components/CompletionCard';
 
+/**
+ * `daily` and `speed` — "Article of the day" and the speed reader — were
+ * removed from the mode row on 2026-08-27. Both are general-learning
+ * surfaces with no analogue in any exam this product prepares for: no
+ * instrument tests words-per-minute, and no instrument gives the candidate a
+ * news article of their choosing. The components below still exist and the
+ * type still admits the values, so nothing is deleted and no user loses a
+ * page mid-session; they are simply no longer offered.
+ */
 type Mode = 'paste' | 'daily' | 'speed';
 
 export default function ReadingPage() {
@@ -16,13 +25,11 @@ export default function ReadingPage() {
     <div className="space-y-6">
       <div>
         <h1 className="font-display text-3xl font-bold text-navy">Reading</h1>
-        <p className="mt-1 text-ink-secondary">Texts at your level, vocabulary support, and reading speed training.</p>
+        <p className="mt-1 text-ink-secondary">Paste any text and read it at your level, with vocabulary support.</p>
       </div>
 
       <div className="flex gap-2 rounded-2xl bg-surface-muted p-1.5">
         <ModeBtn active={mode === 'paste'} onClick={() => setMode('paste')} icon={ClipboardPaste}>Paste any text</ModeBtn>
-        <ModeBtn active={mode === 'daily'} onClick={() => setMode('daily')} icon={Newspaper}>Article of the day</ModeBtn>
-        <ModeBtn active={mode === 'speed'} onClick={() => setMode('speed')} icon={Timer}>Speed reader</ModeBtn>
       </div>
 
       {mode === 'paste' && <PasteMode level={level} />}

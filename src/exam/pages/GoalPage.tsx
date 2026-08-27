@@ -1,16 +1,30 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, Target } from 'lucide-react';
+import { CalendarDays, ChevronRight, Target } from 'lucide-react';
 import clsx from 'clsx';
 import { useExam, allTasks, sectionOf } from '../state';
 import { GOALS } from '../definitions';
 import { t } from '../model/format';
+import { daysUntil, loadPlan, savePlan } from '../model/plan';
 
 export default function GoalPage() {
   const { exam, goal, setGoal, ui, taskId, setTaskId, startSitting } = useExam();
   const nav = useNavigate();
   const tasks = allTasks(exam);
   const task = tasks.find((t) => t.id === taskId) ?? tasks[0];
-  const sameSystem = goal.system === exam.benchmark.system;
+
+  // The requirement may be set on one of the exam's own scales — Australia
+  // asks for IELTS 6, not a CLB level — or on a government benchmark. Only
+  // the second case can disagree with the exam.
+  const onExamScale = goal.scaleId ? exam.scales.some((sc) => sc.id === goal.scaleId) : false;
+  const sameSystem = goal.scaleId ? onExamScale : goal.system === exam.benchmark.system;
+
+  const [examDate, setExamDate] = useState<string>(() => loadPlan()?.examDate ?? '');
+  const left = daysUntil(examDate || null);
+  const commitDate = (v: string) => {
+    setExamDate(v);
+    savePlan({ goalId: goal.id, examId: exam.id, examDate: v || null });
+  };
 
   return (
     <div className="space-y-6">
@@ -40,13 +54,53 @@ export default function GoalPage() {
                   : 'border-surface-divider bg-white text-ink-secondary hover:border-navy/40 hover:bg-surface-muted'
               )}
             >
-              <span>{t(g.label, ui)}</span>
+              <span className="min-w-0">
+                {t(g.label, ui)}
+                <span className="mt-0.5 block text-xs font-normal text-ink-secondary">
+                  {t(g.destination.label, ui)}
+                </span>
+              </span>
               <span className="shrink-0 rounded-full bg-teal/10 px-2.5 py-0.5 text-xs font-bold text-teal">
                 {g.system} {g.requiredLevel}
               </span>
             </button>
           );
         })}
+      </section>
+
+      {/* The date. Not a nicety and not a reminder feature — it is the
+          number the whole dashboard is arranged around, and until it is set
+          the product can tell the candidate how they are doing but not
+          whether they are on time. */}
+      <section className="card p-6">
+        <div className="flex items-start gap-4">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-navy to-teal text-white shadow-md">
+            <CalendarDays className="h-6 w-6" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <span className="chip">{ui === 'en' ? 'Your exam date' : 'Votre date d\u2019examen'}</span>
+            <input
+              type="date"
+              value={examDate}
+              onChange={(e) => commitDate(e.target.value)}
+              className="input mt-3 w-full"
+              aria-label={ui === 'en' ? 'Exam date' : 'Date de l\u2019examen'}
+            />
+            <p className="mt-2 text-xs leading-relaxed text-ink-secondary">
+              {left === null
+                ? ui === 'en'
+                  ? 'Not booked yet is a normal answer. Leave it empty and everything else still works \u2014 you will see where you stand, just not how long you have.'
+                  : "Pas encore r\u00e9serv\u00e9e est une r\u00e9ponse normale. Laissez vide : tout le reste fonctionne \u2014 vous verrez o\u00f9 vous en \u00eates, mais pas le temps qu\u2019il vous reste."
+                : left >= 0
+                  ? ui === 'en'
+                    ? `${left} day${left === 1 ? '' : 's'} remaining.`
+                    : `${left} jour${left === 1 ? '' : 's'} restant${left === 1 ? '' : 's'}.`
+                  : ui === 'en'
+                    ? 'That date has passed. Set the next one when you have it.'
+                    : 'Cette date est pass\u00e9e. Indiquez la suivante quand vous l\u2019aurez.'}
+            </p>
+          </div>
+        </div>
       </section>
 
       <section className="card p-6">

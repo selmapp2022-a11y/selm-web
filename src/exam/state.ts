@@ -10,6 +10,10 @@ import type {
 } from './model/types';
 import type { ScoreResult } from './engine/score';
 import { EXAMS, GOALS } from './definitions';
+import { loadHistory, saveHistory, type SittingRecord } from './model/history';
+import { loadPlan, savePlan } from './model/plan';
+
+export type { SittingRecord } from './model/history';
 
 /**
  * A sitting in progress.
@@ -33,41 +37,7 @@ export type Sitting = {
   submitted: string[];
 };
 
-/**
- * A finished sitting, kept so the line can be seen to move.
- *
- * Deliberately small: per-skill counts and the band held, no answers, no
- * transcripts, no free text. A history record is the easiest place in a
- * product to accumulate more than it needs.
- */
-export type SittingRecord = {
-  examId: string;
-  /** ISO timestamp the sitting finished. */
-  finishedAt: string;
-  /** By section id. `null` for a skill with no result — never a zero. */
-  skills: Record<string, { correct: number; total: number; held: string | null } | null>;
-};
-
 const SITTING_KEY = 'selm_exam_sitting_v1';
-const HISTORY_KEY = 'selm_exam_history_v1';
-
-const loadHistory = (): SittingRecord[] => {
-  try {
-    const raw = localStorage.getItem(HISTORY_KEY);
-    const v = raw ? JSON.parse(raw) : [];
-    return Array.isArray(v) ? (v as SittingRecord[]) : [];
-  } catch {
-    return [];
-  }
-};
-
-const saveHistory = (h: SittingRecord[]) => {
-  try {
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(h));
-  } catch {
-    /* a history that cannot be saved is a lost history, not a broken app */
-  }
-};
 
 const loadSitting = (): Sitting | null => {
   try {
@@ -133,18 +103,44 @@ export const sectionOf = (e: ExamDefinition, taskId: string): ProductionSection 
 // forty minutes into a TCF sitting renders the IELTS sections instead —
 // which is exactly the failure the persistence exists to prevent.
 const RESTORED = loadSitting();
-const START = (RESTORED && EXAMS.find((e) => e.id === RESTORED.examId)) || EXAMS[0];
+
+// The plan the candidate set on the goal screen. It outlives a sitting and it
+// is what the application's dashboard reads, so the store must start from it
+// rather than from the first entry in the array — otherwise the two halves of
+// the product disagree about which exam the candidate is preparing for.
+const PLAN = loadPlan();
+const PLANNED_EXAM = PLAN && EXAMS.find((e) => e.id === PLAN.examId);
+const PLANNED_GOAL = PLAN && GOALS.find((g) => g.id === PLAN.goalId);
+
+const START = (RESTORED && EXAMS.find((e) => e.id === RESTORED.examId)) || PLANNED_EXAM || EXAMS[0];
 
 export const useExam = create<ExamState>((set) => ({
   exam: START,
   taskId: firstTask(START).id,
-  goal: GOALS[1],
+  goal: PLANNED_GOAL || GOALS[1],
   ui: 'en',
   response: null,
   result: null,
-  setExam: (exam) => set({ exam, taskId: firstTask(exam).id, response: null, result: null }),
+  setExam: (exam) =>
+    set((st) => {
+      savePlan({ goalId: st.goal.id, examId: exam.id, examDate: loadPlan()?.examDate ?? null });
+      return { exam, taskId: firstTask(exam).id, response: null, result: null };
+    }),
   setTaskId: (taskId) => set({ taskId, response: null, result: null }),
-  setGoal: (goal) => set({ goal }),
+  setGoal: (goal) =>
+    set((st) => {
+      // Picking a destination picks the exam with it when the current one
+      // does not serve that destination. A candidate who chose the French
+      // Express Entry category and was left sitting IELTS would be preparing
+      // for the wrong instrument without being told.
+      const exam = goal.exams.includes(st.exam.id)
+        ? st.exam
+        : EXAMS.find((e) => goal.exams.includes(e.id)) || st.exam;
+      savePlan({ goalId: goal.id, examId: exam.id, examDate: loadPlan()?.examDate ?? null });
+      return exam.id === st.exam.id
+        ? { goal }
+        : { goal, exam, taskId: firstTask(exam).id, response: null, result: null };
+    }),
   setUi: (ui) => set({ ui }),
   setResult: (response, result) => set({ response, result }),
   reset: () => set({ response: null, result: null }),

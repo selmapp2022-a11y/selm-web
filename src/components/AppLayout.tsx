@@ -4,9 +4,13 @@ import { Logo } from './Logo';
 import { ThemeToggle } from './ThemeToggle';
 import { useAuthStore } from '../store/authStore';
 import { syncProgressFromBackend } from '../lib/progress';
-import { LayoutDashboard, Mic, Headphones, BookOpen, PenLine, Brain, Trophy, LogOut, Settings } from 'lucide-react';
+import { LayoutDashboard, Mic, Headphones, BookOpen, PenLine, Brain, ClipboardCheck, LogOut, Settings } from 'lucide-react';
 import clsx from 'clsx';
 
+// `Progress` left this list on 2026-08-27. The page it opened is the XP,
+// level and achievement screen — the scoreboard of the product the company
+// is repositioning away from. The route still exists and nothing was deleted;
+// it is simply no longer one of the seven things the navigation offers.
 const navItems = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/speaking', label: 'Speaking', icon: Mic },
@@ -14,8 +18,12 @@ const navItems = [
   { to: '/reading', label: 'Reading', icon: BookOpen },
   { to: '/writing', label: 'Writing', icon: PenLine },
   { to: '/vocabulary', label: 'Vocabulary', icon: Brain },
-  { to: '/progress', label: 'Progress', icon: Trophy },
 ];
+
+// The exam engine is a second Vite entry point at `/exam.html`, not a route
+// in this router, so it is an anchor rather than a NavLink. Until today it
+// had no entry anywhere in the signed-in application at all.
+const EXAM_HOME = '/exam.html#/';
 
 export function AppLayout() {
   const { user, logout } = useAuthStore();
@@ -35,6 +43,13 @@ export function AppLayout() {
         <div className="flex h-full flex-col">
           <div className="px-6 py-6"><Logo /></div>
           <nav className="flex-1 space-y-1 px-3">
+            <a
+              href={EXAM_HOME}
+              className="mb-2 flex items-center gap-3 rounded-xl bg-gradient-to-br from-navy to-teal px-4 py-2.5 text-sm font-semibold text-white shadow-card"
+            >
+              <ClipboardCheck className="h-5 w-5" />
+              Mock exam
+            </a>
             {navItems.map((item) => (
               <NavLink
                 key={item.to}
@@ -53,11 +68,11 @@ export function AppLayout() {
             <div className="mb-3 px-2">
               <div className="text-sm font-semibold text-navy">{user?.full_name || user?.username || 'Learner'}</div>
               <div className="truncate text-xs text-ink-secondary">{user?.email}</div>
-              {user?.current_level && (
-                <span className="mt-2 inline-flex items-center rounded-full bg-teal/10 px-2.5 py-0.5 text-xs font-bold text-navy">
-                  Level {user.current_level}
-                </span>
-              )}
+              {/* The backend's `current_level` badge was removed here on
+                  2026-08-27 with the rest of the invented level scale. The
+                  field still exists on the account and is still used to pick
+                  practice difficulty; it is simply not a score, so it is no
+                  longer displayed as one beside the candidate's name. */}
             </div>
             <div className="mb-2 px-2"><ThemeToggle /></div>
             {/* Settings entry — required so users (and Apple's App Review)
@@ -98,7 +113,11 @@ export function AppLayout() {
 
       {/* Bottom nav for mobile */}
       <nav className="fixed bottom-0 left-0 right-0 z-30 flex border-t border-surface-divider bg-white md:hidden">
-        {navItems.slice(0, 5).map((item) => (
+        <a href={EXAM_HOME} className="flex flex-1 flex-col items-center gap-0.5 py-2.5 text-xs text-ink-secondary">
+          <ClipboardCheck className="h-5 w-5" />
+          Exam
+        </a>
+        {navItems.slice(0, 4).map((item) => (
           <NavLink
             key={item.to}
             to={item.to}

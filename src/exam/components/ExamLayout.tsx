@@ -68,7 +68,7 @@ export default function ExamLayout({ children }: { children: ReactNode }) {
     <div className="min-h-screen bg-surface-app">
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-surface-divider bg-white md:block">
         <div className="flex h-full flex-col">
-          <div className="px-6 py-6"><Logo /></div>
+          <div className="px-6 py-6"><Logo lang={ui} /></div>
           <nav className="flex-1 space-y-1 px-3">
             {nav.map((item) => (
               <NavLink
