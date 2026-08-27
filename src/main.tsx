@@ -1,9 +1,32 @@
+/* A note about asset URLs and the CDN in front of this app, written after
+   breaking it twice in one day.
+
+   The static-site component serves `catchall_document: index.html`. A request
+   for a file that is not deployed yet therefore returns index.html with HTTP
+   200 — and Cloudflare caches a 200 for `s-maxage=86400`, a full day.
+
+   So fetching a content-hashed bundle URL to check whether a deploy has
+   landed POISONS that exact URL: when the deploy does land, index.html asks
+   for the bundle and the CDN hands back HTML, and the app never boots.
+
+   Check a deploy by loading `/`, which always exists, and reading which
+   bundle it links. Never by fetching the bundle. */
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import App from './App';
 import './styles/global.css';
+
+/* The safe way to check which build is live.
+
+   Load the page and read `window.__SELM_BUILD__` — from the console, or from
+   a script. Do NOT fetch a hashed bundle URL to find out, for the reason
+   above: before the deploy lands that request returns index.html with a 200,
+   and the CDN keeps it for a day, so the very act of checking breaks the
+   thing being checked. */
+(window as unknown as Record<string, string>).__SELM_BUILD__ = '2026-08-27-b';
 
 const queryClient = new QueryClient({
   defaultOptions: {
