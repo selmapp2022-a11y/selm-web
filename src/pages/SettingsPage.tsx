@@ -96,7 +96,7 @@ export default function SettingsPage() {
           Learn how SELM collects, uses, and stores your data.
         </p>
         <a
-          href="https://selmapp.com/privacy"
+          href="https://app.selmapp.ca/privacy"
           target="_blank"
           rel="noreferrer noopener"
           className="inline-flex items-center gap-1 text-sm font-semibold text-navy hover:underline dark:text-teal-300"

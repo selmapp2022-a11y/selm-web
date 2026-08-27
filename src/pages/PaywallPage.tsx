@@ -572,10 +572,10 @@ export default function PaywallPage() {
           in App.tsx). */}
       <p className="mt-3 text-center text-xs text-ink-secondary dark:text-slate-500">
         By subscribing you agree to our{' '}
-        <a href="https://selmapp.com/terms" target="_blank" rel="noreferrer noopener" className="font-semibold text-navy hover:underline dark:text-teal-300">
+        <a href="https://app.selmapp.ca/terms" target="_blank" rel="noreferrer noopener" className="font-semibold text-navy hover:underline dark:text-teal-300">
           Terms of Use
         </a>{' '}and{' '}
-        <a href="https://selmapp.com/privacy" target="_blank" rel="noreferrer noopener" className="font-semibold text-navy hover:underline dark:text-teal-300">
+        <a href="https://app.selmapp.ca/privacy" target="_blank" rel="noreferrer noopener" className="font-semibold text-navy hover:underline dark:text-teal-300">
           Privacy Policy
         </a>
         .

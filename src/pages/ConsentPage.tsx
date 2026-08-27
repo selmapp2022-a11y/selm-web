@@ -195,7 +195,7 @@ export default function ConsentPage() {
             Full details, including retention periods and your rights,
             are in our{' '}
             <a
-              href="https://selmapp.com/privacy"
+              href="https://app.selmapp.ca/privacy"
               target="_blank"
               rel="noreferrer noopener"
               className="inline-flex items-center gap-1 font-semibold text-navy hover:underline dark:text-teal-300"
@@ -205,7 +205,7 @@ export default function ConsentPage() {
             </a>
             {' '}and{' '}
             <a
-              href="https://selmapp.com/terms"
+              href="https://app.selmapp.ca/terms"
               target="_blank"
               rel="noreferrer noopener"
               className="inline-flex items-center gap-1 font-semibold text-navy hover:underline dark:text-teal-300"

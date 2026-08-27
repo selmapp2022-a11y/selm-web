@@ -26,7 +26,7 @@ import './styles/global.css';
    above: before the deploy lands that request returns index.html with a 200,
    and the CDN keeps it for a day, so the very act of checking breaks the
    thing being checked. */
-(window as unknown as Record<string, string>).__SELM_BUILD__ = '2026-08-27-d';
+(window as unknown as Record<string, string>).__SELM_BUILD__ = '2026-08-27-e';
 
 const queryClient = new QueryClient({
   defaultOptions: {
