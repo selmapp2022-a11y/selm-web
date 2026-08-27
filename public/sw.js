@@ -22,7 +22,8 @@ self.addEventListener('fetch', (event) => {
 
   if (request.method !== 'GET') return;
 
-  // Skip API calls (network-only — must hit selmapp.com)
+  // Skip API calls. They are same-origin `/api/v1` since 2026-08-27, so this
+  // path test is what keeps them off the cache — network-only, always.
   if (url.pathname.startsWith('/api/')) return;
   if (url.hostname !== self.location.hostname) return;
 

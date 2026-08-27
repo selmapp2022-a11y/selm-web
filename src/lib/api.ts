@@ -1,7 +1,32 @@
 import axios from 'axios';
 import { CapacitorHttp, Capacitor } from '@capacitor/core';
 
-export const API_BASE = 'https://selmapp.com/api/v1';
+/**
+ * Where the API is, and why this is not one string any more.
+ *
+ * Until 2026-08-27 it was the absolute `https://selmapp.com/api/v1`, which
+ * meant the web app made a cross-origin request on every call no matter
+ * which host it was served from. On that day `app.selmapp.ca` was pointed at
+ * the same DigitalOcean app, whose routing rules already send `/` to the web
+ * bundle and `/api` to the API and match all domains. So on the web the API
+ * is now simply **relative**: whichever host serves the page serves the API,
+ * same-origin, no CORS, and no host baked into the bundle to go stale.
+ *
+ * Native is the one case that has no host of its own — a Capacitor WebView
+ * loads from the app package — so it keeps an absolute one, and that is now
+ * `app.selmapp.ca` rather than `selmapp.com`. This was the cheapest day it
+ * will ever be to change: there are no installs yet, so no shipped binary is
+ * pointing at the old host. Every day after this one it gets more expensive.
+ *
+ * `import.meta.env.DEV` keeps `vite dev` working: there is no dev proxy in
+ * `vite.config.ts`, so a relative path on :5173 would hit nothing.
+ */
+export const API_HOST = 'https://app.selmapp.ca';
+
+export const API_BASE =
+  Capacitor.isNativePlatform() || import.meta.env.DEV
+    ? `${API_HOST}/api/v1`
+    : '/api/v1';
 
 export const api = axios.create({
   baseURL: API_BASE,
