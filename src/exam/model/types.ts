@@ -56,6 +56,34 @@ export type Scale = {
  */
 export type BenchmarkSystem = string;
 
+/**
+ * An item-type family inside a comprehension section — the teaching unit
+ * that section did not have.
+ *
+ * Amendment 2 §2.4, listed **Open**: *"`comprehension-orale` and
+ * `comprehension-ecrite` carry 39 items each and zero named tâches. The
+ * catalogue and the planner both address tasks by tâche. Until comprehension
+ * has an equivalent structure, half the exam cannot be planned or prescribed
+ * against."*
+ *
+ * Expression has six named tâches because the exam names them. Comprehension
+ * has none, because the exam does not name them — it publishes item TYPES.
+ * So the unit here is the family, and it is declared per exam as data rather
+ * than assumed by the engine, exactly as scales and criteria already are.
+ */
+export type ComprehensionFamily = {
+  id: string;
+  label: Localised;
+  /** What an item of this family looks like, in the candidate's terms. */
+  describes: Localised;
+  /**
+   * Where the taxonomy comes from. Non-optional on purpose: a teaching unit
+   * invented by us and a teaching unit published by the awarding body are
+   * different things, and the difference has to survive into the code.
+   */
+  provenance: Localised;
+};
+
 export type BenchmarkBand = {
   from: number;
   level: number;
@@ -362,6 +390,14 @@ export type ComprehensionItem = {
   /** What the item tests. Never shown during the section. */
   rationale?: string;
   /**
+   * Which `ComprehensionFamily` this item belongs to — the teaching unit.
+   *
+   * Optional because an exam may declare no taxonomy, and because an item
+   * with no family is a **visible gap** rather than a silent default: the
+   * planner routes on this, and a wrong family is worse than a missing one.
+   */
+  family?: string;
+  /**
    * Path to the rendered audio **within the audio store**, e.g.
    * `tcf-co/tcf-co-01.mp3` — not a full URL. `resolveAudio()` joins it with
    * the configured base, so the same bank can be served from the app bundle
@@ -430,6 +466,12 @@ export type ComprehensionSection = {
   delivery: DeliveryRules;
   /** Where the items came from. Always ours, and always said so. */
   provenance: Localised;
+  /**
+   * The item-type families this section teaches by. Empty means the section
+   * has no teaching unit yet, and the planner must say so rather than
+   * inventing one — Amendment 1 §6.
+   */
+  families?: ComprehensionFamily[];
   items: ComprehensionItem[];
 };
 

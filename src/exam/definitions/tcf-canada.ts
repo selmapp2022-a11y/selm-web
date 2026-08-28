@@ -200,6 +200,44 @@ export const TCF_CANADA: ExamDefinition = {
         en: 'Every item in this section was written for this product, to the published format — 39 questions, ordered by progressive difficulty — and no real exam question is reproduced. The A1-to-C2 banding is ours: the exam publishes that difficulty rises across the section and does not publish which item sits at which level.',
         fr: "Tous les items de cette épreuve ont été rédigés pour ce produit, selon le format publié — 39 questions, à difficulté progressive — sans reproduire aucune question réelle d'examen. Le classement A1 à C2 est le nôtre : l'examen indique que la difficulté augmente, sans publier le niveau de chaque item.",
       },
+      families: [
+        {
+          id: 'annonce',
+          label: { en: 'Announcement or short message', fr: 'Annonce ou message court' },
+          describes: {
+            en: 'One voice, a few seconds: a public address, a recorded message, a piece of practical information. What is tested is catching one fact the first time it is said.',
+            fr: "Une seule voix, quelques secondes : une annonce publique, un message enregistré, une information pratique. Ce qui est testé, c'est de saisir un fait à la première écoute.",
+          },
+          provenance: {
+            en: 'Family names follow the item types France Éducation international publishes for the compréhension orale épreuve. The assignment of individual items to families is OURS and is unreviewed.',
+            fr: "Les noms de familles suivent les types d'items publiés par France Éducation international pour l'épreuve de compréhension orale. L'affectation de chaque item à une famille est LA NÔTRE et n'a pas été relue.",
+          },
+        },
+        {
+          id: 'dialogue',
+          label: { en: 'Short dialogue', fr: 'Dialogue court' },
+          describes: {
+            en: 'Two voices in an everyday exchange. What is tested is following who wants what, not the vocabulary.',
+            fr: "Deux voix dans un échange quotidien. Ce qui est testé, c'est de suivre qui veut quoi, non le vocabulaire.",
+          },
+          provenance: {
+            en: 'As above.',
+            fr: 'Comme ci-dessus.',
+          },
+        },
+        {
+          id: 'expose',
+          label: { en: 'Talk or report', fr: 'Exposé ou reportage' },
+          describes: {
+            en: 'One voice at length: a report, an explanation, an argued point. What is tested is holding a structure across more than one sentence.',
+            fr: "Une voix qui dure : un reportage, une explication, un point de vue argumenté. Ce qui est testé, c'est de tenir une structure sur plus d'une phrase.",
+          },
+          provenance: {
+            en: 'As above.',
+            fr: 'Comme ci-dessus.',
+          },
+        },
+      ],
       items: [
         {
           id: "tcf-co-01",
@@ -211,6 +249,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Un thé", "L'addition", "Un café", "Un verre d'eau"],
           answer: 2,
           rationale: "Tests recognition of a single everyday noun in a polite request; the distractors are all items plausibly ordered in the same setting but none of them is said.",
+          family: "annonce",
         },
         {
           id: "tcf-co-02",
@@ -222,6 +261,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["À dix-huit heures", "À dix heures", "À huit heures", "À dix-neuf heures"],
           answer: 0,
           rationale: "Tests comprehension of a compound time expression; the distractors are near-misses formed from the parts of dix-huit or by shifting one hour.",
+          family: "annonce",
         },
         {
           id: "tcf-co-03",
@@ -233,6 +273,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["La sortie du bâtiment", "Un taxi", "La caisse", "Les toilettes"],
           answer: 3,
           rationale: "Tests a basic où est-ce que question with a concrete place noun; the distractors are other things one commonly asks for in a public building but that are never mentioned.",
+          family: "annonce",
         },
         {
           id: "tcf-co-04",
@@ -244,6 +285,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Il neige", "Il pleut", "Il fait chaud", "Il y a du vent"],
           answer: 1,
           rationale: "Tests weather vocabulary in a short piece of advice; the distractors are other common weather statements, one of which (le vent) would also motivate the umbrella but is not said.",
+          family: "annonce",
         },
         {
           id: "tcf-co-05",
@@ -255,6 +297,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Il est trop petit", "Il n'y a pas d'ascenseur", "Il est trop cher", "Il est au rez-de-chaussée"],
           answer: 1,
           rationale: "Tests the restrictive mais in a short housing exchange; the distractors are typical apartment complaints that are never stated, and rez-de-chaussée contradicts troisième étage.",
+          family: "dialogue",
         },
         {
           id: "tcf-co-06",
@@ -266,6 +309,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Prendre un autre autobus", "Attendre devant l'hôpital", "Payer un supplément", "Descendre à l'arrêt suivant"],
           answer: 3,
           rationale: "Tests an instruction inside a public announcement; hôpital and autobus appear in the script but answer a different question, and no change of bus or fare is mentioned.",
+          family: "expose",
         },
         {
           id: "tcf-co-07",
@@ -277,6 +321,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Une pièce d'identité", "Le formulaire papier rempli", "Une photo d'identité récente", "Un paiement en espèces"],
           answer: 0,
           rationale: "Tests the sequence d'abord / puis and what belongs to each step; the strongest distractor reuses formulaire, which is completed online and not carried to the office.",
+          family: "annonce",
         },
         {
           id: "tcf-co-08",
@@ -288,6 +333,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["À neuf heures quinze", "À neuf heures trente", "À neuf heures cinq", "À huit heures quinze"],
           answer: 2,
           rationale: "Tests a one-step calculation on a stated time; the distractors are the appointment time itself, an addition instead of a subtraction, and an hour error.",
+          family: "dialogue",
         },
         {
           id: "tcf-co-09",
@@ -299,6 +345,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["De venir samedi midi", "De rappeler plus tard", "De laisser la voiture au garage", "De venir lundi matin"],
           answer: 3,
           rationale: "Tests plutôt as a recommendation in a short voicemail; samedi and midi are in the script but describe the closing time being avoided, not the advice.",
+          family: "annonce",
         },
         {
           id: "tcf-co-10",
@@ -310,6 +357,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["En métro", "À pied", "À vélo", "En voiture"],
           answer: 1,
           rationale: "Tests a negative answer that corrects the question's assumption; métro is named only to be rejected, and the other means of transport are never mentioned.",
+          family: "dialogue",
         },
         {
           id: "tcf-co-11",
@@ -321,6 +369,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Du prix de la formation", "De la date limite d'inscription au programme", "D'une solution de garde pour les enfants", "Du résultat d'un examen d'entrée"],
           answer: 2,
           rationale: "Tests the conditional link carried by d'abord and sinon; the distractors are plausible but unstated obstacles to starting a course.",
+          family: "dialogue",
         },
         {
           id: "tcf-co-12",
@@ -332,6 +381,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Il manque une preuve de revenus", "La demande a été refusée", "Le dossier est arrivé trop tard", "Le logement est déjà loué"],
           answer: 0,
           rationale: "Tests il ne manque que plus the negative condition sans ce document; the distractors are stronger outcomes (refusal, lateness, loss of the flat) that the message explicitly does not announce.",
+          family: "expose",
         },
         {
           id: "tcf-co-13",
@@ -343,6 +393,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Il regrette l'horaire qu'il avait avant", "Il travaille moins d'heures qu'auparavant", "Il s'entend mal avec ses nouveaux collègues", "Il gagne plus mais dort mal"],
           answer: 3,
           rationale: "Tests the concessive contrast le salaire est meilleur / mais; the distractors add a regret, a reduction in hours and a colleague problem that the speaker never expresses.",
+          family: "dialogue",
         },
         {
           id: "tcf-co-14",
@@ -354,6 +405,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Les horaires d'ouverture", "L'entrée à utiliser", "Le lieu des retours de livres", "La durée des emprunts"],
           answer: 1,
           rationale: "Tests separating what changes from what stays the same; horaires and retours are addressed in the script precisely to say they are unchanged, and loan periods are not mentioned.",
+          family: "expose",
         },
         {
           id: "tcf-co-15",
@@ -365,6 +417,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Il a trois ans d'expérience dans la vente", "Il n'a jamais travaillé avec le public", "Il connaît le contact client mais pas la caisse", "Il a déjà tenu une caisse dans un restaurant pendant trois ans"],
           answer: 2,
           rationale: "Tests the qualified pas exactement and the two-part self-description; the distractors misattribute the three years to sales, overstate the negation, or invert the caisse statement.",
+          family: "dialogue",
         },
         {
           id: "tcf-co-16",
@@ -376,6 +429,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Le colis sera immédiatement renvoyé à l'expéditeur", "Le colis sera livré le lendemain", "Le colis restera au centre de tri", "Le colis sera déposé au bureau de poste"],
           answer: 3,
           rationale: "Tests a si-clause consequence; centre de tri and livré demain are in the script but describe the normal route, not the failed-delivery case.",
+          family: "dialogue",
         },
         {
           id: "tcf-co-17",
@@ -387,6 +441,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Envoyer leurs commentaires par écrit", "Demander une autre réunion", "Venir à une autre heure", "Écouter l'enregistrement de la réunion"],
           answer: 0,
           rationale: "Tests the instruction attached to the absent group; même heure appears in the script but applies to the rescheduled meeting, and no recording or second meeting is offered.",
+          family: "expose",
         },
         {
           id: "tcf-co-18",
@@ -398,6 +453,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Parce que c'est moins cher", "Parce qu'elle n'a pas encore de médecin de famille", "Parce que l'attente y est courte", "Parce que son médecin de famille est absent pour plusieurs semaines"],
           answer: 1,
           rationale: "Tests the causal link expressed through en attendant; the script says the wait there is long, and price and an absent doctor are never mentioned.",
+          family: "dialogue",
         },
         {
           id: "tcf-co-19",
@@ -409,6 +465,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Il est nettement plus grand que l'autre", "Il coûte moins cher", "Il est proche du travail", "Il est plus calme"],
           answer: 2,
           rationale: "Tests holding two contrasted descriptions apart; plus grand and moins cher belong to the first flat, and quietness is never discussed.",
+          family: "dialogue",
         },
         {
           id: "tcf-co-20",
@@ -420,6 +477,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Le télétravail a réduit la productivité des entreprises", "Les employés interrogés travaillent moins qu'avant", "Les entreprises interrogées veulent supprimer le télétravail", "La productivité se maintient, mais l'isolement augmente"],
           answer: 3,
           rationale: "Tests a two-part finding stated partly in the negative; each distractor reverses one element the report explicitly denies or never raises.",
+          family: "expose",
         },
         {
           id: "tcf-co-21",
@@ -431,6 +489,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["La difficulté technique du dossier", "L'incertitude sur la durée du remplacement", "Le manque de formation pour reprendre ce dossier", "Le refus de sa collègue de l'aider"],
           answer: 1,
           rationale: "Tests locating the real worry after a concession; she states that the work itself is not the problem, and no training issue or refusal is mentioned.",
+          family: "dialogue",
         },
         {
           id: "tcf-co-22",
@@ -442,6 +501,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Elle accepterait une hausse si le service s'améliorait", "Elle est opposée à toute augmentation des prix", "Elle trouve que les transports coûtent déjà trop cher", "Elle préfère désormais utiliser sa voiture"],
           answer: 0,
           rationale: "Tests a conditional stance built on a double negation; the speaker opens by saying she is not against the rise, and neither current prices nor cars are her subject.",
+          family: "expose",
         },
         {
           id: "tcf-co-23",
@@ -453,6 +513,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Le règlement pénalise surtout les locataires", "Les propriétaires n'ont pas été consultés", "Les moyens de contrôle manquent", "Les loyers vont augmenter à cause du règlement"],
           answer: 2,
           rationale: "Tests inferring the reservation from the image of a rule without inspectors; propriétaires and locataires both appear in the script but answer a different question.",
+          family: "expose",
         },
         {
           id: "tcf-co-24",
@@ -464,6 +525,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Il refuse les déplacements proposés", "Il demande une augmentation de salaire", "Il propose de travailler entièrement à distance depuis chez lui", "Il accepte, sous réserve d'un calendrier prévisible"],
           answer: 3,
           rationale: "Tests a qualified acceptance signalled by pas un obstacle en soi and en revanche; nothing is refused, and salary and remote work are never raised.",
+          family: "dialogue",
         },
         {
           id: "tcf-co-25",
@@ -475,6 +537,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Le contenu du cours ne lui convient pas vraiment", "Sa concentration baisse au fil de la soirée", "Le cours revient trop cher pour elle", "Le professeur va être remplacé"],
           answer: 1,
           rationale: "Tests inferring a cause from je ne retiens que la première heure; the speaker praises the content, and cost and staffing are never mentioned.",
+          family: "dialogue",
         },
         {
           id: "tcf-co-26",
@@ -486,6 +549,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Les jeunes lisent de moins en moins", "Les jeunes préfèrent toujours les livres imprimés aux écrans", "C'est le support qui change, pas la lecture elle-même", "La lecture en ligne est de moins bonne qualité"],
           answer: 2,
           rationale: "Tests the corrective structure ce n'est pas X, c'est Y; the first distractor repeats the received idea the speaker is refuting, and no judgement on quality is made.",
+          family: "expose",
         },
         {
           id: "tcf-co-27",
@@ -497,6 +561,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["La recommandation apparaît trop tard dans le texte", "Les données sont contestables", "Le rapport est beaucoup trop court", "Le style est beaucoup trop technique pour les membres du comité"],
           answer: 0,
           rationale: "Tests understanding an implied criticism of structure; the script explicitly praises the data, and length and style are never criticised.",
+          family: "expose",
         },
         {
           id: "tcf-co-28",
@@ -508,6 +573,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Ils soutiennent pleinement le projet du maire", "Ils attendent le bilan de fréquentation du printemps", "Ils réclament la construction d'une deuxième piste", "Ils regrettent la perte de places de stationnement"],
           answer: 3,
           rationale: "Tests attributing a stance to the right group in a report with several actors; the bilan belongs to the city's timeline and the support belongs to the mayor.",
+          family: "expose",
         },
         {
           id: "tcf-co-29",
@@ -519,6 +585,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Le délai de six semaines est impossible à tenir", "Son engagement dépend du mode de livraison", "Il demande six semaines supplémentaires", "Il refuse finalement de livrer les pièces"],
           answer: 1,
           rationale: "Tests a correction that reframes rather than contradicts; the supplier does not declare the deadline impossible, ask for more time, or refuse the order.",
+          family: "dialogue",
         },
         {
           id: "tcf-co-30",
@@ -530,6 +597,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["L'automatisation supprimera la majorité des emplois", "Les métiers manuels sont les plus directement menacés", "Le rythme du changement importe plus que son ampleur", "Les transformations passées se sont faites sans difficulté"],
           answer: 2,
           rationale: "Tests identifying a thesis carried by a ce n'est pas X mais Y structure; the distractors state the alarmist claim the speaker declines, a category he never names, and a reassurance he never gives.",
+          family: "expose",
         },
         {
           id: "tcf-co-31",
@@ -541,6 +609,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Un refus poli, assorti d'une invitation à revenir", "Une acceptation de principe sous conditions techniques", "Un rejet définitif et sans appel du projet", "Une demande de révision complète du montage financier"],
           answer: 0,
           rationale: "Tests reading formal register where the refusal is carried by néanmoins and a subjunctive; nothing is accepted, the invitation for January rules out finality, and no revision is requested.",
+          family: "expose",
         },
         {
           id: "tcf-co-32",
@@ -552,6 +621,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Le manque de données fiables sur l'emploi, la langue et le logement", "L'absence de volonté des personnes concernées", "La lenteur des politiques publiques en la matière", "Le fait que les interlocuteurs n'emploient pas le mot dans le même sens"],
           answer: 3,
           rationale: "Tests grasping a meta-level criticism about vocabulary rather than policy; emploi and logement appear only as one camp's indicators, and neither slowness nor individual willingness is discussed.",
+          family: "expose",
         },
         {
           id: "tcf-co-33",
@@ -563,6 +633,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Elle est amère envers ses anciens collègues", "Elle part avec une nostalgie mesurée", "Elle regrette d'avoir donné sa démission", "Elle se montre indifférente à ce départ"],
           answer: 1,
           rationale: "Tests attitude in an understated answer that neither denies nor dramatises regret; the colleagues are named warmly, and ce serait beaucoup dire rules out indifference.",
+          family: "dialogue",
         },
         {
           id: "tcf-co-34",
@@ -574,6 +645,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Les formations courtes sont finalement plus efficaces", "Les formations longues garantissent l'accès à un emploi stable", "La capacité à réapprendre compte plus qu'une compétence ciblée", "Le marché du travail évolue en réalité très peu"],
           answer: 2,
           rationale: "Tests separating the opposition the speaker reports from the position he defends; the first two options restate the two camps he holds at a distance, and the last contradicts the script.",
+          family: "expose",
         },
         {
           id: "tcf-co-35",
@@ -585,6 +657,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Il félicite l'organisme pour ses résultats", "Il conteste l'exactitude du chiffre de dix-huit pour cent", "Il propose de supprimer le formulaire de plainte", "Il met en doute l'interprétation de ce chiffre"],
           answer: 3,
           rationale: "Tests a sceptical stance signalled by on aimerait and encore faudrait-il; he never disputes the figure itself, only what it is taken to prove.",
+          family: "expose",
         },
         {
           id: "tcf-co-36",
@@ -596,6 +669,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Il ironise sur une réforme annoncée sans moyens supplémentaires", "Il admire la clarté et la sobriété de la communication ministérielle", "Il annonce le recrutement prochain de nouveaux agents", "Il regrette la complexité du vocabulaire administratif"],
           answer: 0,
           rationale: "Tests sustained irony where praise words carry criticism; élégance and vocabulaire enrichi are the ironic vehicle, and the script says staff and premises are unchanged.",
+          family: "expose",
         },
         {
           id: "tcf-co-37",
@@ -607,6 +681,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["De ne jamais travailler le samedi", "De critiquer injustement son propre père et son grand-père", "De présenter un lieu commun hérité comme une observation personnelle", "De se tromper entièrement sur la jeunesse d'aujourd'hui et sur le travail"],
           answer: 2,
           rationale: "Tests a stance placed inside a concession: the speaker grants the neighbour is partly right, so the total-error option is excluded, and samedi and père are script words answering a different question.",
+          family: "expose",
         },
         {
           id: "tcf-co-38",
@@ -618,6 +693,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["L'administration a rendu ses documents avec beaucoup de retard cette année", "L'évaluation valide une conformité de procédure, non un résultat réel", "Les familles concernées n'ont pas été consultées par la commission", "Le programme n'a atteint aucun des critères qui lui étaient fixés"],
           answer: 1,
           rationale: "Tests a circularity argument stated obliquely; the script says the criteria are met and the deadlines respected, and the families are invoked as the promise, not as an unconsulted party.",
+          family: "expose",
         },
         {
           id: "tcf-co-39",
@@ -629,6 +705,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["La municipalité a menti sur le nombre d'emplois créés la première année", "L'usine n'ouvrira finalement pas ses portes cette année", "La région aurait dû rester industrielle depuis le début", "La municipalité affirme ses revirements avec la même assurance"],
           answer: 3,
           rationale: "Tests a final reproach placed in the contrast between changer d'avis and changer de ton; the job figures are reported without accusing anyone of lying, and the speaker takes no side on industrial policy.",
+          family: "expose",
         },
       ],
     },
@@ -655,6 +732,47 @@ export const TCF_CANADA: ExamDefinition = {
         en: 'Every item in this section was written for this product, to the published format — 39 questions, ordered by progressive difficulty — and no real exam question is reproduced. The A1-to-C2 banding is ours: the exam publishes that difficulty rises across the section and does not publish which item sits at which level.',
         fr: "Tous les items de cette épreuve ont été rédigés pour ce produit, selon le format publié — 39 questions, à difficulté progressive — sans reproduire aucune question réelle d'examen. Le classement A1 à C2 est le nôtre : l'examen indique que la difficulté augmente, sans publier le niveau de chaque item.",
       },
+      families: [
+        {
+          id: 'consigne',
+          label: { en: 'Notice or instruction', fr: 'Consigne ou avis' },
+          describes: {
+            en: 'A sign, a label, a short notice. What is tested is doing exactly what it says and nothing a reasonable person might also do.',
+            fr: "Un panneau, une étiquette, un avis court. Ce qui est testé, c'est de faire exactement ce qui est écrit, et rien de ce qu'une personne raisonnable ferait aussi.",
+          },
+          provenance: {
+            en: 'Family names follow the item types France Éducation international publishes for the compréhension écrite épreuve. The assignment of individual items to families is OURS and is unreviewed.',
+            fr: "Les noms de familles suivent les types d'items publiés par France Éducation international pour l'épreuve de compréhension écrite. L'affectation de chaque item à une famille est LA NÔTRE et n'a pas été relue.",
+          },
+        },
+        {
+          id: 'correspondance',
+          label: { en: 'Letter, email or message', fr: 'Correspondance' },
+          describes: {
+            en: 'Someone writing to someone. What is tested is the intention behind the politeness, which is where a candidate at this level loses marks.',
+            fr: "Quelqu'un qui écrit à quelqu'un. Ce qui est testé, c'est l'intention derrière la politesse — là où un candidat de ce niveau perd des points.",
+          },
+          provenance: { en: 'As above.', fr: 'Comme ci-dessus.' },
+        },
+        {
+          id: 'article',
+          label: { en: 'Informative text', fr: 'Texte informatif' },
+          describes: {
+            en: 'An article or a factual passage. What is tested is finding a fact that is stated once, among facts that are not asked about.',
+            fr: "Un article ou un passage factuel. Ce qui est testé, c'est de retrouver un fait énoncé une seule fois, parmi des faits sur lesquels rien n'est demandé.",
+          },
+          provenance: { en: 'As above.', fr: 'Comme ci-dessus.' },
+        },
+        {
+          id: 'argumentatif',
+          label: { en: 'Argued text', fr: 'Texte argumentatif' },
+          describes: {
+            en: 'A text that takes a position. What is tested is separating what the author asserts from what the author reports others as saying — the single most common misreading at NCLC 6 and 7.',
+            fr: "Un texte qui prend position. Ce qui est testé, c'est de distinguer ce que l'auteur affirme de ce qu'il rapporte d'autrui — le contresens le plus fréquent aux NCLC 6 et 7.",
+          },
+          provenance: { en: 'As above.', fr: 'Comme ci-dessus.' },
+        },
+      ],
       items: [
         {
           id: "tcf-ce-01",
@@ -664,6 +782,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Réparer l'ascenseur", "Prendre l'escalier", "Attendre le technicien", "Sortir de l'immeuble"],
           answer: 1,
           rationale: "Tests literal comprehension of a single instruction; the distractors all name reactions that would be reasonable in real life but that the notice never asks for.",
+          family: "consigne",
         },
         {
           id: "tcf-ce-02",
@@ -673,6 +792,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Le mettre au réfrigérateur", "Le congeler", "Le jeter le jour même", "Le laisser à la lumière"],
           answer: 0,
           rationale: "Tests recognition of a storage instruction on a label; freezing and discarding are plausible food-handling actions in general but the label prescribes refrigeration only.",
+          family: "consigne",
         },
         {
           id: "tcf-ce-03",
@@ -682,6 +802,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Le samedi", "Le mardi", "Le dimanche", "Le lundi"],
           answer: 3,
           rationale: "Tests reading of a simple opening-hours notice; Sunday is the day a reader would guess from general habit, and Tuesday and Saturday are days explicitly covered by the open period.",
+          family: "consigne",
         },
         {
           id: "tcf-ce-04",
@@ -691,6 +812,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Les cyclistes", "Les voitures", "Les piétons", "Personne"],
           answer: 2,
           rationale: "Tests understanding of a permission-plus-prohibition sign; the cyclist option reverses the prohibition, cars are never mentioned, and the sign does not close the lane to everyone.",
+          family: "consigne",
         },
         {
           id: "tcf-ce-05",
@@ -700,6 +822,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Devant la porte de Madame Roy", "Chez le gardien de l'immeuble", "Au bureau de poste", "Chez une voisine du premier étage"],
           answer: 1,
           rationale: "Tests locating one factual detail in a short message; the post office is the answer general experience suggests, while the door and the neighbour are plausible alternatives the note excludes.",
+          family: "correspondance",
         },
         {
           id: "tcf-ce-06",
@@ -709,6 +832,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["L'arrêt Hôpital Sud n'est plus desservi", "Les billets doivent être achetés à la gare", "Les bus circulent pendant la nuit", "La ligne 12 est supprimée jusqu'en avril"],
           answer: 0,
           rationale: "Tests extraction of the single change announced in a service notice; the other options contradict the stated ticket validity, the stated hours, and the stated dates.",
+          family: "article",
         },
         {
           id: "tcf-ce-07",
@@ -718,6 +842,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Dès que l'appareil est branché", "Avant de remplir le réservoir", "Lorsque le voyant vert est allumé", "Après avoir ajouté un produit nettoyant"],
           answer: 2,
           rationale: "Tests the order of steps in a set of instructions; each distractor picks up a real element of the text (plugging in, filling, cleaning product) but places it at the wrong point in the sequence.",
+          family: "article",
         },
         {
           id: "tcf-ce-08",
@@ -727,6 +852,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Téléphoner en semaine", "Emménager dès le mois d'août", "Venir visiter avec son chat", "Visiter le studio un samedi"],
           answer: 3,
           rationale: "Tests reading of the conditions in a small ad; the three wrong options each contradict an explicit restriction on phone calls, availability date, and animals.",
+          family: "article",
         },
         {
           id: "tcf-ce-09",
@@ -736,6 +862,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["En se présentant à l'accueil", "En téléphonant le matin", "En téléphonant l'après-midi", "En passant par les urgences"],
           answer: 1,
           rationale: "Tests a detail restricted by a time window; the afternoon option is a near-miss on the stated hours, the reception desk is explicitly ruled out, and emergencies are mentioned but do not give a rendez-vous.",
+          family: "article",
         },
         {
           id: "tcf-ce-10",
@@ -745,6 +872,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Les chiffres du mois", "Une invitation en salle A", "Un lien envoyé le jeudi", "Une formation le vendredi"],
           answer: 2,
           rationale: "Tests a small calculation from the text (the meeting is Friday, so \"la veille\" is Thursday); the other options recycle details that appear in the note but answer a different question.",
+          family: "article",
         },
         {
           id: "tcf-ce-11",
@@ -754,6 +882,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Parce qu'elle sera inondée pendant les travaux", "Parce que le chauffage y sera coupé", "Parce qu'elle servira à stocker la nouvelle chaudière", "Parce qu'elle restera ouverte toute la journée"],
           answer: 3,
           rationale: "Tests the inference linking an open door to the advice about personal belongings; the flooding and storage options invent details, and the heating option reverses what the email says about heating continuing.",
+          family: "article",
         },
         {
           id: "tcf-ce-12",
@@ -763,6 +892,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["La durée du trajet est prévisible", "Le vélo est toujours plus rapide que la voiture", "Le vélo lui permet de faire des économies", "Le trajet à vélo est plus agréable qu'en voiture"],
           answer: 0,
           rationale: "Tests identification of the writer's main point against three widely believed claims about cycling that the text explicitly rejects or does not support.",
+          family: "argumentatif",
         },
         {
           id: "tcf-ce-13",
@@ -772,6 +902,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Le service est devenu payant", "Aucun habitant n'a accepté de s'occuper du bac", "La ville manquait de bacs disponibles", "Les immeubles concernés n'avaient pas de cour"],
           answer: 1,
           rationale: "Tests the cause–effect link expressed by \"faute de volontaire\"; cost, supply shortages and unsuitable buildings are ordinary explanations for such failures but none is given in the text.",
+          family: "article",
         },
         {
           id: "tcf-ce-14",
@@ -781,6 +912,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Il doit payer quinze euros", "Il peut utiliser son ancienne carte magnétique", "Le remplacement ne lui est pas facturé", "Il ne peut plus accéder aux locaux"],
           answer: 2,
           rationale: "Tests the implication of \"à partir du deuxième badge perdu\"; the fifteen-euro option is the trap of applying the figure too early, and the other two contradict statements in the notice.",
+          family: "article",
         },
         {
           id: "tcf-ce-15",
@@ -790,6 +922,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["La date de la session de juin", "Le nombre de places disponibles", "Le nom du module", "Le mode de déroulement de la session"],
           answer: 3,
           rationale: "Tests what \"contrairement à ce qui figurait dans le catalogue\" refers back to; the date, the number of places and the module title all appear in the email but none is presented as an error.",
+          family: "correspondance",
         },
         {
           id: "tcf-ce-16",
@@ -799,6 +932,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Par une réorganisation du temps de travail existant", "Par l'embauche de personnel supplémentaire", "Par une subvention obtenue grâce aux étudiants", "Par la fermeture de la bibliothèque le week-end"],
           answer: 0,
           rationale: "Tests the distinction the text draws between the demand for the measure and the argument that made it feasible; hiring is explicitly denied, and the grant and weekend closure are inventions built on real elements of the text.",
+          family: "argumentatif",
         },
         {
           id: "tcf-ce-17",
@@ -808,6 +942,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Le nom d'une assurance privée fiable", "La liste des documents à fournir pour s'inscrire", "Le témoignage de personnes ayant vécu ce délai", "L'adresse d'un médecin pour les jeunes enfants"],
           answer: 2,
           rationale: "Tests recognition of the actual request rather than of the surrounding topics; private insurance, registration documents and the child are all mentioned but none of them is what the writer asks for.",
+          family: "correspondance",
         },
         {
           id: "tcf-ce-18",
@@ -817,6 +952,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Elle est réservée aux riverains", "Elle fait perdre plus de sept minutes aux heures de pointe", "Elle est interdite aux véhicules de livraison", "Elle raccourcit le trajet de sept minutes"],
           answer: 1,
           rationale: "Tests the inference carried by \"davantage le matin\"; the last option reverses the direction of the figure and the other two misapply the separate rules given for residents and deliveries.",
+          family: "article",
         },
         {
           id: "tcf-ce-19",
@@ -826,6 +962,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["L'augmentation des pertes sur les fruits fragiles", "Le refus des clients d'acheter sans emballage", "La hausse du prix des fruits et légumes", "La modification des habitudes d'achat des clients"],
           answer: 3,
           rationale: "Tests identification of what \"ce second effet\" designates; the increase in losses is the first effect, and the customer refusal and price rise are plausible outcomes the text never reports.",
+          family: "article",
         },
         {
           id: "tcf-ce-20",
@@ -835,6 +972,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Un décalage entre le jugement porté sur soi et celui porté sur les autres", "Que les salariés sont réellement plus productifs à domicile", "Que les entreprises disposent de chiffres précis sur la performance", "Que la majorité des salariés souhaitent revenir au bureau"],
           answer: 0,
           rationale: "Tests the reader's grasp of what the authors say the figures actually measure; the second option takes the self-reports at face value against the text's warning, and the last two contradict statements about the absence of performance figures and about employers rather than employees.",
+          family: "argumentatif",
         },
         {
           id: "tcf-ce-21",
@@ -844,6 +982,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Une baisse du budget consacré aux frais professionnels", "Une suspicion de fraude constatée lors de l'audit", "La lenteur de traitement provoquée par les envois tardifs", "Une demande formulée par les responsables d'équipe"],
           answer: 2,
           rationale: "Tests reading of a stated justification against the sentence that explicitly denies mistrust; budget cuts and managers' requests are plausible motives in such memos but appear nowhere in the text.",
+          family: "argumentatif",
         },
         {
           id: "tcf-ce-22",
@@ -853,6 +992,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Ils exagèrent le nombre d'écrans présents dans les classes", "Ils négligent le rôle joué par l'enseignant", "Ils refusent de financer l'achat de matériel", "Ils s'appuient sur des travaux de recherche trop rares"],
           answer: 1,
           rationale: "Tests identification of the common blind spot the writer names; the counting problem belongs to the surveys rather than to the two camps, and the funding and research options distort details from the text.",
+          family: "article",
         },
         {
           id: "tcf-ce-23",
@@ -862,6 +1002,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Les municipalités n'ont pas le droit de délivrer des permis", "Les habitants s'opposent systématiquement aux nouveaux projets", "Le coût des matériaux a fortement augmenté", "Elle demande des années et les terrains sont mal situés"],
           answer: 3,
           rationale: "Tests retrieval of the two obstacles the text actually names; permit powers, local opposition and material costs are familiar real-world explanations that the passage does not mention.",
+          family: "article",
         },
         {
           id: "tcf-ce-24",
@@ -871,6 +1012,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Parce que les salariés la contestaient collectivement", "Parce qu'elle retardait la décision sur les augmentations", "Parce qu'elle ne distinguait presque personne", "Parce que les responsables refusaient de la remplir"],
           answer: 2,
           rationale: "Tests interpretation of the eighty-per-cent figure as the reason given; the timing of pay rises is mentioned but explicitly left unchanged, and employee protest and manager refusal are never stated.",
+          family: "article",
         },
         {
           id: "tcf-ce-25",
@@ -880,6 +1022,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Ils orientent les établissements vers ce qui est mesurable", "Ils reposent sur des données volontairement falsifiées", "Ils défavorisent les universités qui accueillent des étrangers", "Ils paraissent à une période défavorable de l'année"],
           answer: 0,
           rationale: "Tests the difference between \"false\" and \"selective\", which the text draws explicitly; the timing option misreads the remark about universities protesting at the wrong moment, and the foreign-student option inverts a criterion listed as easy to count.",
+          family: "article",
         },
         {
           id: "tcf-ce-26",
@@ -889,6 +1032,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["La mesure coûtera bien plus que les deux millions annoncés", "La gratuité ne devrait pas être réservée aux jeunes", "Les contrôles deviendront impossibles sur l'ensemble du réseau", "Le réseau risque de ne pas absorber les nouveaux voyageurs"],
           answer: 3,
           rationale: "Tests separation of the objection from the surrounding financial explanation; the cost, the age limit and ticket inspection all appear in the text but none is presented as the critics' argument.",
+          family: "article",
         },
         {
           id: "tcf-ce-27",
@@ -898,6 +1042,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Faire réparer l'appareil en magasin", "Obtenir tout de même le remboursement", "Échanger l'appareil contre un modèle équivalent", "Continuer à l'utiliser avec précaution"],
           answer: 1,
           rationale: "Tests a concessive clause stating that the missing receipt is not an obstacle; repair, exchange and continued use are each ruled out elsewhere in the notice even though they are normal expectations for a faulty product.",
+          family: "article",
         },
         {
           id: "tcf-ce-28",
@@ -907,6 +1052,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Reconnaître que les fosses coûtent trop cher aux communes", "Rappeler que les arbres urbains ne survivent jamais longtemps", "Opposer l'effet d'annonce immédiat au bénéfice à long terme", "Inviter les habitants à planter des arbres eux-mêmes"],
           answer: 2,
           rationale: "Tests the rhetorical role of a closing antithesis rather than its literal content; the cost and the invitation are absent from the text, and the survival option overstates a figure that applies only to street trees.",
+          family: "article",
         },
         {
           id: "tcf-ce-29",
@@ -916,6 +1062,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["La perte des revenus des petites annonces", "La réduction de moitié de la rédaction", "La baisse de la participation électorale", "Le désintérêt des lecteurs pour l'information locale"],
           answer: 0,
           rationale: "Tests attribution of a cause to the right voice in the text: the fall in readership is management's explanation, the smaller newsroom is a consequence, and lower turnout belongs to the research findings.",
+          family: "article",
         },
         {
           id: "tcf-ce-30",
@@ -925,6 +1072,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Il donne raison à ceux qui annoncent le déclin de la ville dense", "Il estime que la question est tranchée par les données immobilières", "Il juge que ces lectures reposent sur des chiffres inventés", "Il leur reproche de figer une situation encore en mouvement"],
           answer: 3,
           rationale: "Tests the writer's stance in the concluding paragraph, where he faults both camps for the same reason; the first two options pick a side he refuses to pick, and the third replaces his objection about timing with an accusation of falsification he never makes.",
+          family: "article",
         },
         {
           id: "tcf-ce-31",
@@ -934,6 +1082,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["De s'appuyer sur des chiffres contradictoires", "De ne pas examiner les conséquences réelles d'une interdiction", "De défendre les intérêts des propriétaires les plus aisés", "De confondre logement touristique et logement étudiant"],
           answer: 1,
           rationale: "Tests location of the shared blind spot named in the final paragraph; the text states that both camps accept the same figures, and the student rentals appear as a consequence of the ban rather than as a confusion made by either side.",
+          family: "argumentatif",
         },
         {
           id: "tcf-ce-32",
@@ -943,6 +1092,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Il l'approuve, à condition que les études soient mieux financées", "Il la juge inévitable compte tenu de la complexité croissante des métiers", "Il y voit un mécanisme de tri dont l'effet d'ensemble est nuisible", "Il la considère comme un phénomène déjà corrigé par la pénurie de candidats"],
           answer: 2,
           rationale: "Tests the writer's evaluative stance across a concessive argument; the second option repeats a claim he explicitly denies, and the fourth turns his remark about a few sectors into a general correction he does not assert.",
+          family: "argumentatif",
         },
         {
           id: "tcf-ce-33",
@@ -952,6 +1102,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["L'indicateur est mal employé plutôt que mal construit", "La définition du chômage est volontairement trompeuse", "Les instituts refusent de publier des données complémentaires", "Les comparaisons entre pays devraient être abandonnées"],
           answer: 0,
           rationale: "Tests the distinction between the definition and its use, stated in the middle of the text; the other options each contradict an explicit sentence about manipulation, about published complementary measures, and about the value of stable comparisons.",
+          family: "article",
         },
         {
           id: "tcf-ce-34",
@@ -961,6 +1112,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Sur l'utilité de réduire la vitesse des voitures", "Sur la fiabilité des comptages de cyclistes", "Sur le nombre d'accidents survenant aux intersections", "Sur l'échelle à laquelle on évalue une politique"],
           answer: 3,
           rationale: "Tests the reader's ability to find the point of disagreement the writer isolates rather than the topics that merely appear in each camp's case; speed, counts and intersections are all raised, but only the question of scale is named as the real divergence.",
+          family: "article",
         },
         {
           id: "tcf-ce-35",
@@ -970,6 +1122,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Les journalistes en ligne manquent de rigueur professionnelle", "Le comportement des rédactions découle du dispositif de mesure et du mode de financement", "Les mesures d'audience en temps réel devraient être interdites", "Les lecteurs sont responsables de la baisse de qualité de l'information"],
           answer: 1,
           rationale: "Tests the structural explanation the writer substitutes for a moral one; the first option is the very reading he rejects, and the ban and the blaming of readers are conclusions the text never draws.",
+          family: "article",
         },
         {
           id: "tcf-ce-36",
@@ -979,6 +1132,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Nuancer la critique en reconnaissant l'efficacité réelle des séminaires", "Proposer une méthode pour réformer enfin les procédures", "Feindre une concession pour reformuler la critique de façon plus incisive", "Marquer un changement d'avis de l'auteur sur l'innovation publique"],
           answer: 2,
           rationale: "Tests recognition of an ironic false concession whose closing sentence renames the practice; a literal reader takes it as a genuine qualification or a change of mind, and no method of reform is ever proposed.",
+          family: "article",
         },
         {
           id: "tcf-ce-37",
@@ -988,6 +1142,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Entre un choix assumé et un choix présenté comme une restitution fidèle", "Entre les bâtiments anciens et les ajouts du vingtième siècle", "Entre la restauration des façades et celle des intérieurs", "Entre la mémoire des habitants et celle des spécialistes"],
           answer: 0,
           rationale: "Tests the argumentative pivot introduced by \"Mais il y a une différence entre\"; the layers of the twentieth century serve as an illustration rather than as the distinction itself, and the other two contrasts are never drawn in the text.",
+          family: "argumentatif",
         },
         {
           id: "tcf-ce-38",
@@ -997,6 +1152,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Que les ateliers devraient être rendus obligatoires", "Que les salariés ne prennent pas leurs pauses de façon responsable", "Que l'entreprise a réalisé des économies grâce à ce programme", "Que le bénéfice observé vient du temps libéré et non de la méthode enseignée"],
           answer: 3,
           rationale: "Tests an ironic conclusion whose force depends on the preceding sentence about forty minutes without e-mails; the cost comparison in the final clause tempts a reader toward the savings option, which reverses the point being made.",
+          family: "article",
         },
         {
           id: "tcf-ce-39",
@@ -1006,6 +1162,7 @@ export const TCF_CANADA: ExamDefinition = {
           options: ["Parce que les médias ne vérifient jamais les prévisions passées", "Parce que le chiffre sert avant tout à justifier des décisions déjà à prendre", "Parce que les intervalles de confiance rendent toute erreur discutable", "Parce que les instituts corrigent leurs hypothèses à chaque trimestre"],
           answer: 1,
           rationale: "Tests the implicit argument that the forecast's function is legitimation rather than prediction; the media, the confidence intervals and the quarterly hypotheses all appear in the text but as elements of that argument, not as the reason asked for.",
+          family: "argumentatif",
         },
       ],
     },

@@ -140,3 +140,57 @@ export async function pronunciationLinesFor(): Promise<{ lang: LanguageCode; lin
   }
   return { lang, lines };
 }
+
+
+/**
+ * The comprehension half of the curriculum — Amendment 2 §2.4.
+ *
+ * Expression has six named tâches because the exam names them. Comprehension
+ * had nothing, so half the exam could not be planned or prescribed against.
+ * The unit here is the item-type family, declared on the section as data.
+ *
+ * Returns the counts as well as the names, because §4.1 builds
+ * **thinnest-first** and a family with two items at a level is a hole the
+ * planner has to be able to see.
+ */
+export type FamilyCoverage = {
+  id: string;
+  label: string;
+  describes: string;
+  provenance: string;
+  total: number;
+  /** CEFR band -> how many items of this family sit there. */
+  byLevel: Record<string, number>;
+};
+
+export async function comprehensionFamiliesFor(
+  skill: 'listening' | 'reading',
+): Promise<{ lang: LanguageCode; families: FamilyCoverage[]; unassigned: number } | null> {
+  const plan = loadPlan();
+  if (!plan?.examId) return null;
+  const defs = await import('../exam/definitions');
+  const exam = defs.EXAMS.find((e) => e.id === plan.examId);
+  if (!exam) return null;
+  const lang = exam.language;
+  for (const sec of exam.sections) {
+    if (sec.kind !== 'comprehension' || sec.skill !== skill) continue;
+    const fams = sec.families ?? [];
+    const out: FamilyCoverage[] = fams.map((f) => ({
+      id: f.id,
+      label: f.label[lang],
+      describes: f.describes[lang],
+      provenance: f.provenance[lang],
+      total: 0,
+      byLevel: {},
+    }));
+    let unassigned = 0;
+    for (const it of sec.items) {
+      const row = out.find((f) => f.id === it.family);
+      if (!row) { unassigned += 1; continue; }
+      row.total += 1;
+      row.byLevel[it.level] = (row.byLevel[it.level] ?? 0) + 1;
+    }
+    return { lang, families: out, unassigned };
+  }
+  return null;
+}
