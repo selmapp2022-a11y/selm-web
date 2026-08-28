@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Check, ChevronRight } from 'lucide-react';
 import clsx from 'clsx';
 import { useT, useUiLangValue } from '../i18n';
@@ -40,7 +39,6 @@ type Row = {
 };
 
 export default function OnboardingPage() {
-  const nav = useNavigate();
   const t = useT();
   const lang = useUiLangValue();
   const [rows, setRows] = useState<Row[] | null>(null);
@@ -132,9 +130,9 @@ export default function OnboardingPage() {
       </header>
       <div className="flex flex-wrap gap-3">
         <a href="/exam.html#/attestation" className="btn-primary">{t('onboarding.yes')}</a>
-        <button onClick={() => nav('/dashboard')} className={clsx('btn-ghost border-2 border-surface-divider px-5 py-3')}>
+        <a href="/exam.html#/plan" className={clsx('btn-ghost border-2 border-surface-divider px-5 py-3')}>
           {t('onboarding.no')}
-        </button>
+        </a>
       </div>
       <p className="text-xs text-ink-secondary">{t('onboarding.neverBlocked')}</p>
     </div>

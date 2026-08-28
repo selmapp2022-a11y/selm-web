@@ -312,8 +312,8 @@ export default function AttestationPage() {
           </p>
         </div>
         <div className="flex gap-3">
-          <button type="button" onClick={() => nav('/')} className="rounded-xl bg-navy px-5 py-3 text-sm font-semibold text-white">
-            {ui === 'en' ? 'Continue' : 'Continuer'}
+          <button type="button" onClick={() => nav('/plan')} className="rounded-xl bg-navy px-5 py-3 text-sm font-semibold text-white">
+            {ui === 'en' ? 'See my study plan' : "Voir mon plan d'étude"}
           </button>
           <button
             type="button"
@@ -639,7 +639,7 @@ export default function AttestationPage() {
         >
           {ui === 'en' ? 'Build my plan from these marks' : 'Bâtir mon plan à partir de ces notes'}
         </button>
-        <button type="button" onClick={() => nav('/')} className="rounded-xl border-2 border-surface-divider px-5 py-3 text-sm font-medium text-ink-secondary">
+        <button type="button" onClick={() => nav('/plan')} className="rounded-xl border-2 border-surface-divider px-5 py-3 text-sm font-medium text-ink-secondary">
           {ui === 'en' ? 'I have not sat it — start teaching' : "Je ne l'ai pas passé — commencer l'apprentissage"}
         </button>
       </div>

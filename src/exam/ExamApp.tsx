@@ -8,6 +8,7 @@ import SectionPage from './pages/SectionPage';
 import SittingResultPage from './pages/SittingResultPage';
 import HistoryPage from './pages/HistoryPage';
 import AttestationPage from './pages/AttestationPage';
+import PlanPage from './pages/PlanPage';
 
 export default function ExamApp() {
   return (
@@ -21,6 +22,7 @@ export default function ExamApp() {
         <Route path="/sitting-result" element={<SittingResultPage />} />
         <Route path="/history" element={<HistoryPage />} />
         <Route path="/attestation" element={<AttestationPage />} />
+        <Route path="/plan" element={<PlanPage />} />
         <Route path="*" element={<GoalPage />} />
       </Routes>
       </ExamGate>
