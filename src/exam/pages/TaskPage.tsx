@@ -5,7 +5,7 @@ import { useExam, allTasks, sectionOf } from '../state';
 import { AudioRecorder } from '../../components/AudioRecorder';
 import { SectionClock } from '../components/SectionClock';
 import { t } from '../model/format';
-import { wordCount } from '../engine/text';
+import { wordCount, segmentationFor } from '../engine/text';
 import { scoreResponse } from '../engine/score';
 import type { Response } from '../model/types';
 
@@ -54,7 +54,7 @@ export default function TaskPage() {
 
   const remaining = task.timeLimitSec - elapsed;
   const over = remaining < 0;
-  const wc = wordCount(text);
+  const wc = wordCount(text, segmentationFor(exam.locale));
 
   async function run(response: Response) {
     setBusy(true);

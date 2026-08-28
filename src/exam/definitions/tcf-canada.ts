@@ -1354,7 +1354,15 @@ export const TCF_CANADA: ExamDefinition = {
               // Naming what the two documents are about costs eight
               // consecutive words by itself. Fourteen is the point where a
               // response is reproducing a clause rather than a subject.
-              maxLiftedRun: 14,
+              //
+              // RESTATED 2026-08-28 from 14 to 15, and the number did not
+              // change its meaning — the unit did. `text.ts` now splits
+              // French elision, so `l'avis` is two tokens where it was one,
+              // and every count in this file rose about 5%. Left at 14 the
+              // rule would have quietly tightened by one word as a side
+              // effect of fixing the word counter. Measured across eight
+              // NCLC 6 responses: the same text scores 9→12, 14→15, 13→14.
+              maxLiftedRun: 15,
               verdict: {
                 kind: 'zero',
                 label: { en: 'Copied from the documents', fr: 'Recopié des documents' },

@@ -5,6 +5,7 @@
  */
 import type { ExamDefinition, Localised, Response, Scale, TaskDefinition } from '../model/types';
 import { runGate, type GateResult } from './gate';
+import { segmentationFor } from './text';
 import { runSignal, type SignalResult } from './signal';
 import { runJudge, type JudgeOutcome } from './judge';
 import { aggregate, releaseGate, toBenchmark, type Aggregate, type ReleaseDecision } from './aggregate';
@@ -54,7 +55,11 @@ export async function scoreResponse(
   const signal = await runSignal(task.signal, response);
 
   // Layer 1 — deterministic, on whatever words the signal layer produced.
-  const gate = runGate(task, signal.transcript, promptText);
+  // The exam's own locale decides how its language is cut into words.
+  // Passing it is not optional for French: `text.ts` measures a 5%
+  // under-count and a third of correct-length answers wrongly zeroed
+  // without it.
+  const gate = runGate(task, signal.transcript, promptText, segmentationFor(exam.locale));
 
   const base = { exam, task, scale, signal, gate, release, overtimeSec };
 

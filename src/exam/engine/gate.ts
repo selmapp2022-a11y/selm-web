@@ -7,7 +7,7 @@
  * and the IELTS under-length penalty share this file instead of forking.
  */
 import type { GateRule, Localised, TaskDefinition } from '../model/types';
-import { keywordHits, longestCommonRun, overlapRatio, wordCount } from './text';
+import { keywordHits, longestCommonRun, overlapRatio, wordCount, DEFAULT_SEGMENTATION, type Segmentation } from './text';
 
 export type GateFinding = {
   ruleId: GateRule['id'];
@@ -34,14 +34,26 @@ export type GateResult = {
   };
 };
 
-export function runGate(task: TaskDefinition, text: string, promptText: string): GateResult {
+export function runGate(
+  task: TaskDefinition,
+  text: string,
+  promptText: string,
+  /**
+   * How this exam's language is cut into words. Comes from the exam
+   * definition's `locale` via `segmentationFor`. Defaulted rather than
+   * required so no existing caller breaks — but a French exam that does not
+   * pass it under-counts by 5% and wrongly zeroes a third of correct-length
+   * answers, which is measured in `text.ts`.
+   */
+  seg: Segmentation = DEFAULT_SEGMENTATION,
+): GateResult {
   const scaffold = (task.suppliedScaffold ?? []).join(' ');
   const m = {
-    wordCount: wordCount(text),
-    promptOverlap: overlapRatio(text, promptText),
-    scaffoldRatio: scaffold ? overlapRatio(text, scaffold) : 0,
-    longestLiftedRun: longestCommonRun(text, promptText),
-    topicHits: keywordHits(text, task.topicKeywords),
+    wordCount: wordCount(text, seg),
+    promptOverlap: overlapRatio(text, promptText, seg),
+    scaffoldRatio: scaffold ? overlapRatio(text, scaffold, seg) : 0,
+    longestLiftedRun: longestCommonRun(text, promptText, seg),
+    topicHits: keywordHits(text, task.topicKeywords, seg),
     sourceHits: [] as GateResult['measurements']['sourceHits'],
   };
 
@@ -55,7 +67,7 @@ export function runGate(task: TaskDefinition, text: string, promptText: string):
         m.sourceHits.push({
           id: src.id,
           label: src.label,
-          hits: keywordHits(text, src.keywords),
+          hits: keywordHits(text, src.keywords, seg),
           need: rule.minHitsPerSource,
         });
       }

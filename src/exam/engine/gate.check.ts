@@ -12,6 +12,7 @@
  *   node /tmp/gc/engine/gate.check.js
  */
 import { runGate } from './gate';
+import { segmentationFor } from './text';
 import { TCF_CANADA } from '../definitions/tcf-canada';
 
 const CASES: Array<[string, string]> = [
@@ -59,7 +60,7 @@ c'est toujours mieux quand tout le monde participe à ce genre de décision publ
 const task = TCF_CANADA.sections.flatMap((s) => (s.kind === 'production' ? s.tasks : [])).find((t) => t.id === 'tcf-ee-t3')!;
 console.log('TCF Tache 3 — deterministic gate only, no judge, no network\n');
 for (const [name, text] of CASES) {
-  const r = runGate(task, text, task.prompt.fr);
+  const r = runGate(task, text, task.prompt.fr, segmentationFor(TCF_CANADA.locale));
   const zero = r.findings.filter((f) => f.kind === 'zero').map((f) => f.ruleId);
   const warn = r.findings.filter((f) => f.kind !== 'zero').map((f) => f.ruleId);
   console.log(`  ${name.padEnd(26)} words=${String(r.measurements.wordCount).padStart(3)}  ` +
