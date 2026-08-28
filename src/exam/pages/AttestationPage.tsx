@@ -6,7 +6,7 @@ import { useExam } from '../state';
 import type { SkillId } from '../model/types';
 import { IRCC_ACCEPTED, irccAge } from '../model/ircc';
 import { PROVISIONAL_REFUSAL, TCF_VARIANTS, variantById, type TcfVariantId } from '../model/tcf-variants';
-import { IELTS_REFUSALS, MODULE_NOTE, transfers, type IeltsModule, type IeltsTrfKind } from '../model/ielts-variants';
+import { IELTS_REFUSALS, MODULE_NOTE, transfers, overallFrom, crossCheckBandCefr, type IeltsModule, type IeltsTrfKind } from '../model/ielts-variants';
 import { CONSENT_POINTS, isExpired, kindOf, type Attestation, type EntryMethod, type Verification } from '../model/attestation';
 import { gapMonthsFrom, loadAttestations, newAttestationId, saveAttestation, withdrawAttestation } from '../model/attestationStore';
 import { toBenchmark } from '../engine/aggregate';
@@ -104,6 +104,12 @@ export default function AttestationPage() {
   const [expiry, setExpiry] = useState('');
   const [docStatus, setDocStatus] = useState<'definitive' | 'provisional'>('definitive');
   const [sat, setSat] = useState('');
+  // Non-skill marks a variant prints. TCF Tout public: maîtrise + note
+  // globale. IELTS: Overall Band + CEFR, needed for the two cross-checks.
+  const [maitrise, setMaitrise] = useState('');
+  const [globalScore, setGlobalScore] = useState('');
+  const [overallBand, setOverallBand] = useState('');
+  const [cefr, setCefr] = useState('');
   const [studied, setStudied] = useState<boolean | null>(null);
   const [imageState, setImageState] = useState<'none' | 'unread'>('none');
   const [consented, setConsented] = useState(false);
@@ -141,14 +147,40 @@ export default function AttestationPage() {
   // real person. What blocks is an unanswered module — we cannot know which
   // marks transfer without it — and a One Skill Retake, which IRCC will not
   // read for Express Entry however good it is.
+  // Does the selected TCF variant print these non-skill épreuves?
+  const printsMaitrise = !!variant?.required.includes('maitrise_des_structures');
+  const printsGlobal = !!variant?.hasGlobal;
   const ieltsBlocked = !isFrench && (module_ === null || trfKind !== 'original');
   const complete =
     sat !== '' &&
     consented &&
-    (!isFrench || (tcf !== null && variant?.irccAccepted === true)) &&
+    (!isFrench || (tcf !== null && variant?.qcmMax != null)) &&
+    (!printsMaitrise || maitrise !== '') &&
     !ieltsBlocked &&
     fields.some((f) => !notSat[f.id]) &&
     fields.every((f) => notSat[f.id] || (scores[f.id] !== undefined && scores[f.id] !== '' && !errorFor(f)));
+
+  // The two IELTS cross-checks the spec requires (§4b). Each runs only when
+  // the values it compares are both present, and each surfaces a warning
+  // rather than blocking — a real form can disagree, and the candidate is the
+  // one who can see which line was mistyped.
+  const skillBands = (['listening', 'reading', 'writing', 'speaking'] as const).map((k) =>
+    notSat[k] || scores[k] === undefined || scores[k] === '' ? null : Number(scores[k]));
+  const fourBands = skillBands.every((b) => typeof b === 'number' && !Number.isNaN(b))
+    ? (skillBands as number[]) : null;
+  const typedOverall = overallBand === '' || Number.isNaN(Number(overallBand)) ? null : Number(overallBand);
+  const computedOverall = fourBands ? overallFrom(fourBands) : null;
+  const overallCheck = !isFrench && computedOverall != null && typedOverall != null && Math.abs(computedOverall - typedOverall) > 1e-9
+    ? (ui === 'en'
+        ? `Your four skills average to ${computedOverall}, but the form prints ${typedOverall} as the Overall Band. One of the readings is off — check the numbers against your paper.`
+        : `Vos quatre \u00e9preuves donnent une moyenne de ${computedOverall}, mais l\u2019attestation indique ${typedOverall} comme note globale. Une valeur est erron\u00e9e \u2014 v\u00e9rifiez-les sur votre document.`)
+    : null;
+  const cefrCross = !isFrench ? crossCheckBandCefr(typedOverall, cefr || null) : null;
+  const cefrWarn = cefrCross && !cefrCross.agrees
+    ? (ui === 'en'
+        ? `Overall Band ${typedOverall} maps to ${cefrCross.expected ?? '\u2014'}, but the form prints ${cefrCross.printed}. Check which is right.`
+        : `La note globale ${typedOverall} correspond \u00e0 ${cefrCross.expected ?? '\u2014'}, mais l\u2019attestation indique ${cefrCross.printed}. V\u00e9rifiez laquelle est correcte.`)
+    : null;
 
   /**
    * Read once, never stored. The handler takes the file, records that an
@@ -210,6 +242,12 @@ export default function AttestationPage() {
       sat: sat as `${number}-${number}`,
       awarded: awarded as Attestation['awarded'],
       benchmark: { system: exam.benchmark.system, ...(benchmark as object) } as Attestation['benchmark'],
+      otherMarks: {
+        maitrise: maitrise === '' ? null : Number(maitrise),
+        global: globalScore === '' ? null : Number(globalScore),
+        overallBand: overallBand === '' ? null : Number(overallBand),
+        cefr: cefr === '' ? null : cefr,
+      },
       responseIds: base.responseIds,
       studiedSince: studied,
       expiresAt: expiry === '' ? null : expiry,
@@ -449,7 +487,7 @@ export default function AttestationPage() {
               <button
                 key={v.id}
                 type="button"
-                onClick={() => { setTcf(v.id); setScores({}); setNotSat({}); }}
+                onClick={() => { setTcf(v.id); setScores({}); setNotSat({}); setMaitrise(''); setGlobalScore(''); }}
                 className={clsx(
                   'rounded-xl border-2 px-4 py-2 text-sm',
                   tcf === v.id ? 'border-teal bg-teal/10 text-navy' : 'border-surface-divider text-ink-secondary',
@@ -475,7 +513,7 @@ export default function AttestationPage() {
         </section>
       )}
 
-      {((!isFrench && !ieltsBlocked) || (isFrench && variant && variant.irccAccepted)) && (
+      {((!isFrench && !ieltsBlocked) || (isFrench && variant && variant.qcmMax != null)) && (
       <section className="grid gap-4">
         <div>
           <label className="text-sm font-medium text-navy">
@@ -530,6 +568,77 @@ export default function AttestationPage() {
             );
           })}
         </div>
+
+        {isFrench && (printsMaitrise || printsGlobal) && (
+          <div className="grid gap-3 sm:grid-cols-2">
+            {printsMaitrise && (
+              <div>
+                <label className="text-sm font-medium text-navy">Maîtrise des structures de la langue</label>
+                <input
+                  inputMode="decimal"
+                  value={maitrise}
+                  onChange={(e) => setMaitrise(e.target.value)}
+                  placeholder="0–699"
+                  className="mt-1 w-full rounded-xl border-2 border-surface-divider px-4 py-3 text-sm"
+                />
+                <p className="mt-1 text-xs text-ink-secondary">
+                  {ui === 'en'
+                    ? 'TCF Tout public prints this \u00e9preuve; TCF Canada does not test it. It is recorded as printed and is never turned into a level.'
+                    : 'Le TCF Tout public rapporte cette \u00e9preuve ; le TCF Canada ne l\u2019\u00e9value pas. Elle est enregistr\u00e9e telle quelle et n\u2019est jamais convertie en niveau.'}
+                </p>
+              </div>
+            )}
+            {printsGlobal && (
+              <div>
+                <label className="text-sm font-medium text-navy">
+                  {ui === 'en' ? 'Overall score (note globale), as printed' : 'Note globale, telle qu\u2019imprim\u00e9e'}
+                </label>
+                <input
+                  inputMode="decimal"
+                  value={globalScore}
+                  onChange={(e) => setGlobalScore(e.target.value)}
+                  placeholder="0–699"
+                  className="mt-1 w-full rounded-xl border-2 border-surface-divider px-4 py-3 text-sm"
+                />
+              </div>
+            )}
+          </div>
+        )}
+
+        {!isFrench && (
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <label className="text-sm font-medium text-navy">
+                {ui === 'en' ? 'Overall Band, as printed' : 'Note globale (Overall Band), telle qu\u2019imprim\u00e9e'}
+              </label>
+              <input
+                inputMode="decimal"
+                value={overallBand}
+                onChange={(e) => setOverallBand(e.target.value)}
+                placeholder="0–9"
+                className="mt-1 w-full rounded-xl border-2 border-surface-divider px-4 py-3 text-sm"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-navy">
+                {ui === 'en' ? 'CEFR level, as printed' : 'Niveau CECRL, tel qu\u2019imprim\u00e9'}
+              </label>
+              <input
+                value={cefr}
+                onChange={(e) => setCefr(e.target.value.toUpperCase())}
+                placeholder="A1–C2"
+                className="mt-1 w-full rounded-xl border-2 border-surface-divider px-4 py-3 text-sm"
+              />
+              <p className="mt-1 text-xs text-ink-secondary">
+                {ui === 'en'
+                  ? 'Both are optional. When you enter them we cross-check them against your four skills and tell you if anything disagrees.'
+                  : 'Les deux sont facultatifs. Si vous les saisissez, nous les recoupons avec vos quatre \u00e9preuves et signalons toute incoh\u00e9rence.'}
+              </p>
+            </div>
+          </div>
+        )}
+        {overallCheck && <p className="rounded-lg bg-amber-50 p-3 text-xs text-amber-900">{overallCheck}</p>}
+        {cefrWarn && <p className="rounded-lg bg-amber-50 p-3 text-xs text-amber-900">{cefrWarn}</p>}
 
         <div className="grid gap-3 sm:grid-cols-2">
           <div>

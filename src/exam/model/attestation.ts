@@ -159,6 +159,30 @@ export type Attestation = {
    */
   responseIds: string[];
   /**
+   * Marks a variant prints that are NOT one of the four teaching skills. Kept
+   * as printed, for completeness, and NEVER converted to a benchmark level —
+   * none of them seeds a per-skill plan.
+   *
+   * They exist because the form the candidate is reading shows them and a
+   * cross-check needs the printed value: TCF Tout public prints a *maîtrise
+   * des structures* mark and a *note globale*; an IELTS Test Report Form
+   * prints an Overall Band and a CEFR level, and the spec requires both IELTS
+   * cross-checks (skills-average-to-Overall, Overall-agrees-with-CEFR) to run,
+   * which is impossible unless the printed Overall and CEFR are captured.
+   *
+   * Optional, so every record written before this field existed stays valid.
+   */
+  otherMarks?: {
+    /** TCF maîtrise des structures, on the /699 QCM scale. */
+    maitrise?: number | null;
+    /** TCF note globale, on the /699 scale. */
+    global?: number | null;
+    /** IELTS Overall Band as printed, 0-9 in half steps. */
+    overallBand?: number | null;
+    /** IELTS CEFR level as printed, e.g. "C1". */
+    cefr?: string | null;
+  };
+  /**
    * How this arrived, so a self-selection bias can be measured rather than
    * assumed away. Candidates who did well are more likely to volunteer a
    * report, and a set built only from `volunteered` will overstate accuracy
