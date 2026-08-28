@@ -1,3 +1,4 @@
+import { practiceLanguage } from './practiceLanguage';
 import { api } from './api';
 
 export type VocabWord = {
@@ -50,7 +51,7 @@ export async function addWord(word: string): Promise<{
   const trimmed = word.trim();
   if (!trimmed) return { success: false, error: 'Please type a word.' };
   try {
-    const { data } = await api.post('/vocabulary/my/add', { word: trimmed });
+    const { data } = await api.post('/vocabulary/my/add', { word: trimmed, language: practiceLanguage() });
     return {
       success: true,
       word: data.word,

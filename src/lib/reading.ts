@@ -1,3 +1,4 @@
+import { practiceLanguage } from './practiceLanguage';
 import { api, unwrap, parseAIContent } from './api';
 
 export type ReadingText = {
@@ -24,6 +25,10 @@ export async function generateText(topic: string, level: string, textType = 'art
     word_count: 250,
     vocabulary_count: 8,
     include_questions: true,
+    // The exam decides the language, exactly as it decides dialect and
+    // task_type. Was absent, so the backend fell back to "en" and a TCF
+    // candidate practised reading in English. Amendment 2 §2.3.
+    language: practiceLanguage(),
   });
   return normalize(data, level);
 }
@@ -41,6 +46,7 @@ export async function enhanceText(text: string, level: string): Promise<ReadingT
       vocabulary_count: 8,
       include_questions: true,
       original_text: text,
+      language: practiceLanguage(),
     });
     const r = normalize(data, level);
     // If backend echoed our text back, keep it; otherwise, prepend a note

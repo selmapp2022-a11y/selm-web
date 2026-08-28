@@ -1,3 +1,4 @@
+import { practiceLanguage } from './practiceLanguage';
 import { api, unwrap } from './api';
 import { remapTranscript, pickSpeakerPair } from './speakerNames';
 import { variantOfTopic } from './topicVariants';
@@ -32,6 +33,7 @@ export async function generateListening(level: string, topic: string): Promise<L
     question_count: 5,
     include_transcript: true,
     include_vocabulary: true,
+    language: practiceLanguage(),
   });
   const ex: any = unwrap(data, 'exercise');
   const rawTranscript: string = ex.transcript || ex.dialogue || ex.audio_text || '';

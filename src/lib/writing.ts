@@ -1,3 +1,4 @@
+import { practiceLanguage, practiceLocale } from './practiceLanguage';
 import { api, unwrap, parseAIContent } from './api';
 
 export type GrammarError = {
@@ -28,7 +29,7 @@ export type WritingAssessment = {
 };
 
 export async function checkGrammar(text: string): Promise<GrammarCheck> {
-  const { data } = await api.post('/ai/grammar-check', { text });
+  const { data } = await api.post('/ai/grammar-check', { text, language: practiceLanguage() });
   // backend returns { content: "```json {...} ```", success: true }
   const parsed = parseAIContent<any>(data) || {};
   const errors = (parsed.errors || []).map((e: any) => ({
@@ -91,6 +92,9 @@ export async function assessWriting(text: string, prompt: string): Promise<Writi
     text,
     prompt,
     writing_type: inferWritingType(prompt),
+    // The /writing/assess endpoint names this dialect (en-us / fr-ca), the
+    // full locale, not the 2-letter code the reading/listening endpoints take.
+    dialect: practiceLocale(),
   });
   const a: any = unwrap(data, 'assessment');
   const scores = a?.scores || {};
