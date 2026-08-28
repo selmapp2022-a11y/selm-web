@@ -2,23 +2,19 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/selm-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#183048" />
-    <meta name="description" content="SELM exam engine — a working slice. One code path, two exam definitions." />
     <meta name="robots" content="noindex" />
-
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"
-      rel="stylesheet"
-    />
-
-    <title>SELM — exam engine (preview)</title>
+    <title>SELM</title>
+    <script>
+      // SELM-IA.md §1: the exam engine is no longer a separate app. This file
+      // survives only to forward old links and bookmarks into the single app.
+      // Old form was /exam.html#/attestation, /exam.html#/plan, etc.
+      (function () {
+        var h = (location.hash || '').replace(/^#/, '');
+        var dest = (!h || h === '/') ? '/goal' : h;
+        location.replace(dest + location.search);
+      })();
+    </script>
   </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/exam/main.tsx"></script>
-  </body>
+  <body></body>
 </html>

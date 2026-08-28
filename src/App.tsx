@@ -20,6 +20,19 @@ import TermsPage from './pages/TermsPage';
 import ConsentPage, { hasPrivacyConsent } from './pages/ConsentPage';
 import { initTheme } from './lib/theme';
 import OnboardingPage from './pages/OnboardingPage';
+// The exam engine, folded in from its old separate /exam.html entry point
+// (SELM-IA.md §1: one app, one router, one navigation). These pages used to
+// live behind ExamGate in a HashRouter; here they are ordinary protected
+// routes, so ProtectedRoute (account) and the consent gate before login cover
+// what ExamGate did.
+import GoalPage from './exam/pages/GoalPage';
+import TaskPage from './exam/pages/TaskPage';
+import ResultPage from './exam/pages/ResultPage';
+import SectionPage from './exam/pages/SectionPage';
+import SittingResultPage from './exam/pages/SittingResultPage';
+import HistoryPage from './exam/pages/HistoryPage';
+import AttestationPage from './exam/pages/AttestationPage';
+import PlanPage from './exam/pages/PlanPage';
 
 // Gate every unauthenticated entry route through the privacy consent
 // screen unless the user has already accepted. This satisfies App Store
@@ -104,6 +117,18 @@ export default function App() {
               entry with the same name. */}
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/account" element={<SettingsPage />} />
+
+          {/* Exam engine, now in-app (SELM-IA.md §1). Provisional paths for
+              this step; §2 renames the navigation. `/exam.html` redirects
+              here so old links and bookmarks keep working. */}
+          <Route path="/goal" element={<GoalPage />} />
+          <Route path="/attestation" element={<AttestationPage />} />
+          <Route path="/plan" element={<PlanPage />} />
+          <Route path="/task" element={<TaskPage />} />
+          <Route path="/result" element={<ResultPage />} />
+          <Route path="/section" element={<SectionPage />} />
+          <Route path="/sitting-result" element={<SittingResultPage />} />
+          <Route path="/history" element={<HistoryPage />} />
         </Route>
       </Route>
 

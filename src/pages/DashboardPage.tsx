@@ -57,8 +57,8 @@ import type {
  */
 
 /** The engine is a second Vite entry point on the same origin, not a route. */
-const EXAM_HOME = '/exam.html#/';
-const EXAM_HISTORY = '/exam.html#/history';
+const EXAM_HOME = '/goal';
+const EXAM_HISTORY = '/history';
 
 /** Where a skill's own practice lives inside the application. */
 const PRACTICE: Record<SkillId, string> = {

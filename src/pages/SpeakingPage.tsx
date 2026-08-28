@@ -60,7 +60,7 @@ export default function SpeakingPage() {
         <div className="card p-6">
           <h3 className="font-display text-lg font-bold text-navy">{ts('practice.chooseExamFirst')}</h3>
           <p className="mt-1 text-sm text-ink-secondary">{ts('practice.speakingNeedsExam')}</p>
-          <a href="/exam.html#/" className="btn-primary mt-4 inline-flex">{ts('common.chooseExam')}</a>
+          <a href="/goal" className="btn-primary mt-4 inline-flex">{ts('common.chooseExam')}</a>
         </div>
       )}
 
@@ -200,7 +200,7 @@ function PronunciationMode({ level }: { level: string }) {
       <div className="card p-6">
         <h3 className="font-display text-lg font-bold text-navy">{ts('practice.chooseExamFirst')}</h3>
         <p className="mt-1 text-sm text-ink-secondary">{ts('practice.pronunciationNeedsExam')}</p>
-        <a href="/exam.html#/" className="btn-primary mt-4 inline-flex">{ts('common.chooseExam')}</a>
+        <a href="/goal" className="btn-primary mt-4 inline-flex">{ts('common.chooseExam')}</a>
       </div>
     );
   }

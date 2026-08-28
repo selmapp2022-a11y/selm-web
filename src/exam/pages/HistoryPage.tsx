@@ -41,7 +41,7 @@ export default function HistoryPage() {
               : "Rien ici pour l'instant. Une seule session ne dit pas grand-chose — ce qui compte, c'est la deuxième, et la cinquième. Passez l'examen et cette page commencera à avoir du sens."
           }
           action={
-            <button onClick={() => nav('/')} className="btn-primary">
+            <button onClick={() => nav('/goal')} className="btn-primary">
               {ui === 'en' ? 'Go to the exam' : "Aller à l'examen"}
             </button>
           }

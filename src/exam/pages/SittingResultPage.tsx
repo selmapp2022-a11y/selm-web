@@ -185,7 +185,7 @@ export default function SittingResultPage() {
         <button
           onClick={() => {
             endSitting();
-            nav('/');
+            nav('/goal');
           }}
           className="btn-primary flex-1"
         >

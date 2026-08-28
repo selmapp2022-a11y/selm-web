@@ -24,7 +24,7 @@ const navItems = [
 // The exam engine is a second Vite entry point at `/exam.html`, not a route
 // in this router, so it is an anchor rather than a NavLink. Until today it
 // had no entry anywhere in the signed-in application at all.
-const EXAM_HOME = '/exam.html#/';
+const EXAM_HOME = '/goal';
 
 export function AppLayout() {
   const { user, logout } = useAuthStore();

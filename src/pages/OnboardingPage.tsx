@@ -129,8 +129,8 @@ export default function OnboardingPage() {
         <p className="mt-1 text-ink-secondary">{t('onboarding.satBeforeHelp')}</p>
       </header>
       <div className="flex flex-wrap gap-3">
-        <a href="/exam.html#/attestation" className="btn-primary">{t('onboarding.yes')}</a>
-        <a href="/exam.html#/plan" className={clsx('btn-ghost border-2 border-surface-divider px-5 py-3')}>
+        <a href="/attestation" className="btn-primary">{t('onboarding.yes')}</a>
+        <a href="/plan" className={clsx('btn-ghost border-2 border-surface-divider px-5 py-3')}>
           {t('onboarding.no')}
         </a>
       </div>
