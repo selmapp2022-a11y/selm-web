@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { Headphones, PenLine, RefreshCcw, CheckCircle2, XCircle } from 'lucide-react';
 import clsx from 'clsx';
 import { AudioPlayer } from '../components/AudioPlayer';
-import { useAuthStore } from '../store/authStore';
 import { generateListening, type ListeningExercise } from '../lib/listening';
 import { TopicPicker, LISTENING_TOPICS } from '../components/TopicPicker';
 import { CompletionCard } from '../components/CompletionCard';
 import { Loader, ErrorBox } from '../components/States';
+import { difficultyForSkill } from '../lib/difficulty';
 
 // Two tabs only — "Adaptive Practice" and "Dictation". The previous "News &
 // Stories" tab called the same backend with the same params as Adaptive
@@ -15,8 +15,11 @@ import { Loader, ErrorBox } from '../components/States';
 type Mode = 'practice' | 'dictation';
 
 export default function ListeningPage() {
-  const { user } = useAuthStore();
-  const level = user?.current_level || 'B1';
+  // Was `user?.current_level` — one CEFR level per user, set by the adaptive
+  // placement test at /onboarding/assessment and shared by three of the four
+  // practice pages. Part 3 (replacement) §3: difficulty is per task, comes
+  // from performance, and is never shown. See `lib/difficulty.ts`.
+  const level = difficultyForSkill('listening');
   const [mode, setMode] = useState<Mode>('practice');
 
   return (

@@ -6,10 +6,10 @@ import { SpeechResults } from '../components/SpeechResults';
 import { assessRealtime, assessFreeform, audioConversation, type SpeechAssessment } from '../lib/speaking';
 import { aiTTS, browserTTS, stopBrowserTTS } from '../lib/tts';
 import { TopicPicker, SPEAKING_TOPICS } from '../components/TopicPicker';
-import { useAuthStore } from '../store/authStore';
 import { CompletionCard } from '../components/CompletionCard';
 import { ErrorBox } from '../components/States';
 import { practiceTasksFor, pronunciationLinesFor, type PracticeSet } from '../lib/practiceTasks';
+import { difficultyForSkill } from '../lib/difficulty';
 
 type Mode = 'pronunciation' | 'conversation' | 'ielts';
 
@@ -27,8 +27,11 @@ type Mode = 'pronunciation' | 'conversation' | 'ielts';
 // read-aloud lines are a stopgap rather than the finished answer.
 
 export default function SpeakingPage() {
-  const { user } = useAuthStore();
-  const level = user?.current_level || 'B1';
+  // Was `user?.current_level` — one CEFR level per user, set by the adaptive
+  // placement test at /onboarding/assessment and shared by three of the four
+  // practice pages. Part 3 (replacement) §3: difficulty is per task, comes
+  // from performance, and is never shown. See `lib/difficulty.ts`.
+  const level = difficultyForSkill('speaking');
   const [mode, setMode] = useState<Mode>('pronunciation');
 
   useEffect(() => () => stopBrowserTTS(), []);

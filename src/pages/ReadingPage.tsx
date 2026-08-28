@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { ClipboardPaste, Timer, RefreshCcw, CheckCircle2, XCircle } from 'lucide-react';
 import clsx from 'clsx';
-import { useAuthStore } from '../store/authStore';
 import { enhanceText, generateText, type ReadingText } from '../lib/reading';
 import { CompletionCard } from '../components/CompletionCard';
+import { difficultyForSkill } from '../lib/difficulty';
 
 /**
  * `daily` and `speed` — "Article of the day" and the speed reader — were
@@ -17,8 +17,11 @@ import { CompletionCard } from '../components/CompletionCard';
 type Mode = 'paste' | 'daily' | 'speed';
 
 export default function ReadingPage() {
-  const { user } = useAuthStore();
-  const level = user?.current_level || 'B1';
+  // Was `user?.current_level` — one CEFR level per user, set by the adaptive
+  // placement test at /onboarding/assessment and shared by three of the four
+  // practice pages. Part 3 (replacement) §3: difficulty is per task, comes
+  // from performance, and is never shown. See `lib/difficulty.ts`.
+  const level = difficultyForSkill('reading');
   const [mode, setMode] = useState<Mode>('paste');
 
   return (

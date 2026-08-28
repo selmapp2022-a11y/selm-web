@@ -6,8 +6,6 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
-import OnboardingProfilePage from './pages/OnboardingProfilePage';
-import AssessmentPage from './pages/AssessmentPage';
 import DashboardPage from './pages/DashboardPage';
 import SpeakingPage from './pages/SpeakingPage';
 import ListeningPage from './pages/ListeningPage';
@@ -21,6 +19,7 @@ import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import TermsPage from './pages/TermsPage';
 import ConsentPage, { hasPrivacyConsent } from './pages/ConsentPage';
 import { initTheme } from './lib/theme';
+import OnboardingPage from './pages/OnboardingPage';
 
 // Gate every unauthenticated entry route through the privacy consent
 // screen unless the user has already accepted. This satisfies App Store
@@ -77,8 +76,16 @@ export default function App() {
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route path="/onboarding/profile" element={<OnboardingProfilePage />} />
-          <Route path="/onboarding/assessment" element={<AssessmentPage />} />
+          {/* Part 3 (replacement) §1 and §6: one choice, one question, then
+              start. The five demographic questions and the adaptive CEFR
+              placement test that used to live at these two paths are gone —
+              §6 requires "no placement step anywhere", and the exam gives
+              every candidate the same tasks, so there is nothing to place
+              them on. Both old paths still resolve so that a link in an old
+              email or a bookmarked route does not 404; neither runs a test. */}
+          <Route path="/onboarding" element={<OnboardingPage />} />
+          <Route path="/onboarding/profile" element={<OnboardingPage />} />
+          <Route path="/onboarding/assessment" element={<Navigate to="/onboarding" replace />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/speaking" element={<SpeakingPage />} />
           <Route path="/listening" element={<ListeningPage />} />
