@@ -18,6 +18,20 @@ export type Plan = {
   /** Id of an `ExamDefinition`. */
   examId: string;
   /**
+   * The chosen exam's own locale, copied here when the plan is saved.
+   *
+   * Not a second source of truth — the exam definition remains the source,
+   * and this is a copy taken from it at the moment of choosing. It exists so
+   * that the four practice pages, which live in the app bundle and not the
+   * exam bundle, can know what language to work in **without importing the
+   * exam definitions**, which carry ~72 000 characters of authored French
+   * and have no business in the app's first paint.
+   *
+   * Optional because plans saved before 2026-08-28 do not have it; a missing
+   * value means English, which is what those plans were.
+   */
+  examLocale?: string;
+  /**
    * The sitting date, `YYYY-MM-DD`, in the candidate's own calendar day.
    * Null is a real state: someone can be preparing before booking, and a
    * dashboard that demands a date before it will say anything is a form,
@@ -37,7 +51,12 @@ export function loadPlan(): Plan | null {
     if (!raw) return null;
     const v = JSON.parse(raw) as Partial<Plan>;
     if (!v || typeof v.goalId !== 'string' || typeof v.examId !== 'string') return null;
-    return { goalId: v.goalId, examId: v.examId, examDate: typeof v.examDate === 'string' ? v.examDate : null };
+    return {
+      goalId: v.goalId,
+      examId: v.examId,
+      examDate: typeof v.examDate === 'string' ? v.examDate : null,
+      examLocale: typeof v.examLocale === 'string' ? v.examLocale : undefined,
+    };
   } catch {
     return null;
   }

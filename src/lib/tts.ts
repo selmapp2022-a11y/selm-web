@@ -1,4 +1,5 @@
 import { api, API_BASE } from './api';
+import { voiceMatchesPractice } from './practiceLanguage';
 
 const cache = new Map<string, string>();
 
@@ -38,7 +39,13 @@ function loadVoices(): SpeechSynthesisVoice[] {
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) return [];
   if (voicesCache && voicesCache.length) return voicesCache;
   const all = speechSynthesis.getVoices();
-  voicesCache = all.filter((v) => v.lang.toLowerCase().startsWith('en'));
+  // Was `startsWith('en')`, which meant a French exercise was read aloud by
+  // an English voice or by nothing at all. Amendment 2 §2.3.
+  voicesCache = all.filter((v) => voiceMatchesPractice(v.lang));
+  // A browser with no voice for the practice language must not fall silent:
+  // an English voice reading French is bad, and no audio at all is worse,
+  // because the candidate cannot tell it from a broken page.
+  if (!voicesCache.length) voicesCache = all;
   return voicesCache;
 }
 

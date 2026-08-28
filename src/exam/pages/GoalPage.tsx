@@ -23,7 +23,7 @@ export default function GoalPage() {
   const left = daysUntil(examDate || null);
   const commitDate = (v: string) => {
     setExamDate(v);
-    savePlan({ goalId: goal.id, examId: exam.id, examDate: v || null });
+    savePlan({ goalId: goal.id, examId: exam.id, examDate: v || null, examLocale: exam.locale });
   };
 
   return (

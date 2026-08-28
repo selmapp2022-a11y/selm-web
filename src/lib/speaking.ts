@@ -1,6 +1,7 @@
 import { api, parseAIContent } from './api';
 import { remapDialogueSpeakers } from './speakerNames';
 import { variantOfTopic } from './topicVariants';
+import { practiceLocale } from './practiceLanguage';
 
 export type PhonemeScore = { phoneme: string; quality_score: number; ipa?: string };
 export type WordScore = { word: string; quality_score: number; phonemes?: PhonemeScore[] };
@@ -59,7 +60,8 @@ export async function assessRealtime(blob: Blob, prompt?: string): Promise<Speec
   const fd = new FormData();
   fd.append('audio', blob, 'recording.webm');
   fd.append('reference_text', prompt || '');
-  fd.append('language', 'en-US');
+  // Was pinned to 'en-US'. Amendment 2 §2.3: it comes from the chosen exam.
+  fd.append('language', practiceLocale());
   const { data } = await api.post('/speech/evaluate', fd);
   return normalizeAssessment(data);
 }
@@ -75,7 +77,8 @@ export async function assessFreeform(blob: Blob, prompt?: string): Promise<Speec
   const fd = new FormData();
   fd.append('audio', blob, 'recording.webm');
   fd.append('reference_text', '');
-  fd.append('language', 'en-US');
+  // Was pinned to 'en-US'. Amendment 2 §2.3: it comes from the chosen exam.
+  fd.append('language', practiceLocale());
   fd.append('mode', 'ielts');
   fd.append('prompt', prompt || '');
   const { data } = await api.post('/speech/evaluate', fd);

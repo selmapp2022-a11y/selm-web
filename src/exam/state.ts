@@ -123,7 +123,7 @@ export const useExam = create<ExamState>((set) => ({
   result: null,
   setExam: (exam) =>
     set((st) => {
-      savePlan({ goalId: st.goal.id, examId: exam.id, examDate: loadPlan()?.examDate ?? null });
+      savePlan({ goalId: st.goal.id, examId: exam.id, examDate: loadPlan()?.examDate ?? null, examLocale: exam.locale });
       return { exam, taskId: firstTask(exam).id, response: null, result: null };
     }),
   setTaskId: (taskId) => set({ taskId, response: null, result: null }),
@@ -136,7 +136,7 @@ export const useExam = create<ExamState>((set) => ({
       const exam = goal.exams.includes(st.exam.id)
         ? st.exam
         : EXAMS.find((e) => goal.exams.includes(e.id)) || st.exam;
-      savePlan({ goalId: goal.id, examId: exam.id, examDate: loadPlan()?.examDate ?? null });
+      savePlan({ goalId: goal.id, examId: exam.id, examDate: loadPlan()?.examDate ?? null, examLocale: exam.locale });
       return exam.id === st.exam.id
         ? { goal }
         : { goal, exam, taskId: firstTask(exam).id, response: null, result: null };
