@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { goNext, safeNext } from '../lib/nextPath';
 import { Shield, Sparkles, Mic, Lock, CreditCard, ExternalLink } from 'lucide-react';
 import { Capacitor } from '@capacitor/core';
 import { Logo } from '../components/Logo';
@@ -119,6 +120,10 @@ export default function ConsentPage() {
   const handleAgree = () => {
     if (!agreed) return;
     setPrivacyConsent();
+    // A candidate sent here from `/exam.html` goes back to the exam, not to
+    // the dashboard they never asked for.
+    const back = safeNext(window.location.search);
+    if (back) { goNext(back); return; }
     // Send authenticated users straight to the dashboard so a
     // returning user updating from Build 34/35/36/37 (who already has
     // a valid session token in localStorage) doesn't get bounced

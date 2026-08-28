@@ -3,11 +3,16 @@ import { Link, useNavigate } from 'react-router-dom';
 import { SignInWithApple, SignInWithAppleOptions } from '@capacitor-community/apple-sign-in';
 import { auth } from '../lib/api';
 import { useAuthStore } from '../store/authStore';
+import { goNext, safeNext } from '../lib/nextPath';
 import { Logo } from '../components/Logo';
 import { Capacitor } from '@capacitor/core';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
+
+  // Carried from `/exam.html`, which is a separate document. `safeNext`
+  // refuses anything that is not a path on this origin.
+  const back = safeNext(window.location.search);
   const { setUser } = useAuthStore();
   const [form, setForm] = useState({ full_name: '', email: '', username: '', password: '' });
   const [loading, setLoading] = useState(false);
@@ -21,6 +26,7 @@ export default function RegisterPage() {
     try {
       const res = await auth.register(form);
       setUser(res.user);
+      if (back) { goNext(back); return; }
       navigate('/onboarding/profile');
     } catch (err: any) {
       const detail = err?.response?.data?.detail;
@@ -55,6 +61,7 @@ export default function RegisterPage() {
         family_name: r.familyName || undefined,
       });
       setUser(res.user);
+      if (back) { goNext(back); return; }
       navigate(res.user?.onboarding_completed ? '/dashboard' : '/onboarding/profile');
     } catch (err: any) {
       const msg = err?.message || String(err);

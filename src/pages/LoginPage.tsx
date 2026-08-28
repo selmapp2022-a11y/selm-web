@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { SignInWithApple, SignInWithAppleOptions } from '@capacitor-community/apple-sign-in';
 import { auth } from '../lib/api';
 import { useAuthStore } from '../store/authStore';
+import { goNext, safeNext } from '../lib/nextPath';
 import { Logo } from '../components/Logo';
 import { Eye, EyeOff } from 'lucide-react';
 import { Capacitor } from '@capacitor/core';
@@ -17,6 +18,12 @@ export default function LoginPage() {
   const [appleLoading, setAppleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+
+  // A candidate sent here from `/exam.html` carries where to go back to.
+  // `/exam.html` is a separate document, so returning is a navigation and
+  // not a route change — and `safeNext` refuses anything that is not a path
+  // on this origin, because the value arrives in a query string.
+  const back = safeNext(window.location.search);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -24,6 +31,7 @@ export default function LoginPage() {
     try {
       const res = await auth.login(email, password);
       setUser(res.user);
+      if (back) { goNext(back); return; }
       navigate(res.user.onboarding_completed ? '/dashboard' : '/onboarding/profile');
     } catch (err: any) {
       setError(err?.response?.data?.detail || 'Invalid email or password.');
@@ -57,6 +65,7 @@ export default function LoginPage() {
         family_name: r.familyName || undefined,
       });
       setUser(res.user);
+      if (back) { goNext(back); return; }
       navigate(res.user?.onboarding_completed ? '/dashboard' : '/onboarding/profile');
     } catch (err: any) {
       // User cancel is silent — everything else surfaces.

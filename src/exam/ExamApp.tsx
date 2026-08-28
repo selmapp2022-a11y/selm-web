@@ -1,5 +1,6 @@
 import { Route, Routes } from 'react-router-dom';
 import ExamLayout from './components/ExamLayout';
+import ExamGate from './components/ExamGate';
 import GoalPage from './pages/GoalPage';
 import TaskPage from './pages/TaskPage';
 import ResultPage from './pages/ResultPage';
@@ -11,6 +12,7 @@ import AttestationPage from './pages/AttestationPage';
 export default function ExamApp() {
   return (
     <ExamLayout>
+      <ExamGate>
       <Routes>
         <Route path="/" element={<GoalPage />} />
         <Route path="/task" element={<TaskPage />} />
@@ -21,6 +23,7 @@ export default function ExamApp() {
         <Route path="/attestation" element={<AttestationPage />} />
         <Route path="*" element={<GoalPage />} />
       </Routes>
+      </ExamGate>
     </ExamLayout>
   );
 }
