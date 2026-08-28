@@ -51,8 +51,17 @@ export type Plan = {
   examId: string;
   /** Ordered worst-first when marks exist; exam order when they do not. */
   slots: Slot[];
-  /** Skills, ordered by distance to target. Empty without an attestation. */
-  order: Array<{ skill: SkillId; awarded: number; target: number; gap: number }>;
+  /**
+   * Skills, ordered by distance to target. Empty without an attestation.
+   *
+   * `awarded` and `gap` are `null` for an épreuve the candidate did not sit.
+   * Those sort FIRST, ahead of every measured shortfall, and the reason is
+   * not that they are presumed weak — it is that under IRCC an absent mark
+   * is not a low mark, it is an application that cannot be filed at all.
+   * A candidate at NCLC 4 against a target of 7 is three levels short; a
+   * candidate who never sat the épreuve is missing a required document.
+   */
+  order: Array<{ skill: SkillId; awarded: number | null; target: number; gap: number | null }>;
   /** Slots whose coordinate holds fewer than this many items. §6 calls zero a bug. */
   thin: Slot[];
   daysLeft: number | null;
@@ -130,6 +139,19 @@ export type PlannerInput = {
 /** The candidate's CEFR index for one skill, or null when unknown. */
 function attestationLevel(exam: ExamDefinition, a: Attestation | null, skill: SkillId): number | null {
   if (!a) return null;
+  // The AWARDED SCORE first, through the scale's own CEFR bands. Going via
+  // the NCLC level made this a conversion of a conversion, and it disagreed
+  // with the awarding body on 2 of 10 real listening scores — see
+  // `cefrBands` in `types.ts`. The NCLC route stays only as the fallback for
+  // an exam whose scale declares no CEFR.
+  const award = exam.awards.find((w) => w.skill === skill);
+  const raw = (a.awarded as unknown as Record<string, number | null>)[skill];
+  const scale = exam.scales.find((sc) => sc.id === award?.scaleId);
+  if (typeof raw === 'number' && Number.isFinite(raw) && scale?.cefrBands) {
+    const hit = scale.cefrBands.find((b) => raw >= b.from);
+    const i = hit ? CEFR.indexOf(hit.cefr) : -1;
+    if (i >= 0) return i;
+  }
   const lvl = (a.benchmark as unknown as Record<string, number>)[skill];
   if (typeof lvl !== 'number' || !Number.isFinite(lvl)) return null;
   return cefrIndexFor(exam, lvl);
@@ -183,10 +205,22 @@ export function buildPlan(input: PlannerInput): Plan {
     basis = 'attestation';
     order = exam.awards
       .map((a) => {
-        const awarded = (attestation.benchmark as unknown as Record<string, number>)[a.skill] ?? 0;
-        return { skill: a.skill, awarded, target, gap: target - awarded };
+        // `?? 0` stood here until a corpus of eight real score reports
+        // showed two of them printing « Non inscrit(e) à cette épreuve »
+        // where a mark would go. `null ?? 0` is 0, so an épreuve nobody sat
+        // was arriving as "awarded NCLC 0" — the largest gap on the sheet,
+        // taking the most slots, on a number the document never contained.
+        const raw = (attestation.benchmark as unknown as Record<string, number | null>)[a.skill];
+        const awarded = typeof raw === 'number' && Number.isFinite(raw) ? raw : null;
+        return { skill: a.skill, awarded, target, gap: awarded === null ? null : target - awarded };
       })
-      .sort((x, y) => y.gap - x.gap);
+      // Unsat épreuves first, then measured shortfalls worst-first.
+      .sort((x, y) => {
+        if (x.gap === null && y.gap === null) return 0;
+        if (x.gap === null) return -1;
+        if (y.gap === null) return 1;
+        return y.gap - x.gap;
+      });
   }
 
   const skillSequence: SkillId[] = attestation

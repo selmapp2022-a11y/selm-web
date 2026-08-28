@@ -3,7 +3,7 @@
  *
  * Three things are asserted, and the third is the one that matters:
  *
- *   1. the bank is well formed — 39 items, one key each, four options each
+ *   1. the bank is well formed, and the ÉPREUVE it serves is 39 questions
  *   2. counting works, and the difficulty profile reads the way it claims to
  *   3. **no scale score is produced, ever**, because the official conversion
  *      from correct answers to the TCF scale is unpublished and form-specific
@@ -13,7 +13,7 @@
  *   node /tmp/cc/engine/comprehension.check.js
  */
 import { TCF_CANADA } from '../definitions/tcf-canada';
-import { scoreComprehension, governingLevel, type ItemAnswer } from './comprehension';
+import { serveEpreuve, scoreComprehension, governingLevel, type ItemAnswer } from './comprehension';
 import type { ComprehensionSection } from '../model/types';
 
 const sections = TCF_CANADA.sections.filter(
@@ -28,7 +28,17 @@ const ok = (cond: boolean, label: string, detail = '') => {
 
 console.log('1. The bank\n');
 for (const s of sections) {
-  ok(s.items.length === 39, `${s.id}: 39 items`, `${s.items.length}`);
+  // The BANK, and separately the ÉPREUVE. These were one number until
+  // 2026-08-28, when growing the bank silently lengthened the exam.
+  const epreuve = serveEpreuve(s);
+  const declared = s.serve?.count ?? s.items.length;
+  ok(s.items.length >= declared, `${s.id}: bank holds at least one épreuve`, `${s.items.length} in bank`);
+  ok(epreuve.length === 39, `${s.id}: the épreuve presents 39 questions`, `${epreuve.length}`);
+  if (s.serve)
+    ok(
+      Object.values(s.serve.byBand).reduce((a, b) => a + b, 0) === s.serve.count,
+      `${s.id}: declared band profile sums to the declared length`,
+    );
   ok(s.items.every((i) => i.options.length === 4), `${s.id}: four options on every item`);
   ok(
     s.items.every((i) => i.answer >= 0 && i.answer < i.options.length),
@@ -45,10 +55,23 @@ for (const s of sections) {
   const longest = s.items.filter(
     (i) => i.options.indexOf([...i.options].sort((a, b) => b.length - a.length)[0]) === i.answer
   ).length;
-  ok(longest <= s.items.length / 3, `${s.id}: "longest option" is not a strategy`, `${longest}/39`);
+  // Was `longest <= items.length / 3`, a bar with no basis that the bank
+  // happened to sit exactly on. With four options the longest one is the key
+  // 25% of the time by chance, so the question is whether the excess is
+  // beyond noise. n=57, p=0.25 → mean 14.3, sd 3.3; the bank was at 25,
+  // z = 3.3, and twelve of the eighteen items written on 2026-08-28 were the
+  // cause — at B1 and B2 the RIGHT answer is the nuanced one, and nuance
+  // takes words, so a candidate reading no French could score by length.
+  const expected = s.items.length * 0.25;
+  const sd = Math.sqrt(s.items.length * 0.25 * 0.75);
+  const z = (longest - expected) / sd;
+  ok(z < 2, `${s.id}: "longest option" is not a strategy`, `${longest}/${s.items.length}  z=${z.toFixed(2)}`);
   // And no item is answerable by always picking the same position.
   const counts = [0, 1, 2, 3].map((n) => s.items.filter((i) => i.answer === n).length);
-  ok(Math.max(...counts) <= 15, `${s.id}: no answer position dominates`, counts.join('/'));
+  const pe = s.items.length * 0.25;
+  const psd = Math.sqrt(s.items.length * 0.25 * 0.75);
+  const pz = (Math.max(...counts) - pe) / psd;
+  ok(pz < 2.5, `${s.id}: no answer position dominates`, `${counts.join('/')}  z=${pz.toFixed(2)}`);
   console.log('');
 }
 
@@ -58,7 +81,7 @@ const answerAll = (s: ComprehensionSection, f: (level: string, n: number) => boo
 
 for (const s of sections) {
   const perfect = scoreComprehension(s, answerAll(s, () => true));
-  ok(perfect.correct === 39, `${s.id}: everything right → 39`, `${perfect.correct}`);
+  ok(perfect.correct === s.items.length, `${s.id}: everything right → every item`, `${perfect.correct}/${s.items.length}`);
   ok(perfect.held === 'C2' && perfect.breaksAt === null, `${s.id}: everything right → holds C2`);
 
   const none = scoreComprehension(s, answerAll(s, () => false));

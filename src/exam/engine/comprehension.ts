@@ -25,6 +25,7 @@
  * print a three-digit number.
  */
 import type { ComprehensionItem, ComprehensionSection, Localised } from '../model/types';
+import { newServeState, serve, type ServeState } from './pool';
 
 export const BANDS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'] as const;
 export type Band = (typeof BANDS)[number];
@@ -120,4 +121,51 @@ export function governingLevel(levels: Array<number | null>): { level: number | 
   const complete = levels.length > 0 && levels.every((l) => typeof l === 'number');
   if (!complete) return { level: null, complete: false };
   return { level: Math.min(...(levels as number[])), complete: true };
+}
+
+/**
+ * The items ONE sitting presents, drawn from a bank that may be larger.
+ *
+ * Found 2026-08-28, by the bank's own check failing after eighteen items
+ * were written for compréhension écrite: `items.length` had been serving as
+ * both *the bank* and *the length of the exam*. Growing the bank from 39 to
+ * 57 — done so that a candidate who practises twice does not meet the same
+ * 39 items twice — silently turned a published 39-question épreuve into a
+ * 57-question one, inside the same 60-minute clock. The candidate would have
+ * been given 46% more work and the same time, and nothing would have said so.
+ *
+ * The rule:
+ *
+ *   - the épreuve's **band profile is declared** and never inferred, so
+ *     writing more items cannot change the shape of the exam;
+ *   - within a band, the pool rule applies — least-recently-served among
+ *     unseen (§4.3), so a second sitting is a different sitting;
+ *   - the result is returned in ladder order, because progressive difficulty
+ *     is part of the published format.
+ *
+ * A section with no `serve` presents everything it holds, unchanged.
+ */
+export function serveEpreuve(
+  section: ComprehensionSection,
+  st?: ServeState,
+): ComprehensionItem[] {
+  const spec = section.serve;
+  if (!spec) return section.items;
+  const state = st ?? newServeState();
+  const out: ComprehensionItem[] = [];
+  for (const band of BANDS) {
+    const want = spec.byBand[band] ?? 0;
+    const pool = section.items.filter((i) => i.level === band);
+    for (let n = 0; n < want; n++) {
+      const { item } = serve(pool, state);
+      if (item) out.push(item);
+    }
+  }
+  // Ladder order, and stable within a band on the bank's own order.
+  const at = new Map(section.items.map((i, n) => [i.id, n]));
+  return out.sort(
+    (a, b) =>
+      BANDS.indexOf(a.level as Band) - BANDS.indexOf(b.level as Band) ||
+      (at.get(a.id)! - at.get(b.id)!),
+  );
 }

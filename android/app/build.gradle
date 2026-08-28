@@ -21,7 +21,7 @@ android {
         // Jumped to versionCode 42 to leap past the failed upload attempts
         // that Play Console registered as "used" (codes 2, 3, 4 — and the
         // existing live Flutter line which is at 15). Reserving room.
-        versionCode 42
+        versionCode 43
         versionName "2.0.8"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {

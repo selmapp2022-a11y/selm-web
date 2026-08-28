@@ -29,7 +29,7 @@ console.log('  tcf-ee-t3 starts at', difficultyFor('tcf-ee-t3', 'writing'), '(th
 
 console.log('\nSEEDED FROM AN ATTESTATION, per skill, expanded to every task of that skill');
 mem.set(ATTESTATION_KEY, JSON.stringify([{
-  id: 'a1', examId: 'tcf-canada', kind: 'retrospective', entryMethod: 'typed', verification: 'unverified',
+  id: 'a1', examId: 'tcf-canada', kind: 'retrospective', entryMethod: 'typed', verification: 'no_qr_legacy_format',
   language: 'fr', sat: '2026-06', awarded: { listening: 420, reading: 460, writing: 9, speaking: 11 },
   benchmark: { system: 'NCLC', listening: 6, reading: 7, writing: 6, speaking: 7 },
   responseIds: [], provenance: 'volunteered', studiedSince: null, consentedAt: '', retainUntil: '',

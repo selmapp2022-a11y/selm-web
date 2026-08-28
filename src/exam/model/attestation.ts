@@ -47,7 +47,30 @@ export type EntryMethod =
   | 'typed+image_agreed'
   | 'typed+image_disagreed_resolved';
 
-export type Verification = 'qr_verified' | 'unverified' | 'not_available';
+/**
+ * Whether the awarding body's own check confirmed this document, and — where
+ * it did not — WHY not. The distinction was added 2026-08-28 because
+ * `unverified` was carrying two situations that call for different actions:
+ *
+ * | | means | what to do |
+ * |---|---|---|
+ * | `qr_verified` | the QR was followed and the body confirmed it | nothing |
+ * | `no_qr_legacy_format` | the document predates verification — no QR exists to follow | nothing CAN be done; do not imply otherwise |
+ * | `not_available` | a check exists but is not open to us | say so plainly |
+ *
+ * Of sixteen real score reports, **eight carry no QR at all** — every CIEP
+ * attestation and every pre-2023 FEI layout. Filing those as `unverified`
+ * reads as "we did not bother", and a reviewer looking at a calibration set
+ * would discount them for a failure that is ours rather than theirs.
+ *
+ * `not_available` covers two closures that are the same from the candidate's
+ * side: IELTS restricts verification to registered Recognising
+ * Organisations, which SELM is not; and a current TCF attestation carries a
+ * QR that no reader here is bound to follow. In both cases a check exists
+ * and we did not make it, which is not the same as no check existing.
+ * **Never mixed silently.**
+ */
+export type Verification = 'qr_verified' | 'no_qr_legacy_format' | 'not_available';
 
 export type Attestation = {
   /**
@@ -98,20 +121,35 @@ export type Attestation = {
   /**
    * The awarded result, on the exam's own scale, per skill. This is the
    * ground truth, and it is the only thing on the document that is.
+   *
+   * **`null` is a real value and means the candidate did not sit that
+   * épreuve.** Discovered 2026-08-28 from a corpus of eight real score
+   * reports: TCF's expression épreuves are optional, and two attestations in
+   * the sample print *« Non inscrit(e) à cette épreuve »* where a mark would
+   * go. A form that demands four numbers cannot accept those documents at
+   * all, and a zero would be a lie about a test nobody took.
    */
   awarded: {
-    speaking: number;
-    listening: number;
-    reading: number;
-    writing: number;
+    speaking: number | null;
+    listening: number | null;
+    reading: number | null;
+    writing: number | null;
   };
-  /** The benchmark levels those map to, so the gate can count by level. */
+  /**
+   * The benchmark levels those map to, so the gate can count by level.
+   *
+   * `null` wherever `awarded` is `null`. There is no CLB/NCLC level for an
+   * épreuve nobody sat, and a zero here would be worse than a blank: the
+   * planner sorts by distance to target, so a fabricated 0 would silently
+   * become "this candidate's most urgent skill" on evidence that does not
+   * exist.
+   */
   benchmark: {
     system: string;
-    speaking: number;
-    listening: number;
-    reading: number;
-    writing: number;
+    speaking: number | null;
+    listening: number | null;
+    reading: number | null;
+    writing: number | null;
   };
   /**
    * The candidate's own responses that fall inside the prediction window
@@ -138,6 +176,32 @@ export type Attestation = {
    * Amendment 2 §1.3.
    */
   studiedSince: boolean | null;
+  /**
+   * The document's OWN expiry, as printed on it. `null` where it prints none.
+   *
+   * Not the same thing as `retainUntil`, which is our retention rule. This is
+   * whether the awarding body still stands behind the result, and whether
+   * IRCC would accept it.
+   *
+   * **Of eight real score reports, two printed an expiry and both had already
+   * passed it.** A plan built on those marks is built on numbers no
+   * immigration officer will look at, and the product would have said nothing.
+   * TCF attestations are valid two years; IELTS prints no expiry but its own
+   * note recommends re-assessment after two years, and IRCC applies its own
+   * limit.
+   */
+  expiresAt: string | null;
+  /**
+   * Whether this is the awarding body's definitive result or an interim sheet.
+   *
+   * A TCF *fiche de résultats provisoires* carries scores and says in its own
+   * words that only the definitive attestation on secured paper is valid. It
+   * is worth having — it is a real measurement of a real candidate — but it
+   * is not the same evidence, and adding it to the same pile as a definitive
+   * attestation would be the same mistake as adding retrospective and
+   * prospective pairs together.
+   */
+  documentStatus: 'definitive' | 'provisional';
   /** ISO timestamp of the consent that permitted this record to exist. */
   consentedAt: string;
   /**
@@ -181,3 +245,26 @@ export const CONSENT_POINTS = {
     "Vous pouvez le retirer à tout moment et l'enregistrement est détruit. Ce retrait n'affecte rien d'autre dans votre compte.",
   ],
 } as const;
+
+
+/**
+ * Has the awarding body's own validity period passed?
+ *
+ * `null` for a document that prints no expiry — which is not the same as
+ * "valid forever" and must not be rendered as though it were.
+ *
+ * `expiresAt` is held at MONTH precision, for the same reason `sat` is: a TCF
+ * attestation expires exactly two years after the sitting, so storing a full
+ * expiry date would hand back the full sitting date the form deliberately
+ * refused to ask for. A month is therefore read as its LAST instant — a
+ * document valid through January is not expired on the 2nd of January.
+ */
+export function isExpired(a: Pick<Attestation, 'expiresAt'>, on: Date = new Date()): boolean | null {
+  if (!a.expiresAt) return null;
+  const m = /^(\d{4})-(\d{2})$/.exec(a.expiresAt);
+  const end = m
+    ? new Date(Date.UTC(Number(m[1]), Number(m[2]), 1) - 1)
+    : new Date(a.expiresAt);
+  if (Number.isNaN(end.getTime())) return null;
+  return end < on;
+}

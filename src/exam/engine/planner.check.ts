@@ -21,7 +21,7 @@ const pad = (s: string, n: number) => (s + ' '.repeat(n)).slice(0, n);
 // NCLC 7 — the French Express Entry category, and the cluster §2.5 predicts.
 const ATT: Attestation = {
   id: 'a1', examId: 'tcf-canada', kind: 'retrospective', entryMethod: 'typed',
-  verification: 'unverified', language: 'fr', sat: '2026-06',
+  verification: 'no_qr_legacy_format', language: 'fr', sat: '2026-06',
   awarded: { listening: 398, reading: 503, writing: 9, speaking: 12 },
   benchmark: { system: 'NCLC', listening: 5, reading: 8, writing: 6, speaking: 8 },
   responseIds: [], provenance: 'volunteered', studiedSince: null,
@@ -34,7 +34,11 @@ for (const att of [ATT, null]) {
   if (plan.order.length) {
     console.log('  distance to target, worst first:');
     for (const o of plan.order)
-      console.log(`    ${pad(o.skill, 11)} awarded NCLC ${o.awarded}   target ${o.target}   gap ${o.gap > 0 ? '+' + o.gap : o.gap}`);
+      console.log(
+        `    ${pad(o.skill, 11)} awarded ${o.awarded === null ? 'NOT SAT ' : 'NCLC ' + o.awarded}   target ${o.target}   gap ${
+          o.gap === null ? '— (no mark: an absent épreuve is a missing document, not a low one)' : o.gap > 0 ? '+' + o.gap : o.gap
+        }`,
+      );
   } else {
     console.log('  no marks, so no distances. Order is the exam\'s own — Part 3 §2.');
   }

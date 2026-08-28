@@ -4,7 +4,9 @@ import { Check, ShieldCheck, Trash2, Upload } from 'lucide-react';
 import clsx from 'clsx';
 import { useExam } from '../state';
 import type { SkillId } from '../model/types';
-import { CONSENT_POINTS, kindOf, type Attestation, type EntryMethod, type Verification } from '../model/attestation';
+import { IRCC_ACCEPTED, irccAge } from '../model/ircc';
+import { PROVISIONAL_REFUSAL, TCF_VARIANTS, variantById, type TcfVariantId } from '../model/tcf-variants';
+import { CONSENT_POINTS, isExpired, kindOf, type Attestation, type EntryMethod, type Verification } from '../model/attestation';
 import { gapMonthsFrom, loadAttestations, newAttestationId, saveAttestation, withdrawAttestation } from '../model/attestationStore';
 import { toBenchmark } from '../engine/aggregate';
 import { formatScale, t } from '../model/format';
@@ -38,12 +40,51 @@ export default function AttestationPage() {
   // was shown two boxes, because listening and reading are not built here.
   // The candidate's document does not care what we built. `awards` does not
   // either — see `types.ts`.
-  const fields = useMemo(
-    () => exam.awards.map((a) => ({ id: a.skill, label: a.label, scaleId: a.scaleId })),
-    [exam],
-  );
+  /**
+   * Which TCF the candidate is holding.
+   *
+   * Asked BEFORE any score box is shown, and the boxes are built from the
+   * answer. Sixteen real score reports contained four different TCF
+   * examinations printing four different sets of épreuves; a form that shows
+   * four boxes and calls them "your TCF scores" is wrong for three of them.
+   * `null` means not yet answered, and nothing is shown until it is.
+   */
+  const [tcf, setTcf] = useState<TcfVariantId | null>(null);
+
+  const isFrench = exam.language === 'fr';
+  const variant = tcf ? variantById(tcf) : null;
+  // The épreuves the DOCUMENT carries, in our own skill ids.
+  const EPREUVE_SKILL: Record<string, string> = {
+    comprehension_orale: 'listening',
+    comprehension_ecrite: 'reading',
+    expression_ecrite: 'writing',
+    expression_orale: 'speaking',
+  };
+  const fields = useMemo(() => {
+    const all = exam.awards.map((a) => ({ id: a.skill, label: a.label, scaleId: a.scaleId }));
+    if (!variant) return all;
+    // Only the boxes this variant actually prints, and only where we have a
+    // scale for them. `maîtrise des structures` has no counterpart at all,
+    // which is why the variant is refused rather than partly filled.
+    const printed = new Set(
+      [...variant.required, ...variant.optional].map((e) => EPREUVE_SKILL[e]).filter(Boolean),
+    );
+    return all.filter((f) => printed.has(f.id as string));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [exam, tcf]);
 
   const [scores, setScores] = useState<Record<string, string>>({});
+  // Which épreuves the candidate did not sit.
+  //
+  // Added 2026-08-28 after eight real score reports were read into the model.
+  // Two of them print « Non inscrit(e) à cette épreuve » where a mark would
+  // go — TCF's expression épreuves are optional and are sat separately. The
+  // form as it stood demanded four numbers and would not submit without
+  // them, so those two documents could not be entered at all, and the only
+  // way through was to invent a mark.
+  const [notSat, setNotSat] = useState<Record<string, boolean>>({});
+  const [expiry, setExpiry] = useState('');
+  const [docStatus, setDocStatus] = useState<'definitive' | 'provisional'>('definitive');
   const [sat, setSat] = useState('');
   const [studied, setStudied] = useState<boolean | null>(null);
   const [imageState, setImageState] = useState<'none' | 'unread'>('none');
@@ -53,6 +94,7 @@ export default function AttestationPage() {
 
   const scaleOf = (id?: string) => exam.scales.find((s) => s.id === id);
   const errorFor = (f: { id: string; scaleId?: string }) => {
+    if (notSat[f.id]) return null;
     const raw = scores[f.id];
     if (raw === undefined || raw === '') return null;
     const v = Number(raw);
@@ -72,10 +114,16 @@ export default function AttestationPage() {
     return null;
   };
 
+  // A field is answered when it holds a valid score OR is marked not sat.
+  // At least one real mark is still required — an attestation with four
+  // blanks is not evidence of anything and there would be nothing to build
+  // a plan from.
   const complete =
     sat !== '' &&
     consented &&
-    fields.every((f) => scores[f.id] !== undefined && scores[f.id] !== '' && !errorFor(f));
+    (!isFrench || (tcf !== null && variant?.irccAccepted === true)) &&
+    fields.some((f) => !notSat[f.id]) &&
+    fields.every((f) => notSat[f.id] || (scores[f.id] !== undefined && scores[f.id] !== '' && !errorFor(f)));
 
   /**
    * Read once, never stored. The handler takes the file, records that an
@@ -91,20 +139,34 @@ export default function AttestationPage() {
 
   const submit = () => {
     if (!complete) return;
-    const awarded: Record<string, number> = {};
-    const benchmark: Record<string, number> = {};
+    const awarded: Record<string, number | null> = {};
+    const benchmark: Record<string, number | null> = {};
     for (const f of fields) {
+      if (notSat[f.id]) {
+        // Not zero. Nobody sat it, so there is no mark and no level, and
+        // both have to stay empty all the way down to the planner.
+        awarded[f.id] = null;
+        benchmark[f.id] = null;
+        continue;
+      }
       const v = Number(scores[f.id]);
       awarded[f.id] = v;
       // The skill is passed, and it has to be: IRCC converts each IELTS skill
       // differently on the same 0-9 scale. See `types.ts` on `bySkill`.
-      benchmark[f.id] = toBenchmark(v, exam.benchmark, f.scaleId, f.id as SkillId) ?? 0;
+      benchmark[f.id] = toBenchmark(v, exam.benchmark, f.scaleId, f.id as SkillId) ?? null;
     }
     const entryMethod: EntryMethod = imageState === 'none' ? 'typed' : 'typed+image_unread';
-    // TCF and TEF publish a QR anyone can follow; IELTS restricts
-    // verification to registered Recognising Organisations, which we are
-    // not. §2.4: never mixed silently.
-    const verification: Verification = exam.language === 'fr' ? 'unverified' : 'not_available';
+    // Three states, and which one applies is a property of the DOCUMENT, not
+    // of the language. A CIEP attestation carries no QR — there is nothing to
+    // follow, and filing that as "unverified" reads as though we could not be
+    // bothered. A current FEI attestation does carry one, and no reader here
+    // is bound to it, which is the same closure as IELTS restricting checks
+    // to Recognising Organisations: a check exists and we did not make it.
+    const verification: Verification = variant
+      ? variant.hasQr
+        ? 'not_available'
+        : 'no_qr_legacy_format'
+      : 'not_available';
     const base = { responseIds: [] as string[] };
     const a: Attestation = {
       id: newAttestationId(),
@@ -118,6 +180,8 @@ export default function AttestationPage() {
       benchmark: { system: exam.benchmark.system, ...(benchmark as object) } as Attestation['benchmark'],
       responseIds: base.responseIds,
       studiedSince: studied,
+      expiresAt: expiry === '' ? null : expiry,
+      documentStatus: docStatus,
       provenance: 'volunteered',
       consentedAt: new Date().toISOString(),
       retainUntil: new Date(Date.now() + 3 * 365 * 24 * 3600 * 1000).toISOString(),
@@ -128,6 +192,11 @@ export default function AttestationPage() {
 
   if (saved) {
     const gap = gapMonthsFrom(saved.sat);
+    const expired = isExpired(saved);
+    // IRCC's two-year rule, which is stricter than any expiry the paper
+    // prints and is the one that actually decides. Applied to the month the
+    // candidate typed, shown so they can check it themselves.
+    const age = irccAge(saved.sat);
     return (
       <div className="space-y-6">
         <header>
@@ -151,17 +220,50 @@ export default function AttestationPage() {
                     scale itself declaring `decimals: 0` for an exam that
                     reports halves. */}
                 <span className="font-semibold">
-                  {formatScale(
-                    saved.awarded[f.id as keyof Attestation['awarded']],
-                    scaleOf(f.scaleId)!,
-                    ui,
-                  )}{' '}
-                  · {saved.benchmark.system}{' '}
-                  {saved.benchmark[f.id as keyof Attestation['benchmark']] as number}
+                  {(() => {
+                    const v = saved.awarded[f.id as keyof Attestation['awarded']];
+                    const b = saved.benchmark[f.id as keyof Attestation['benchmark']] as number | null;
+                    // `null` is a value, not a missing one, and it renders as
+                    // words rather than as an empty cell or a dash the
+                    // candidate has to interpret.
+                    if (v === null)
+                      return (
+                        <span className="text-ink-secondary">
+                          {ui === 'en' ? 'not sat' : 'non passée'}
+                        </span>
+                      );
+                    return (
+                      <>
+                        {formatScale(v, scaleOf(f.scaleId)!, ui)} · {saved.benchmark.system}{' '}
+                        {b === null ? '—' : b}
+                      </>
+                    );
+                  })()}
                 </span>
               </div>
             ))}
           </div>
+          {age === 'past' && (
+            <p className="mt-4 rounded-lg bg-amber-50 p-3 text-sm font-medium text-amber-900">
+              {ui === 'en'
+                ? `This sitting was ${gap} months ago. IRCC requires results to be less than two years old both when you complete your Express Entry profile and again when you submit your application, so you will need to sit the exam again before you file. Your plan is built on these marks all the same — they measure you, and they are the best starting point we have.`
+                : `Cette épreuve remonte à ${gap} mois. IRCC exige des résultats de moins de deux ans au moment où vous complétez votre profil Entrée express et de nouveau au dépôt de votre demande : il faudra donc repasser l'examen avant de déposer. Votre plan repose malgré tout sur ces notes — elles vous mesurent, et c'est le meilleur point de départ dont nous disposions.`}
+            </p>
+          )}
+          {expired === true && (
+            <p className="mt-4 rounded-lg bg-amber-50 p-3 text-sm font-medium text-amber-900">
+              {ui === 'en'
+                ? 'This result has passed the validity period printed on it. Your plan is still built from these marks — they are a true measurement of you — but IRCC will not accept the document itself, and you will need to sit the exam again before you file.'
+                : "Ce résultat a dépassé la durée de validité qui y figure. Votre plan repose toujours sur ces notes — elles vous mesurent réellement — mais IRCC n'acceptera pas le document lui-même, et il faudra repasser l'examen avant de déposer votre dossier."}
+            </p>
+          )}
+          {saved.documentStatus === 'provisional' && (
+            <p className="mt-3 rounded-lg bg-surface-muted p-3 text-sm text-ink-secondary">
+              {ui === 'en'
+                ? 'Recorded as a provisional results sheet. It builds your plan exactly like a definitive one. It is kept separate when we measure how closely our marking agrees with official marking, because the awarding body does not stand behind it in the same way.'
+                : "Enregistré comme fiche de résultats provisoires. Elle bâtit votre plan exactement comme une attestation définitive. Elle est comptée à part lorsque nous mesurons l'accord entre notre correction et la correction officielle, car l'organisme n'en répond pas de la même manière."}
+            </p>
+          )}
           <p className="mt-4 text-xs text-ink-secondary">
             {ui === 'en'
               ? `Kind: ${saved.kind} — derived from your record, not asked. Sitting was ${gap} month(s) before today, and that interval is published with any figure this contributes to.`
@@ -198,6 +300,12 @@ export default function AttestationPage() {
         </p>
       </header>
 
+      {IRCC_ACCEPTED[exam.id]?.caution && (
+        <p className="rounded-xl border-2 border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+          {IRCC_ACCEPTED[exam.id].caution![ui]}
+        </p>
+      )}
+
       <section className="rounded-xl border-2 border-surface-divider bg-white p-5">
         <div className="flex items-center gap-2 text-sm font-semibold text-navy">
           <ShieldCheck className="h-4 w-4 text-teal" />
@@ -214,6 +322,48 @@ export default function AttestationPage() {
         </label>
       </section>
 
+      {isFrench && (
+        <section className="rounded-xl border-2 border-surface-divider bg-white p-5">
+          <span className="text-sm font-semibold text-navy">
+            {ui === 'en' ? 'Which TCF is on your attestation?' : 'Quel TCF figure sur votre attestation ?'}
+          </span>
+          <p className="mt-1 text-xs text-ink-secondary">
+            {ui === 'en'
+              ? 'The TCF is a family of exams, not one exam. They print different épreuves on different scales, and asking for "your TCF scores" without asking this first is wrong for most of them. The title is at the top of your document.'
+              : "Le TCF est une famille d'examens, pas un examen. Ils rapportent des épreuves différentes sur des barèmes différents, et demander « vos notes au TCF » sans poser d'abord cette question est faux pour la plupart d'entre eux. Le titre figure en haut de votre document."}
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {TCF_VARIANTS.map((v) => (
+              <button
+                key={v.id}
+                type="button"
+                onClick={() => { setTcf(v.id); setScores({}); setNotSat({}); }}
+                className={clsx(
+                  'rounded-xl border-2 px-4 py-2 text-sm',
+                  tcf === v.id ? 'border-teal bg-teal/10 text-navy' : 'border-surface-divider text-ink-secondary',
+                )}
+              >
+                {v.label[ui]}
+              </button>
+            ))}
+          </div>
+          {variant && !variant.irccAccepted && (
+            <p className="mt-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-900">
+              {variant.id === 'provisional' ? PROVISIONAL_REFUSAL[ui] : variant.why![ui]}
+              {variant.qcmMax === null && (
+                <>
+                  {' '}
+                  {ui === 'en'
+                    ? 'We also do not calculate a level from it: its published score scale is not agreed between sources, and a scale guessed wrong moves a result by more than a full level.'
+                    : "Nous n'en calculons pas non plus de niveau : son barème publié n'est pas concordant selon les sources, et un barème deviné à tort déplace un résultat de plus d'un niveau entier."}
+                </>
+              )}
+            </p>
+          )}
+        </section>
+      )}
+
+      {(!isFrench || (variant && variant.irccAccepted)) && (
       <section className="grid gap-4">
         <div>
           <label className="text-sm font-medium text-navy">
@@ -236,23 +386,84 @@ export default function AttestationPage() {
           {fields.map((f) => {
             const sc = scaleOf(f.scaleId);
             const err = errorFor(f);
+            const off = !!notSat[f.id];
             return (
               <div key={f.id}>
                 <label className="text-sm font-medium text-navy">{t(f.label, ui)}</label>
                 <input
                   inputMode="decimal"
-                  value={scores[f.id] ?? ''}
+                  value={off ? '' : scores[f.id] ?? ''}
+                  disabled={off}
                   onChange={(e) => setScores({ ...scores, [f.id]: e.target.value })}
-                  placeholder={sc ? `${sc.min}–${sc.max}` : ''}
+                  placeholder={off ? (ui === 'en' ? 'not sat' : 'non passée') : sc ? `${sc.min}–${sc.max}` : ''}
                   className={clsx(
                     'mt-1 w-full rounded-xl border-2 px-4 py-3 text-sm',
-                    err ? 'border-red-400' : 'border-surface-divider',
+                    off ? 'border-surface-divider bg-surface-muted text-ink-secondary' : err ? 'border-red-400' : 'border-surface-divider',
                   )}
                 />
                 {err && <p className="mt-1 text-xs text-red-600">{err}</p>}
+                <label className="mt-1 flex items-center gap-2 text-xs text-ink-secondary">
+                  <input
+                    type="checkbox"
+                    checked={off}
+                    onChange={(e) => setNotSat({ ...notSat, [f.id]: e.target.checked })}
+                  />
+                  <span>
+                    {ui === 'en'
+                      ? 'My attestation says I did not sit this one'
+                      : "Mon attestation indique « Non inscrit(e) à cette épreuve »"}
+                  </span>
+                </label>
               </div>
             );
           })}
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div>
+            <label className="text-sm font-medium text-navy">
+              {ui === 'en' ? 'Valid until, if it says' : "Valable jusqu'au, si c'est indiqué"}
+            </label>
+            <input
+              type="month"
+              value={expiry}
+              onChange={(e) => setExpiry(e.target.value)}
+              className="mt-1 w-full rounded-xl border-2 border-surface-divider px-4 py-3 text-sm"
+            />
+            <p className="mt-1 text-xs text-ink-secondary">
+              {ui === 'en'
+                ? 'Leave it blank if your document prints no expiry. Month only, for the same reason as above.'
+                : "Laissez vide si votre document n'indique aucune échéance. Le mois seulement, pour la même raison que ci-dessus."}
+            </p>
+          </div>
+          <div>
+            <span className="text-sm font-medium text-navy">
+              {ui === 'en' ? 'Which document is it?' : 'De quel document s’agit-il ?'}
+            </span>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {([
+                ['definitive', ui === 'en' ? 'The official result' : 'Attestation définitive'],
+                ['provisional', ui === 'en' ? 'A provisional sheet' : 'Fiche provisoire'],
+              ] as const).map(([v, label]) => (
+                <button
+                  key={v}
+                  type="button"
+                  onClick={() => setDocStatus(v)}
+                  className={clsx(
+                    'rounded-xl border-2 px-4 py-2 text-sm',
+                    docStatus === v ? 'border-teal bg-teal/10 text-navy' : 'border-surface-divider text-ink-secondary',
+                  )}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            <p className="mt-1 text-xs text-ink-secondary">
+              {ui === 'en'
+                ? 'A provisional sheet builds your plan just the same. It only changes which pile it sits in when we publish how closely our marking agrees with official marking.'
+                : "Une fiche provisoire bâtit votre plan exactement pareil. Elle change seulement le lot auquel elle appartient quand nous publions l'accord entre notre correction et la correction officielle."}
+            </p>
+          </div>
         </div>
 
         <div>
@@ -302,6 +513,7 @@ export default function AttestationPage() {
           </p>
         </div>
       </section>
+      )}
 
       <div className="flex flex-wrap gap-3">
         <button

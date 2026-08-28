@@ -39,6 +39,27 @@ export type Scale = {
     suffix?: Localised;
     decimals: number;
   };
+  /**
+   * The AWARDING BODY's own CEFR level for a score on this scale, highest
+   * threshold first.
+   *
+   * This is not the same mapping as `benchmark`, and treating it as the same
+   * was a real defect. `benchmark` converts a score to CLB/NCLC — IRCC's
+   * chart, for immigration. CEFR is the awarding body's own reading of the
+   * same number, and the product uses it for something else entirely: to
+   * decide which practice material is at the candidate's level.
+   *
+   * Until 2026-08-28 the CEFR was read off the NCLC row, which made it a
+   * conversion of a conversion. Checked against 23 CEFR levels printed on
+   * real TCF attestations, that route was **wrong on 2 of 10 compréhension
+   * orale readings** — a candidate awarded 447 was being called B1 where FEI
+   * calls them B2, and one awarded 521 was called B2 where FEI says C1. The
+   * planner orders practice by distance from this level, so a CEFR one level
+   * low spends a six-week plan on material the candidate finished a year ago.
+   *
+   * Read straight off the score, it agrees with all 23.
+   */
+  cefrBands?: Array<{ from: number; cefr: string }>;
 };
 
 /**
@@ -488,6 +509,32 @@ export type ComprehensionSection = {
    * inventing one — Amendment 1 §6.
    */
   families?: ComprehensionFamily[];
+  /**
+   * How many items the épreuve presents, and with what band profile, when
+   * `items` is a BANK larger than one sitting.
+   *
+   * The published TCF compréhension écrite épreuve is 39 questions. The bank
+   * behind it was grown to 57 so that a candidate who practises twice does
+   * not meet the same 39 items twice — §4.3's whole argument — and the
+   * moment it was grown, `items.length` stopped being the length of the
+   * exam. It was silently presenting 57 questions in a 60-minute épreuve
+   * published as 39.
+   *
+   * Absent means the section presents everything it holds.
+   */
+  serve?: {
+    /** Items in one sitting. Must equal the sum of `byBand`. */
+    count: number;
+    /**
+     * How many of each band the épreuve presents.
+     *
+     * Declared, not inferred from the bank. A profile inferred from the bank
+     * changes every time an item is written, which would mean the exam's
+     * shape drifts as a side effect of authoring — and the candidate would
+     * have no way to know.
+     */
+    byBand: Record<string, number>;
+  };
   items: ComprehensionItem[];
 };
 

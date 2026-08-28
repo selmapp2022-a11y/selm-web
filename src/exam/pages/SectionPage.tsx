@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import { useExam } from '../state';
 import { t } from '../model/format';
 import { resolveAudio } from '../engine/audio';
+import { serveEpreuve } from '../engine/comprehension';
 import { SectionClock, ProgressBar } from '../components/SectionClock';
 import { PlayOnce } from '../components/PlayOnce';
 import type { ComprehensionItem, ComprehensionSection, LanguageCode } from '../model/types';
@@ -59,8 +60,12 @@ function Section({ section }: { section: ComprehensionSection }) {
 
   const started = sitting?.sectionStartedAt ?? Date.now();
   const left = section.timeLimitSec - Math.floor((now - started) / 1000);
+  // The ÉPREUVE, not the bank. `section.items` is what has been written;
+  // this is what one sitting presents, at the published length and band
+  // profile. They were the same number until the bank outgrew the exam.
+  const items = useMemo(() => serveEpreuve(section), [section]);
   const answers = sitting?.answers[section.id] ?? {};
-  const answeredCount = section.items.filter((i) => typeof answers[i.id] === 'number').length;
+  const answeredCount = items.filter((i) => typeof answers[i.id] === 'number').length;
 
   const done = useMemo(
     () => () => {
@@ -84,7 +89,7 @@ function Section({ section }: { section: ComprehensionSection }) {
   // is the one behaviour worse than refusing outright — the candidate would
   // never know a question had been dropped.
   const missing = section.delivery.audioPlaysOnce
-    ? section.items.filter((i) => !i.audioPath).map((i) => i.id)
+    ? items.filter((i) => !i.audioPath).map((i) => i.id)
     : [];
   const audioMissing = missing.length > 0;
 
@@ -95,8 +100,8 @@ function Section({ section }: { section: ComprehensionSection }) {
           <h1 className="font-display text-3xl font-bold text-navy">{t(section.name, ui)}</h1>
           <p className="mt-1 text-sm text-ink-secondary">
             {ui === 'en'
-              ? `${section.items.length} questions · ${Math.round(section.timeLimitSec / 60)} minutes for the whole section · ${answeredCount} answered`
-              : `${section.items.length} questions · ${Math.round(section.timeLimitSec / 60)} minutes pour l'ensemble · ${answeredCount} répondues`}
+              ? `${items.length} questions · ${Math.round(section.timeLimitSec / 60)} minutes for the whole section · ${answeredCount} answered`
+              : `${items.length} questions · ${Math.round(section.timeLimitSec / 60)} minutes pour l'ensemble · ${answeredCount} répondues`}
           </p>
         </div>
         <SectionClock
@@ -106,7 +111,7 @@ function Section({ section }: { section: ComprehensionSection }) {
         />
       </header>
 
-      <ProgressBar value={answeredCount} total={section.items.length} />
+      <ProgressBar value={answeredCount} total={items.length} />
 
       {audioMissing ? (
         <div className="rounded-xl border border-amber-200 bg-amber-50 p-5">
@@ -118,8 +123,8 @@ function Section({ section }: { section: ComprehensionSection }) {
               </p>
               <p className="mt-1 text-xs text-ink-secondary">
                 {ui === 'en'
-                  ? `${missing.length} of ${section.items.length} items have no recording: ${missing.slice(0, 6).join(', ')}${missing.length > 6 ? '…' : ''}`
-                  : `${missing.length} items sur ${section.items.length} n'ont pas d'enregistrement : ${missing.slice(0, 6).join(', ')}${missing.length > 6 ? '…' : ''}`}
+                  ? `${missing.length} of ${items.length} items have no recording: ${missing.slice(0, 6).join(', ')}${missing.length > 6 ? '…' : ''}`
+                  : `${missing.length} items sur ${items.length} n'ont pas d'enregistrement : ${missing.slice(0, 6).join(', ')}${missing.length > 6 ? '…' : ''}`}
               </p>
               <p className="mt-2 text-sm leading-relaxed text-ink-secondary">
                 {ui === 'en'
@@ -131,7 +136,7 @@ function Section({ section }: { section: ComprehensionSection }) {
         </div>
       ) : section.delivery.presentation === 'all_at_once' ? (
         <ol className="space-y-4">
-          {section.items.map((item, n) => (
+          {items.map((item, n) => (
             <li key={item.id}>
               <Item
                 item={item}
@@ -147,9 +152,10 @@ function Section({ section }: { section: ComprehensionSection }) {
       ) : (
         <OneAtATime
           section={section}
+          items={items}
           cursor={cursor}
           setCursor={setCursor}
-          chose={answers[section.items[cursor].id] ?? null}
+          chose={answers[items[cursor].id] ?? null}
           onChoose={answerItem}
           ui={ui}
         />
@@ -173,6 +179,7 @@ function Section({ section }: { section: ComprehensionSection }) {
 
 function OneAtATime({
   section,
+  items,
   cursor,
   setCursor,
   chose,
@@ -180,13 +187,15 @@ function OneAtATime({
   ui,
 }: {
   section: ComprehensionSection;
+  /** The épreuve's items, already served from the bank by the parent. */
+  items: ComprehensionItem[];
   cursor: number;
   setCursor: (n: number) => void;
   chose: number | null;
   onChoose: (sectionId: string, itemId: string, chose: number | null) => void;
   ui: LanguageCode;
 }) {
-  const item = section.items[cursor];
+  const item = items[cursor];
   const [played, setPlayed] = useState(false);
 
   useEffect(() => setPlayed(false), [cursor]);
@@ -196,8 +205,8 @@ function OneAtATime({
       <div className="card p-6">
         <span className="chip">
           {ui === 'en'
-            ? `Question ${cursor + 1} of ${section.items.length}`
-            : `Question ${cursor + 1} sur ${section.items.length}`}
+            ? `Question ${cursor + 1} of ${items.length}`
+            : `Question ${cursor + 1} sur ${items.length}`}
         </span>
         <div className="mt-4">
           <PlayOnce
@@ -242,7 +251,7 @@ function OneAtATime({
           {ui === 'en' ? 'Previous' : 'Précédent'}
         </button>
         <button
-          disabled={cursor >= section.items.length - 1}
+          disabled={cursor >= items.length - 1}
           onClick={() => setCursor(cursor + 1)}
           className="btn-secondary flex-1"
         >
