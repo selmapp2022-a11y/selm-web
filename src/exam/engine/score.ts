@@ -9,6 +9,8 @@ import { segmentationFor } from './text';
 import { runSignal, type SignalResult } from './signal';
 import { runJudge, type JudgeOutcome } from './judge';
 import { aggregate, releaseGate, toBenchmark, type Aggregate, type ReleaseDecision } from './aggregate';
+import { entriesFor } from '../definitions/prescriptions';
+import type { Diagnosis } from '../model/prescription';
 
 export type ScoreResult = {
   exam: ExamDefinition;
@@ -28,6 +30,14 @@ export type ScoreResult = {
   examScaleAggregate: Aggregate | null;
   benchmarkLevel: number | null;
   release: ReleaseDecision;
+  /**
+   * Layer 2's findings — the named failure modes this response matched.
+   *
+   * Empty when no cell has been written for this task, and that emptiness is
+   * meant to be shown rather than filled: Amendment 1 §6 asks for a visible
+   * gap instead of a plausible generic answer.
+   */
+  diagnoses: Diagnosis[];
   zeroedBy: Localised | null;
   overtimeSec: number;
 };
@@ -59,9 +69,26 @@ export async function scoreResponse(
   // Passing it is not optional for French: `text.ts` measures a 5%
   // under-count and a third of correct-length answers wrongly zeroed
   // without it.
-  const gate = runGate(task, signal.transcript, promptText, segmentationFor(exam.locale));
+  const seg = segmentationFor(exam.locale);
+  const gate = runGate(task, signal.transcript, promptText, seg);
 
-  const base = { exam, task, scale, signal, gate, release, overtimeSec };
+  // Layer 2 — the diagnostic tier, and it runs BEFORE the zero check on
+  // purpose.
+  //
+  // Amendment 2 §3.1. The short-circuit below is right for the judge, which
+  // costs money on every call. It is wrong for this, which costs nothing and
+  // touches no network. Measured on the first cell: the NCLC 6 response to
+  // `t3-n6-04` is zeroed by `prompt_copy` AND is a textbook juxtaposition —
+  // the two travel together, because a candidate who summarises instead of
+  // comparing also tends to lift a clause. Returning only the zero throws
+  // away the half the candidate can act on.
+  //
+  //   "You copied a sentence, AND you did not compare the two documents"
+  //
+  // is worth more than a zero.
+  const diagnoses = entriesFor(exam.id, task.id).map((e) => e.detect(task, signal.transcript, seg));
+
+  const base = { exam, task, scale, signal, gate, release, diagnoses, overtimeSec };
 
   // A response the official scheme awards nothing to is not sent to a judge.
   if (gate.zeroed) {

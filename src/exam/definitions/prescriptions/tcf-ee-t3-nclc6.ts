@@ -20,6 +20,7 @@
 import type { FailureMode, Prescription, PrescriptionCell } from '../../model/prescription';
 import type { JuxtapositionThresholds } from '../../engine/diagnose';
 import type { ProxyBounds } from '../../engine/proxy';
+import { ITEMS } from '../practice/tcf-ee-t3-nclc6.items';
 
 export const AT = { examId: 'tcf-canada', taskId: 'tcf-ee-t3', level: 6 } as const;
 
@@ -136,5 +137,5 @@ export const CELL: PrescriptionCell = {
   at: AT,
   failureMode: FAILURE_MODE,
   prescription: PRESCRIPTION,
-  practiceItemIds: [],
+  practiceItemIds: ITEMS.map((i) => i.id),
 };

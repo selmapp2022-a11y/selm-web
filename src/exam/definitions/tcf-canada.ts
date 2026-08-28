@@ -1075,7 +1075,14 @@ export const TCF_CANADA: ExamDefinition = {
             },
             {
               id: 'prompt_copy',
-              maxOverlapRatio: 0.5,
+              // RESTATED 2026-08-28, 0.5 -> 0.53. Measured across 24 French
+              // responses: splitting elision raised prompt overlap by 6.4%
+              // (0.540 -> 0.575 mean), because the elided fragments the fix
+              // creates appear in BOTH the response and the prompt and so
+              // count as overlap on each side. Left at 0.5 this rule became
+              // 6.4% tighter as a side effect of fixing the word counter,
+              // and it is an automatic zero.
+              maxOverlapRatio: 0.53,
               verdict: {
                 kind: 'zero',
                 label: { en: 'Copied from the instruction', fr: 'Recopié de la consigne' },
@@ -1193,7 +1200,14 @@ export const TCF_CANADA: ExamDefinition = {
             },
             {
               id: 'prompt_copy',
-              maxOverlapRatio: 0.5,
+              // RESTATED 2026-08-28, 0.5 -> 0.53. Measured across 24 French
+              // responses: splitting elision raised prompt overlap by 6.4%
+              // (0.540 -> 0.575 mean), because the elided fragments the fix
+              // creates appear in BOTH the response and the prompt and so
+              // count as overlap on each side. Left at 0.5 this rule became
+              // 6.4% tighter as a side effect of fixing the word counter,
+              // and it is an automatic zero.
+              maxOverlapRatio: 0.53,
               verdict: {
                 kind: 'zero',
                 label: { en: 'Copied from the instruction', fr: 'Recopié de la consigne' },
@@ -1379,6 +1393,18 @@ export const TCF_CANADA: ExamDefinition = {
               // it fired on the model answer. A candidate who structures a
               // comparison properly is not cheating.
               id: 'template_ratio',
+              // MEASURED 2026-08-28 and deliberately NOT changed. The elision
+              // fix moved this ratio the OPPOSITE way from prompt overlap —
+              // DOWN 5.0% (0.136 -> 0.130 mean) — because the scaffold phrases
+              // are short connectives with little elision while the response's
+              // denominator grew. So the rule is now ~5% LOOSER than when the
+              // number was chosen.
+              //
+              // Restating it to 0.38 would preserve the original intent. It is
+              // left alone because tightening an automatic-zero rule on our own
+              // measurement, with no francophone reviewer yet appointed, is the
+              // one direction that costs a real candidate a real mark. It goes
+              // to the reviewer with the rest of the cell.
               maxRatio: 0.4,
               verdict: {
                 kind: 'zero',
