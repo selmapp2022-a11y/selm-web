@@ -26,64 +26,20 @@ export function sentences(text: string): string[] {
 }
 
 /**
- * Opposition and concession markers, B1 and below. The list is short on
- * purpose: it is a floor test — "did this response mark contrast at all" —
- * not a style score.
- */
-export const CONTRAST_MARKERS = [
-  'en revanche',
-  'tandis que',
-  'alors que',
-  'au contraire',
-  'contrairement',
-  'cependant',
-  'pourtant',
-  'toutefois',
-  'à l’inverse',
-  "à l'inverse",
-  'par contre',
-  's’oppose',
-  "s'oppose",
-  'désaccord',
-  'là où',
-  'mais',
-];
-
-/**
- * The subset that marks contrast STRUCTURALLY rather than in passing.
+ * The lexicons moved out on 2026-08-28.
  *
- * `mais` is excluded on purpose and the reason was measured: on 2 of 8
- * items the NCLC 6 response was not diagnosed, because a sentence that
- * merely REPORTS one document's worry about the other's proposal —
- * "l'amende touchera surtout les petits logements" — contains words from
- * both documents and was being counted as a comparison. Holding both
- * documents in one sentence is necessary and not sufficient; the sentence
- * has to set them against each other.
+ * They were French word lists inside `engine/`, which is the file that
+ * `types.ts` says must never name a language. Re-exported here so existing
+ * imports keep working; owned by `definitions/prescriptions/lexicon.fr.ts`.
  */
-export const STRUCTURAL_CONTRAST = [
-  'en revanche', 'tandis que', 'alors que', 'au contraire', 'contrairement',
-  'à l’inverse', "à l'inverse", 'par contre', 's’oppose', "s'oppose",
-  'désaccord', 'là où', 'cependant', 'pourtant', 'toutefois',
-];
-
-/** First-person stance markers — where the candidate's own opinion lives. */
-export const STANCE_MARKERS = [
-  'je pense',
-  'à mon avis',
-  'pour ma part',
-  'selon moi',
-  'je trouve',
-  'je crois',
-  'j’estime',
-  "j'estime",
-  'il me semble',
-];
+export { CONTRAST as CONTRAST_MARKERS, STRUCTURAL_CONTRAST, STANCE as STANCE_MARKERS } from '../definitions/prescriptions/lexicon.fr';
+import { CONTRAST, STRUCTURAL_CONTRAST as SC, STANCE } from '../definitions/prescriptions/lexicon.fr';
 
 function norm(s: string): string {
   return s.toLowerCase().normalize('NFC');
 }
 
-function countAny(text: string, needles: string[]): number {
+export function countAny(text: string, needles: string[]): number {
   const t = norm(text);
   let n = 0;
   for (const needle of needles) {
@@ -134,7 +90,7 @@ export function comparisonMetrics(task: TaskDefinition, text: string, seg: Segme
       // Both documents are in this sentence. It is a BRIDGE only if it also
       // sets them against each other — structurally, or by engaging each
       // document with more than one word.
-      const structural = countAny(s, STRUCTURAL_CONTRAST) > 0;
+      const structural = countAny(s, SC) > 0;
       const engaged = present.every((h) => h.n >= 2);
       if (structural || engaged) bridgeSentences += 1;
       tags.push('both');
@@ -153,7 +109,7 @@ export function comparisonMetrics(task: TaskDefinition, text: string, seg: Segme
     last = t;
   }
 
-  const opinion = sents.filter((s) => countAny(s, STANCE_MARKERS) > 0);
+  const opinion = sents.filter((s) => countAny(s, STANCE) > 0);
   const opinionAnchors = opinion.reduce(
     (n, s) => n + srcs.reduce((m, src) => m + keywordHits(s, src.keywords, seg), 0),
     0,
@@ -162,7 +118,7 @@ export function comparisonMetrics(task: TaskDefinition, text: string, seg: Segme
   return {
     bridgeSentences,
     alternations,
-    contrastMarkers: countAny(text, CONTRAST_MARKERS),
+    contrastMarkers: countAny(text, CONTRAST),
     opinionAnchors,
     opinionSentences: opinion.length,
   };
@@ -242,4 +198,169 @@ export function diagnoseJuxtaposition(
   const floating = signals[2].tripped && m.opinionSentences > 0 && m.bridgeSentences === 0;
 
   return { failureModeId: 'juxtaposition-sans-comparaison', fired: structural || floating, signals };
+}
+
+// ── tâche 1 · `message-sans-information` ────────────────────────────────
+
+import { EVALUATIVE, LEARNED, SEQUENCE, PIVOT, BEFORE_AFTER } from '../definitions/prescriptions/lexicon.fr';
+
+/**
+ * Concrete informational tokens: numbers, durations, and capitalised words
+ * that are not sentence-initial.
+ *
+ * The last of these is the crude one and it is crude on purpose. A proper
+ * noun mid-sentence — a place, a tool, a name — is almost always a FACT,
+ * and a response made entirely of evaluations contains none. Counting them
+ * is not understanding them, and this layer does not claim to.
+ */
+export function factTokens(text: string): number {
+  const digits = (text.match(/\b\d+([.,]\d+)?\b/g) ?? []).length;
+  const sentences_ = sentences(text);
+  let propers = 0;
+  for (const s of sentences_) {
+    const words_ = s.split(/\s+/).slice(1);
+    for (const w of words_) if (/^[A-ZÀ-Þ][\p{L}-]{2,}/u.test(w)) propers += 1;
+  }
+  return digits + propers;
+}
+
+export type MessageThresholds = {
+  minFacts: number;
+  /** Evaluative adjectives per 100 words, above which the response is telling. */
+  maxEvaluativePer100: number;
+};
+
+/**
+ * What the second half of THIS item's instruction asks for.
+ *
+ * Passed in rather than held here, because tâche 1's instruction always has
+ * two halves and the second half differs by prompt: *what you learned*, or
+ * *what changes for the reader*, or *what the rules are*. A global list
+ * diagnosed four correct answers as failures before this argument existed.
+ */
+export type SecondRequirement = string[];
+
+/**
+ * `message-sans-information` — the NCLC 6 failure on TCF tâche 1.
+ *
+ * A message that is polite, correct and empty. The instruction asks two
+ * things — *décrire cette formation* and *expliquer ce que vous avez
+ * appris* — and a response can be fluent French while doing neither, by
+ * saying the course was interesting and useful and that the candidate
+ * learned a lot.
+ *
+ * The gate is silent on it: the word count is fine, the topic keywords hit,
+ * nothing is copied. It is marked, and marked at 7–9 of 20 under
+ * `capacite_informer`, which is NCLC 6.
+ */
+export function diagnoseEmptyMessage(
+  _task: TaskDefinition,
+  text: string,
+  t: MessageThresholds,
+  secondRequirement: SecondRequirement = LEARNED,
+  seg: Segmentation = DEFAULT_SEGMENTATION,
+): Diagnosis {
+  const words_ = text.split(/\s+/).filter(Boolean).length || 1;
+  const facts = factTokens(text);
+  const evaluatives = countAny(text, EVALUATIVE);
+  const evalPer100 = (evaluatives * 100) / words_;
+  const learned = countAny(text, secondRequirement);
+  void seg;
+
+  const signals: Signal[] = [
+    {
+      id: 'facts',
+      label: { en: 'Things a reader could repeat', fr: 'Choses qu’un lecteur pourrait répéter' },
+      measured: facts,
+      threshold: t.minFacts,
+      tripped: facts < t.minFacts,
+    },
+    {
+      id: 'evaluative_density',
+      label: { en: 'Evaluative words per 100', fr: 'Mots d’appréciation pour 100' },
+      measured: Math.round(evalPer100 * 10) / 10,
+      threshold: t.maxEvaluativePer100,
+      tripped: evalPer100 > t.maxEvaluativePer100,
+    },
+    {
+      id: 'second_requirement',
+      label: {
+        en: 'Answers the second half of the instruction',
+        fr: 'Répond à la seconde moitié de la consigne',
+      },
+      measured: learned,
+      threshold: 1,
+      tripped: learned < 1,
+    },
+  ];
+
+  // Two ways to fail, and they are different failures: nothing concrete to
+  // report, or one of the instruction's two requirements simply skipped.
+  const empty = signals[0].tripped && signals[1].tripped;
+  const halfDone = signals[2].tripped;
+  return { failureModeId: 'message-sans-information', fired: empty || halfDone, signals };
+}
+
+// ── tâche 2 · `recit-sans-bascule` ──────────────────────────────────────
+
+export type NarrativeThresholds = {
+  /** Sequence markers below which there is no narrative to judge. */
+  minSequence: number;
+  minPivot: number;
+};
+
+/**
+ * `recit-sans-bascule` — the NCLC 6 failure on TCF tâche 2.
+ *
+ * Events in order, and nothing turns. The instruction asks for *ce que cela
+ * a changé pour vous*, so the change IS the task; a response that lists a
+ * day from morning to evening has written a diary entry and answered the
+ * easier question.
+ *
+ * Counted rather than understood: sequence markers say a narrative is being
+ * attempted, and the absence of any pivot or before-and-after says it never
+ * arrives anywhere. A response with no sequence markers at all is a
+ * different problem and this detector stays quiet about it.
+ */
+export function diagnoseNoPivot(
+  _task: TaskDefinition,
+  text: string,
+  t: NarrativeThresholds,
+  seg: Segmentation = DEFAULT_SEGMENTATION,
+): Diagnosis {
+  void seg;
+  const sequence = countAny(text, SEQUENCE);
+  const pivot = countAny(text, PIVOT);
+  const beforeAfter = countAny(text, BEFORE_AFTER);
+
+  const signals: Signal[] = [
+    {
+      id: 'sequence',
+      label: { en: 'Markers that move the story', fr: 'Marqueurs qui font avancer le récit' },
+      measured: sequence,
+      threshold: t.minSequence,
+      tripped: sequence < t.minSequence,
+    },
+    {
+      id: 'pivot',
+      label: { en: 'The turn — what changed', fr: 'La bascule — ce qui a changé' },
+      measured: pivot,
+      threshold: t.minPivot,
+      tripped: pivot < t.minPivot,
+    },
+    {
+      id: 'before_after',
+      label: { en: 'Before set against after', fr: 'Un avant opposé à un après' },
+      measured: beforeAfter,
+      threshold: 1,
+      tripped: beforeAfter < 1,
+    },
+  ];
+
+  // Only fires on a response that IS narrating. Without sequence markers
+  // there is no récit to be missing a turn from, and saying so would be
+  // diagnosing the wrong thing.
+  const narrating = !signals[0].tripped;
+  const noTurn = signals[1].tripped && signals[2].tripped;
+  return { failureModeId: 'recit-sans-bascule', fired: narrating && noTurn, signals };
 }

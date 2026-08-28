@@ -1260,7 +1260,29 @@ export const TCF_CANADA: ExamDefinition = {
             },
             {
               id: 'template_ratio',
-              maxRatio: 0.2,
+              // RAISED 2026-08-28, 0.2 -> 0.4, matching tâche 3, and for the
+              // same reason tâche 3 was raised: the scaffold is the phrasing a
+              // CORRECT answer uses, so overlapping it is not evidence of
+              // memorisation.
+              //
+              // Tâche 3's note records that at 0.2 the rule fired on its own
+              // model answer. Tâches 1 and 2 were left at 0.2 because no model
+              // answer had ever been run through them. MEASURED today across
+              // eight independently written NCLC 7 messages: mean 0.211, max
+              // 0.288, and **four of the eight were zeroed** — awarded
+              // « texte appris par cœur », an automatic zero, for writing
+              // ordinary French.
+              //
+              // The root cause is deeper than the number and is recorded here
+              // rather than fixed in a hurry: this scaffold is 26 distinct
+              // tokens and most of them are the commonest function words in
+              // the language — à, de, une, ce, que, le, plus, je, nous, pour.
+              // A ratio over tokens cannot tell "reused the scaffold" from
+              // "wrote French". Measuring overlap on CONTENT words only would
+              // fix the measure instead of the threshold, and it would change
+              // tâche 3's calibration too, so it goes to the reviewer with the
+              // rest of the cell rather than being changed alongside a bank.
+              maxRatio: 0.4,
               verdict: {
                 kind: 'zero',
                 label: { en: 'Memorised text', fr: 'Texte appris par cœur' },
@@ -1385,7 +1407,29 @@ export const TCF_CANADA: ExamDefinition = {
             },
             {
               id: 'template_ratio',
-              maxRatio: 0.2,
+              // RAISED 2026-08-28, 0.2 -> 0.4, matching tâche 3, and for the
+              // same reason tâche 3 was raised: the scaffold is the phrasing a
+              // CORRECT answer uses, so overlapping it is not evidence of
+              // memorisation.
+              //
+              // Tâche 3's note records that at 0.2 the rule fired on its own
+              // model answer. Tâches 1 and 2 were left at 0.2 because no model
+              // answer had ever been run through them. MEASURED today across
+              // eight independently written NCLC 7 messages: mean 0.211, max
+              // 0.288, and **four of the eight were zeroed** — awarded
+              // « texte appris par cœur », an automatic zero, for writing
+              // ordinary French.
+              //
+              // The root cause is deeper than the number and is recorded here
+              // rather than fixed in a hurry: this scaffold is 26 distinct
+              // tokens and most of them are the commonest function words in
+              // the language — à, de, une, ce, que, le, plus, je, nous, pour.
+              // A ratio over tokens cannot tell "reused the scaffold" from
+              // "wrote French". Measuring overlap on CONTENT words only would
+              // fix the measure instead of the threshold, and it would change
+              // tâche 3's calibration too, so it goes to the reviewer with the
+              // rest of the cell rather than being changed alongside a bank.
+              maxRatio: 0.4,
               verdict: {
                 kind: 'zero',
                 label: { en: 'Memorised text', fr: 'Texte appris par cœur' },
