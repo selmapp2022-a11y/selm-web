@@ -40,6 +40,19 @@ export const IELTS_GT: ExamDefinition = {
       // that exists to tell them what they were awarded.
       step: 0.5,
       display: { prefix: { en: 'Band', fr: 'Bande' }, decimals: 1 },
+      // IELTS's own CEFR reading of a band, verified against eight overall
+      // bands printed on real Test Report Forms from 2015 to 2024 — all
+      // agree. Applied per skill on IELTS's own authority: a UKVI form in
+      // the corpus prints a CEFR cell beside EACH of the four bands.
+      // See `ielts-variants.ts`.
+      cefrBands: [
+        { from: 8.5, cefr: 'C2' },
+        { from: 7.0, cefr: 'C1' },
+        { from: 5.5, cefr: 'B2' },
+        { from: 4.5, cefr: 'B1' },
+        { from: 3.5, cefr: 'A2' },
+        { from: 3.0, cefr: 'A1' },
+      ],
     },
   ],
   benchmark: {

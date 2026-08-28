@@ -5,7 +5,7 @@
  *     --target es2020 --moduleResolution node --skipLibCheck --esModuleInterop
  *   node /tmp/cp/exam/engine/corpus.check.js
  *
- * **Eighteen documents. Scores, session month and exam type. Nothing else.**
+ * **Twenty documents. Scores, session month and exam type. Nothing else.**
  * No name, no date of birth, no candidate or centre number, no nationality,
  * no first language, no photograph, no attestation number. `Attestation`
  * has nowhere to put any of it and neither does this file — which is the
@@ -22,6 +22,7 @@ import type { SkillId } from '../model/types';
 import { isExpired, type Attestation } from '../model/attestation';
 import { IRCC_ACCEPTED, IRCC_VALIDITY_MONTHS, irccAge, monthsSince } from '../model/ircc';
 import { detectTcfVariant, type TcfEpreuve, type TcfVariantId } from '../model/tcf-variants';
+import { VERIFY_URL, cefrForBand, crossCheckBandCefr, overallFrom } from '../model/ielts-variants';
 
 const pad = (s: string, n: number) => (s + ' '.repeat(n)).slice(0, n);
 
@@ -43,6 +44,14 @@ type Doc = {
   truth?: TcfVariantId;
   /** Layout evidence, as a reader would report it. */
   seen?: { global?: boolean; qr?: boolean; photo?: boolean };
+  /**
+   * A SPECIMEN form — placeholder names, straight nines. Kept for its
+   * LAYOUT, which is real, and excluded from every count of real results.
+   * A published sample is not a person and must never be counted as one.
+   */
+  specimen?: true;
+  /** IELTS only: what the verification line at the foot of the page says. */
+  verifyUrl?: string;
   /** The document's own expiry, where it prints one. */
   expires?: string;
   note?: string;
@@ -52,29 +61,34 @@ const CORPUS: Doc[] = [
   {
     ref: 'A', family: 'IELTS', variant: 'General Training', sat: '2021-10',
     printed: { listening: 5.0, reading: 4.5, writing: 6.0, speaking: 6.5 },
-    overall: 5.5, cefr: 'B2', verification: 'recognising organisations only',
+    overall: 5.5, cefr: 'B2', verifyUrl: 'ielts.ucles.org.uk',
+    verification: 'recognising organisations only',
   },
   {
     ref: 'B', family: 'IELTS', variant: 'General (older Cambridge ESOL layout)', sat: null,
     printed: { listening: 8, reading: 8, writing: 8, speaking: 8.5 },
-    overall: 8, verification: 'recognising organisations only',
+    overall: 8, verifyUrl: 'britishcouncil.org.eg (a COUNTRY-SPECIFIC address, on the oldest layout)',
+    verification: 'recognising organisations only',
     note: 'no CEFR box; whole bands printed without a decimal; carries Repeating IELTS / Previous Test Date / examiner numbers that the modern form does not',
   },
   {
     ref: 'C', family: 'IELTS', variant: 'General Training', sat: '2023-06',
     printed: { listening: 5.0, reading: 5.0, writing: 6.0, speaking: 6.0 },
-    overall: 5.5, cefr: 'B2', verification: 'recognising organisations only',
+    overall: 5.5, cefr: 'B2', verifyUrl: 'ielts.ucles.org.uk',
+    verification: 'recognising organisations only',
   },
   {
     ref: 'D', family: 'IELTS', variant: 'Academic', sat: '2021-10',
     printed: { listening: 8.0, reading: 7.0, writing: 6.5, speaking: 6.5 },
-    overall: 7.0, cefr: 'C1', verification: 'recognising organisations only',
+    overall: 7.0, cefr: 'C1', verifyUrl: 'ielts.ucles.org.uk',
+    verification: 'recognising organisations only',
     note: 'ACADEMIC, not General Training — IRCC does not accept it for Express Entry at all',
   },
   {
     ref: 'E', family: 'IELTS', variant: 'General Training', sat: '2023-08',
     printed: { listening: 8.5, reading: 8.5, writing: 8.0, speaking: 7.0 },
-    overall: 8.0, cefr: 'C1', verification: 'recognising organisations only',
+    overall: 8.0, cefr: 'C1', verifyUrl: 'ielts.ucles.org.uk',
+    verification: 'recognising organisations only',
   },
   {
     ref: 'F', family: 'TCF', variant: 'Tout public — fiche de résultats PROVISOIRES', sat: '2022-09',
@@ -179,6 +193,38 @@ const CORPUS: Doc[] = [
     truth: 'quebec', seen: { global: false, qr: false, photo: false },
     verification: 'none printed', expires: '2014-04-25',
     note: 'TWO épreuves only — compréhension orale and expression orale. A fourth TCF variant, and the narrowest document in the corpus.',
+  },
+
+  // ── the third delivery, 2026-08-28: five IELTS Test Report Forms ────────
+  {
+    ref: 'Q', family: 'IELTS', variant: 'Academic', sat: '2021-08',
+    printed: { listening: 8.5, reading: 6.5, writing: 6.5, speaking: 6.5 },
+    overall: 7.0, cefr: 'C1', verification: 'recognising organisations only',
+    verifyUrl: 'ielts.ucles.org.uk',
+    note: 'ACADEMIC — not accepted by IRCC for economic immigration',
+  },
+  {
+    ref: 'R', family: 'IELTS', variant: 'Academic', sat: '2015-03',
+    printed: { listening: 7.5, reading: 6.0, writing: 6.5, speaking: 5.5 },
+    overall: 6.5, cefr: 'B2', verification: 'recognising organisations only',
+    verifyUrl: 'ielts.ucles.org.uk',
+    note: 'the oldest IELTS form in the corpus that still carries a CEFR cell — the CEFR box predates 2015',
+  },
+  {
+    ref: 'S', family: 'IELTS', variant: 'Academic', sat: '2024-01',
+    printed: { listening: 7.5, reading: 7.0, writing: 6.0, speaking: 6.0 },
+    overall: 6.5, cefr: 'B2', verification: 'recognising organisations only',
+    verifyUrl: 'ielts.ucles.org.uk',
+  },
+  {
+    ref: 'T', family: 'IELTS', variant: 'General Training — UKVI', sat: '2024-07',
+    printed: { listening: 9.0, reading: 9.0, writing: 9.0, speaking: 9.0 },
+    overall: 9.0, cefr: 'C2',
+    cefrOf: { listening: 'C2', reading: 'C2', writing: 'C2', speaking: 'C2' },
+    verification: 'recognising organisations only',
+    verifyUrl: 'ielts.org/verify',
+    specimen: true,
+    note: 'SPECIMEN — placeholder names and straight nines, so not a result. Kept for its layout: it prints a CEFR cell beside EACH band rather than only beside the overall, plus a UKVI CEFR Threshold table and a UKVI reference number, and its verification address is ielts.org/verify rather than ielts.ucles.org.uk',
   },
 ];
 
@@ -445,3 +491,67 @@ console.log('   the QCM: « quelle que soit la version du test, les résultats r
 console.log('   comparables ». Either way NO FIXED /20 TABLE IS CORRECT, and the argument');
 console.log('   `comprehension.ts` makes for the QCM scale now has evidence for expression');
 console.log('   too. We must not print a CEFR level for an expression mark.');
+
+// ── 10. IELTS: ONE FORM, ONE BOX THAT DECIDES ────────────────────────────
+console.log('\n10. IELTS — the good news, and the box that is not decoration');
+const ielts = CORPUS.filter((d) => d.family === 'IELTS');
+const real = ielts.filter((d) => !d.specimen);
+console.log(`   ${ielts.length} Test Report Forms (${ielts.length - real.length} specimen, excluded from every count below).`);
+console.log('   Academic and General Training print the IDENTICAL form: same boxes, same');
+console.log('   order, same four bands, same overall, same CEFR cell. English needs ONE');
+console.log('   reader template, not six — unlike the TCF, which needed five models.\n');
+const acad = real.filter((d) => d.variant.startsWith('Academic'));
+console.log(`   But ${acad.length} of ${real.length} real IELTS documents are ACADEMIC (${acad.map((d) => d.ref).join(', ')}),`);
+console.log('   which IRCC does not accept for economic immigration. The module box at the');
+console.log('   top right is the only thing on the page that says so.');
+
+console.log('\n   VERIFICATION ADDRESSES, as each form prints its own:');
+for (const u of [...new Set(ielts.map((d) => d.verifyUrl))])
+  console.log(`     ${pad(String(u), 58)} ${ielts.filter((d) => d.verifyUrl === u).map((d) => d.ref).join(', ')}`);
+console.log(`   The model holds both: standard → ${VERIFY_URL.standard}, ukvi → ${VERIFY_URL.ukvi}.`);
+console.log('   A checker pointed at the wrong one gets nothing and reports "could not');
+console.log('   verify" — recorded against the candidate rather than against us.');
+console.log('\n   AND THE MODEL IS ALREADY INCOMPLETE: the oldest form prints a THIRD,');
+console.log('   country-specific British Council address. Two constants were written from');
+console.log('   two documents and a third document broke them inside the same hour. The');
+console.log('   right shape is to READ the address off the page rather than to derive it');
+console.log('   from the layout — recorded here rather than guessed at now, because a');
+console.log('   fourth address almost certainly exists and no reader is bound yet.');
+
+// ── 11. TWO FREE CHECKS A READER CAN RUN ON ITSELF ───────────────────────
+console.log('\n11. THE PAGE CHECKS ITSELF — two independent tests, no model needed');
+console.log('   A Test Report Form prints its four bands, the overall derived from them,');
+console.log('   AND the CEFR level derived from that. Three readings of one measurement.');
+console.log('   Redundancy is a checksum: a reader that misreads a cell can catch itself.\n');
+console.log('   ' + pad('doc', 5) + pad('bands', 22) + pad('overall', 10) + pad('recomputed', 12) + pad('CEFR', 7) + 'from band');
+let c1ok = 0;
+let c2ok = 0;
+let n = 0;
+for (const d of ielts) {
+  const bands = (['listening', 'reading', 'writing', 'speaking'] as const).map((k) => d.printed[k] as number);
+  const recomputed = overallFrom(bands);
+  const x = crossCheckBandCefr(d.overall, d.cefr);
+  n += 1;
+  if (recomputed === d.overall) c1ok += 1;
+  if (x?.agrees) c2ok += 1;
+  console.log(
+    '   ' + pad(d.ref, 5) + pad(bands.join(' '), 22) + pad(String(d.overall ?? '—'), 10) +
+    pad(`${recomputed ?? '—'} ${recomputed === d.overall ? '✓' : '✗'}`, 12) +
+    pad(String(d.cefr ?? '—'), 7) + `${cefrForBand(d.overall ?? -1) ?? '—'} ${x ? (x.agrees ? '✓' : '✗') : '—'}`,
+  );
+}
+console.log(`\n   check 1 — overall follows from the four bands : ${c1ok}/${n}`);
+console.log(`   check 2 — CEFR follows from the overall band  : ${c2ok}/${ielts.filter((d) => d.cefr).length}`);
+console.log('\n   Both are free, both work on every form since the CEFR cell appeared (the');
+console.log('   oldest here carrying one was sat 2015-03), and they are INDEPENDENT: a');
+console.log('   misread skill band usually breaks check 1, a misread overall breaks both,');
+console.log('   and a misread CEFR cell breaks only check 2. When a reader is finally');
+console.log('   bound, it has two ways to catch its own error before anyone downstream');
+console.log('   sees a number.');
+console.log('\n   ONE SKILL RETAKE — the case neither check can catch.');
+console.log('     Since 2023 a candidate may retake ONE skill and receive a SECOND, separate');
+console.log('     Test Report Form. Both are genuine, both are current, and they disagree.');
+console.log('     Each passes both checks on its own page. IRCC does not accept One Skill');
+console.log('     Retake for Express Entry — only for the Economic Mobility Pathways Pilot');
+console.log('     — so the ORIGINAL form is the one that counts even where the retake is');
+console.log('     higher. No checksum finds this. Only asking does.');

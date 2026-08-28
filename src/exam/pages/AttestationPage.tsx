@@ -6,6 +6,7 @@ import { useExam } from '../state';
 import type { SkillId } from '../model/types';
 import { IRCC_ACCEPTED, irccAge } from '../model/ircc';
 import { PROVISIONAL_REFUSAL, TCF_VARIANTS, variantById, type TcfVariantId } from '../model/tcf-variants';
+import { IELTS_REFUSALS, type IeltsModule, type IeltsTrfKind } from '../model/ielts-variants';
 import { CONSENT_POINTS, isExpired, kindOf, type Attestation, type EntryMethod, type Verification } from '../model/attestation';
 import { gapMonthsFrom, loadAttestations, newAttestationId, saveAttestation, withdrawAttestation } from '../model/attestationStore';
 import { toBenchmark } from '../engine/aggregate';
@@ -50,6 +51,23 @@ export default function AttestationPage() {
    * `null` means not yet answered, and nothing is shown until it is.
    */
   const [tcf, setTcf] = useState<TcfVariantId | null>(null);
+  /**
+   * IELTS asks two questions instead of five, and neither is about layout.
+   *
+   * Academic and General Training print the identical form — so unlike the
+   * TCF there is nothing to detect from shape, and the module has to be
+   * asked. It decides everything: IRCC does not accept Academic for economic
+   * immigration, and four of the eight real Test Report Forms in the corpus
+   * are Academic.
+   *
+   * `trfKind` is the newer hazard. Since 2023 a candidate can retake one
+   * skill and receive a SECOND genuine Test Report Form that disagrees with
+   * the first. Nothing on either page says which one IRCC will read, and no
+   * checksum can find it — the two forms are each internally consistent.
+   * Only asking works.
+   */
+  const [module_, setModule] = useState<IeltsModule | null>(null);
+  const [trfKind, setTrfKind] = useState<IeltsTrfKind>('original');
 
   const isFrench = exam.language === 'fr';
   const variant = tcf ? variantById(tcf) : null;
@@ -118,10 +136,12 @@ export default function AttestationPage() {
   // At least one real mark is still required — an attestation with four
   // blanks is not evidence of anything and there would be nothing to build
   // a plan from.
+  const ieltsBlocked = !isFrench && (module_ !== 'general_training' || trfKind !== 'original');
   const complete =
     sat !== '' &&
     consented &&
     (!isFrench || (tcf !== null && variant?.irccAccepted === true)) &&
+    !ieltsBlocked &&
     fields.some((f) => !notSat[f.id]) &&
     fields.every((f) => notSat[f.id] || (scores[f.id] !== undefined && scores[f.id] !== '' && !errorFor(f)));
 
@@ -322,6 +342,73 @@ export default function AttestationPage() {
         </label>
       </section>
 
+      {!isFrench && (
+        <section className="rounded-xl border-2 border-surface-divider bg-white p-5">
+          <span className="text-sm font-semibold text-navy">
+            {ui === 'en' ? 'Which IELTS is on your form?' : 'Quel IELTS figure sur votre attestation ?'}
+          </span>
+          <p className="mt-1 text-xs text-ink-secondary">
+            {ui === 'en'
+              ? 'Academic and General Training print the identical Test Report Form, so there is no way to tell from the layout. The module is the box at the top right of your page.'
+              : "L'Academic et le General Training impriment une attestation identique : rien dans la mise en page ne les distingue. Le module figure dans la case en haut à droite de votre page."}
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {([
+              ['general_training', 'GENERAL TRAINING'],
+              ['academic', 'ACADEMIC'],
+            ] as const).map(([v, label]) => (
+              <button
+                key={v}
+                type="button"
+                onClick={() => setModule(v)}
+                className={clsx(
+                  'rounded-xl border-2 px-4 py-2 text-sm font-medium',
+                  module_ === v ? 'border-teal bg-teal/10 text-navy' : 'border-surface-divider text-ink-secondary',
+                )}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          <span className="mt-5 block text-sm font-semibold text-navy">
+            {ui === 'en' ? 'Is this a One Skill Retake report?' : "S'agit-il d'une attestation One Skill Retake ?"}
+          </span>
+          <p className="mt-1 text-xs text-ink-secondary">
+            {ui === 'en'
+              ? 'If you retook a single skill you were given a second, separate form carrying just that skill. Both are real, and they disagree — so we have to know which one you are entering.'
+              : "Si vous avez repassé une seule épreuve, vous avez reçu une deuxième attestation distincte ne portant que cette épreuve. Les deux sont authentiques et se contredisent : nous devons savoir laquelle vous saisissez."}
+          </p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {([
+              ['original', ui === 'en' ? 'My original, full form' : "Mon attestation d'origine, complète"],
+              ['one_skill_retake', ui === 'en' ? 'A One Skill Retake' : 'Une One Skill Retake'],
+            ] as const).map(([v, label]) => (
+              <button
+                key={v}
+                type="button"
+                onClick={() => setTrfKind(v)}
+                className={clsx(
+                  'rounded-xl border-2 px-4 py-2 text-sm',
+                  trfKind === v ? 'border-teal bg-teal/10 text-navy' : 'border-surface-divider text-ink-secondary',
+                )}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          {module_ === 'academic' && (
+            <p className="mt-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-900">{IELTS_REFUSALS.academic[ui]}</p>
+          )}
+          {trfKind === 'one_skill_retake' && (
+            <p className="mt-3 rounded-lg bg-amber-50 p-3 text-sm text-amber-900">
+              {IELTS_REFUSALS.one_skill_retake[ui]}
+            </p>
+          )}
+        </section>
+      )}
+
       {isFrench && (
         <section className="rounded-xl border-2 border-surface-divider bg-white p-5">
           <span className="text-sm font-semibold text-navy">
@@ -363,7 +450,7 @@ export default function AttestationPage() {
         </section>
       )}
 
-      {(!isFrench || (variant && variant.irccAccepted)) && (
+      {((!isFrench && !ieltsBlocked) || (isFrench && variant && variant.irccAccepted)) && (
       <section className="grid gap-4">
         <div>
           <label className="text-sm font-medium text-navy">
