@@ -3,15 +3,21 @@ import { PenLine, Sparkles, FileText, RefreshCcw } from 'lucide-react';
 import clsx from 'clsx';
 import { checkGrammar, rewriteText, assessWriting, type GrammarCheck, type WritingAssessment } from '../lib/writing';
 import { CompletionCard } from '../components/CompletionCard';
+import { practiceTasksFor, type PracticeSet, type PracticeTask } from '../lib/practiceTasks';
 
 type Mode = 'live' | 'rewrite' | 'templates';
 
-const TEMPLATES = [
-  { id: 'email_professional', title: 'Professional email', prompt: 'Write a professional email to a colleague about scheduling a project meeting.', guide: ['Subject line', 'Greeting', 'Reason for writing', 'Specific details', 'Closing'] },
-  { id: 'cover_letter', title: 'Cover letter', prompt: 'Write a cover letter for a software engineer position.', guide: ['Opening hook', 'Why you', 'Relevant experience', 'Why this company', 'Call to action'] },
-  { id: 'opinion_essay', title: 'Opinion essay', prompt: 'Should remote work become the standard? Write an opinion essay (250 words).', guide: ['Thesis statement', 'Argument 1 + example', 'Argument 2 + example', 'Counter-argument', 'Conclusion'] },
-  { id: 'short_story', title: 'Short story', prompt: 'Write a short story (200 words) starting with: "When the lights went out..."', guide: ['Set the scene', 'Introduce conflict', 'Build tension', 'Resolve', 'Reflect'] },
-];
+// The four templates that used to live here — professional email, cover
+// letter for a software engineer, opinion essay on remote work, short story
+// beginning "When the lights went out…" — are gone. Amendment 2 §2.2.
+//
+// They were not merely English. They belonged to no exam. A TCF Canada
+// candidate practising a cover letter is practising something the exam does
+// not ask for, with no word band and no clock, and the mark they get back
+// measures nothing they will be marked on.
+//
+// What replaces them is the exam's own writing tasks, loaded from the
+// definition the candidate chose. See `lib/practiceTasks.ts`.
 
 export default function WritingPage() {
   const [mode, setMode] = useState<Mode>('live');
@@ -167,29 +173,58 @@ function RewriteMode() {
 }
 
 function TemplatesMode() {
-  const [tpl, setTpl] = useState<typeof TEMPLATES[number] | null>(null);
+  const [set, setSet] = useState<PracticeSet | null | 'loading'>('loading');
+  const [tpl, setTpl] = useState<PracticeTask | null>(null);
   const [text, setText] = useState('');
   const [assessment, setAssessment] = useState<WritingAssessment | null>(null);
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => { practiceTasksFor('writing').then((r) => setSet(r)); }, []);
+
   const submit = async () => {
-    if (!text.trim()) return;
+    if (!text.trim() || !tpl) return;
     setLoading(true); setAssessment(null);
-    if (!tpl) return;
     try { setAssessment(await assessWriting(text, tpl.prompt)); }
     finally { setLoading(false); }
   };
 
+  if (set === 'loading') {
+    return <div className="card p-6 text-sm text-ink-secondary">Loading your exam's tasks…</div>;
+  }
+
+  // No exam chosen yet. The old code would have offered four generic
+  // templates here; a visible gap is a better failure than a plausible
+  // generic answer — Amendment 1 §6.
+  if (!set || set.tasks.length === 0) {
+    return (
+      <div className="card p-6">
+        <h3 className="font-display text-lg font-bold text-navy">Choose your exam first</h3>
+        <p className="mt-1 text-sm text-ink-secondary">
+          Writing practice is the tasks of the exam you are sitting — its instructions, its word
+          bands, its clock. Without an exam there is nothing honest to practise against.
+        </p>
+        <a href="/exam.html#/" className="btn-primary mt-4 inline-flex">Choose an exam</a>
+      </div>
+    );
+  }
+
   if (!tpl) {
     return (
-      <div className="grid gap-4 sm:grid-cols-2">
-        {TEMPLATES.map((t) => (
-          <button key={t.id} onClick={() => { setTpl(t); setText(''); setAssessment(null); }} className="card p-6 text-left hover:shadow-cardHover">
-            <FileText className="mb-3 h-8 w-8 text-teal" />
-            <h3 className="font-display text-lg font-bold text-navy">{t.title}</h3>
-            <p className="mt-1 text-sm text-ink-secondary">{t.prompt}</p>
-          </button>
-        ))}
+      <div className="space-y-3">
+        <p className="text-sm text-ink-secondary">{set.examName} — writing tasks, as the exam sets them.</p>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {set.tasks.map((t) => (
+            <button key={t.id} onClick={() => { setTpl(t); setText(''); setAssessment(null); }} className="card p-6 text-left hover:shadow-cardHover">
+              <FileText className="mb-3 h-8 w-8 text-teal" />
+              <h3 className="font-display text-lg font-bold text-navy">{t.title}</h3>
+              <p className="mt-1 text-sm text-ink-secondary">{t.instruction}</p>
+              <p className="mt-2 text-xs text-ink-secondary">
+                {t.words ? t.words + ' · ' : ''}{Math.round(t.timeLimitSec / 60)} min
+                {t.timeIsOurs ? ' (our split of the exam\u2019s total)' : ''}
+              </p>
+            </button>
+          ))}
+        </div>
       </div>
     );
   }
@@ -198,9 +233,14 @@ function TemplatesMode() {
     <div className="grid gap-6 lg:grid-cols-[1fr,300px]">
       <div className="space-y-4">
         <div className="card p-6">
-          <button onClick={() => setTpl(null)} className="btn-ghost mb-3 text-sm"><RefreshCcw className="h-4 w-4" /> Pick another template</button>
+          <button onClick={() => setTpl(null)} className="btn-ghost mb-3 text-sm"><RefreshCcw className="h-4 w-4" /> Pick another task</button>
           <h3 className="mb-2 font-display text-xl font-bold text-navy">{tpl.title}</h3>
-          <p className="text-sm text-ink-secondary">{tpl.prompt}</p>
+          <p className="text-sm font-medium text-navy">{tpl.instruction}</p>
+          <p className="mt-2 whitespace-pre-line text-sm text-ink-secondary">{tpl.prompt}</p>
+          <p className="mt-3 text-xs text-ink-secondary">
+            {tpl.words ? tpl.words + ' \u00b7 ' : ''}{Math.round(tpl.timeLimitSec / 60)} min
+            {tpl.timeIsOurs ? ' (our split of the exam\u2019s published total)' : ''}
+          </p>
         </div>
         <div className="card p-6">
           <label className="label">Your draft</label>
@@ -248,12 +288,18 @@ function TemplatesMode() {
         )}
       </div>
       <div className="card sticky top-6 h-fit p-6">
-        <h4 className="mb-3 font-display font-bold text-navy">Structure guide</h4>
-        <ol className="space-y-2 text-sm">
-          {tpl.guide.map((g, i) => (
-            <li key={i} className="flex gap-2"><span className="font-bold text-teal">{i + 1}.</span><span>{g}</span></li>
+        <h4 className="mb-1 font-display font-bold text-navy">What scores zero here</h4>
+        <p className="mb-3 text-xs text-ink-secondary">
+          Whatever the quality of the language. These are the exam's rules, not ours.
+        </p>
+        <ul className="space-y-3 text-sm">
+          {tpl.zeroRules.map((r, i) => (
+            <li key={i}>
+              <div className="font-semibold text-navy">{r.label}</div>
+              <div className="text-xs text-ink-secondary">{r.detail}</div>
+            </li>
           ))}
-        </ol>
+        </ul>
       </div>
     </div>
   );

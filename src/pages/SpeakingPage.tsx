@@ -9,22 +9,22 @@ import { TopicPicker, SPEAKING_TOPICS } from '../components/TopicPicker';
 import { useAuthStore } from '../store/authStore';
 import { CompletionCard } from '../components/CompletionCard';
 import { ErrorBox } from '../components/States';
+import { practiceTasksFor, pronunciationLinesFor, type PracticeSet } from '../lib/practiceTasks';
 
 type Mode = 'pronunciation' | 'conversation' | 'ielts';
 
-const PRACTICE_PROMPTS = [
-  { level: 'A1', text: 'My name is Alex and I live in a small town near the mountains.' },
-  { level: 'A2', text: 'Last weekend I visited my grandparents and we cooked dinner together.' },
-  { level: 'B1', text: 'Although the weather was unpredictable, the team decided to continue with the outdoor event.' },
-  { level: 'B2', text: 'Climate change is one of the most pressing issues of our generation, requiring international cooperation.' },
-  { level: 'C1', text: 'The intricate relationship between technology and society has been the subject of countless academic debates.' },
-];
-
-const IELTS_PROMPTS = [
-  'Describe a place you have visited that left a strong impression on you. Say where it is, when you went there, what you did, and explain why it impressed you.',
-  'Talk about a skill you would like to learn in the future. Explain what the skill is, why you want to learn it, and how it might help you.',
-  'Describe an important decision you have made. Say what the decision was, when you made it, and why it was important.',
-];
+// The five pronunciation sentences and the three IELTS cue cards that used
+// to sit here are gone. Amendment 2 §2.2.
+//
+// They were English CEFR specimens and generic Part-2 cue cards belonging to
+// no exam. A TCF Canada candidate was handed "Climate change is one of the
+// most pressing issues of our generation" to read aloud, in the wrong
+// language, against a level ladder the exam does not use.
+//
+// Both surfaces now come from the exam the candidate chose — the speaking
+// tasks for the cue cards, the exam's own task instructions for the
+// read-aloud lines. See `lib/practiceTasks.ts`, which also explains why the
+// read-aloud lines are a stopgap rather than the finished answer.
 
 export default function SpeakingPage() {
   const { user } = useAuthStore();
@@ -120,23 +120,51 @@ function PlayButton({ text, speaker }: { text: string; speaker?: string }) {
 }
 
 function PronunciationMode({ level }: { level: string }) {
-  const [prompt, setPrompt] = useState(() => PRACTICE_PROMPTS.find((p) => p.level === level) || PRACTICE_PROMPTS[2]);
+  const [lines, setLines] = useState<string[] | null>(null);
+  const [prompt, setPrompt] = useState<{ level: string; text: string } | null>(null);
   const [result, setResult] = useState<SpeechAssessment | null>(null);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
+  useEffect(() => {
+    pronunciationLinesFor().then((r) => {
+      const ls = r?.lines ?? [];
+      setLines(ls);
+      if (ls.length) setPrompt({ level, text: ls[0] });
+    });
+  }, [level]);
+
   const newPrompt = () => {
-    const others = PRACTICE_PROMPTS.filter((p) => p.text !== prompt.text);
-    setPrompt(others[Math.floor(Math.random() * others.length)]);
+    const others = (lines ?? []).filter((t) => t !== prompt?.text);
+    if (!others.length) return;
+    setPrompt({ level, text: others[Math.floor(Math.random() * others.length)] });
     setResult(null); setErr(null);
   };
 
   const onRecorded = async (blob: Blob) => {
+    if (!prompt) return;
     setLoading(true); setErr(null); setResult(null);
     try { setResult(await assessRealtime(blob, prompt.text)); }
     catch (e: any) { setErr(e?.response?.data?.detail || e?.message || 'Assessment failed.'); }
     finally { setLoading(false); }
   };
+
+  if (lines === null) return <div className="card p-6 text-sm text-ink-secondary">Loading…</div>;
+
+  // No exam chosen, so no sentences. The old code had five English ones to
+  // fall back on; falling back to those is the behaviour this change exists
+  // to remove — Amendment 1 §6, a visible gap over a plausible generic answer.
+  if (!prompt) {
+    return (
+      <div className="card p-6">
+        <h3 className="font-display text-lg font-bold text-navy">Choose your exam first</h3>
+        <p className="mt-1 text-sm text-ink-secondary">
+          Pronunciation practice reads lines from the exam you are sitting, in its language.
+        </p>
+        <a href="/exam.html#/" className="btn-primary mt-4 inline-flex">Choose an exam</a>
+      </div>
+    );
+  }
 
   return (
     <div className="grid gap-6 lg:grid-cols-2">
@@ -306,13 +334,23 @@ function ConversationMode({ level: _level }: { level: string }) {
 }
 
 function IELTSMode() {
-  const [prompt, setPrompt] = useState(IELTS_PROMPTS[0]);
+  const [set, setSet] = useState<PracticeSet | null | 'loading'>('loading');
+  const [prompt, setPrompt] = useState<string>('');
   const [result, setResult] = useState<SpeechAssessment | null>(null);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
+  useEffect(() => {
+    practiceTasksFor('speaking').then((r) => {
+      setSet(r);
+      if (r?.tasks.length) setPrompt(r.tasks[0].instruction + '\n\n' + r.tasks[0].prompt);
+    });
+  }, []);
+
   const newPrompt = () => {
-    const others = IELTS_PROMPTS.filter((p) => p !== prompt);
+    const all = set && set !== 'loading' ? set.tasks.map((t) => t.instruction + '\n\n' + t.prompt) : [];
+    const others = all.filter((p) => p !== prompt);
+    if (!others.length) return;
     setPrompt(others[Math.floor(Math.random() * others.length)]);
     setResult(null); setErr(null);
   };
@@ -326,6 +364,21 @@ function IELTSMode() {
     catch (e: any) { setErr(e?.response?.data?.detail || e?.message || 'Assessment failed.'); }
     finally { setLoading(false); }
   };
+
+  if (set === 'loading') return <div className="card p-6 text-sm text-ink-secondary">Loading…</div>;
+
+  if (!prompt) {
+    return (
+      <div className="card p-6">
+        <h3 className="font-display text-lg font-bold text-navy">Choose your exam first</h3>
+        <p className="mt-1 text-sm text-ink-secondary">
+          Speaking practice is the speaking tasks of the exam you are sitting, in its language and
+          with its timing — not a generic cue card.
+        </p>
+        <a href="/exam.html#/" className="btn-primary mt-4 inline-flex">Choose an exam</a>
+      </div>
+    );
+  }
 
   return (
     <div className="grid gap-6 lg:grid-cols-2">
