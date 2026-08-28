@@ -146,3 +146,67 @@ export const IELTS_REFUSALS = {
     fr: "Il s'agit d'une attestation One Skill Retake. C'est un vrai résultat IELTS, mais IRCC n'accepte pas le One Skill Retake pour Entrée express — seulement pour le Economic Mobility Pathways Pilot. Pour Entrée express, c'est votre attestation d'origine qui compte, même si la reprise est meilleure. Saisissez celle-là, et gardez ce résultat pour votre propre lecture de votre niveau.",
   },
 } as const;
+
+/**
+ * Which skills carry across from one IELTS module to another.
+ *
+ * **Founder's decision, 2026-08-28**, and it is the right one because it
+ * follows the exam's own construction rather than our convenience:
+ *
+ *   Listening and Speaking are THE SAME TEST in Academic and General
+ *   Training. Same recordings, same tasks, same examiner, same criteria.
+ *   IELTS publishes this. A band awarded for listening on an Academic form
+ *   measures exactly what a General Training listening band measures, so
+ *   refusing to use it would be throwing away a real measurement of a real
+ *   person for a bureaucratic reason that does not apply to teaching.
+ *
+ *   Reading and Writing genuinely differ. Academic Reading is scientific and
+ *   academic prose; General Training Reading is notices, advertisements and
+ *   workplace documents. Academic Writing Task 1 describes a chart; General
+ *   Training Task 1 writes a letter. Those are different constructs marked
+ *   on different material, and a band from one is not a band in the other.
+ *
+ * So an Academic Test Report Form is not refused and not accepted whole. Two
+ * of its four marks seed the plan, two do not, and **the candidate is told
+ * which and why** — see `MODULE_NOTE`. Half a measurement, honestly labelled,
+ * beats a whole one that is wrong in two places.
+ *
+ * This says nothing about IRCC. IRCC does not accept IELTS Academic for
+ * economic immigration at all, whatever we do with the numbers, and that has
+ * to be said in the same breath — otherwise using two of the marks would
+ * imply the document is usable, which is the one impression that would cost
+ * a candidate real money.
+ */
+export const TRANSFERABLE: Record<IeltsModule, Array<'listening' | 'reading' | 'writing' | 'speaking'>> = {
+  general_training: ['listening', 'reading', 'writing', 'speaking'],
+  academic: ['listening', 'speaking'],
+};
+
+export function transfers(module: IeltsModule | null, skill: string): boolean {
+  if (!module) return true;
+  return (TRANSFERABLE[module] as string[]).includes(skill);
+}
+
+/**
+ * What the candidate is told when they enter an Academic form.
+ *
+ * Two separate facts, and neither may be dropped: what we did with their
+ * marks, and what IRCC will do with their document. They point in opposite
+ * directions — we found the form useful, IRCC will not accept it — and a
+ * candidate who hears only the first will believe they are further along
+ * than they are.
+ */
+export const MODULE_NOTE = {
+  academic: {
+    en:
+      'You entered an IELTS Academic form, so we used two of its four marks.\n\n' +
+      'USED — Listening and Speaking. These are the same test in Academic and General Training: the same recordings, the same tasks, the same marking. Your bands mean exactly what they would mean on a General Training form, so your plan is built on them.\n\n' +
+      'NOT USED — Reading and Writing. These genuinely differ. Academic Reading is scientific prose; General Training Reading is notices, adverts and workplace documents. Academic Writing Task 1 describes a chart; General Training Task 1 writes a letter. A band from one is not a band in the other, and we will not pretend otherwise. Your plan treats these two as unmeasured and starts them in the middle.\n\n' +
+      'AND SEPARATELY — IRCC does not accept IELTS Academic for economic immigration at all. General Training is the only IELTS it takes. The two marks above are useful to us for teaching you; the document itself is not something you can file. You will need to sit General Training.',
+    fr:
+      "Vous avez saisi une attestation IELTS Academic : nous en avons retenu deux notes sur quatre.\n\n" +
+      "RETENUES — Compréhension orale et expression orale. Ce sont les mêmes épreuves en Academic et en General Training : mêmes enregistrements, mêmes tâches, même correction. Vos scores signifient exactement ce qu'ils signifieraient sur une attestation General Training ; votre plan repose donc dessus.\n\n" +
+      "NON RETENUES — Compréhension écrite et expression écrite. Elles diffèrent réellement. La compréhension écrite Academic porte sur des textes scientifiques ; celle du General Training sur des annonces, des publicités et des documents professionnels. La tâche 1 d'expression écrite Academic décrit un graphique ; celle du General Training rédige une lettre. Un score de l'un n'est pas un score de l'autre, et nous ne ferons pas semblant du contraire. Votre plan considère ces deux compétences comme non mesurées et les démarre au milieu.\n\n" +
+      "ET SÉPARÉMENT — IRCC n'accepte pas du tout l'IELTS Academic pour l'immigration économique. Le General Training est le seul IELTS qu'il prend. Les deux notes ci-dessus nous servent à vous enseigner ; le document lui-même n'est pas déposable. Il faudra passer le General Training.",
+  },
+} as const;

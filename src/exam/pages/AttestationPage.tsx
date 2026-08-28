@@ -6,7 +6,7 @@ import { useExam } from '../state';
 import type { SkillId } from '../model/types';
 import { IRCC_ACCEPTED, irccAge } from '../model/ircc';
 import { PROVISIONAL_REFUSAL, TCF_VARIANTS, variantById, type TcfVariantId } from '../model/tcf-variants';
-import { IELTS_REFUSALS, type IeltsModule, type IeltsTrfKind } from '../model/ielts-variants';
+import { IELTS_REFUSALS, MODULE_NOTE, transfers, type IeltsModule, type IeltsTrfKind } from '../model/ielts-variants';
 import { CONSENT_POINTS, isExpired, kindOf, type Attestation, type EntryMethod, type Verification } from '../model/attestation';
 import { gapMonthsFrom, loadAttestations, newAttestationId, saveAttestation, withdrawAttestation } from '../model/attestationStore';
 import { toBenchmark } from '../engine/aggregate';
@@ -136,7 +136,12 @@ export default function AttestationPage() {
   // At least one real mark is still required — an attestation with four
   // blanks is not evidence of anything and there would be nothing to build
   // a plan from.
-  const ieltsBlocked = !isFrench && (module_ !== 'general_training' || trfKind !== 'original');
+  // Academic no longer blocks. Two of its four marks are the SAME TEST as
+  // General Training's, and refusing them threw away a real measurement of a
+  // real person. What blocks is an unanswered module — we cannot know which
+  // marks transfer without it — and a One Skill Retake, which IRCC will not
+  // read for Express Entry however good it is.
+  const ieltsBlocked = !isFrench && (module_ === null || trfKind !== 'original');
   const complete =
     sat !== '' &&
     consented &&
@@ -170,7 +175,14 @@ export default function AttestationPage() {
         continue;
       }
       const v = Number(scores[f.id]);
+      // The mark is REAL and is kept as printed. What may not survive is the
+      // conversion: a reading band from an Academic form is a band in a
+      // different construct, so it is recorded and not converted.
       awarded[f.id] = v;
+      if (!isFrench && !transfers(module_, f.id as string)) {
+        benchmark[f.id] = null;
+        continue;
+      }
       // The skill is passed, and it has to be: IRCC converts each IELTS skill
       // differently on the same 0-9 scale. See `types.ts` on `bySkill`.
       benchmark[f.id] = toBenchmark(v, exam.benchmark, f.scaleId, f.id as SkillId) ?? null;
@@ -250,6 +262,15 @@ export default function AttestationPage() {
                       return (
                         <span className="text-ink-secondary">
                           {ui === 'en' ? 'not sat' : 'non passée'}
+                        </span>
+                      );
+                    // A mark that exists but does not transfer. Shown, with
+                    // the number, and labelled — never silently dropped.
+                    if (b === null && !isFrench && !transfers(module_, f.id as string))
+                      return (
+                        <span className="text-ink-secondary">
+                          {formatScale(v, scaleOf(f.scaleId)!, ui)} ·{' '}
+                          {ui === 'en' ? 'not used — different test' : 'non retenu — épreuve différente'}
                         </span>
                       );
                     return (
@@ -399,7 +420,11 @@ export default function AttestationPage() {
           </div>
 
           {module_ === 'academic' && (
-            <p className="mt-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-900">{IELTS_REFUSALS.academic[ui]}</p>
+            <div className="mt-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-900">
+              {MODULE_NOTE.academic[ui].split('\n\n').map((para) => (
+                <p key={para.slice(0, 24)} className="mt-2 first:mt-0">{para}</p>
+              ))}
+            </div>
           )}
           {trfKind === 'one_skill_retake' && (
             <p className="mt-3 rounded-lg bg-amber-50 p-3 text-sm text-amber-900">
