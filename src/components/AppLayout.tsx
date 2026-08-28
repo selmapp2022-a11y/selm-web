@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { Logo } from './Logo';
 import { ThemeToggle } from './ThemeToggle';
+import { PracticeLanguageBadge } from './PracticeLanguageBadge';
 import { useAuthStore } from '../store/authStore';
 import { syncProgressFromBackend } from '../lib/progress';
 import { LayoutDashboard, Mic, Headphones, BookOpen, PenLine, Brain, ClipboardCheck, LogOut, Settings } from 'lucide-react';
@@ -41,7 +42,8 @@ export function AppLayout() {
     <div className="min-h-screen bg-surface-app">
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-surface-divider bg-white md:block">
         <div className="flex h-full flex-col">
-          <div className="px-6 py-6"><Logo /></div>
+          <div className="px-6 pb-3 pt-6"><Logo /></div>
+          <div className="mb-2 px-4"><PracticeLanguageBadge /></div>
           <nav className="flex-1 space-y-1 px-3">
             <a
               href={EXAM_HOME}
@@ -96,7 +98,7 @@ export function AppLayout() {
       </aside>
 
       <header className="sticky top-0 z-20 flex items-center justify-between border-b border-surface-divider bg-white/80 px-4 py-3 backdrop-blur md:hidden">
-        <Logo />
+        <div className="flex items-center gap-2"><Logo /><PracticeLanguageBadge compact /></div>
         <div className="flex items-center gap-2">
           <ThemeToggle />
           {/* Gear icon → Settings → Delete Account. Required so

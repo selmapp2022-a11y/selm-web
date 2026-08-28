@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AlertTriangle, Trash2, User as UserIcon, Mail, Shield, LogOut } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { deleteAccount, tokenStore } from '../lib/api';
-import { Languages } from 'lucide-react';
+import { Languages, GraduationCap } from 'lucide-react';
+import { loadPlan, savePlan } from '../exam/model/plan';
 import { setUiLang, ts, useUiLangValue } from '../i18n';
 
 // Settings page — Build 37 / v2.0.6.
@@ -27,6 +28,36 @@ export default function SettingsPage() {
   const { user, logout } = useAuthStore();
   const [step, setStep] = useState<'idle' | 'confirm' | 'deleting' | 'done'>('idle');
   const [error, setError] = useState<string | null>(null);
+
+  // The exam the candidate is preparing for — which decides the LANGUAGE every
+  // skill is practised in. Read from the plan (localStorage), the same plan the
+  // exam engine and the four practice pages read. Until this control existed
+  // the exam could only be chosen once, at onboarding, so a candidate who
+  // defaulted to English had no way to switch to French and every skill stayed
+  // English. That was the whole of "there is no option to choose".
+  type ExamRow = { id: string; name: string; language: string; locale: string };
+  const [exams, setExams] = useState<ExamRow[] | null>(null);
+  const [examId, setExamId] = useState<string>(() => loadPlan()?.examId ?? '');
+  useEffect(() => {
+    // Lazy import: the exam definitions carry ~72 000 characters of authored
+    // French and have no business in the app's first paint.
+    let alive = true;
+    import('../exam/definitions').then((d) => {
+      if (!alive) return;
+      setExams(d.EXAMS.map((e) => ({ id: e.id, name: e.name[e.language], language: e.language, locale: e.locale })));
+    });
+    return () => { alive = false; };
+  }, []);
+  const chooseExam = (e: ExamRow) => {
+    const prev = loadPlan();
+    savePlan({
+      goalId: prev?.goalId ?? '',
+      examId: e.id,
+      examDate: prev?.examDate ?? null,
+      examLocale: e.locale,
+    });
+    setExamId(e.id);
+  };
 
   const handleSignOut = () => {
     logout();
@@ -87,6 +118,60 @@ export default function SettingsPage() {
             </div>
           </div>
         </div>
+      </section>
+
+      {/* Practice language / exam — the missing switch.
+          Distinct from the interface language below: this decides the language
+          EVERY skill (reading, listening, writing, speaking, vocabulary) is
+          practised in, because that language comes from the chosen exam
+          (French => TCF, English => IELTS). The interface language only
+          translates the buttons and menus. */}
+      <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+        <h2 className="mb-1 flex items-center gap-2 text-lg font-bold text-navy dark:text-white">
+          <GraduationCap className="h-5 w-5 text-navy" />
+          {uiLangNow === 'fr' ? 'Langue de pratique' : 'Practice language'}
+        </h2>
+        <p className="mb-3 text-sm text-ink-secondary dark:text-slate-400">
+          {uiLangNow === 'fr'
+            ? "L'examen que vous préparez décide de la langue de TOUTES les épreuves — compréhension, expression, vocabulaire. Français = TCF, anglais = IELTS. (À ne pas confondre avec la langue de l'interface, ci-dessous.)"
+            : 'The exam you are preparing for decides the language of EVERY skill — reading, listening, writing, speaking, vocabulary. French = TCF, English = IELTS. (Not the same as the interface language, below.)'}
+        </p>
+        {!exams ? (
+          <p className="text-sm text-ink-secondary">…</p>
+        ) : (
+          <div className="flex flex-col gap-2">
+            {exams.map((e) => (
+              <button
+                key={e.id}
+                type="button"
+                onClick={() => chooseExam(e)}
+                className={
+                  'flex items-center justify-between rounded-xl border-2 px-4 py-3 text-left text-sm font-medium ' +
+                  (examId === e.id
+                    ? 'border-teal bg-teal/10 text-navy dark:text-white'
+                    : 'border-slate-200 text-ink-secondary dark:border-slate-700')
+                }
+              >
+                <span>
+                  <span className="font-semibold">{e.name}</span>
+                  <span className="ml-2 text-xs uppercase tracking-wide text-ink-secondary">
+                    {e.language === 'fr' ? (uiLangNow === 'fr' ? 'français' : 'French') : (uiLangNow === 'fr' ? 'anglais' : 'English')}
+                  </span>
+                </span>
+                {examId === e.id && (
+                  <span className="text-xs font-semibold text-teal">
+                    {uiLangNow === 'fr' ? 'actif' : 'active'}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+        )}
+        <p className="mt-3 text-xs text-ink-secondary dark:text-slate-500">
+          {uiLangNow === 'fr'
+            ? 'Le changement s\'applique à la prochaine activité de chaque compétence.'
+            : 'The change applies to the next activity in each skill.'}
+        </p>
       </section>
 
       {/* Interface language — Part 5 §5.1.
