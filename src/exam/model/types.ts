@@ -54,6 +54,8 @@ export type Scale = {
  * `from` is the lowest scale value that earns `level`, so the table is read
  * downward and the first match wins.
  */
+export type SkillId = 'speaking' | 'listening' | 'reading' | 'writing';
+
 export type BenchmarkSystem = string;
 
 /**
@@ -107,11 +109,25 @@ export type BenchmarkMap = {
    * differ at every boundary except the top, so one table cannot serve both.
    */
   byScale?: Record<string, BenchmarkBand[]>;
+  /**
+   * Band tables that differ per SKILL rather than per scale.
+   *
+   * Added 2026-08-28, when a real IELTS Test Report Form was put through the
+   * model for the first time and two of its four conversions came out wrong.
+   *
+   * `byScale` cannot express IELTS: all four of its skills are reported on
+   * the same 0–9 band scale, and IRCC still converts them differently — a
+   * Reading 6.5 is CLB 8 while a Listening 6.5 is CLB 7, because the
+   * published chart requires 7.5 in listening for CLB 8 and 6.5 in reading.
+   * One table per exam was a structural assumption, and a real document is
+   * what exposed it.
+   *
+   * Read before `byScale` and before `bands`.
+   */
+  bySkill?: Partial<Record<SkillId, BenchmarkBand[]>>;
 };
 
 // ── the exam tree ───────────────────────────────────────────────────────
-
-export type SkillId = 'speaking' | 'listening' | 'reading' | 'writing';
 
 export type Criterion = {
   id: string;

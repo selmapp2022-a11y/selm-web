@@ -7,7 +7,7 @@
  * publishes a predicted score. That is the behaviour the governance standard
  * requires, so it is the default rather than an option.
  */
-import type { BenchmarkMap, ExamDefinition, Localised, Scale } from '../model/types';
+import type { BenchmarkMap, ExamDefinition, Localised, Scale , SkillId } from '../model/types';
 import type { CriterionScore } from './judge';
 
 export type Aggregate = {
@@ -28,8 +28,16 @@ export function aggregate(scoresByJudge: CriterionScore[][], scale: Scale): Aggr
   return { point: Math.min(scale.max, Math.max(scale.min, stepped)), judgeSpread: spread, judgeCount: means.length };
 }
 
-export function toBenchmark(value: number, map: BenchmarkMap, scaleId?: string): number | null {
-  const bands = (scaleId && map.byScale?.[scaleId]) || map.bands;
+export function toBenchmark(
+  value: number,
+  map: BenchmarkMap,
+  scaleId?: string,
+  skill?: SkillId,
+): number | null {
+  // Skill first, then scale, then the exam-wide table. IELTS needs the first
+  // — four skills, one scale, four different conversions — and TCF needs the
+  // second. An exam that needs neither still works with one table.
+  const bands = (skill && map.bySkill?.[skill]) || (scaleId && map.byScale?.[scaleId]) || map.bands;
   const sorted = [...bands].sort((a, b) => b.from - a.from);
   for (const b of sorted) if (value >= b.from) return b.level;
   return null;

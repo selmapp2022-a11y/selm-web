@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { Check, ShieldCheck, Trash2, Upload } from 'lucide-react';
 import clsx from 'clsx';
 import { useExam } from '../state';
+import type { SkillId } from '../model/types';
 import { CONSENT_POINTS, kindOf, type Attestation, type EntryMethod, type Verification } from '../model/attestation';
 import { gapMonthsFrom, loadAttestations, newAttestationId, saveAttestation, withdrawAttestation } from '../model/attestationStore';
 import { toBenchmark } from '../engine/aggregate';
-import { t } from '../model/format';
+import { formatScale, t } from '../model/format';
 
 /**
  * Upload and type. §1.4, and the design is the point rather than a
@@ -60,6 +61,14 @@ export default function AttestationPage() {
     if (Number.isNaN(v)) return ui === 'en' ? 'Not a number' : 'Ce n’est pas un nombre';
     if (v < sc.min || v > sc.max)
       return ui === 'en' ? `Outside ${sc.min}–${sc.max}` : `Hors de ${sc.min}–${sc.max}`;
+    // The scale declares its smallest reportable increment and the form has
+    // to honour it. IELTS reports half bands and nothing between them, so
+    // 4.7 is not a low score — it is not a score. Added after a real Test
+    // Report Form showed the scale itself had been wrong.
+    if (sc.step > 0 && Math.abs(v / sc.step - Math.round(v / sc.step)) > 1e-9)
+      return ui === 'en'
+        ? `This exam reports in steps of ${sc.step}`
+        : `Cet examen est noté par paliers de ${sc.step}`;
     return null;
   };
 
@@ -87,7 +96,9 @@ export default function AttestationPage() {
     for (const f of fields) {
       const v = Number(scores[f.id]);
       awarded[f.id] = v;
-      benchmark[f.id] = toBenchmark(v, exam.benchmark, f.scaleId) ?? 0;
+      // The skill is passed, and it has to be: IRCC converts each IELTS skill
+      // differently on the same 0-9 scale. See `types.ts` on `bySkill`.
+      benchmark[f.id] = toBenchmark(v, exam.benchmark, f.scaleId, f.id as SkillId) ?? 0;
     }
     const entryMethod: EntryMethod = imageState === 'none' ? 'typed' : 'typed+image_unread';
     // TCF and TEF publish a QR anyone can follow; IELTS restricts
@@ -134,9 +145,19 @@ export default function AttestationPage() {
             {fields.map((f) => (
               <div key={f.id} className="flex justify-between">
                 <span>{t(f.label, ui)}</span>
+                {/* Through the scale, not raw. The scale declares how many
+                    decimals its awards carry, and a screen that ignores it
+                    showed a real 5.0 as "5" — the same class of defect as the
+                    scale itself declaring `decimals: 0` for an exam that
+                    reports halves. */}
                 <span className="font-semibold">
-                  {saved.awarded[f.id as keyof Attestation['awarded']]} ·{' '}
-                  {saved.benchmark.system} {saved.benchmark[f.id as keyof Attestation['benchmark']] as number}
+                  {formatScale(
+                    saved.awarded[f.id as keyof Attestation['awarded']],
+                    scaleOf(f.scaleId)!,
+                    ui,
+                  )}{' '}
+                  · {saved.benchmark.system}{' '}
+                  {saved.benchmark[f.id as keyof Attestation['benchmark']] as number}
                 </span>
               </div>
             ))}

@@ -31,19 +31,87 @@ export const IELTS_GT: ExamDefinition = {
       label: { en: 'Band', fr: 'Bande' },
       min: 0,
       max: 9,
-      step: 1,
-      display: { prefix: { en: 'Band', fr: 'Bande' }, decimals: 0 },
+      // CORRECTED 2026-08-28 against a real Test Report Form: IELTS reports
+      // HALF BANDS. The form read carried 4.5, 6.5 and an overall 5.5.
+      //
+      // `step: 1` with `decimals: 0` was worse than a validation error — a
+      // candidate entering their real 6.5 would have seen it rendered as
+      // "Band 7", one whole band above what they were awarded, on the screen
+      // that exists to tell them what they were awarded.
+      step: 0.5,
+      display: { prefix: { en: 'Band', fr: 'Bande' }, decimals: 1 },
     },
   ],
   benchmark: {
     system: 'CLB',
+    // REPLACED 2026-08-28. The table that was here had one set of bands for
+    // all four skills, and it was wrong twice over.
+    //
+    // First, IRCC's IELTS (General Training) equivalency chart converts EACH
+    // SKILL DIFFERENTLY. A 6.5 is CLB 8 in reading, writing and speaking and
+    // CLB 7 in listening, because listening needs 7.5 for CLB 8. One table
+    // cannot express that, which is why `bySkill` now exists.
+    //
+    // Second, the old table could not emit CLB 6 or CLB 8 AT ALL — it ran
+    // 4, 5, 7, 9, 10 — so no IELTS candidate could ever be told they were at
+    // CLB 8, which is the level that carries the CRS points, or CLB 6.
+    //
+    // Checked against a real Test Report Form: of its four skills the old
+    // table got two right and two wrong. Reading 4.5 came out CLB 4 instead
+    // of 5; Speaking 6.5 came out CLB 7 instead of 8.
+    //
+    // Source: IRCC, "Language test equivalency charts",
+    // canada.ca/en/immigration-refugees-citizenship/corporate/publications-manuals/
+    // operational-bulletins-manuals/standard-requirements/language-requirements/
+    // test-equivalency-charts.html — fetched twice, from two pages, agreeing.
+    // CLB 10 is the chart's top row; the chart shows 10+ as a range to 9.0.
     bands: [
-      { from: 8, level: 10 },
-      { from: 7, level: 9 },
-      { from: 6, level: 7 },
-      { from: 5, level: 5 },
-      { from: 4, level: 4 },
+      { from: 7.5, level: 10 },
+      { from: 7.0, level: 9 },
+      { from: 6.5, level: 8 },
+      { from: 6.0, level: 7 },
+      { from: 5.5, level: 6 },
+      { from: 5.0, level: 5 },
+      { from: 4.0, level: 4 },
     ],
+    bySkill: {
+      listening: [
+        { from: 8.5, level: 10 },
+        { from: 8.0, level: 9 },
+        { from: 7.5, level: 8 },
+        { from: 6.0, level: 7 },
+        { from: 5.5, level: 6 },
+        { from: 5.0, level: 5 },
+        { from: 4.5, level: 4 },
+      ],
+      reading: [
+        { from: 8.0, level: 10 },
+        { from: 7.0, level: 9 },
+        { from: 6.5, level: 8 },
+        { from: 6.0, level: 7 },
+        { from: 5.0, level: 6 },
+        { from: 4.0, level: 5 },
+        { from: 3.5, level: 4 },
+      ],
+      writing: [
+        { from: 7.5, level: 10 },
+        { from: 7.0, level: 9 },
+        { from: 6.5, level: 8 },
+        { from: 6.0, level: 7 },
+        { from: 5.5, level: 6 },
+        { from: 5.0, level: 5 },
+        { from: 4.0, level: 4 },
+      ],
+      speaking: [
+        { from: 7.5, level: 10 },
+        { from: 7.0, level: 9 },
+        { from: 6.5, level: 8 },
+        { from: 6.0, level: 7 },
+        { from: 5.5, level: 6 },
+        { from: 5.0, level: 5 },
+        { from: 4.0, level: 4 },
+      ],
+    },
   },
   calibration: {
     // Accuracy against real Test Report Forms. Still zero: no official score
