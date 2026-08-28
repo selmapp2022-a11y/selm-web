@@ -5,7 +5,7 @@ import { ThemeToggle } from './ThemeToggle';
 import { PracticeLanguageBadge } from './PracticeLanguageBadge';
 import { useAuthStore } from '../store/authStore';
 import { syncProgressFromBackend } from '../lib/progress';
-import { LayoutDashboard, Mic, Headphones, BookOpen, PenLine, Brain, ClipboardCheck, LogOut, Settings } from 'lucide-react';
+import { Home, Dumbbell, ClipboardCheck, TrendingUp, Target, LogOut, Settings } from 'lucide-react';
 import clsx from 'clsx';
 
 // `Progress` left this list on 2026-08-27. The page it opened is the XP,
@@ -13,18 +13,12 @@ import clsx from 'clsx';
 // is repositioning away from. The route still exists and nothing was deleted;
 // it is simply no longer one of the seven things the navigation offers.
 const navItems = [
-  { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { to: '/speaking', label: 'Speaking', icon: Mic },
-  { to: '/listening', label: 'Listening', icon: Headphones },
-  { to: '/reading', label: 'Reading', icon: BookOpen },
-  { to: '/writing', label: 'Writing', icon: PenLine },
-  { to: '/vocabulary', label: 'Vocabulary', icon: Brain },
+  { to: '/', label: 'Today', icon: Home, end: true },
+  { to: '/practice', label: 'Practice', icon: Dumbbell },
+  { to: '/exam', label: 'Mock exam', icon: ClipboardCheck },
+  { to: '/progress', label: 'Progress', icon: TrendingUp },
+  { to: '/goal', label: 'My exam', icon: Target },
 ];
-
-// The exam engine is a second Vite entry point at `/exam.html`, not a route
-// in this router, so it is an anchor rather than a NavLink. Until today it
-// had no entry anywhere in the signed-in application at all.
-const EXAM_HOME = '/goal';
 
 export function AppLayout() {
   const { user, logout } = useAuthStore();
@@ -45,17 +39,11 @@ export function AppLayout() {
           <div className="px-6 pb-3 pt-6"><Logo /></div>
           <div className="mb-2 px-4"><PracticeLanguageBadge /></div>
           <nav className="flex-1 space-y-1 px-3">
-            <a
-              href={EXAM_HOME}
-              className="mb-2 flex items-center gap-3 rounded-xl bg-gradient-to-br from-navy to-teal px-4 py-2.5 text-sm font-semibold text-white shadow-card"
-            >
-              <ClipboardCheck className="h-5 w-5" />
-              Mock exam
-            </a>
             {navItems.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
+                end={item.end}
                 className={({ isActive }) => clsx(
                   'flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition',
                   isActive ? 'bg-navy text-white shadow-card' : 'text-ink-secondary hover:bg-surface-muted hover:text-navy'
@@ -115,15 +103,12 @@ export function AppLayout() {
 
       {/* Bottom nav for mobile */}
       <nav className="fixed bottom-0 left-0 right-0 z-30 flex border-t border-surface-divider bg-white md:hidden">
-        <a href={EXAM_HOME} className="flex flex-1 flex-col items-center gap-0.5 py-2.5 text-xs text-ink-secondary">
-          <ClipboardCheck className="h-5 w-5" />
-          Exam
-        </a>
-        {navItems.slice(0, 4).map((item) => (
+        {navItems.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
-            className={({ isActive }) => clsx('flex flex-1 flex-col items-center gap-0.5 py-2.5 text-xs', isActive ? 'text-teal' : 'text-ink-secondary')}
+            end={item.end}
+            className={({ isActive }) => clsx('flex flex-1 flex-col items-center gap-0.5 py-2 text-[11px]', isActive ? 'text-teal' : 'text-ink-secondary')}
           >
             <item.icon className="h-5 w-5" />
             {item.label}

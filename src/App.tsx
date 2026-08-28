@@ -20,6 +20,8 @@ import TermsPage from './pages/TermsPage';
 import ConsentPage, { hasPrivacyConsent } from './pages/ConsentPage';
 import { initTheme } from './lib/theme';
 import OnboardingPage from './pages/OnboardingPage';
+import PracticePage from './pages/PracticePage';
+import MockExamPage from './exam/pages/MockExamPage';
 // The exam engine, folded in from its old separate /exam.html entry point
 // (SELM-IA.md §1: one app, one router, one navigation). These pages used to
 // live behind ExamGate in a HashRouter; here they are ordinary protected
@@ -88,7 +90,8 @@ export default function App() {
 
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          {/* IA §2: Today is the home route. /dashboard stays as an alias. */}
+          <Route path="/" element={<DashboardPage />} />
           {/* Part 3 (replacement) §1 and §6: one choice, one question, then
               start. The five demographic questions and the adaptive CEFR
               placement test that used to live at these two paths are gone —
@@ -104,6 +107,7 @@ export default function App() {
           <Route path="/listening" element={<ListeningPage />} />
           <Route path="/reading" element={<ReadingPage />} />
           <Route path="/writing" element={<WritingPage />} />
+          <Route path="/practice" element={<PracticePage />} />
           <Route path="/vocabulary" element={<VocabularyPage />} />
           <Route path="/progress" element={<ProgressPage />} />
           {/* Paywall — reachable from the crown icon in the header and
@@ -126,6 +130,7 @@ export default function App() {
           <Route path="/plan" element={<PlanPage />} />
           <Route path="/task" element={<TaskPage />} />
           <Route path="/result" element={<ResultPage />} />
+          <Route path="/exam" element={<MockExamPage />} />
           <Route path="/section" element={<SectionPage />} />
           <Route path="/sitting-result" element={<SittingResultPage />} />
           <Route path="/history" element={<HistoryPage />} />

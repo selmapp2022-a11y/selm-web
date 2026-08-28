@@ -1,17 +1,15 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CalendarDays, ChevronRight, Target } from 'lucide-react';
+import { CalendarDays, ChevronRight } from 'lucide-react';
 import clsx from 'clsx';
-import { useExam, allTasks, sectionOf } from '../state';
+import { useExam } from '../state';
 import { GOALS } from '../definitions';
 import { t } from '../model/format';
 import { daysUntil, loadPlan, savePlan } from '../model/plan';
 
 export default function GoalPage() {
-  const { exam, goal, setGoal, ui, taskId, setTaskId, startSitting } = useExam();
+  const { exam, goal, setGoal, ui } = useExam();
   const nav = useNavigate();
-  const tasks = allTasks(exam);
-  const task = tasks.find((t) => t.id === taskId) ?? tasks[0];
 
   // The requirement may be set on one of the exam's own scales — Australia
   // asks for IELTS 6, not a CLB level — or on a government benchmark. Only
@@ -129,82 +127,24 @@ export default function GoalPage() {
       </section>
 
       <section className="card p-6">
-        <div className="flex items-start gap-4">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-navy to-teal text-white shadow-md">
-            <Target className="h-6 w-6" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <span className="chip">{ui === 'en' ? 'The task' : 'La tâche'}</span>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {tasks.map((x) => (
-                <button
-                  key={x.id}
-                  type="button"
-                  onClick={() => setTaskId(x.id)}
-                  className={clsx(
-                    'rounded-xl border-2 px-4 py-2 text-sm font-medium transition-all',
-                    x.id === task.id
-                      ? 'border-teal bg-teal/10 text-navy'
-                      : 'border-surface-divider bg-white text-ink-secondary hover:border-navy/40 hover:bg-surface-muted'
-                  )}
-                >
-                  {t(sectionOf(exam, x.id).name, ui)} · {t(x.name, ui)}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <p className="mt-4 text-sm text-ink-primary">{t(task.instruction, ui)}</p>
-        <p className="mt-1 text-xs text-ink-secondary">
-          {task.responseMode === 'audio'
-            ? ui === 'en' ? 'Spoken response · recorded' : 'Réponse orale · enregistrée'
-            : ui === 'en' ? 'Written response' : 'Réponse écrite'}
-          {' · '}
-          {Math.round(task.timeLimitSec / 60)} {ui === 'en' ? 'min' : 'min'}
-          {task.preparationSec !== undefined && (
-            <>
-              {' · '}
-              {task.preparationSec > 0
-                ? ui === 'en'
-                  ? `${Math.round(task.preparationSec / 60)} min to prepare`
-                  : `${Math.round(task.preparationSec / 60)} min de préparation`
-                : ui === 'en'
-                  ? 'no preparation'
-                  : 'sans préparation'}
-            </>
-          )}
+        <span className="chip">{ui === 'en' ? 'Already sat this exam?' : 'Déjà passé cet examen ?'}</span>
+        <h2 className="mt-3 font-display text-xl font-bold text-navy">
+          {ui === 'en' ? 'Enter a past result' : 'Saisir un résultat passé'}
+        </h2>
+        <p className="mt-1 text-sm text-ink-secondary">
+          {ui === 'en'
+            ? 'Your real marks build a better plan than any test we could give you. This page holds your exam, destination and date; your scores go in here.'
+            : "Vos vraies notes bâtissent un meilleur plan que tout test. Cette page contient votre examen, votre destination et votre date ; vos notes se saisissent ici."}
         </p>
-        {task.timeLimitApportioned && (
-          <p className="mt-1 text-xs text-ink-secondary">
-            {ui === 'en'
-              ? `This exam publishes ${Math.round((sectionOf(exam, task.id).timeLimitSec ?? 0) / 60)} minutes for the whole section and no time per task. The figure above is our own even split, not the exam's rule.`
-              : `Cet examen publie ${Math.round((sectionOf(exam, task.id).timeLimitSec ?? 0) / 60)} minutes pour l'ensemble de l'épreuve et aucun temps par tâche. La durée ci-dessus est notre propre répartition, et non une règle de l'examen.`}
-          </p>
-        )}
-
-        <button onClick={() => nav('/task')} className="btn-primary mt-6 w-full">
-          {ui === 'en' ? 'Start this task' : 'Commencer cette tâche'}
+        <button onClick={() => nav('/attestation')} className="btn-primary mt-4">
+          {ui === 'en' ? 'Enter my scores' : 'Saisir mes notes'}
           <ChevronRight className="h-4 w-4" />
         </button>
-
-        {/* A whole sitting, not a task: four épreuves in the official order,
-            with section boundaries that cannot be crossed backwards. It is
-            the only thing that answers "am I ready to book", which is the
-            question the candidate actually arrived with. */}
-        {exam.sections.some((s) => s.kind === 'comprehension') && (
-          <button
-            onClick={() => {
-              startSitting(exam);
-              nav('/section');
-            }}
-            className="btn-secondary mt-2 w-full"
-          >
-            {ui === 'en'
-              ? `Sit the whole exam — ${exam.sections.length} sections`
-              : `Passer l'examen complet — ${exam.sections.length} épreuves`}
-          </button>
-        )}
+        <p className="mt-3 text-xs text-ink-secondary">
+          {ui === 'en'
+            ? 'To practise, or to sit a full mock exam, use Practice and Mock exam in the navigation.'
+            : "Pour vous entraîner ou passer un examen blanc complet, utilisez Practice et Mock exam dans la navigation."}
+        </p>
       </section>
     </div>
   );
