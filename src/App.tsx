@@ -19,7 +19,6 @@ import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import TermsPage from './pages/TermsPage';
 import ConsentPage, { hasPrivacyConsent } from './pages/ConsentPage';
 import { initTheme } from './lib/theme';
-import OnboardingPage from './pages/OnboardingPage';
 import PracticePage from './pages/PracticePage';
 import MockExamPage from './exam/pages/MockExamPage';
 // The exam engine, folded in from its old separate /exam.html entry point
@@ -99,9 +98,10 @@ export default function App() {
               every candidate the same tasks, so there is nothing to place
               them on. Both old paths still resolve so that a link in an old
               email or a bookmarked route does not 404; neither runs a test. */}
-          <Route path="/onboarding" element={<OnboardingPage />} />
-          <Route path="/onboarding/profile" element={<OnboardingPage />} />
-          <Route path="/onboarding/assessment" element={<Navigate to="/onboarding" replace />} />
+          {/* IA section 6: onboarding is Today's empty state, not a page. */}
+          <Route path="/onboarding" element={<Navigate to="/" replace />} />
+          <Route path="/onboarding/profile" element={<Navigate to="/" replace />} />
+          <Route path="/onboarding/assessment" element={<Navigate to="/" replace />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/speaking" element={<SpeakingPage />} />
           <Route path="/listening" element={<ListeningPage />} />

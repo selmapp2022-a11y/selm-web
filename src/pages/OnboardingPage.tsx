@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Check, ChevronRight } from 'lucide-react';
 import clsx from 'clsx';
 import { useT, useUiLangValue } from '../i18n';
@@ -41,8 +42,12 @@ type Row = {
 export default function OnboardingPage() {
   const t = useT();
   const lang = useUiLangValue();
+  const nav = useNavigate();
   const [rows, setRows] = useState<Row[] | null>(null);
   const [chosen, setChosen] = useState<Row | null>(null);
+  // Default destination per exam, so choosing an exam yields a complete plan
+  // and the candidate lands on Today rather than looping on the empty state.
+  const [goalOf, setGoalOf] = useState<Record<string, string>>({});
 
   useEffect(() => {
     // Lazy, for the same reason `practiceTasks.ts` is lazy: the definitions
@@ -58,18 +63,42 @@ export default function OnboardingPage() {
           built: Array.from(new Set(e.sections.map((s) => s.skill))),
         })),
       );
+      const map: Record<string, string> = {};
+      for (const e of d.EXAMS) {
+        const g = d.GOALS.find((gg) => gg.exams.includes(e.id));
+        if (g) map[e.id] = g.id;
+      }
+      setGoalOf(map);
     });
   }, []);
 
   const choose = (r: Row) => {
     setChosen(r);
     import('../exam/model/plan').then(({ savePlan, loadPlan }) => {
+      // Exam is set, but the plan is left INCOMPLETE (no destination yet) so
+      // Today stays on this empty state and shows the second question below.
       savePlan({
         goalId: loadPlan()?.goalId ?? '',
         examId: r.id,
         examDate: loadPlan()?.examDate ?? null,
         examLocale: r.locale,
       });
+    });
+  };
+
+  // The second answer completes the plan with the exam's default destination
+  // (changeable later on My exam), so the candidate lands on Today. 'Yes' then
+  // goes to the score form; 'No' lets Today take over with the plan.
+  const finish = (satBefore: boolean) => {
+    if (!chosen) return;
+    import('../exam/model/plan').then(({ savePlan, loadPlan }) => {
+      savePlan({
+        goalId: goalOf[chosen.id] ?? '',
+        examId: chosen.id,
+        examDate: loadPlan()?.examDate ?? null,
+        examLocale: chosen.locale,
+      });
+      if (satBefore) nav('/attestation');
     });
   };
 
@@ -129,10 +158,10 @@ export default function OnboardingPage() {
         <p className="mt-1 text-ink-secondary">{t('onboarding.satBeforeHelp')}</p>
       </header>
       <div className="flex flex-wrap gap-3">
-        <a href="/attestation" className="btn-primary">{t('onboarding.yes')}</a>
-        <a href="/plan" className={clsx('btn-ghost border-2 border-surface-divider px-5 py-3')}>
+        <button type="button" onClick={() => finish(true)} className="btn-primary">{t('onboarding.yes')}</button>
+        <button type="button" onClick={() => finish(false)} className={clsx('btn-ghost border-2 border-surface-divider px-5 py-3')}>
           {t('onboarding.no')}
-        </a>
+        </button>
       </div>
       <p className="text-xs text-ink-secondary">{t('onboarding.neverBlocked')}</p>
     </div>

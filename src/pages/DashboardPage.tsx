@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
 import {
-  Brain,
   CalendarDays,
   ChevronRight,
   Compass,
@@ -10,18 +8,18 @@ import {
   ExternalLink,
   Flag,
   ScrollText,
-  TrendingUp,
 } from 'lucide-react';
-import { api } from '../lib/api';
 import { EmptyState, Loader } from '../components/States';
 import { ProgressBar } from '../exam/components/SectionClock';
 import { loadHistory, type SittingRecord } from '../exam/model/history';
 import { PLAN_EVENT, daysUntil, loadPlan, type Plan } from '../exam/model/plan';
 import { levelsShort, releaseGate } from '../exam/engine/aggregate';
+import { buildPlan } from '../exam/engine/planner';
+import { loadAttestations } from '../exam/model/attestationStore';
+import OnboardingPage from './OnboardingPage';
 import { governingLevel } from '../exam/engine/comprehension';
 import { t } from '../exam/model/format';
 import type {
-  ComprehensionSection,
   ExamDefinition,
   Goal,
   SectionDefinition,
@@ -58,7 +56,6 @@ import type {
 
 /** The engine is a second Vite entry point on the same origin, not a route. */
 const EXAM_HOME = '/goal';
-const EXAM_HISTORY = '/history';
 
 /** Where a skill's own practice lives inside the application. */
 const PRACTICE: Record<SkillId, string> = {
@@ -70,16 +67,7 @@ const PRACTICE: Record<SkillId, string> = {
 
 type Catalogue = { EXAMS: ExamDefinition[]; GOALS: Goal[] };
 
-async function fetchVocabSummary() {
-  try {
-    const review = await api.get('/vocabulary/my/review').then((r) => r.data).catch(() => null);
-    const dueCount = Array.isArray(review) ? review.length : (review?.words?.length || 0);
-    return { dueCount };
-  } catch { return { dueCount: 0 }; }
-}
-
 export default function DashboardPage() {
-  const { data: vocab } = useQuery({ queryKey: ['vocab-sum'], queryFn: fetchVocabSummary });
 
   const [cat, setCat] = useState<Catalogue | null>(null);
   const [catFailed, setCatFailed] = useState(false);
@@ -133,17 +121,10 @@ export default function DashboardPage() {
   // A candidate who has not set a destination is a real state, not an error.
   // The old dashboard would have shown them a level and a streak; this one
   // sends them to the one screen that makes everything else meaningful.
+  // IA §4 & §6: when there is no plan, Today IS the entry flow — the onboarding
+  // rendered in place, in the same app and router, not a prompt pointing away.
   if (!plan || !goal || !exam) {
-    return (
-      <div className="mx-auto max-w-3xl">
-        <EmptyState
-          icon={Compass}
-          title="Where are you going, and what do you need?"
-          body="The destination decides the score you need, and the exam is chosen from that. Set it once and this page can tell you whether you are on track."
-          action={<a href={EXAM_HOME} className="btn-primary">Set your destination</a>}
-        />
-      </div>
-    );
+    return <OnboardingPage />;
   }
 
   const left = daysUntil(plan.examDate);
@@ -159,7 +140,12 @@ export default function DashboardPage() {
   const levels: Array<number | null> = exam.sections.map(() => null);
   const governing = governingLevel(levels);
 
-  const weakest = weakestSection(exam, latest);
+  // IA §4 item 2 — the next thing, from the plan. The planner orders slots
+  // worst-first; the first one with content behind it is where to go now.
+  const attestation = loadAttestations().filter((a) => a.examId === exam.id).sort((a, b) => (a.sat < b.sat ? 1 : -1))[0] ?? null;
+  const builtPlan = buildPlan({ exam, attestation, target: goal.requiredLevel, daysLeft: left });
+  const nextSlot = builtPlan.slots.find((sl) => sl.items > 0) ?? builtPlan.slots[0] ?? null;
+  const nextSkill = nextSlot?.coordinate.skill ?? null;
   const counted = exam.sections.filter((s) => s.kind === 'comprehension').length;
 
   // Both exams award four skills. Only the TCF definition carries all four
@@ -185,9 +171,9 @@ export default function DashboardPage() {
           </div>
           <div className="shrink-0 text-right">
             {left === null ? (
-              <a href={EXAM_HOME} className="inline-flex items-center gap-2 rounded-xl bg-surface-muted px-3 py-2 text-sm font-medium text-ink-secondary hover:text-navy">
-                <CalendarDays className="h-4 w-4" /> Set your exam date
-              </a>
+              <span className="inline-flex items-center gap-2 rounded-xl bg-surface-muted px-3 py-2 text-sm font-medium text-ink-secondary">
+                <CalendarDays className="h-4 w-4" /> No exam date set
+              </span>
             ) : (
               <>
                 <div className="font-display text-4xl font-bold tabular-nums text-navy">
@@ -204,10 +190,38 @@ export default function DashboardPage() {
         </div>
         <div className="mt-4 flex flex-wrap items-center gap-2">
           <a href={EXAM_HOME} className="text-xs font-medium text-teal hover:underline">
-            Change destination, exam or date
+            Change exam, destination or date
           </a>
         </div>
       </header>
+
+      {/* 2 ── the next thing, from the plan: one button, straight into it (IA §4) */}
+      <section className="card p-6">
+        <div className="flex items-center gap-2 text-sm font-semibold text-teal">
+          <Compass className="h-4 w-4" /> Do this next
+        </div>
+        {nextSlot && nextSkill ? (
+          <div className="mt-3 flex flex-wrap items-center gap-4">
+            <div className="min-w-[180px] flex-1">
+              <div className="font-display text-lg font-bold text-navy">{nextSlot.coordinate.label}</div>
+              <div className="mt-0.5 text-xs text-ink-secondary">
+                {builtPlan.basis === 'attestation'
+                  ? 'Your weakest skill first — this is what moves your governing level.'
+                  : 'Your plan is in exam order until you enter a past result.'}
+              </div>
+            </div>
+            <Link to={PRACTICE[nextSkill]} className="btn-primary shrink-0">
+              Start now
+              <ChevronRight className="h-4 w-4" />
+            </Link>
+          </div>
+        ) : (
+          <div className="mt-3 flex flex-wrap items-center gap-4">
+            <p className="min-w-[180px] flex-1 text-sm text-ink-secondary">Pick a skill and begin.</p>
+            <Link to="/practice" className="btn-primary shrink-0">Go to Practice<ChevronRight className="h-4 w-4" /></Link>
+          </div>
+        )}
+      </section>
 
       {/* 2 ── the four skills, and which kind of number each one is */}
       <section className="space-y-3">
@@ -309,96 +323,7 @@ export default function DashboardPage() {
         )}
       </section>
 
-      {/* 4 ── the weakest skill, and one thing to do about it */}
-      <section className="space-y-3">
-        <h2 className="font-display text-xl font-bold text-navy">Your weakest skill</h2>
-        {weakest ? (
-          <div className="card flex flex-wrap items-center gap-4 p-5">
-            <div className="min-w-[150px] flex-1">
-              <div className="font-display text-lg font-bold text-navy">
-                {t(weakest.section.name, 'en')}
-              </div>
-              <div className="text-xs text-ink-secondary">
-                {weakest.correct} of {weakest.total} correct in your last sitting
-              </div>
-            </div>
-            <Link to={PRACTICE[weakest.section.skill]} className="btn-primary shrink-0">
-              Practise {t(weakest.section.name, 'en').toLowerCase()}
-              <ChevronRight className="h-4 w-4" />
-            </Link>
-          </div>
-        ) : (
-          <div className="card p-5 text-sm text-ink-secondary">
-            Nothing to name yet — no sitting has been completed, so there is no measured weakest
-            skill. Guessing one from practice activity would be an invented answer.
-          </div>
-        )}
-      </section>
 
-      {/* 5 ── the primary action. Before today the exam engine was not
-              reachable from anywhere inside the signed-in application. */}
-      <a href={EXAM_HOME} className="btn-primary w-full justify-center py-4 text-base">
-        Sit a full mock exam — {exam.sections.length} sections
-        <ChevronRight className="h-5 w-5" />
-      </a>
-
-      {/* 6 ── history */}
-      <section className="space-y-3">
-        <div className="flex items-baseline justify-between gap-2">
-          <h2 className="font-display text-xl font-bold text-navy">Your sittings</h2>
-          {mine.length > 0 && (
-            <a href={EXAM_HISTORY} className="text-xs font-medium text-teal hover:underline">
-              See all {mine.length}
-            </a>
-          )}
-        </div>
-        {mine.length === 0 ? (
-          <div className="card flex items-center gap-4 p-5 text-sm text-ink-secondary">
-            <TrendingUp className="h-5 w-5 shrink-0 text-ink-secondary" />
-            No sittings yet. The line starts at your first one.
-          </div>
-        ) : (
-          <div className="card divide-y divide-surface-divider">
-            {mine.slice(-4).reverse().map((r) => (
-              <div key={r.finishedAt} className="space-y-2 px-5 py-4">
-                <div className="text-xs font-semibold text-ink-secondary">
-                  {new Date(r.finishedAt).toLocaleDateString()}
-                </div>
-                {exam.sections.map((s) => {
-                  const v = r.skills[s.id];
-                  if (!v) return null;
-                  return (
-                    <div key={s.id} className="flex items-center gap-3">
-                      <span className="w-24 shrink-0 truncate text-xs text-ink-secondary sm:w-44">
-                        {t(s.name, 'en')}
-                      </span>
-                      <div className="flex-1"><ProgressBar value={v.correct} total={v.total} /></div>
-                      <span className="w-12 shrink-0 text-right text-xs tabular-nums text-ink-secondary">
-                        {v.correct}/{v.total}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* Vocabulary — kept, demoted. It has an exam analogue; it is simply
-          not what the candidate came for. */}
-      <Link to="/vocabulary" className="card flex items-center gap-4 p-5 hover:shadow-cardHover">
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-100 text-purple-600">
-          <Brain className="h-5 w-5" />
-        </div>
-        <div className="flex-1">
-          <div className="font-display font-bold text-navy">Vocabulary</div>
-          <div className="text-xs text-ink-secondary">
-            {vocab?.dueCount ? `${vocab.dueCount} cards due for review` : 'Review and add new words'}
-          </div>
-        </div>
-        <ChevronRight className="h-5 w-5 text-ink-secondary" />
-      </Link>
 
       {/* Upgrade to SELM Pro. This is the primary in-app entry point to the
           paywall and it stays on the dashboard: Apple's App Review has to be
@@ -433,29 +358,6 @@ function requirementLine(goal: Goal): string {
   }
 }
 
-/**
- * The weakest skill, measured rather than guessed.
- *
- * Only comprehension sections can answer this today, because they are the
- * only ones with a number. A production section with no scorer bound is not
- * "weak" — it is unmeasured, and calling it weakest would be an invention.
- */
-function weakestSection(
-  exam: ExamDefinition,
-  record: SittingRecord | null
-): { section: ComprehensionSection; correct: number; total: number } | null {
-  if (!record) return null;
-  let best: { section: ComprehensionSection; correct: number; total: number } | null = null;
-  for (const s of exam.sections) {
-    if (s.kind !== 'comprehension') continue;
-    const v = record.skills[s.id];
-    if (!v || v.total === 0) continue;
-    if (!best || v.correct / v.total < best.correct / best.total) {
-      best = { section: s, correct: v.correct, total: v.total };
-    }
-  }
-  return best;
-}
 
 /**
  * One skill, with the kind of number it produces stated on the row.
