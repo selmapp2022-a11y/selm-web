@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
-import { PenLine, Sparkles, FileText, RefreshCcw } from 'lucide-react';
+import { PenLine, Sparkles, FileText } from 'lucide-react';
 import clsx from 'clsx';
 import { checkGrammar, rewriteText, assessWriting, type GrammarCheck, type WritingAssessment } from '../lib/writing';
 import { CompletionCard } from '../components/CompletionCard';
 import { practiceTasksFor, type PracticeSet, type PracticeTask } from '../lib/practiceTasks';
-import { ts, tf } from '../i18n';
+import { ts } from '../i18n';
 
-type Mode = 'live' | 'rewrite' | 'templates';
 
 // The four templates that used to live here — professional email, cover
 // letter for a software engineer, opinion essay on remote work, short story
@@ -21,24 +20,75 @@ type Mode = 'live' | 'rewrite' | 'templates';
 // definition the candidate chose. See `lib/practiceTasks.ts`.
 
 export default function WritingPage() {
-  const [mode, setMode] = useState<Mode>('live');
+  // Like Speaking: the main tabs are the EXAM's own writing tasks, from the
+  // definition the candidate chose (TCF tâche 1·2·3, IELTS Task 1·2). The old
+  // generic modes — live grammar coach and smart rewrite — belonged to no
+  // exam; they are kept but demoted below the row as auxiliary practice.
+  const [set, setSet] = useState<PracticeSet | null | 'loading'>('loading');
+  const [taskIdx, setTaskIdx] = useState(0);
+  const [aux, setAux] = useState<null | 'live' | 'rewrite'>(null);
+
+  useEffect(() => { practiceTasksFor('writing').then(setSet); }, []);
+
+  const tasks = set && set !== 'loading' ? set.tasks : [];
+  const activeTask = !aux && tasks.length ? tasks[Math.min(taskIdx, tasks.length - 1)] : null;
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="font-display text-3xl font-bold text-navy">Writing</h1>
-        <p className="mt-1 text-ink-secondary">Live grammar coach, smart rewrites, and structured writing templates.</p>
+        <p className="mt-1 text-ink-secondary">
+          {set && set !== 'loading' ? `${set.examName} — write each task and get scored feedback.` : 'Write each exam task and get scored feedback.'}
+        </p>
       </div>
 
-      <div className="flex gap-2 rounded-2xl bg-surface-muted p-1.5">
-        <ModeBtn active={mode === 'live'} onClick={() => setMode('live')} icon={PenLine}>Live grammar</ModeBtn>
-        <ModeBtn active={mode === 'rewrite'} onClick={() => setMode('rewrite')} icon={Sparkles}>Smart rewrite</ModeBtn>
-        <ModeBtn active={mode === 'templates'} onClick={() => setMode('templates')} icon={FileText}>Templates</ModeBtn>
-      </div>
+      {set === 'loading' && <div className="card p-6 text-sm text-ink-secondary">{ts('common.loading')}</div>}
 
-      {mode === 'live' && <LiveMode />}
-      {mode === 'rewrite' && <RewriteMode />}
-      {mode === 'templates' && <TemplatesMode />}
+      {set === null && (
+        <div className="card p-6">
+          <h3 className="font-display text-lg font-bold text-navy">{ts('practice.chooseExamFirst')}</h3>
+          <p className="mt-1 text-sm text-ink-secondary">{ts('practice.writingNeedsExam')}</p>
+          <a href="/exam.html#/" className="btn-primary mt-4 inline-flex">{ts('common.chooseExam')}</a>
+        </div>
+      )}
+
+      {tasks.length > 0 && (
+        <>
+          <div className="flex gap-2 rounded-2xl bg-surface-muted p-1.5">
+            {tasks.map((tk, i) => (
+              <ModeBtn key={tk.id} active={!aux && taskIdx === i} onClick={() => { setAux(null); setTaskIdx(i); }} icon={FileText}>
+                {tk.title}
+              </ModeBtn>
+            ))}
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs text-ink-secondary">Extra practice:</span>
+            <AuxBtn active={aux === 'live'} onClick={() => setAux('live')} icon={PenLine}>Live grammar</AuxBtn>
+            <AuxBtn active={aux === 'rewrite'} onClick={() => setAux('rewrite')} icon={Sparkles}>Smart rewrite</AuxBtn>
+          </div>
+
+          {activeTask && <TaskWriteMode task={activeTask} />}
+          {aux === 'live' && <LiveMode />}
+          {aux === 'rewrite' && <RewriteMode />}
+        </>
+      )}
     </div>
+  );
+}
+
+function AuxBtn({ active, onClick, icon: Icon, children }: any) {
+  return (
+    <button
+      onClick={onClick}
+      className={clsx(
+        'flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition',
+        active ? 'border-teal bg-teal/10 text-navy' : 'border-surface-divider text-ink-secondary hover:text-navy'
+      )}
+    >
+      <Icon className="h-3.5 w-3.5" />
+      {children}
+    </button>
   );
 }
 
@@ -173,71 +223,29 @@ function RewriteMode() {
   );
 }
 
-function TemplatesMode() {
-  const [set, setSet] = useState<PracticeSet | null | 'loading'>('loading');
-  const [tpl, setTpl] = useState<PracticeTask | null>(null);
+function TaskWriteMode({ task }: { task: PracticeTask }) {
   const [text, setText] = useState('');
   const [assessment, setAssessment] = useState<WritingAssessment | null>(null);
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => { practiceTasksFor('writing').then((r) => setSet(r)); }, []);
+  useEffect(() => { setText(''); setAssessment(null); }, [task.id]);
 
   const submit = async () => {
-    if (!text.trim() || !tpl) return;
+    if (!text.trim()) return;
     setLoading(true); setAssessment(null);
-    try { setAssessment(await assessWriting(text, tpl.prompt)); }
+    try { setAssessment(await assessWriting(text, task.prompt)); }
     finally { setLoading(false); }
   };
-
-  if (set === 'loading') {
-    return <div className="card p-6 text-sm text-ink-secondary">{ts('common.loading')}</div>;
-  }
-
-  // No exam chosen yet. The old code would have offered four generic
-  // templates here; a visible gap is a better failure than a plausible
-  // generic answer — Amendment 1 §6.
-  if (!set || set.tasks.length === 0) {
-    return (
-      <div className="card p-6">
-        <h3 className="font-display text-lg font-bold text-navy">{ts('practice.chooseExamFirst')}</h3>
-        <p className="mt-1 text-sm text-ink-secondary">{ts('practice.writingNeedsExam')}</p>
-        <a href="/exam.html#/" className="btn-primary mt-4 inline-flex">{ts('common.chooseExam')}</a>
-      </div>
-    );
-  }
-
-  if (!tpl) {
-    return (
-      <div className="space-y-3">
-        <p className="text-sm text-ink-secondary">{tf('practice.tasksAsSet', { exam: set.examName })}</p>
-        <div className="grid gap-4 sm:grid-cols-2">
-          {set.tasks.map((t) => (
-            <button key={t.id} onClick={() => { setTpl(t); setText(''); setAssessment(null); }} className="card p-6 text-left hover:shadow-cardHover">
-              <FileText className="mb-3 h-8 w-8 text-teal" />
-              <h3 className="font-display text-lg font-bold text-navy">{t.title}</h3>
-              <p className="mt-1 text-sm text-ink-secondary">{t.instruction}</p>
-              <p className="mt-2 text-xs text-ink-secondary">
-                {t.words ? t.words + ' · ' : ''}{Math.round(t.timeLimitSec / 60)} min
-                {t.timeIsOurs ? ' ' + ts('practice.ourSplit') : ''}
-              </p>
-            </button>
-          ))}
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr,300px]">
       <div className="space-y-4">
         <div className="card p-6">
-          <button onClick={() => setTpl(null)} className="btn-ghost mb-3 text-sm"><RefreshCcw className="h-4 w-4" /> {ts('practice.pickAnother')}</button>
-          <h3 className="mb-2 font-display text-xl font-bold text-navy">{tpl.title}</h3>
-          <p className="text-sm font-medium text-navy">{tpl.instruction}</p>
-          <p className="mt-2 whitespace-pre-line text-sm text-ink-secondary">{tpl.prompt}</p>
+          <h3 className="mb-2 font-display text-xl font-bold text-navy">{task.title}</h3>
+          <p className="text-sm font-medium text-navy">{task.instruction}</p>
+          <p className="mt-2 whitespace-pre-line text-sm text-ink-secondary">{task.prompt}</p>
           <p className="mt-3 text-xs text-ink-secondary">
-            {tpl.words ? tpl.words + ' \u00b7 ' : ''}{Math.round(tpl.timeLimitSec / 60)} min
-            {tpl.timeIsOurs ? ' ' + ts('practice.ourSplit') : ''}
+            {task.words ? task.words + ' \u00b7 ' : ''}{Math.round(task.timeLimitSec / 60)} min
+            {task.timeIsOurs ? ' ' + ts('practice.ourSplit') : ''}
           </p>
         </div>
         <div className="card p-6">
@@ -277,10 +285,10 @@ function TemplatesMode() {
             </div>
             <CompletionCard
               skill="writing"
-              topic={tpl.title}
+              topic={task.title}
               score={assessment.overall_score}
-              onNext={() => { setTpl(null); setText(''); setAssessment(null); }}
-              nextLabel="Try another template"
+              onNext={() => { setText(''); setAssessment(null); }}
+              nextLabel="Write again"
             />
           </>
         )}
@@ -289,7 +297,7 @@ function TemplatesMode() {
         <h4 className="mb-1 font-display font-bold text-navy">{ts('practice.zeroTitle')}</h4>
         <p className="mb-3 text-xs text-ink-secondary">{ts('practice.zeroHelp')}</p>
         <ul className="space-y-3 text-sm">
-          {tpl.zeroRules.map((r, i) => (
+          {task.zeroRules.map((r, i) => (
             <li key={i}>
               <div className="font-semibold text-navy">{r.label}</div>
               <div className="text-xs text-ink-secondary">{r.detail}</div>

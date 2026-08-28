@@ -8,11 +8,10 @@ import { aiTTS, browserTTS, stopBrowserTTS } from '../lib/tts';
 import { TopicPicker, SPEAKING_TOPICS } from '../components/TopicPicker';
 import { CompletionCard } from '../components/CompletionCard';
 import { ErrorBox } from '../components/States';
-import { practiceTasksFor, pronunciationLinesFor, type PracticeSet } from '../lib/practiceTasks';
+import { practiceTasksFor, pronunciationLinesFor, type PracticeSet, type PracticeTask } from '../lib/practiceTasks';
 import { difficultyForSkill } from '../lib/difficulty';
 import { ts } from '../i18n';
 
-type Mode = 'pronunciation' | 'conversation' | 'ielts';
 
 // The five pronunciation sentences and the three IELTS cue cards that used
 // to sit here are gone. Amendment 2 §2.2.
@@ -28,44 +27,82 @@ type Mode = 'pronunciation' | 'conversation' | 'ielts';
 // read-aloud lines are a stopgap rather than the finished answer.
 
 export default function SpeakingPage() {
-  // Was `user?.current_level` — one CEFR level per user, set by the adaptive
-  // placement test at /onboarding/assessment and shared by three of the four
-  // practice pages. Part 3 (replacement) §3: difficulty is per task, comes
-  // from performance, and is never shown. See `lib/difficulty.ts`.
   const level = difficultyForSkill('speaking');
-  const [mode, setMode] = useState<Mode>('pronunciation');
+  // The tabs are the EXAM's tasks, built from the exam definition — TCF Canada
+  // shows tâche 1·2·3, IELTS shows Part 1·2·3 — never a fixed "IELTS Speaking"
+  // label on a French page. Pronunciation and live conversation are kept, but
+  // demoted below the main row as auxiliary practice, because they are general
+  // exercises and not the exam's tasks.
+  const [set, setSet] = useState<PracticeSet | null | 'loading'>('loading');
+  const [taskIdx, setTaskIdx] = useState(0);
+  const [aux, setAux] = useState<null | 'pronunciation' | 'conversation'>(null);
 
+  useEffect(() => { practiceTasksFor('speaking').then(setSet); }, []);
   useEffect(() => () => stopBrowserTTS(), []);
+
+  const tasks = set && set !== 'loading' ? set.tasks : [];
+  const activeTask = !aux && tasks.length ? tasks[Math.min(taskIdx, tasks.length - 1)] : null;
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="font-display text-3xl font-bold text-navy">Speaking</h1>
-        <p className="mt-1 text-ink-secondary">Real-time AI feedback on pronunciation, fluency, and conversation.</p>
+        <p className="mt-1 text-ink-secondary">
+          {set && set !== 'loading'
+            ? `${set.examName} — record each task and get scored feedback.`
+            : 'Record each exam task and get scored feedback.'}
+        </p>
       </div>
 
-      <div className="flex gap-2 rounded-2xl bg-surface-muted p-1.5">
-        {/* Labels were "Pronunciation" / "Live Conversation" / "IELTS Speaking"
-            which overflowed the three-up flex row on narrow phones. Shortened
-            to one-word labels everywhere except a slightly fuller "Conversation"
-            via sm-and-up. Each button also gets min-w-0 so flex can actually
-            shrink children, plus whitespace-nowrap + truncate as a belt-and-
-            suspenders guard against icon-fonts widening past their box. */}
-        <ModeBtn active={mode === 'pronunciation'} onClick={() => setMode('pronunciation')} icon={Mic}>Pronunciation</ModeBtn>
-        <ModeBtn active={mode === 'conversation'} onClick={() => setMode('conversation')} icon={MessageSquare}>
-          <span className="sm:hidden">Conversation</span>
-          <span className="hidden sm:inline">Live Conversation</span>
-        </ModeBtn>
-        <ModeBtn active={mode === 'ielts'} onClick={() => setMode('ielts')} icon={Trophy}>
-          <span className="sm:hidden">IELTS</span>
-          <span className="hidden sm:inline">IELTS Speaking</span>
-        </ModeBtn>
-      </div>
+      {set === 'loading' && <div className="card p-6 text-sm text-ink-secondary">{ts('common.loading')}</div>}
 
-      {mode === 'pronunciation' && <PronunciationMode level={level} />}
-      {mode === 'conversation' && <ConversationMode level={level} />}
-      {mode === 'ielts' && <IELTSMode />}
+      {set === null && (
+        <div className="card p-6">
+          <h3 className="font-display text-lg font-bold text-navy">{ts('practice.chooseExamFirst')}</h3>
+          <p className="mt-1 text-sm text-ink-secondary">{ts('practice.speakingNeedsExam')}</p>
+          <a href="/exam.html#/" className="btn-primary mt-4 inline-flex">{ts('common.chooseExam')}</a>
+        </div>
+      )}
+
+      {tasks.length > 0 && (
+        <>
+          {/* MAIN ROW — the exam's own tasks, from the definition. */}
+          <div className="flex gap-2 rounded-2xl bg-surface-muted p-1.5">
+            {tasks.map((tk, i) => (
+              <ModeBtn key={tk.id} active={!aux && taskIdx === i} onClick={() => { setAux(null); setTaskIdx(i); }} icon={Mic}>
+                {tk.title}
+              </ModeBtn>
+            ))}
+          </div>
+
+          {/* AUXILIARY — kept, but not the exam. */}
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs text-ink-secondary">Extra practice:</span>
+            <AuxBtn active={aux === 'pronunciation'} onClick={() => setAux('pronunciation')} icon={Volume2}>Pronunciation</AuxBtn>
+            <AuxBtn active={aux === 'conversation'} onClick={() => setAux('conversation')} icon={MessageSquare}>Conversation</AuxBtn>
+          </div>
+
+          {activeTask && <TaskMode task={activeTask} />}
+          {aux === 'pronunciation' && <PronunciationMode level={level} />}
+          {aux === 'conversation' && <ConversationMode level={level} />}
+        </>
+      )}
     </div>
+  );
+}
+
+function AuxBtn({ active, onClick, icon: Icon, children }: any) {
+  return (
+    <button
+      onClick={onClick}
+      className={clsx(
+        'flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition',
+        active ? 'border-teal bg-teal/10 text-navy' : 'border-surface-divider text-ink-secondary hover:text-navy'
+      )}
+    >
+      <Icon className="h-3.5 w-3.5" />
+      {children}
+    </button>
   );
 }
 
@@ -335,27 +372,13 @@ function ConversationMode({ level: _level }: { level: string }) {
   );
 }
 
-function IELTSMode() {
-  const [set, setSet] = useState<PracticeSet | null | 'loading'>('loading');
-  const [prompt, setPrompt] = useState<string>('');
+function TaskMode({ task }: { task: PracticeTask }) {
+  const prompt = task.instruction + '\n\n' + task.prompt;
   const [result, setResult] = useState<SpeechAssessment | null>(null);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
-
-  useEffect(() => {
-    practiceTasksFor('speaking').then((r) => {
-      setSet(r);
-      if (r?.tasks.length) setPrompt(r.tasks[0].instruction + '\n\n' + r.tasks[0].prompt);
-    });
-  }, []);
-
-  const newPrompt = () => {
-    const all = set && set !== 'loading' ? set.tasks.map((t) => t.instruction + '\n\n' + t.prompt) : [];
-    const others = all.filter((p) => p !== prompt);
-    if (!others.length) return;
-    setPrompt(others[Math.floor(Math.random() * others.length)]);
-    setResult(null); setErr(null);
-  };
+  // Re-mounting on task change resets the result; nothing else to do.
+  useEffect(() => { setResult(null); setErr(null); }, [task.id]);
 
   const onRecorded = async (blob: Blob) => {
     setLoading(true); setErr(null); setResult(null);
@@ -367,28 +390,13 @@ function IELTSMode() {
     finally { setLoading(false); }
   };
 
-  if (set === 'loading') return <div className="card p-6 text-sm text-ink-secondary">{ts('common.loading')}</div>;
-
-  if (!prompt) {
-    return (
-      <div className="card p-6">
-        <h3 className="font-display text-lg font-bold text-navy">{ts('practice.chooseExamFirst')}</h3>
-        <p className="mt-1 text-sm text-ink-secondary">{ts('practice.speakingNeedsExam')}</p>
-        <a href="/exam.html#/" className="btn-primary mt-4 inline-flex">{ts('common.chooseExam')}</a>
-      </div>
-    );
-  }
-
   return (
     <div className="grid gap-6 lg:grid-cols-2">
       <div className="space-y-4">
         <div className="card p-6">
           <div className="mb-3 flex items-center justify-between">
-            <span className="chip bg-amber-100 text-amber-700">IELTS Part 2</span>
-            <div className="flex gap-2">
-              <PlayButton text={prompt} />
-              <button onClick={newPrompt} className="btn-ghost text-sm"><RefreshCcw className="h-4 w-4" /> New</button>
-            </div>
+            <span className="chip bg-amber-100 text-amber-700">{task.title}</span>
+            <PlayButton text={prompt} />
           </div>
           <p className="text-base leading-relaxed text-ink-primary">{prompt}</p>
           <p className="mt-3 text-xs text-ink-secondary">Speak for 1–2 minutes.</p>
@@ -402,16 +410,16 @@ function IELTSMode() {
         {result && (
           <CompletionCard
             skill="speaking"
-            topic="IELTS Part 2"
+            topic={task.title}
             score={Math.round(result.overall_score)}
-            onNext={newPrompt}
-            nextLabel="Try the next IELTS prompt"
+            onNext={() => { setResult(null); setErr(null); }}
+            nextLabel="Record again"
           />
         )}
         {!loading && !err && !result && (
           <div className="card p-8 text-center text-ink-secondary">
             <Trophy className="mx-auto mb-2 h-10 w-10 opacity-40" />
-            <p className="text-sm">Your IELTS-style score will appear here.</p>
+            <p className="text-sm">Your score and feedback will appear here.</p>
           </div>
         )}
       </div>

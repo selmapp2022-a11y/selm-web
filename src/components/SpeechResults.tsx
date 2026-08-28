@@ -1,10 +1,16 @@
 import type { SpeechAssessment } from '../lib/speaking';
 import { scoreColor } from '../lib/speaking';
+import { loadPlan } from '../exam/model/plan';
 import clsx from 'clsx';
 
 export function SpeechResults({ result }: { result: SpeechAssessment }) {
   const overall = scoreColor(result.overall_score);
-  const isIelts = !!(result.ielts || (result.transcript && result.transcript.trim().length > 0));
+  // The four labels below (Fluency & Coherence, Lexical Resource, Grammar &
+  // Accuracy, Pronunciation) and the heading are IELTS's own criteria. They
+  // must never render for a TCF (French) candidate even if the backend
+  // erroneously attaches an `ielts` block — the exam decides, not the payload.
+  const examIsIelts = loadPlan()?.examId === 'ielts-gt';
+  const isIelts = examIsIelts && !!(result.ielts || (result.transcript && result.transcript.trim().length > 0));
 
   return (
     <div className="space-y-6">
