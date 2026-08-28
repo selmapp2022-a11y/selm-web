@@ -165,6 +165,15 @@ export const TCF_CANADA: ExamDefinition = {
       fr: "Le niveau NCLC que ce candidat obtiendrait pour cette compétence s'il passait le TCF Canada maintenant, estimé à partir de ses réponses d'entraînement des 30 derniers jours.",
     },
   },
+  // What FEI prints on the attestation. All four, and the two comprehension
+  // sections are reported on their own scales, which is why `scaleId` is here
+  // rather than assumed.
+  awards: [
+    { skill: 'listening', label: { en: 'Listening comprehension', fr: 'Compréhension orale' }, scaleId: 'co699' },
+    { skill: 'reading', label: { en: 'Reading comprehension', fr: 'Compréhension écrite' }, scaleId: 'ce699' },
+    { skill: 'writing', label: { en: 'Written expression', fr: 'Expression écrite' }, scaleId: 'sur20' },
+    { skill: 'speaking', label: { en: 'Spoken expression', fr: 'Expression orale' }, scaleId: 'sur20' },
+  ],
   sections: [
     {
       kind: 'comprehension',

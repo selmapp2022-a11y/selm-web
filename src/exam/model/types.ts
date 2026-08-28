@@ -445,6 +445,26 @@ export type ExamDefinition = {
   acceptedFor: Localised;
   scales: Scale[];
   benchmark: BenchmarkMap;
+  /**
+   * What the AWARDING BODY reports on its attestation — which is not the
+   * same thing as `sections`, and conflating the two was a real defect.
+   *
+   * Found 2026-08-28 by rendering the attestation form: it derived its
+   * fields from `sections`, so an IELTS General Training candidate holding
+   * a Test Report Form with four band scores was asked for **two** of them,
+   * because listening and reading are not built here.
+   *
+   * `sections` is what SELM has built. `awards` is what the exam gives the
+   * candidate. **The candidate's document is governed by the second.** The
+   * gap between the two lists is also exactly what Part 3 §1.1 requires be
+   * stated out loud when the exam is offered.
+   */
+  awards: Array<{
+    skill: SkillId;
+    label: Localised;
+    /** Which of this exam's scales that skill is reported on. */
+    scaleId: string;
+  }>;
   sections: SectionDefinition[];
   /**
    * The calibration evidence behind this exam's numeric predictions.

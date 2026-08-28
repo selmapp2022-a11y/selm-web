@@ -72,6 +72,15 @@ export const IELTS_GT: ExamDefinition = {
       fr: "Le niveau CLB que ce candidat obtiendrait pour cette compétence s'il passait l'IELTS General Training maintenant, estimé à partir de ses réponses d'entraînement des 30 derniers jours.",
     },
   },
+  // What the Test Report Form prints: four band scores, all on the same
+  // 4-9 band scale. Two of these four have nothing built behind them here,
+  // and that is a fact about US, not about the candidate's document.
+  awards: [
+    { skill: 'listening', label: { en: 'Listening', fr: 'Compréhension orale' }, scaleId: 'band' },
+    { skill: 'reading', label: { en: 'Reading', fr: 'Compréhension écrite' }, scaleId: 'band' },
+    { skill: 'writing', label: { en: 'Writing', fr: 'Expression écrite' }, scaleId: 'band' },
+    { skill: 'speaking', label: { en: 'Speaking', fr: 'Expression orale' }, scaleId: 'band' },
+  ],
   sections: [
     {
       kind: 'production',
