@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Check, ChevronRight } from 'lucide-react';
 import clsx from 'clsx';
+import { useT, useUiLangValue } from '../i18n';
 
 /**
  * Onboarding, rebuilt. Part 3 (replacement) §1.
@@ -40,6 +41,8 @@ type Row = {
 
 export default function OnboardingPage() {
   const nav = useNavigate();
+  const t = useT();
+  const lang = useUiLangValue();
   const [rows, setRows] = useState<Row[] | null>(null);
   const [chosen, setChosen] = useState<Row | null>(null);
 
@@ -72,17 +75,14 @@ export default function OnboardingPage() {
     });
   };
 
-  if (!rows) return <div className="card p-6 text-sm text-ink-secondary">Loading…</div>;
+  if (!rows) return <div className="card p-6 text-sm text-ink-secondary">{t('common.loading')}</div>;
 
   if (!chosen) {
     return (
       <div className="mx-auto max-w-2xl space-y-6 py-8">
         <header>
-          <h1 className="font-display text-3xl font-bold text-navy">Which exam are you sitting?</h1>
-          <p className="mt-1 text-ink-secondary">
-            It is the only thing we need to start. No placement test, no level — the exam gives every
-            candidate the same tasks, so there is nothing to place you on.
-          </p>
+          <h1 className="font-display text-3xl font-bold text-navy">{t('onboarding.title')}</h1>
+          <p className="mt-1 text-ink-secondary">{t('onboarding.subtitle')}</p>
         </header>
         <div className="grid gap-3">
           {rows.map((r) => {
@@ -96,13 +96,18 @@ export default function OnboardingPage() {
                 <div>
                   <div className="font-display text-lg font-bold text-navy">{r.name}</div>
                   {missing.length === 0 ? (
-                    <div className="mt-1 text-sm text-teal">Complete — all four skills built.</div>
+                    <div className="mt-1 text-sm text-teal">{t('onboarding.complete')}</div>
                   ) : (
                     // §1.1: state it plainly. The list is computed from the
                     // definition, so it cannot drift out of date the way a
-                    // sentence written by hand would.
+                    // sentence written by hand would — and the joining word
+                    // comes from the dictionary too, because "and"/"et" is a
+                    // string like any other.
                     <div className="mt-1 text-sm text-amber-700">
-                      {r.built.join(' and ')} only. {missing.join(' and ')} not built yet.
+                      {t('onboarding.partial', {
+                        built: r.built.join(lang === 'fr' ? ' et ' : ' and '),
+                        missing: missing.join(lang === 'fr' ? ' et ' : ' and '),
+                      })}
                     </div>
                   )}
                 </div>
@@ -111,10 +116,7 @@ export default function OnboardingPage() {
             );
           })}
         </div>
-        <p className="text-xs text-ink-secondary">
-          Only exams that are actually built are listed. An exam offered but unbuilt would be a claim
-          we cannot keep.
-        </p>
+        <p className="text-xs text-ink-secondary">{t('onboarding.onlyBuilt')}</p>
       </div>
     );
   }
@@ -125,22 +127,16 @@ export default function OnboardingPage() {
         <Check className="h-4 w-4" /> {chosen.name}
       </div>
       <header>
-        <h1 className="font-display text-3xl font-bold text-navy">Have you sat it before?</h1>
-        <p className="mt-1 text-ink-secondary">
-          If you have, your real marks build a better plan than any test we could give you — however
-          long ago it was. If you have not, we start teaching now.
-        </p>
+        <h1 className="font-display text-3xl font-bold text-navy">{t('onboarding.satBefore')}</h1>
+        <p className="mt-1 text-ink-secondary">{t('onboarding.satBeforeHelp')}</p>
       </header>
       <div className="flex flex-wrap gap-3">
-        <a href="/exam.html#/attestation" className="btn-primary">Yes — enter my marks</a>
+        <a href="/exam.html#/attestation" className="btn-primary">{t('onboarding.yes')}</a>
         <button onClick={() => nav('/dashboard')} className={clsx('btn-ghost border-2 border-surface-divider px-5 py-3')}>
-          No — start teaching
+          {t('onboarding.no')}
         </button>
       </div>
-      <p className="text-xs text-ink-secondary">
-        Skipping changes nothing about what you can use. You will be asked again later, and never
-        blocked.
-      </p>
+      <p className="text-xs text-ink-secondary">{t('onboarding.neverBlocked')}</p>
     </div>
   );
 }

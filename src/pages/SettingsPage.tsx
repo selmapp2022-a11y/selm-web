@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { AlertTriangle, Trash2, User as UserIcon, Mail, Shield, LogOut } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { deleteAccount, tokenStore } from '../lib/api';
+import { Languages } from 'lucide-react';
+import { setUiLang, ts, useUiLangValue } from '../i18n';
 
 // Settings page — Build 37 / v2.0.6.
 //
@@ -20,6 +22,7 @@ import { deleteAccount, tokenStore } from '../lib/api';
 // can find the deletion flow without hunting.
 
 export default function SettingsPage() {
+  const uiLangNow = useUiLangValue();
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
   const [step, setStep] = useState<'idle' | 'confirm' | 'deleting' | 'done'>('idle');
@@ -83,6 +86,36 @@ export default function SettingsPage() {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Interface language — Part 5 §5.1.
+          The user chooses. The device locale is the initial suggestion and
+          nothing more, because many francophone candidates carry phones set
+          to English. And it is independent of the exam's language: a
+          candidate can read the app in French and sit IELTS in English. */}
+      <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+        <h2 className="mb-3 flex items-center gap-2 text-lg font-bold text-navy dark:text-white">
+          <Languages className="h-5 w-5 text-navy" />
+          {ts('lang.label')}
+        </h2>
+        <p className="mb-3 text-sm text-ink-secondary dark:text-slate-400">{ts('lang.help')}</p>
+        <div className="flex gap-2">
+          {(['en', 'fr'] as const).map((l) => (
+            <button
+              key={l}
+              type="button"
+              onClick={() => setUiLang(l)}
+              className={
+                'rounded-xl border-2 px-4 py-2 text-sm font-medium ' +
+                (uiLangNow === l
+                  ? 'border-teal bg-teal/10 text-navy dark:text-white'
+                  : 'border-slate-200 text-ink-secondary dark:border-slate-700')
+              }
+            >
+              {ts(l === 'en' ? 'lang.en' : 'lang.fr')}
+            </button>
+          ))}
         </div>
       </section>
 

@@ -10,6 +10,7 @@ import { CompletionCard } from '../components/CompletionCard';
 import { ErrorBox } from '../components/States';
 import { practiceTasksFor, pronunciationLinesFor, type PracticeSet } from '../lib/practiceTasks';
 import { difficultyForSkill } from '../lib/difficulty';
+import { ts } from '../i18n';
 
 type Mode = 'pronunciation' | 'conversation' | 'ielts';
 
@@ -152,7 +153,7 @@ function PronunciationMode({ level }: { level: string }) {
     finally { setLoading(false); }
   };
 
-  if (lines === null) return <div className="card p-6 text-sm text-ink-secondary">Loading…</div>;
+  if (lines === null) return <div className="card p-6 text-sm text-ink-secondary">{ts('common.loading')}</div>;
 
   // No exam chosen, so no sentences. The old code had five English ones to
   // fall back on; falling back to those is the behaviour this change exists
@@ -160,11 +161,9 @@ function PronunciationMode({ level }: { level: string }) {
   if (!prompt) {
     return (
       <div className="card p-6">
-        <h3 className="font-display text-lg font-bold text-navy">Choose your exam first</h3>
-        <p className="mt-1 text-sm text-ink-secondary">
-          Pronunciation practice reads lines from the exam you are sitting, in its language.
-        </p>
-        <a href="/exam.html#/" className="btn-primary mt-4 inline-flex">Choose an exam</a>
+        <h3 className="font-display text-lg font-bold text-navy">{ts('practice.chooseExamFirst')}</h3>
+        <p className="mt-1 text-sm text-ink-secondary">{ts('practice.pronunciationNeedsExam')}</p>
+        <a href="/exam.html#/" className="btn-primary mt-4 inline-flex">{ts('common.chooseExam')}</a>
       </div>
     );
   }
@@ -368,17 +367,14 @@ function IELTSMode() {
     finally { setLoading(false); }
   };
 
-  if (set === 'loading') return <div className="card p-6 text-sm text-ink-secondary">Loading…</div>;
+  if (set === 'loading') return <div className="card p-6 text-sm text-ink-secondary">{ts('common.loading')}</div>;
 
   if (!prompt) {
     return (
       <div className="card p-6">
-        <h3 className="font-display text-lg font-bold text-navy">Choose your exam first</h3>
-        <p className="mt-1 text-sm text-ink-secondary">
-          Speaking practice is the speaking tasks of the exam you are sitting, in its language and
-          with its timing — not a generic cue card.
-        </p>
-        <a href="/exam.html#/" className="btn-primary mt-4 inline-flex">Choose an exam</a>
+        <h3 className="font-display text-lg font-bold text-navy">{ts('practice.chooseExamFirst')}</h3>
+        <p className="mt-1 text-sm text-ink-secondary">{ts('practice.speakingNeedsExam')}</p>
+        <a href="/exam.html#/" className="btn-primary mt-4 inline-flex">{ts('common.chooseExam')}</a>
       </div>
     );
   }

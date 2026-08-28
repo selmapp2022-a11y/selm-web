@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import { checkGrammar, rewriteText, assessWriting, type GrammarCheck, type WritingAssessment } from '../lib/writing';
 import { CompletionCard } from '../components/CompletionCard';
 import { practiceTasksFor, type PracticeSet, type PracticeTask } from '../lib/practiceTasks';
+import { ts, tf } from '../i18n';
 
 type Mode = 'live' | 'rewrite' | 'templates';
 
@@ -189,7 +190,7 @@ function TemplatesMode() {
   };
 
   if (set === 'loading') {
-    return <div className="card p-6 text-sm text-ink-secondary">Loading your exam's tasks…</div>;
+    return <div className="card p-6 text-sm text-ink-secondary">{ts('common.loading')}</div>;
   }
 
   // No exam chosen yet. The old code would have offered four generic
@@ -198,12 +199,9 @@ function TemplatesMode() {
   if (!set || set.tasks.length === 0) {
     return (
       <div className="card p-6">
-        <h3 className="font-display text-lg font-bold text-navy">Choose your exam first</h3>
-        <p className="mt-1 text-sm text-ink-secondary">
-          Writing practice is the tasks of the exam you are sitting — its instructions, its word
-          bands, its clock. Without an exam there is nothing honest to practise against.
-        </p>
-        <a href="/exam.html#/" className="btn-primary mt-4 inline-flex">Choose an exam</a>
+        <h3 className="font-display text-lg font-bold text-navy">{ts('practice.chooseExamFirst')}</h3>
+        <p className="mt-1 text-sm text-ink-secondary">{ts('practice.writingNeedsExam')}</p>
+        <a href="/exam.html#/" className="btn-primary mt-4 inline-flex">{ts('common.chooseExam')}</a>
       </div>
     );
   }
@@ -211,7 +209,7 @@ function TemplatesMode() {
   if (!tpl) {
     return (
       <div className="space-y-3">
-        <p className="text-sm text-ink-secondary">{set.examName} — writing tasks, as the exam sets them.</p>
+        <p className="text-sm text-ink-secondary">{tf('practice.tasksAsSet', { exam: set.examName })}</p>
         <div className="grid gap-4 sm:grid-cols-2">
           {set.tasks.map((t) => (
             <button key={t.id} onClick={() => { setTpl(t); setText(''); setAssessment(null); }} className="card p-6 text-left hover:shadow-cardHover">
@@ -220,7 +218,7 @@ function TemplatesMode() {
               <p className="mt-1 text-sm text-ink-secondary">{t.instruction}</p>
               <p className="mt-2 text-xs text-ink-secondary">
                 {t.words ? t.words + ' · ' : ''}{Math.round(t.timeLimitSec / 60)} min
-                {t.timeIsOurs ? ' (our split of the exam\u2019s total)' : ''}
+                {t.timeIsOurs ? ' ' + ts('practice.ourSplit') : ''}
               </p>
             </button>
           ))}
@@ -233,13 +231,13 @@ function TemplatesMode() {
     <div className="grid gap-6 lg:grid-cols-[1fr,300px]">
       <div className="space-y-4">
         <div className="card p-6">
-          <button onClick={() => setTpl(null)} className="btn-ghost mb-3 text-sm"><RefreshCcw className="h-4 w-4" /> Pick another task</button>
+          <button onClick={() => setTpl(null)} className="btn-ghost mb-3 text-sm"><RefreshCcw className="h-4 w-4" /> {ts('practice.pickAnother')}</button>
           <h3 className="mb-2 font-display text-xl font-bold text-navy">{tpl.title}</h3>
           <p className="text-sm font-medium text-navy">{tpl.instruction}</p>
           <p className="mt-2 whitespace-pre-line text-sm text-ink-secondary">{tpl.prompt}</p>
           <p className="mt-3 text-xs text-ink-secondary">
             {tpl.words ? tpl.words + ' \u00b7 ' : ''}{Math.round(tpl.timeLimitSec / 60)} min
-            {tpl.timeIsOurs ? ' (our split of the exam\u2019s published total)' : ''}
+            {tpl.timeIsOurs ? ' ' + ts('practice.ourSplit') : ''}
           </p>
         </div>
         <div className="card p-6">
@@ -288,10 +286,8 @@ function TemplatesMode() {
         )}
       </div>
       <div className="card sticky top-6 h-fit p-6">
-        <h4 className="mb-1 font-display font-bold text-navy">What scores zero here</h4>
-        <p className="mb-3 text-xs text-ink-secondary">
-          Whatever the quality of the language. These are the exam's rules, not ours.
-        </p>
+        <h4 className="mb-1 font-display font-bold text-navy">{ts('practice.zeroTitle')}</h4>
+        <p className="mb-3 text-xs text-ink-secondary">{ts('practice.zeroHelp')}</p>
         <ul className="space-y-3 text-sm">
           {tpl.zeroRules.map((r, i) => (
             <li key={i}>
