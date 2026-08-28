@@ -364,3 +364,184 @@ export function diagnoseNoPivot(
   const noTurn = signals[1].tripped && signals[2].tripped;
   return { failureModeId: 'recit-sans-bascule', fired: narrating && noTurn, signals };
 }
+
+// ── expression orale ────────────────────────────────────────────────────
+
+import {
+  DEVELOPMENT, REASON, OPEN_QUESTION, CLOSED_QUESTION,
+  SUPPORT, CONCESSION, OBJECTION,
+} from '../definitions/prescriptions/lexicon.fr';
+
+/**
+ * `presentation-catalogue` — the NCLC 6 failure on TCF expression orale,
+ * tâche 1.
+ *
+ * A self-presentation read out as a list. *Je m'appelle… Je suis… J'ai…
+ * Je travaille… J'habite…* — five true sentences, each of which ends where
+ * it began, and then two minutes of silence to fill with nothing left to
+ * say.
+ *
+ * **The candidate has not run out of facts. They have run out of the words
+ * that attach one fact to another**, which is why the fix is a word list and
+ * not more biography. The instruction also asks *ce qui vous a amené à
+ * apprendre le français* — a reason — and a catalogue never gives one.
+ */
+export type PresentationThresholds = { minDevelopment: number; maxJeOpeningShare: number };
+
+export function diagnoseCatalogue(
+  _task: TaskDefinition,
+  text: string,
+  t: PresentationThresholds,
+  seg: Segmentation = DEFAULT_SEGMENTATION,
+): Diagnosis {
+  void seg;
+  const sents = sentences(text);
+  const jeOpening = sents.filter((s) => /^\s*(je|j’|j')/i.test(s)).length;
+  const share = sents.length ? jeOpening / sents.length : 0;
+  const development = countAny(text, DEVELOPMENT);
+  const reason = countAny(text, REASON);
+
+  const signals: Signal[] = [
+    {
+      id: 'development',
+      label: { en: 'Words that attach one fact to the next', fr: 'Mots qui relient un fait au suivant' },
+      measured: development,
+      threshold: t.minDevelopment,
+      tripped: development < t.minDevelopment,
+    },
+    {
+      id: 'je_opening_share',
+      label: { en: 'Sentences beginning "Je"', fr: 'Phrases commençant par « Je »' },
+      measured: Math.round(share * 100) / 100,
+      threshold: t.maxJeOpeningShare,
+      tripped: share > t.maxJeOpeningShare,
+    },
+    {
+      id: 'reason',
+      label: { en: 'Says why, as the instruction asks', fr: 'Dit pourquoi, comme la consigne le demande' },
+      measured: reason,
+      threshold: 1,
+      tripped: reason < 1,
+    },
+  ];
+
+  const cataloguing = signals[0].tripped && signals[1].tripped;
+  return { failureModeId: 'presentation-catalogue', fired: cataloguing || signals[2].tripped, signals };
+}
+
+/**
+ * `questions-fermees` — the NCLC 6 failure on tâche 2, and the one the exam
+ * is most explicit about.
+ *
+ * Tâche 2 is the only task in the exam where **the candidate asks and the
+ * examiner answers**. The instruction is *obtenez les informations dont vous
+ * avez besoin* — obtaining is the task. A candidate who asks *est-ce que le
+ * chauffage sera réparé ?* gets "oui", and has three minutes left and
+ * nothing obtained.
+ *
+ * `required` is per item: each prompt names the specific things to find out,
+ * so the markers belong to the prompt. Same lesson as tâche 1's second
+ * requirement, learned the same way.
+ */
+export type QuestionThresholds = { minQuestions: number; minOpen: number; minRequired: number };
+
+export function diagnoseClosedQuestions(
+  _task: TaskDefinition,
+  text: string,
+  t: QuestionThresholds,
+  required: string[][] = [],
+  seg: Segmentation = DEFAULT_SEGMENTATION,
+): Diagnosis {
+  void seg;
+  const marks = (text.match(/\?/g) ?? []).length;
+  const open = countAny(text, OPEN_QUESTION);
+  const closed = countAny(text, CLOSED_QUESTION);
+  const asked = Math.max(marks, open + closed);
+  const covered = required.filter((group) => countAny(text, group) > 0).length;
+
+  const signals: Signal[] = [
+    {
+      id: 'questions_asked',
+      label: { en: 'Questions asked at all', fr: 'Questions réellement posées' },
+      measured: asked,
+      threshold: t.minQuestions,
+      tripped: asked < t.minQuestions,
+    },
+    {
+      id: 'open_questions',
+      label: { en: 'Questions that come back with something', fr: 'Questions qui rapportent quelque chose' },
+      measured: open,
+      threshold: t.minOpen,
+      tripped: open < t.minOpen,
+    },
+    {
+      id: 'required_covered',
+      label: { en: 'Things the instruction told you to find out', fr: 'Points que la consigne demandait d’obtenir' },
+      measured: covered,
+      threshold: t.minRequired,
+      tripped: required.length > 0 && covered < t.minRequired,
+    },
+  ];
+
+  return {
+    failureModeId: 'questions-fermees',
+    fired: signals[0].tripped || signals[1].tripped || signals[2].tripped,
+    signals,
+  };
+}
+
+/**
+ * `avis-sans-defense` — the NCLC 6 failure on tâche 3.
+ *
+ * The instruction has three parts: give your view, **support it**, and say
+ * what you would answer someone who disagreed. A response can state a clear
+ * view in good French and then restate it three times more firmly, which
+ * satisfies the first part and neither of the others.
+ *
+ * Conceding once is what separates arguing from repeating, and at this level
+ * it is also the cheapest thing to teach: one sentence, one connective.
+ */
+export type ArgumentThresholds = { minSupport: number };
+
+export function diagnoseUndefended(
+  _task: TaskDefinition,
+  text: string,
+  t: ArgumentThresholds,
+  seg: Segmentation = DEFAULT_SEGMENTATION,
+): Diagnosis {
+  void seg;
+  const support = countAny(text, SUPPORT);
+  const concession = countAny(text, CONCESSION);
+  const objection = countAny(text, OBJECTION);
+
+  const signals: Signal[] = [
+    {
+      id: 'support',
+      label: { en: 'Reasons and instances', fr: 'Raisons et exemples' },
+      measured: support,
+      threshold: t.minSupport,
+      tripped: support < t.minSupport,
+    },
+    {
+      id: 'concession',
+      label: { en: 'Conceded something once', fr: 'A concédé quelque chose une fois' },
+      measured: concession,
+      threshold: 1,
+      tripped: concession < 1,
+    },
+    {
+      id: 'objection',
+      label: { en: 'Met the objection the instruction asks for', fr: 'A répondu à l’objection demandée' },
+      measured: objection,
+      threshold: 1,
+      tripped: objection < 1,
+    },
+  ];
+
+  // Supporting nothing is one failure; supporting well while never admitting
+  // the other side exists is a different one, and the instruction asks for
+  // both, so either fires.
+  const unsupported = signals[0].tripped;
+  const undefended = signals[1].tripped && signals[2].tripped;
+  return { failureModeId: 'avis-sans-defense', fired: unsupported || undefended, signals };
+}

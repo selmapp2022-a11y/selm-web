@@ -1715,7 +1715,30 @@ export const TCF_CANADA: ExamDefinition = {
             },
             {
               id: 'off_topic',
-              minKeywordHits: 1,
+              // RAISED 2026-08-28, 1 -> 2, and the keywords widened below.
+              //
+              // At 1, with `je` and `suis` on the list, this rule could not
+              // fire on any text written in French. MEASURED across four
+              // model answers, four NCLC 6 answers and four deliberately
+              // off-topic answers:
+              //
+              //   bar 1  correct wrongly zeroed 0/8 · off-topic missed 4/4
+              //   bar 2  correct wrongly zeroed 0/8 · off-topic missed 1/4
+              //   bar 3  correct wrongly zeroed 0/8 · off-topic missed 0/4
+              //   bar 4  correct wrongly zeroed 1/8 · off-topic missed 0/4
+              //
+              // Bar 3 catches everything and leaves ZERO margin — the lowest
+              // correct answer scores exactly 3. Bar 2 keeps a margin of one
+              // and lets one off-topic answer through to the judge, which
+              // then marks it low anyway.
+              //
+              // The asymmetry decides it: wrongly zeroing a correct answer
+              // costs a real candidate a real mark, and missing an off-topic
+              // one costs a marking pass that happens regardless. So 2, and
+              // the trade-off goes to the reviewer with the rest of the cell.
+              // Four items cannot calibrate this; they can only show that 1
+              // was inert.
+              minKeywordHits: 2,
               verdict: {
                 kind: 'zero',
                 label: { en: 'Off topic', fr: 'Hors sujet' },
@@ -1726,7 +1749,12 @@ export const TCF_CANADA: ExamDefinition = {
               },
             },
           ],
-          topicKeywords: ['je', 'suis', 'travaille', 'français', 'appelle'],
+          // Widened at the same time. The shipped five included `je` and `suis`;
+          // these carry content, which is what a topic list is for.
+          topicKeywords: [
+            'appelle', 'travaille', 'étudie', 'arrivé', 'arrivée', 'apprends',
+            'ans', 'cours', 'famille', 'métier', 'pays',
+          ],
           // The transcriber is bound: SpeechAce and the STT chain both
           // support fr-CA, so a French recording yields a real transcript and
           // real acoustic measures. The judge is not bound, because nothing

@@ -4,14 +4,15 @@
  * THE PLAN old §3.2, restored by Amendment 2 §2.1: roughly 20–30 named
  * failure modes per exam, each with the one structural move that fixes it.
  *
- * **Three entries**, all of expression écrite at NCLC 6 — Amendment 2 §5's
- * order: *"Extend the cell to tâches 1 and 2, then expression orale, before
- * widening to another level."* The order is right because a candidate does
- * all six tâches whatever their level, so a second tâche at the same level
- * is worth more to them than the same tâche at a second level.
+ * **Six entries — every one of TCF Canada's six tâches, at NCLC 6.** That
+ * completes Amendment 2 §5's order: *"Extend the cell to tâches 1 and 2,
+ * then expression orale, before widening to another level."* The order is
+ * right because a candidate does all six tâches whatever their level, so a
+ * second tâche at the same level is worth more to them than the same tâche
+ * at a second level.
  *
- * Of 20–30 per exam, that is three. The file says so rather than pretending
- * at a catalogue.
+ * Of the 20–30 per exam §3.2 asks for, that is six, all at one level and one
+ * exam. The file says so rather than pretending at a catalogue.
  *
  * A coordinate with no cell returns nothing, and the caller says so out loud.
  * Amendment 1 §6: **a visible gap is a better failure than a plausible
@@ -21,11 +22,19 @@
 import type { Diagnosis, PrescriptionCell } from '../../model/prescription';
 import type { Segmentation } from '../../engine/text';
 import type { TaskDefinition } from '../../model/types';
-import { diagnoseJuxtaposition, diagnoseEmptyMessage, diagnoseNoPivot } from '../../engine/diagnose';
+import {
+  diagnoseJuxtaposition, diagnoseEmptyMessage, diagnoseNoPivot,
+  diagnoseCatalogue, diagnoseClosedQuestions, diagnoseUndefended,
+} from '../../engine/diagnose';
 import { CELL as TCF_EE_T3_NCLC6, THRESHOLDS as T3_N6 } from './tcf-ee-t3-nclc6';
 import { CELL as TCF_EE_T1_NCLC6, THRESHOLDS as T1_N6 } from './tcf-ee-t1-nclc6';
 import { CELL as TCF_EE_T2_NCLC6, THRESHOLDS as T2_N6 } from './tcf-ee-t2-nclc6';
 import { ITEMS as T1_ITEMS } from '../practice/tcf-ee-t1-nclc6.items';
+import {
+  T1_CELL as EO_T1, T2_CELL as EO_T2, T3_CELL as EO_T3,
+  T1_THRESHOLDS as EO_T1_TH, T2_THRESHOLDS as EO_T2_TH, T3_THRESHOLDS as EO_T3_TH,
+} from './tcf-eo-nclc6';
+import { ITEMS as EO_ITEMS } from '../practice/tcf-eo-nclc6.items';
 
 /**
  * A cell plus the detector that finds its failure mode.
@@ -59,6 +68,23 @@ export const CATALOGUE: CatalogueEntry[] = [
   {
     cell: TCF_EE_T3_NCLC6,
     detect: (task, text, seg) => diagnoseJuxtaposition(task, text, T3_N6, seg),
+  },
+  {
+    cell: EO_T1,
+    detect: (task, text, seg) => diagnoseCatalogue(task, text, EO_T1_TH, seg),
+  },
+  {
+    cell: EO_T2,
+    // `required` is per item for the same reason tâche 1's second
+    // requirement is: each prompt names its own three things to find out.
+    detect: (task, text, seg) => {
+      const item = EO_ITEMS.find((i) => i.id === task.id);
+      return diagnoseClosedQuestions(task, text, EO_T2_TH, item?.required ?? [], seg);
+    },
+  },
+  {
+    cell: EO_T3,
+    detect: (task, text, seg) => diagnoseUndefended(task, text, EO_T3_TH, seg),
   },
 ];
 

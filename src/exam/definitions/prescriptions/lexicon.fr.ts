@@ -101,3 +101,60 @@ export const BEFORE_AFTER = [
   'autrefois', 'à l’époque', "à l'époque", 'désormais', 'plus jamais',
   'ne les choisis plus', 'ne le pense plus', 'ne le défends plus',
 ];
+
+// ── expression orale ────────────────────────────────────────────────────
+
+/**
+ * What turns a fact into a sentence that has a next one.
+ *
+ * A self-presentation that runs out at forty seconds has not run out of
+ * facts; it has run out of the words that attach one fact to another.
+ */
+export const DEVELOPMENT = [
+  'parce que', 'parce qu’', "parce qu'", 'c’est pourquoi', "c'est pourquoi",
+  'ce qui', 'depuis que', 'en fait', 'par exemple', 'grâce à', 'à cause de',
+  'c’est pour ça', "c'est pour ça", 'du coup', 'alors que', 'ce qui fait que',
+  'si bien que', 'au point que', 'notamment', 'surtout parce',
+];
+
+/** Answers *why* — tâche 1 asks what brought you to French, which is a reason. */
+export const REASON = [
+  'parce que', 'parce qu’', "parce qu'", 'pour pouvoir', 'afin de', 'afin que',
+  'grâce à', 'à cause de', 'c’est pour ça', "c'est pour ça", 'c’est pourquoi',
+  "c'est pourquoi", 'la raison', 'pour cette raison', 'dans le but',
+];
+
+/** Open questions — the ones that come back with something. */
+export const OPEN_QUESTION = [
+  'pourquoi', 'comment', 'combien', 'quand', 'où', 'quel', 'quelle', 'quels',
+  'quelles', 'qu’est-ce que', "qu'est-ce que", 'qu’est-ce qui', "qu'est-ce qui",
+  'à partir de quand', 'jusqu’à quand', "jusqu'à quand", 'de quoi', 'à qui',
+  'dans quel', 'en quoi',
+];
+
+/** Closed ones — a yes, a no, and the turn is over. */
+export const CLOSED_QUESTION = [
+  'est-ce que', 'est-ce qu’', "est-ce qu'", 'avez-vous', 'êtes-vous',
+  'pouvez-vous', 'y a-t-il', 'serait-il', 'est-il', 'est-elle', 'faut-il',
+];
+
+/** Support for a claim: the reason, the case, the instance. */
+export const SUPPORT = [
+  'parce que', 'parce qu’', "parce qu'", 'par exemple', 'en effet', 'ainsi',
+  'c’est pourquoi', "c'est pourquoi", 'la preuve', 'd’ailleurs', "d'ailleurs",
+  'notamment', 'en particulier', 'c’est le cas', "c'est le cas", 'on le voit',
+];
+
+/** Conceding once, which is what separates arguing from repeating. */
+export const CONCESSION = [
+  'certes', 'bien sûr', 'il est vrai que', 'je comprends que', 'on peut comprendre',
+  'j’admets', "j'admets", 'sans doute', 'évidemment', 'je ne nie pas',
+  'il faut reconnaître',
+];
+
+/** Meeting the objection the instruction explicitly asks for. */
+export const OBJECTION = [
+  'on pourrait dire', 'certains diront', 'certains disent', 'à cela je répondrais',
+  'on m’objectera', "on m'objectera", 'on me dira', 'si l’on me dit', "si l'on me dit",
+  'à ceux qui', 'mes contradicteurs', 'l’argument contraire', "l'argument contraire",
+];
