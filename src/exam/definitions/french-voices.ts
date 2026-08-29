@@ -187,6 +187,15 @@ export const KNOWN_CAST_GAPS = [
  * the same error the ruling rejected when it refused to make Québécois
  * dominant. Putting the voices in the cast costs nothing and means the
  * decision, if it is ever taken, is a one-line change to the mix.
+ *
+ * Upheld 29 August 2026 (`SELM-RULINGS-voices.md` §2), which added the
+ * argument this file was missing: it is not only that "it exists in Canada"
+ * is the wrong test — **the evidence base itself excludes Acadian.** The
+ * mixture is grounded in FEI's own TCF material, which draws on Paris,
+ * Geneva, Dakar, Montreal and Brussels. Acadian is not among them.
+ *
+ * Cast, unscheduled, reason recorded. If evidence later shows the real TCF
+ * plays it, it is one line.
  */
 export const ACADIAN_NOTE = true;
 
@@ -214,5 +223,61 @@ export const ACADIAN_NOTE = true;
  */
 export const MIGRATION = {
   unknownRecordings: 39,
-  approvedApproach: null as null | 'listen_and_label' | 're_render',
+  approvedApproach: 're_render' as null | 'listen_and_label' | 're_render',
+  /**
+   * Ruled 29 August 2026, and NOT on the grounds this file expected.
+   *
+   * The file assumed the choice was between discovering the varieties and
+   * declaring them. The ruling pointed out that discovery cannot succeed
+   * either: the 39 were rendered in one batch, from one cast, by one process,
+   * so **whatever variety they turn out to be, they are all the same one.**
+   * A perfect identification still leaves a bank of a single variety, and
+   * `FRENCH_VARIETY_MIX` requires a weighted mixture.
+   *
+   *   *"Listening tells us what they are. It does not make them what the
+   *   ruling requires."*
+   *
+   * The cost objection was dismissed on facts: `calibration.samples` is 0,
+   * no candidate is mid-plan, and 40 000 of 348 000 credits is 12% of a
+   * balance running at 4% utilisation.
+   */
+  ruledOn: '2026-08-29',
+  /**
+   * The gate, from §4.2 of the same ruling, and it binds this migration too.
+   *
+   * Render ONE item per variety first, have it heard, then run the batch.
+   * Rendering 39 files against a cast nobody has listened to would repeat
+   * precisely the mistake the migration exists to correct.
+   */
+  castHeard: false,
 } as const;
+
+/**
+ * The French cast is larger than the language labels suggest.
+ *
+ * ElevenLabs verifies accents PER LANGUAGE, in `verified_languages`, and that
+ * field disagrees with `labels` more often than it agrees. Observed live on
+ * 29 August 2026 on the account's own catalogue:
+ *
+ * ```json
+ * // "Silias North - Passionate Narration"
+ * "labels":  { "language": "en", "accent": "canadian", "gender": "male" },
+ * "verified_languages": [
+ *   { "language": "fr", "accent": "fr-quebec", "locale": "fr-FR",
+ *     "model_id": "eleven_flash_v2_5" }
+ * ]
+ * ```
+ *
+ * A Canadian ENGLISH narrator, verified by the vendor as Québécois when
+ * speaking French — which is what a Canadian anglophone speaking French
+ * actually sounds like. Reading `labels.language` alone would have excluded it
+ * from every French query, and with it an unknown number of others.
+ *
+ * So: **a voice's own language label is a statement about its primary use,
+ * not a limit on what it can speak.** `find_voices` in
+ * `elevenlabs_tts_service.py` reads both, and sorts native-language voices
+ * first so a cross-language voice supplements the cast rather than displacing
+ * it. Anyone extending this cast should search `verified_languages`, not the
+ * French section of the library.
+ */
+export const CROSS_LANGUAGE_NOTE = true;

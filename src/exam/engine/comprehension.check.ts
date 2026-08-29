@@ -166,6 +166,35 @@ for (const s of sections) {
   if (unknown) {
     console.log(`      ${s.id}: ${unknown} recording(s) declare variety 'unknown' — established by listening, not by guessing`);
   }
+
+  // A rendered recording says WHO spoke it, and the request it answered.
+  //
+  // `variety` says what a recording is supposed to be. `voice` says what was
+  // asked for and what answered. Ruled 29 August 2026: *"Record the voice
+  // used, per recording. The current bank cannot say, and that is the defect
+  // underneath this one."*
+  //
+  // Not yet an assertion. Every recording that exists today predates the
+  // field, so failing on it would fail the whole bank for a fact that could
+  // not have been recorded. It becomes `ok(...)` the moment the re-render
+  // lands — the first bank produced under the new casting has no excuse.
+  const noVoice = s.recordings.filter((r) => r.audioPath && !r.voice).map((r) => r.id);
+  if (noVoice.length) {
+    console.log(
+      `      ${s.id}: ${noVoice.length} rendered recording(s) do not say which voice spoke them ` +
+      `— pre-dates the field; re-render fills it`,
+    );
+  }
+
+  // And when it IS recorded, the substitution check is one comparison. This is
+  // the failure the field exists to catch: the account holds no voice of the
+  // requested accent, the renderer quietly uses another, and the file plays
+  // perfectly in the wrong variety.
+  const substituted = s.recordings
+    .filter((r) => r.voice?.requestedVariety && r.variety && r.voice.requestedVariety !== r.variety)
+    .map((r) => `${r.id}: asked ${r.voice!.requestedVariety}, got ${r.variety}`);
+  ok(substituted.length === 0, `${s.id}: no recording was rendered in a variety other than the one asked for`,
+     substituted.length ? substituted.slice(0, 5).join(' | ') : 'none substituted');
 }
 
 console.log(bad === 0 ? '\nAll comprehension cases pass.' : `\n${bad} FAILURES`);

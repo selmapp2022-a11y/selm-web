@@ -561,11 +561,54 @@ export type Recording = {
    */
   audioPath?: string;
   /**
+   * Who spoke it, and with what — written down AT RENDER TIME, by the thing
+   * that did the rendering.
+   *
+   * Ruled 29 August 2026 (`SELM-RULINGS-voices.md` §1): *"Record the voice
+   * used, per recording. The current bank cannot say, and that is the defect
+   * underneath this one."*
+   *
+   * `variety` above says what a recording is SUPPOSED to be. This says what
+   * was actually asked for and what actually answered. The two are separate
+   * because the gap between them is the whole failure mode: when the account
+   * holds no voice of the requested accent the renderer substitutes one and
+   * the file still plays. With only `variety` recorded, a substituted accent
+   * is indistinguishable from a correct one. With this, it is one comparison.
+   *
+   * Absent on anything rendered before this existed — which is the 39, and is
+   * exactly the state `variety: 'unknown'` describes.
+   */
+  voice?: RenderedVoice;
+  /**
    * The exam's own name for this piece, where it publishes one — IELTS names
    * four Parts and a candidate hears them named. Absent where the exam does
    * not, as with the TCF's undifferentiated 39.
    */
   part?: Localised;
+};
+
+/**
+ * What produced a recording's audio, recorded when it was produced.
+ *
+ * Every field is a fact at render time, not a lookup that can drift. A voice
+ * can be renamed, removed from the account, or replaced in the library; the
+ * `voiceId` in a rendered file is the only thing that stays true afterwards.
+ * That is why the id is here even though the rest of the codebase deliberately
+ * addresses voices by name.
+ */
+export type RenderedVoice = {
+  /** The vendor id that actually rendered. Not the one that was asked for. */
+  voiceId: string;
+  /** Display name at render time, for tracing. Names change; ids do not. */
+  vendorName?: string;
+  /** The cast role, e.g. `qc-f`, so a bank can be re-cast without re-listening. */
+  role?: string;
+  /** The variety REQUESTED. Compare with `Recording.variety` to catch a substitution. */
+  requestedVariety?: SpeechVariety;
+  /** Vendor model, e.g. `eleven_flash_v2_5` — two models of one voice differ audibly. */
+  modelId?: string;
+  /** ISO date the audio was produced. */
+  renderedAt?: string;
 };
 
 export type ComprehensionItem = {
