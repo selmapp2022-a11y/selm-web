@@ -32,6 +32,25 @@
  * exam's own task, which this codebase removed from all four skills on the
  * morning of 29 August 2026.
  *
+ * ── Where the material came from, and the test it had to pass ─────────────
+ * **From the published specification, never from a real paper.** IELTS
+ * publishes the structure — four parts, forty questions, the question types,
+ * the timings, the marking. None of that is anyone's protected content. No
+ * real exam paper was read, quoted, reconstructed or used as a model for any
+ * script here, and that is a position rather than a precaution: a product
+ * whose whole claim is honesty and compliance, submitted in writing to an
+ * immigration authority, cannot have a bank built from reconstructed papers.
+ * An evaluator who found one would have reason to doubt the rest of the file.
+ *
+ * **And every script had to pass the two-year test:** would this still make
+ * sense, and still feel current, to a candidate sitting in two years? Nothing
+ * here needs today's news to be understood — there is no named politician, no
+ * election, no disaster — and nothing here could have been written in 2015
+ * without changing a word, which is the other half of the test. The subjects
+ * are a leisure centre membership, volunteering at a community garden, a
+ * student project on urban transport, and a lecture on urban heat: ordinary,
+ * neutral, and of this decade.
+ *
  * ── The accents ───────────────────────────────────────────────────────────
  * ielts.org says the recordings carry *"different accents, including British,
  * Australian, New Zealand and North American"* — **including**, so four is a
