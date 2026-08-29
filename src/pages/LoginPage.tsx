@@ -32,7 +32,7 @@ export default function LoginPage() {
       const res = await auth.login(email, password);
       setUser(res.user);
       if (back) { goNext(back); return; }
-      navigate(res.user.onboarding_completed ? '/dashboard' : '/onboarding/profile');
+      navigate(res.user.onboarding_completed ? '/dashboard' : '/');
     } catch (err: any) {
       setError(err?.response?.data?.detail || 'Invalid email or password.');
     } finally {
@@ -66,7 +66,7 @@ export default function LoginPage() {
       });
       setUser(res.user);
       if (back) { goNext(back); return; }
-      navigate(res.user?.onboarding_completed ? '/dashboard' : '/onboarding/profile');
+      navigate(res.user?.onboarding_completed ? '/dashboard' : '/');
     } catch (err: any) {
       // User cancel is silent — everything else surfaces.
       const msg = err?.message || String(err);

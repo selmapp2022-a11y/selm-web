@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Trophy, Star, Flame, Award, Mic, Headphones, BookOpen, PenLine, Brain, Calendar, ChevronRight, Lock } from 'lucide-react';
 import clsx from 'clsx';
 import { getSummary, getAchievements, getEvents, type ProgressSummary, type AchievementState, type SkillKey, PROGRESS_EVENT } from '../lib/progress';
+import { loadPlan, PLAN_EVENT } from '../exam/model/plan';
 
 const SKILL_META: Record<Exclude<SkillKey, 'vocabulary'>, { label: string; to: string; icon: any; color: string }> = {
   speaking:  { label: 'Speaking',  to: '/speaking',  icon: Mic,        color: 'from-teal-500 to-teal-600' },
@@ -37,10 +38,20 @@ export default function ProgressPage() {
     <div className="space-y-8">
       <div>
         <h1 className="font-display text-3xl font-bold text-navy">Your progress</h1>
-        <p className="mt-1 text-ink-secondary">Track your growth across every skill.</p>
+        <p className="mt-1 text-ink-secondary">What you have practised, and what it is for.</p>
       </div>
 
-      {/* Big level banner */}
+      <ExamAnchor />
+
+      {/* Practice activity.
+          This banner led the page and said "Level 16 · 3076 XP · 25 perfect",
+          which is the general app's scoreboard: it counts exercises finished
+          and answers nothing a candidate came here to ask. A person who needs
+          CLB 9 cannot tell from Level 16 whether they can book their test, and
+          a page that leads with it implies they can. It now sits below the
+          exam, under its own name, and says what it is not. */}
+      <div>
+        <h2 className="mb-3 font-display text-lg font-bold text-navy">Practice activity</h2>
       <div className="rounded-3xl bg-gradient-to-br from-navy via-navy-700 to-teal p-6 text-white shadow-cardHover sm:p-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-4">
@@ -68,6 +79,11 @@ export default function ProgressPage() {
             <div className="h-full rounded-full bg-white transition-all" style={{ width: `${(summary.xpThisLevel / 200) * 100}%` }} />
           </div>
         </div>
+        </div>
+        <p className="mt-2 text-xs leading-relaxed text-ink-secondary">
+          Exercises finished and days in a row. It is a record of effort, not a
+          predicted score — no level here means you have reached a band.
+        </p>
       </div>
 
       {/* Per-skill cards */}
@@ -196,6 +212,69 @@ function BannerStat({ icon: Icon, value, label }: { icon: any; value: number | s
     <div className="rounded-xl bg-white/15 px-4 py-3 text-center backdrop-blur">
       <div className="font-display text-2xl font-bold"><Icon className="-mt-1 mr-1 inline h-5 w-5" />{value}</div>
       <div className="text-[11px] uppercase tracking-wider opacity-80">{label}</div>
+    </div>
+  );
+}
+
+/**
+ * What the practice is FOR, at the top of the page that measures it.
+ *
+ * Progress opened on "Level 16 · 3076 XP · 25 perfect" and never mentioned the
+ * examination, the target, or the plan. A candidate who needs CLB 9 learns
+ * nothing from Level 16 about whether they can book their test, and a page
+ * that leads with it quietly implies that they can. This block names the
+ * instrument and the number that governs, and sends the reader to the screen
+ * that actually holds their standing rather than duplicating it here - one
+ * page owns that answer.
+ */
+function ExamAnchor() {
+  const [row, setRow] = useState<{ exam: string; goal: string; target: string } | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    const read = async () => {
+      const plan = loadPlan();
+      if (!plan?.examId || !plan?.goalId) { if (alive) setRow(null); return; }
+      const defs = await import('../exam/definitions');
+      const exam = defs.EXAMS.find((e) => e.id === plan.examId);
+      const goal = defs.GOALS.find((g) => g.id === plan.goalId);
+      if (!exam || !goal) { if (alive) setRow(null); return; }
+      const lang = exam.language;
+      if (alive) {
+        setRow({
+          exam: exam.name[lang] ?? exam.name.en,
+          goal: goal.label[lang] ?? goal.label.en,
+          // Same shape Today uses: the benchmark system and the level it asks for.
+          target: `${goal.system} ${goal.requiredLevel}`,
+        });
+      }
+    };
+    read();
+    window.addEventListener(PLAN_EVENT, read);
+    return () => { alive = false; window.removeEventListener(PLAN_EVENT, read); };
+  }, []);
+
+  if (!row) {
+    return (
+      <div className="card p-5">
+        <p className="text-sm text-ink-primary">
+          Choose your exam and destination, and this page can tell you what your practice is for.
+        </p>
+        <Link to="/goal" className="btn-primary mt-3 inline-block">Choose my exam</Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className="card p-5">
+      <div className="text-xs uppercase tracking-widest text-ink-secondary">What this is for</div>
+      <div className="mt-1 font-display text-xl font-bold text-navy">{row.exam}</div>
+      <p className="mt-1 text-sm text-ink-secondary">
+        {row.goal}{row.target ? ` · ${row.target}` : ''} — and the lowest skill governs.
+      </p>
+      <Link to="/" className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-teal">
+        Where you stand <ChevronRight className="h-4 w-4" />
+      </Link>
     </div>
   );
 }

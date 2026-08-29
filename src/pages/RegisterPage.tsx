@@ -27,7 +27,7 @@ export default function RegisterPage() {
       const res = await auth.register(form);
       setUser(res.user);
       if (back) { goNext(back); return; }
-      navigate('/onboarding/profile');
+      navigate('/');
     } catch (err: any) {
       const detail = err?.response?.data?.detail;
       setError(typeof detail === 'string' ? detail : 'Could not create account. Try a different email or username.');
@@ -62,7 +62,7 @@ export default function RegisterPage() {
       });
       setUser(res.user);
       if (back) { goNext(back); return; }
-      navigate(res.user?.onboarding_completed ? '/dashboard' : '/onboarding/profile');
+      navigate(res.user?.onboarding_completed ? '/dashboard' : '/');
     } catch (err: any) {
       const msg = err?.message || String(err);
       if (!/cancel|1001/i.test(msg)) {
