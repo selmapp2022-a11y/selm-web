@@ -5,10 +5,10 @@ import clsx from 'clsx';
 import { useExam } from '../state';
 import { t } from '../model/format';
 import { resolveAudio } from '../engine/audio';
-import { serveEpreuve } from '../engine/comprehension';
+import { serveEpreuve, itemsOf, itemsFor } from '../engine/comprehension';
 import { SectionClock, ProgressBar } from '../components/SectionClock';
 import { PlayOnce } from '../components/PlayOnce';
-import type { ComprehensionItem, ComprehensionSection, LanguageCode } from '../model/types';
+import type { ComprehensionItem, ComprehensionSection, LanguageCode, Recording } from '../model/types';
 
 /**
  * One comprehension section, run under the exam's own delivery rules.
@@ -63,7 +63,10 @@ function Section({ section }: { section: ComprehensionSection }) {
   // The ÉPREUVE, not the bank. `section.items` is what has been written;
   // this is what one sitting presents, at the published length and band
   // profile. They were the same number until the bank outgrew the exam.
-  const items = useMemo(() => serveEpreuve(section), [section]);
+  // The ÉPREUVE, not the bank — and RECORDINGS, not questions. A recording's
+  // questions travel with it, because half a recording cannot be served.
+  const recordings = useMemo(() => serveEpreuve(section), [section]);
+  const items = useMemo(() => itemsFor(section, recordings), [section, recordings]);
   const answers = sitting?.answers[section.id] ?? {};
   const answeredCount = items.filter((i) => typeof answers[i.id] === 'number').length;
 
@@ -88,8 +91,12 @@ function Section({ section }: { section: ComprehensionSection }) {
   // whose audio is missing stops the section rather than being skipped, which
   // is the one behaviour worse than refusing outright — the candidate would
   // never know a question had been dropped.
+  // Per RECORDING, not per question. A section whose bank is complete runs; a
+  // recording with no audio stops the section rather than being skipped,
+  // which is the one behaviour worse than refusing outright — the candidate
+  // would never know that questions had been dropped.
   const missing = section.delivery.audioPlaysOnce
-    ? items.filter((i) => !i.audioPath).map((i) => i.id)
+    ? recordings.filter((r) => !r.audioPath).map((r) => r.id)
     : [];
   const audioMissing = missing.length > 0;
 
@@ -123,8 +130,8 @@ function Section({ section }: { section: ComprehensionSection }) {
               </p>
               <p className="mt-1 text-xs text-ink-secondary">
                 {ui === 'en'
-                  ? `${missing.length} of ${items.length} items have no recording: ${missing.slice(0, 6).join(', ')}${missing.length > 6 ? '…' : ''}`
-                  : `${missing.length} items sur ${items.length} n'ont pas d'enregistrement : ${missing.slice(0, 6).join(', ')}${missing.length > 6 ? '…' : ''}`}
+                  ? `${missing.length} of ${recordings.length} recordings have no audio: ${missing.slice(0, 6).join(', ')}${missing.length > 6 ? '…' : ''}`
+                  : `${missing.length} enregistrements sur ${recordings.length} n'ont pas d'audio : ${missing.slice(0, 6).join(', ')}${missing.length > 6 ? '…' : ''}`}
               </p>
               <p className="mt-2 text-sm leading-relaxed text-ink-secondary">
                 {ui === 'en'
@@ -135,27 +142,36 @@ function Section({ section }: { section: ComprehensionSection }) {
           </div>
         </div>
       ) : section.delivery.presentation === 'all_at_once' ? (
-        <ol className="space-y-4">
-          {items.map((item, n) => (
-            <li key={item.id}>
-              <Item
-                item={item}
-                n={n}
-                sectionId={section.id}
-                chose={answers[item.id] ?? null}
-                onChoose={answerItem}
-                showContent
-              />
-            </li>
-          ))}
+        <ol className="space-y-6">
+          {recordings.map((rec, ri) => {
+            const its = itemsOf(section, rec.id);
+            const before = recordings.slice(0, ri).reduce((n, r) => n + itemsOf(section, r.id).length, 0);
+            return (
+              <li key={rec.id} className="space-y-3">
+                <div className="card p-6">
+                  <p className="whitespace-pre-line text-sm leading-relaxed text-ink-primary">{rec.script}</p>
+                </div>
+                {its.map((item, n) => (
+                  <Item
+                    key={item.id}
+                    item={item}
+                    n={before + n}
+                    sectionId={section.id}
+                    chose={answers[item.id] ?? null}
+                    onChoose={answerItem}
+                  />
+                ))}
+              </li>
+            );
+          })}
         </ol>
       ) : (
-        <OneAtATime
+        <OneRecording
           section={section}
-          items={items}
+          recordings={recordings}
           cursor={cursor}
           setCursor={setCursor}
-          chose={answers[items[cursor].id] ?? null}
+          answers={answers}
           onChoose={answerItem}
           ui={ui}
         />
@@ -177,44 +193,59 @@ function Section({ section }: { section: ComprehensionSection }) {
   );
 }
 
-function OneAtATime({
+/**
+ * One recording at a time, with all of its questions beneath it.
+ *
+ * The cursor indexes RECORDINGS, not questions. Before 2026-08-29 it indexed
+ * questions and the played flag was component state reset on every cursor
+ * change — which was correct only while every question had its own clip. Ten
+ * questions on one five-minute recording would have bought ten listens.
+ *
+ * The flag now lives in the sitting (`playedRecordings`), so it survives a
+ * reload and a device change: a dropped connection resumes at the questions
+ * rather than costing the candidate the recording. Ruling 2.
+ */
+function OneRecording({
   section,
-  items,
+  recordings,
   cursor,
   setCursor,
-  chose,
+  answers,
   onChoose,
   ui,
 }: {
   section: ComprehensionSection;
-  /** The épreuve's items, already served from the bank by the parent. */
-  items: ComprehensionItem[];
+  recordings: Recording[];
   cursor: number;
   setCursor: (n: number) => void;
-  chose: number | null;
+  answers: Record<string, number | null>;
   onChoose: (sectionId: string, itemId: string, chose: number | null) => void;
   ui: LanguageCode;
 }) {
-  const item = items[cursor];
-  const [played, setPlayed] = useState(false);
-
-  useEffect(() => setPlayed(false), [cursor]);
+  const { sitting, markPlayed } = useExam();
+  const rec = recordings[cursor];
+  const its = itemsOf(section, rec.id);
+  const before = recordings.slice(0, cursor).reduce((n, r) => n + itemsOf(section, r.id).length, 0);
+  const played = !!sitting?.playedRecordings.includes(rec.id);
 
   return (
     <div className="space-y-4">
       <div className="card p-6">
         <span className="chip">
-          {ui === 'en'
-            ? `Question ${cursor + 1} of ${items.length}`
-            : `Question ${cursor + 1} sur ${items.length}`}
+          {rec.part
+            ? t(rec.part, ui)
+            : ui === 'en'
+              ? `Recording ${cursor + 1} of ${recordings.length}`
+              : `Enregistrement ${cursor + 1} sur ${recordings.length}`}
         </span>
         <div className="mt-4">
           <PlayOnce
-            src={resolveAudio(item.audioPath)}
+            src={resolveAudio(rec.audioPath)}
             played={played}
-            // One play. The flag is set before the audio starts, so a reload,
-            // a second click or a failed play does not buy a second listen.
-            onPlayed={() => setPlayed(true)}
+            // Recorded before the audio starts, and written straight into the
+            // sitting, so a reload, a second click or a failed play does not
+            // buy a second listen.
+            onPlayed={() => markPlayed(rec.id)}
             label={
               played
                 ? ui === 'en' ? 'Played' : 'Écouté'
@@ -223,24 +254,25 @@ function OneAtATime({
             note={
               section.delivery.questionAfterAudio && !played
                 ? ui === 'en'
-                  ? 'The question appears after the recording, as it does in the exam.'
-                  : "La question apparaît après l'enregistrement, comme à l'examen."
+                  ? 'The questions appear after the recording, as they do in the exam.'
+                  : "Les questions apparaissent après l'enregistrement, comme à l'examen."
                 : undefined
             }
           />
         </div>
       </div>
 
-      {(!section.delivery.questionAfterAudio || played) && (
-        <Item
-          item={item}
-          n={cursor}
-          sectionId={section.id}
-          chose={chose}
-          onChoose={onChoose}
-          showContent={false}
-        />
-      )}
+      {(!section.delivery.questionAfterAudio || played) &&
+        its.map((item, n) => (
+          <Item
+            key={item.id}
+            item={item}
+            n={before + n}
+            sectionId={section.id}
+            chose={answers[item.id] ?? null}
+            onChoose={onChoose}
+          />
+        ))}
 
       <div className="flex gap-2">
         <button
@@ -251,7 +283,7 @@ function OneAtATime({
           {ui === 'en' ? 'Previous' : 'Précédent'}
         </button>
         <button
-          disabled={cursor >= items.length - 1}
+          disabled={cursor >= recordings.length - 1}
           onClick={() => setCursor(cursor + 1)}
           className="btn-secondary flex-1"
         >
@@ -268,19 +300,18 @@ function Item({
   sectionId,
   chose,
   onChoose,
-  showContent,
 }: {
   item: ComprehensionItem;
   n: number;
   sectionId: string;
   chose: number | null;
   onChoose: (sectionId: string, itemId: string, chose: number | null) => void;
-  showContent: boolean;
 }) {
+  // The material is rendered by whoever owns the recording — once, above its
+  // questions — rather than repeated under each of them.
   return (
     <div className="card p-6">
-      {showContent && <p className="whitespace-pre-line text-sm leading-relaxed text-ink-primary">{item.content}</p>}
-      <p className={clsx('font-medium text-ink-primary', showContent && 'mt-4')}>
+      <p className="font-medium text-ink-primary">
         <span className="mr-2 text-ink-secondary">{n + 1}.</span>
         {item.stem}
       </p>

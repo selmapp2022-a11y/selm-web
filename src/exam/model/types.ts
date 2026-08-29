@@ -406,34 +406,52 @@ export type TaskDefinition = {
  * nothing about reading French. The UI language may differ from the exam
  * language everywhere else in this model; here it may not.
  */
-export type ComprehensionItem = {
+/**
+ * A RECORDING — the material a candidate meets in one go, and the unit the
+ * planner schedules.
+ *
+ * Introduced 2026-08-29. Until then a comprehension item carried its own
+ * `content` and its own `audioPath`: one recording per question. That fits
+ * the TCF, whose compréhension orale is 39 short clips of one question each.
+ * It does not fit IELTS, whose Listening is **four recordings of about five
+ * minutes, each carrying ten questions** — and the once-only rule broke on
+ * it, because the played flag was keyed on the question. Ten questions
+ * sharing one file would have bought the candidate ten listens, and "heard
+ * once only" is not a detail of that exam, it is the construct.
+ *
+ * The band lives HERE, not on the question. A five-minute conversation is not
+ * written at one level, but it is what a candidate is served, and you cannot
+ * serve half of one — so the recording is what the planner can address. The
+ * per-question band survives on the item, for diagnosis rather than
+ * scheduling: *"you answered the B1 questions and missed the B2 ones"* is a
+ * pattern within one piece of material, which is a better prescription signal
+ * than anything the per-item model could produce.
+ */
+export type Recording = {
   id: string;
   /**
-   * The CEFR band this item is written to. **Ours, not the exam's.** TCF
+   * The CEFR band the RECORDING is written to. **Ours, not the exam's.** TCF
    * publishes that its comprehension épreuves run "selon un principe de
-   * difficulté progressive" and publishes nothing about which item sits at
-   * which level, so this banding is our authoring decision and is labelled as
-   * one wherever it is shown.
+   * difficulté progressive" and publishes nothing about which material sits
+   * at which level, so this banding is our authoring decision and is labelled
+   * as one wherever it is shown.
+   *
+   * This is the schedulable band — `familiesOf` counts recordings, and the
+   * planner's coordinate is `conversation · B2`, never "Part 3 of test 2".
    */
   level: 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2';
-  /** Listening: the words spoken. Reading: the passage read. */
-  content: string;
-  /** Listening only: how many voices the script has. */
-  speakers?: number;
-  stem: string;
-  options: string[];
-  /** Index into `options`. Exactly one key per item. */
-  answer: number;
-  /** What the item tests. Never shown during the section. */
-  rationale?: string;
   /**
-   * Which `ComprehensionFamily` this item belongs to — the teaching unit.
+   * Which `ComprehensionFamily` this recording belongs to — the teaching unit.
    *
-   * Optional because an exam may declare no taxonomy, and because an item
+   * Optional because an exam may declare no taxonomy, and because material
    * with no family is a **visible gap** rather than a silent default: the
    * planner routes on this, and a wrong family is worse than a missing one.
    */
   family?: string;
+  /** Listening: the words spoken. Reading: the passage read. */
+  script: string;
+  /** Listening only: how many voices the script has. */
+  speakers?: number;
   /**
    * Path to the rendered audio **within the audio store**, e.g.
    * `tcf-co/tcf-co-01.mp3` — not a full URL. `resolveAudio()` joins it with
@@ -441,11 +459,38 @@ export type ComprehensionItem = {
    * today and from the CDN later without editing a single item.
    *
    * Authored once, stored, served — never generated per user and never
-   * generated at request time. Absent means not yet rendered, and a section
-   * whose items are missing audio refuses to run rather than falling back to
-   * showing the script.
+   * generated at request time. Absent means not yet rendered, and a play-once
+   * section holding an unrendered recording refuses to run rather than
+   * falling back to showing the script.
    */
   audioPath?: string;
+  /**
+   * The exam's own name for this piece, where it publishes one — IELTS names
+   * four Parts and a candidate hears them named. Absent where the exam does
+   * not, as with the TCF's undifferentiated 39.
+   */
+  part?: Localised;
+};
+
+export type ComprehensionItem = {
+  id: string;
+  /** The recording this question is asked about. */
+  recordingId: string;
+  /**
+   * The CEFR band this QUESTION is written to.
+   *
+   * Diagnostic only. The recording carries the schedulable band — see
+   * `Recording.level`. Ten questions on one conversation are deliberately not
+   * of equal difficulty, and which of them a candidate held is the signal a
+   * prescription is built from.
+   */
+  level: 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2';
+  stem: string;
+  options: string[];
+  /** Index into `options`. Exactly one key per item. */
+  answer: number;
+  /** What the item tests. Never shown during the section. */
+  rationale?: string;
 };
 
 /**
@@ -535,6 +580,14 @@ export type ComprehensionSection = {
      */
     byBand: Record<string, number>;
   };
+  /**
+   * The material. One entry per recording (listening) or passage (reading).
+   *
+   * `serve` draws RECORDINGS, not questions — a recording's questions travel
+   * with it, because half a recording cannot be served.
+   */
+  recordings: Recording[];
+  /** The questions, each naming the recording it is asked about. */
   items: ComprehensionItem[];
 };
 

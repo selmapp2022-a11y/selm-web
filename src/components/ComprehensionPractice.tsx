@@ -4,7 +4,8 @@ import { CheckCircle2, XCircle, Headphones, BookOpen, RefreshCcw } from 'lucide-
 import clsx from 'clsx';
 import { loadPlan, PLAN_EVENT } from '../exam/model/plan';
 import { resolveAudio } from '../exam/engine/audio';
-import type { ComprehensionItem, ComprehensionSection, LanguageCode } from '../exam/model/types';
+import { itemsOf } from '../exam/engine/comprehension';
+import type { ComprehensionSection, LanguageCode, Recording } from '../exam/model/types';
 
 /**
  * Practice for a comprehension skill, served from THE EXAM'S OWN BANK.
@@ -38,7 +39,7 @@ export function ComprehensionPractice({ skill }: { skill: 'reading' | 'listening
     | { kind: 'no-plan' }
     | { kind: 'no-section'; examName: string }
     | { kind: 'no-audio'; examName: string }
-    | { kind: 'ready'; examName: string; section: ComprehensionSection; items: ComprehensionItem[]; lang: LanguageCode }
+    | { kind: 'ready'; examName: string; section: ComprehensionSection; recordings: Recording[]; lang: LanguageCode }
   >({ kind: 'loading' });
 
   useEffect(() => {
@@ -56,14 +57,14 @@ export function ComprehensionPractice({ skill }: { skill: 'reading' | 'listening
       );
       if (!section) { if (alive) setState({ kind: 'no-section', examName }); return; }
 
-      // An item whose audio was never rendered cannot be a listening question.
+      // A recording that was never rendered cannot carry listening questions.
       // Showing its script would turn a listening test into a reading test -
       // the same rule SectionPage enforces, for the same reason.
       const usable = section.delivery.audioPlaysOnce
-        ? section.items.filter((i) => !!i.audioPath)
-        : section.items;
+        ? section.recordings.filter((r) => !!r.audioPath)
+        : section.recordings;
       if (!usable.length) { if (alive) setState({ kind: 'no-audio', examName }); return; }
-      if (alive) setState({ kind: 'ready', examName, section, items: usable, lang });
+      if (alive) setState({ kind: 'ready', examName, section, recordings: usable, lang });
     };
     read();
     window.addEventListener(PLAN_EVENT, read);
@@ -136,48 +137,65 @@ export function ComprehensionPractice({ skill }: { skill: 'reading' | 'listening
     );
   }
 
-  return <Runner examName={state.examName} section={state.section} items={state.items} />;
+  return <Runner examName={state.examName} section={state.section} recordings={state.recordings} />;
 }
 
+/**
+ * Practice serves a WHOLE PART: the recording, then its questions, then
+ * feedback on all of them.
+ *
+ * Per-question listening practice does not exist for this skill. Question 7
+ * without the four minutes of conversation before it is not a task, it is a
+ * guess — ruling 3.
+ *
+ * And practice may replay, where the exam may not. The distinction is not
+ * arbitrary: **refusing the script protects the construct, because reading a
+ * transcript is a different skill. Replaying the audio does not — it is the
+ * same skill, attempted again.** So the transcript stays hidden here too, and
+ * the replay is allowed. The screen says the exam plays once, because the
+ * candidate should never learn that difference on exam day.
+ */
 function Runner({
   examName,
   section,
-  items,
+  recordings,
 }: {
   examName: string;
   section: ComprehensionSection;
-  items: ComprehensionItem[];
+  recordings: Recording[];
 }) {
-  // Easiest first. Practice is not a measurement, so there is no reason to open
-  // on a C2 item and no reason to randomise; a ladder is what teaches.
+  // Easiest first. Practice is not a measurement, so there is no reason to
+  // open on a C2 recording and no reason to randomise; a ladder is what
+  // teaches.
   const ordered = useMemo(() => {
     const CEFR = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
-    return [...items].sort((a, b) => CEFR.indexOf(a.level) - CEFR.indexOf(b.level));
-  }, [items]);
+    return [...recordings].sort((a, b) => CEFR.indexOf(a.level) - CEFR.indexOf(b.level));
+  }, [recordings]);
 
   const [cursor, setCursor] = useState(0);
-  const [chose, setChose] = useState<number | null>(null);
-  const [revealed, setRevealed] = useState(false);
-  const [correct, setCorrect] = useState(0);
+  const [chosen, setChosen] = useState<Record<string, number>>({});
+  const [marked, setMarked] = useState(false);
+  const [tally, setTally] = useState({ correct: 0, total: 0 });
   const [done, setDone] = useState(false);
 
-  const item = ordered[cursor];
+  const rec = ordered[cursor];
+  const items = useMemo(() => (rec ? itemsOf(section, rec.id) : []), [section, rec]);
   const isAudio = section.delivery.audioPlaysOnce;
-  const family = section.families?.find((f) => f.id === item?.family);
+  const family = section.families?.find((f) => f.id === rec?.family);
 
   const restart = () => {
-    setCursor(0); setChose(null); setRevealed(false); setCorrect(0); setDone(false);
+    setCursor(0); setChosen({}); setMarked(false); setTally({ correct: 0, total: 0 }); setDone(false);
   };
 
   if (done) {
     return (
       <div className="card p-6 text-center">
         <p className="font-display text-2xl font-bold text-navy">
-          {correct} of {ordered.length}
+          {tally.correct} of {tally.total}
         </p>
         <p className="mt-2 text-sm text-ink-secondary">
-          These are practice items from the {examName} bank. Your score here is not a predicted band —
-          it is how you did on these questions today.
+          These are practice questions from the {examName} bank. Your score here is not a predicted
+          band — it is how you did on these questions today.
         </p>
         <button onClick={restart} className="btn-primary mt-4 inline-flex items-center gap-2">
           <RefreshCcw className="h-4 w-4" /> Again
@@ -186,73 +204,98 @@ function Runner({
     );
   }
 
-  const answer = (i: number) => {
-    if (revealed) return;
-    setChose(i);
-    setRevealed(true);
-    if (i === item.answer) setCorrect((n) => n + 1);
+  const allAnswered = items.every((i) => typeof chosen[i.id] === 'number');
+
+  const mark = () => {
+    const right = items.filter((i) => chosen[i.id] === i.answer).length;
+    setTally((t) => ({ correct: t.correct + right, total: t.total + items.length }));
+    setMarked(true);
   };
 
   const next = () => {
     if (cursor + 1 >= ordered.length) { setDone(true); return; }
-    setCursor(cursor + 1); setChose(null); setRevealed(false);
+    setCursor(cursor + 1); setChosen({}); setMarked(false);
   };
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between text-xs text-ink-secondary">
-        <span>Question {cursor + 1} of {ordered.length}</span>
-        <span className="chip">{item.level}{family ? ` · ${family.label.en}` : ''}</span>
+        <span>
+          {isAudio ? 'Recording' : 'Passage'} {cursor + 1} of {ordered.length} · {items.length}{' '}
+          {items.length === 1 ? 'question' : 'questions'}
+        </span>
+        <span className="chip">{rec.level}{family ? ` · ${family.label.en}` : ''}</span>
       </div>
 
       <div className="card p-6">
         {isAudio ? (
-          <audio controls src={resolveAudio(item.audioPath)} className="w-full" />
-        ) : (
-          <p className="whitespace-pre-line text-sm leading-relaxed text-ink-primary">{item.content}</p>
-        )}
-
-        <p className="mt-4 font-medium text-ink-primary">{item.stem}</p>
-
-        <div className="mt-3 space-y-2">
-          {item.options.map((o, i) => {
-            const isKey = i === item.answer;
-            const picked = chose === i;
-            return (
-              <button
-                key={i}
-                onClick={() => answer(i)}
-                disabled={revealed}
-                className={clsx(
-                  'flex w-full items-start gap-2 rounded-xl border-2 px-5 py-3 text-left text-sm font-medium transition-all',
-                  !revealed && 'border-surface-divider bg-white text-ink-secondary hover:border-navy/40 hover:bg-surface-muted',
-                  revealed && isKey && 'border-teal bg-teal/10 text-navy',
-                  revealed && picked && !isKey && 'border-red-400 bg-red-50 text-red-800',
-                  revealed && !picked && !isKey && 'border-surface-divider bg-white text-ink-secondary opacity-60',
-                )}
-              >
-                {revealed && isKey && <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-teal" />}
-                {revealed && picked && !isKey && <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-500" />}
-                <span>{o}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        {revealed && (
-          <div className="mt-4 rounded-xl bg-surface-muted p-4">
-            <p className="text-sm font-medium text-navy">
-              {chose === item.answer ? 'Correct' : 'Not this one'}
+          <>
+            <audio controls src={resolveAudio(rec.audioPath)} className="w-full" />
+            <p className="mt-2 text-xs text-ink-secondary">
+              You can replay this here. In the real exam you will hear it once.
             </p>
-            {item.rationale && (
-              <p className="mt-1 text-sm leading-relaxed text-ink-secondary">{item.rationale}</p>
-            )}
-            <button onClick={next} className="btn-primary mt-3">
-              {cursor + 1 >= ordered.length ? 'Finish' : 'Next question'}
-            </button>
-          </div>
+          </>
+        ) : (
+          <p className="whitespace-pre-line text-sm leading-relaxed text-ink-primary">{rec.script}</p>
         )}
       </div>
+
+      {items.map((item, n) => {
+        const pick = chosen[item.id];
+        return (
+          <div key={item.id} className="card p-6">
+            <p className="font-medium text-ink-primary">
+              <span className="mr-2 text-ink-secondary">{n + 1}.</span>
+              {item.stem}
+            </p>
+            <div className="mt-3 space-y-2">
+              {item.options.map((o, i) => {
+                const isKey = i === item.answer;
+                const picked = pick === i;
+                return (
+                  <button
+                    key={i}
+                    onClick={() => !marked && setChosen((c) => ({ ...c, [item.id]: i }))}
+                    disabled={marked}
+                    className={clsx(
+                      'flex w-full items-start gap-2 rounded-xl border-2 px-5 py-3 text-left text-sm font-medium transition-all',
+                      !marked && picked && 'border-teal bg-teal/10 text-navy',
+                      !marked && !picked && 'border-surface-divider bg-white text-ink-secondary hover:border-navy/40 hover:bg-surface-muted',
+                      marked && isKey && 'border-teal bg-teal/10 text-navy',
+                      marked && picked && !isKey && 'border-red-400 bg-red-50 text-red-800',
+                      marked && !picked && !isKey && 'border-surface-divider bg-white text-ink-secondary opacity-60',
+                    )}
+                  >
+                    {marked && isKey && <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-teal" />}
+                    {marked && picked && !isKey && <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-500" />}
+                    <span>{o}</span>
+                  </button>
+                );
+              })}
+            </div>
+            {marked && item.rationale && (
+              <p className="mt-3 rounded-xl bg-surface-muted p-3 text-sm leading-relaxed text-ink-secondary">
+                {item.rationale}
+              </p>
+            )}
+          </div>
+        );
+      })}
+
+      {marked ? (
+        <button onClick={next} className="btn-primary w-full">
+          {cursor + 1 >= ordered.length ? 'Finish' : isAudio ? 'Next recording' : 'Next passage'}
+        </button>
+      ) : (
+        <button
+          onClick={mark}
+          disabled={!allAnswered}
+          className={clsx('w-full rounded-xl px-5 py-3 text-sm font-semibold',
+            allAnswered ? 'bg-navy text-white' : 'cursor-not-allowed bg-surface-muted text-ink-secondary')}
+        >
+          {allAnswered ? 'Check my answers' : `Answer all ${items.length} to check`}
+        </button>
+      )}
 
       <div className="card p-6">
         <p className="text-xs leading-relaxed text-ink-secondary">{section.provenance.en}</p>

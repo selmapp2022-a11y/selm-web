@@ -24,7 +24,7 @@
  * rendering this must show the count, may show the profile, and must not
  * print a three-digit number.
  */
-import type { ComprehensionItem, ComprehensionSection, Localised } from '../model/types';
+import type { ComprehensionItem, ComprehensionSection, Localised, Recording } from '../model/types';
 import { newServeState, serve, type ServeState } from './pool';
 
 export const BANDS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'] as const;
@@ -124,7 +124,11 @@ export function governingLevel(levels: Array<number | null>): { level: number | 
 }
 
 /**
- * The items ONE sitting presents, drawn from a bank that may be larger.
+ * The RECORDINGS one sitting presents, drawn from a bank that may be larger.
+ *
+ * Serves recordings rather than questions since 2026-08-29: a recording's
+ * questions travel with it, because half a recording cannot be served. See
+ * `Recording` in the model for why the band lives there.
  *
  * Found 2026-08-28, by the bank's own check failing after eighteen items
  * were written for compréhension écrite: `items.length` had been serving as
@@ -148,24 +152,34 @@ export function governingLevel(levels: Array<number | null>): { level: number | 
 export function serveEpreuve(
   section: ComprehensionSection,
   st?: ServeState,
-): ComprehensionItem[] {
+): Recording[] {
   const spec = section.serve;
-  if (!spec) return section.items;
+  if (!spec) return section.recordings;
   const state = st ?? newServeState();
-  const out: ComprehensionItem[] = [];
+  const out: Recording[] = [];
   for (const band of BANDS) {
     const want = spec.byBand[band] ?? 0;
-    const pool = section.items.filter((i) => i.level === band);
+    const pool = section.recordings.filter((r) => r.level === band);
     for (let n = 0; n < want; n++) {
       const { item } = serve(pool, state);
       if (item) out.push(item);
     }
   }
   // Ladder order, and stable within a band on the bank's own order.
-  const at = new Map(section.items.map((i, n) => [i.id, n]));
+  const at = new Map(section.recordings.map((r, n) => [r.id, n]));
   return out.sort(
     (a, b) =>
       BANDS.indexOf(a.level as Band) - BANDS.indexOf(b.level as Band) ||
       (at.get(a.id)! - at.get(b.id)!),
   );
+}
+
+/** The questions asked about one recording, in the bank's own order. */
+export function itemsOf(section: ComprehensionSection, recordingId: string): ComprehensionItem[] {
+  return section.items.filter((i) => i.recordingId === recordingId);
+}
+
+/** The questions carried by a served set of recordings, in that order. */
+export function itemsFor(section: ComprehensionSection, recordings: Recording[]): ComprehensionItem[] {
+  return recordings.flatMap((r) => itemsOf(section, r.id));
 }

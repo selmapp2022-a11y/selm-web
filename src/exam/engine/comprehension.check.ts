@@ -46,10 +46,20 @@ for (const s of sections) {
   );
   ok(new Set(s.items.map((i) => i.id)).size === s.items.length, `${s.id}: ids unique`);
   ok(s.items.every((i) => new Set(i.options).size === 4), `${s.id}: no duplicate options`);
-  ok(s.items.every((i) => i.content.trim().length > 0), `${s.id}: no empty content`);
+  ok(s.recordings.every((r) => r.script.trim().length > 0), `${s.id}: no empty script`);
+  // Every question names material that exists, and every piece of material is
+  // asked about. A recording with no questions is dead weight; a question
+  // pointing at nothing is a crash waiting for a candidate to find it.
+  const recIds = new Set(s.recordings.map((r) => r.id));
+  ok(s.items.every((i) => recIds.has(i.recordingId)), `${s.id}: every question names a real recording`);
+  ok(
+    s.recordings.every((r) => s.items.some((i) => i.recordingId === r.id)),
+    `${s.id}: every recording is asked about`
+  );
+  ok(new Set(s.recordings.map((r) => r.id)).size === s.recordings.length, `${s.id}: recording ids unique`);
   // Progressive difficulty: the bands never go backwards down the list.
   const order = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
-  const idx = s.items.map((i) => order.indexOf(i.level));
+  const idx = s.recordings.map((r) => order.indexOf(r.level));
   ok(idx.every((v, n) => n === 0 || v >= idx[n - 1]), `${s.id}: difficulty never goes backwards`);
   // No item is answerable by picking the longest option every time.
   const longest = s.items.filter(
@@ -133,15 +143,17 @@ console.log(
 console.log('\n5. The audio bank\n');
 for (const s of sections) {
   if (!s.delivery.audioPlaysOnce) continue;
-  const withAudio = s.items.filter((i) => i.audioPath).length;
-  ok(withAudio === s.items.length, `${s.id}: every item has a recording`, `${withAudio}/${s.items.length}`);
+  const withAudio = s.recordings.filter((r) => r.audioPath).length;
+  ok(withAudio === s.recordings.length, `${s.id}: every recording has audio`, `${withAudio}/${s.recordings.length}`);
   ok(
-    s.items.every((i) => !i.audioPath || /^tcf-co\/tcf-co-\d\d\.mp3$/.test(i.audioPath)),
+    s.recordings.every((r) => !r.audioPath || /^[a-z0-9-]+\/[a-z0-9-]+\.mp3$/.test(r.audioPath)),
     `${s.id}: every path is a store path, not a hardcoded URL`
   );
+  // Two RECORDINGS sharing a file is a bug. Two QUESTIONS sharing a recording
+  // is the point — IELTS asks ten of them about one five-minute part.
   ok(
-    new Set(s.items.map((i) => i.audioPath)).size === s.items.length,
-    `${s.id}: no two items share a recording`
+    new Set(s.recordings.map((r) => r.audioPath)).size === s.recordings.length,
+    `${s.id}: no two recordings share a file`
   );
 }
 

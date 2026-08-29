@@ -183,12 +183,13 @@ export async function comprehensionFamiliesFor(
       total: 0,
       byLevel: {},
     }));
+    // Coverage is counted in RECORDINGS, matching what the planner schedules.
     let unassigned = 0;
-    for (const it of sec.items) {
-      const row = out.find((f) => f.id === it.family);
+    for (const r of sec.recordings) {
+      const row = out.find((f) => f.id === r.family);
       if (!row) { unassigned += 1; continue; }
       row.total += 1;
-      row.byLevel[it.level] = (row.byLevel[it.level] ?? 0) + 1;
+      row.byLevel[r.level] = (row.byLevel[r.level] ?? 0) + 1;
     }
     return { lang, families: out, unassigned };
   }

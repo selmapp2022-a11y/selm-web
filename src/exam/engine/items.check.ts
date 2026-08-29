@@ -39,6 +39,11 @@ const soft: string[] = [];
 
 for (const sec of sections) {
   const items = sec.items;
+  // The material moved to `recordings` on 2026-08-29 (see the model). Where a
+  // check reads the passage or the family, it reads the recording the
+  // question is asked about.
+  const recOf = (it: { recordingId: string }) =>
+    sec.recordings.find((r) => r.id === it.recordingId);
   console.log(`\n${'='.repeat(84)}\n${sec.id} — ${items.length} items`);
 
   // ── structural, per item. These are defects, not tendencies. ──────────
@@ -48,7 +53,7 @@ for (const sec of sections) {
     if (it.answer < 0 || it.answer >= it.options.length) p.push('answer out of range');
     if (new Set(it.options.map((o) => o.trim().toLowerCase())).size !== it.options.length)
       p.push('duplicate options');
-    if (!it.family) p.push('no family');
+    if (!recOf(it)?.family) p.push('no family');
     if (!it.rationale) p.push('no rationale');
     if (!it.stem.trim().endsWith('?') && !it.stem.trim().endsWith(':')) p.push('stem is not a question');
     if (p.length) { hard += p.length; console.log(`  ✗ ${it.id}: ${p.join(', ')}`); }
@@ -85,7 +90,7 @@ for (const sec of sections) {
   // ── does a distractor echo the passage more than the key does? ────────
   let echo = 0;
   for (const it of items) {
-    const src = tokenSet(it.content, SEG);
+    const src = tokenSet(recOf(it)?.script ?? '', SEG);
     const overlap = it.options.map((o) => {
       const w = words(o, SEG).map((x) => x.toLowerCase()).filter((x) => x.length > 3);
       return w.length ? w.filter((x) => src.has(x)).length / w.length : 0;
@@ -98,7 +103,9 @@ for (const sec of sections) {
 
   // ── per family × level, the planner's own coordinate ──────────────────
   const grid = new Map<string, number>();
-  for (const it of items) grid.set(`${it.family}|${it.level}`, (grid.get(`${it.family}|${it.level}`) ?? 0) + 1);
+  // Counted in RECORDINGS: the planner's coordinate is a recording, because
+  // that is what a candidate is served.
+  for (const r of sec.recordings) grid.set(`${r.family}|${r.level}`, (grid.get(`${r.family}|${r.level}`) ?? 0) + 1);
   const empty = [...(sec.families ?? [])].flatMap((f) =>
     ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'].filter((l) => (grid.get(`${f.id}|${l}`) ?? 0) < 4).map((l) => `${f.id}·${l}`),
   );

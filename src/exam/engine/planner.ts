@@ -98,10 +98,15 @@ function familiesOf(exam: ExamDefinition, skill: SkillId): Array<{ family: strin
   const out: Array<{ family: string; level: string; items: number }> = [];
   for (const s of exam.sections) {
     if (s.kind !== 'comprehension' || s.skill !== skill) continue;
+    // Ruling 4: the RECORDING is the schedulable unit, because it is what a
+    // candidate is served and you cannot serve half of one. Counting
+    // questions here would have let the planner emit two coordinates that
+    // require the same recording — which the once-only rule then has to
+    // answer for. A recording IS one coordinate, so that cannot arise.
     const counts = new Map<string, number>();
-    for (const it of s.items) {
-      if (!it.family) continue;
-      const k = `${it.family}|${it.level}`;
+    for (const r of s.recordings) {
+      if (!r.family) continue;
+      const k = `${r.family}|${r.level}`;
       counts.set(k, (counts.get(k) ?? 0) + 1);
     }
     for (const f of s.families ?? [])

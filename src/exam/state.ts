@@ -35,6 +35,27 @@ export type Sitting = {
   answers: Record<string, Record<string, number | null>>;
   /** Section ids already submitted. */
   submitted: string[];
+  /**
+   * Recordings already played, by recording id.
+   *
+   * Ruling 2, and it is a fairness ruling rather than a mechanism. The played
+   * flag used to be component state keyed on the question, so a reload gave
+   * the candidate the recording again — and, once a recording carries ten
+   * questions, moving between them did too.
+   *
+   * It lives in the sitting so that it survives a reload AND a device change.
+   * But it records that the recording was PLAYED, not that the page was
+   * LOADED. A reload is usually not a candidate seeking a second listen; it
+   * is a dropped connection, and this product's priority market sits on
+   * unreliable connectivity. If a reload cost the recording, the first
+   * candidate whose connection drops mid-part loses their mock and does not
+   * come back — a worse failure than an unearned advantage, and one that
+   * punishes exactly the people the product exists for.
+   *
+   * So: once per sitting, not once per page load. Already played means resume
+   * at the questions. "Heard once" means once. It does not mean zero.
+   */
+  playedRecordings: string[];
 };
 
 const SITTING_KEY = 'selm_exam_sitting_v1';
@@ -42,7 +63,13 @@ const SITTING_KEY = 'selm_exam_sitting_v1';
 const loadSitting = (): Sitting | null => {
   try {
     const raw = localStorage.getItem(SITTING_KEY);
-    return raw ? (JSON.parse(raw) as Sitting) : null;
+    if (!raw) return null;
+    const v = JSON.parse(raw) as Sitting;
+    // A sitting saved before `playedRecordings` existed is still a sitting.
+    // Treating it as unplayable, or crashing on it, would end a mock that was
+    // already in progress when the app updated underneath the candidate.
+    if (!Array.isArray(v.playedRecordings)) v.playedRecordings = [];
+    return v;
   } catch {
     return null;
   }
@@ -79,6 +106,8 @@ type ExamState = {
   clearHistory: () => void;
   startSitting: (e: ExamDefinition) => void;
   answerItem: (sectionId: string, itemId: string, chose: number | null) => void;
+  /** Record that a recording has been played. Irreversible within a sitting. */
+  markPlayed: (recordingId: string) => void;
   submitSection: (sectionId: string) => void;
   endSitting: () => void;
 };
@@ -206,10 +235,24 @@ export const useExam = create<ExamState>((set) => ({
       sectionStartedAt: Date.now(),
       answers: {},
       submitted: [],
+      playedRecordings: [],
     };
     saveSitting(sitting);
     set({ exam, sitting });
   },
+  markPlayed: (recordingId) =>
+    set((st) => {
+      if (!st.sitting) return st;
+      if (st.sitting.playedRecordings.includes(recordingId)) return st;
+      const sitting = {
+        ...st.sitting,
+        playedRecordings: [...st.sitting.playedRecordings, recordingId],
+      };
+      // Saved before the audio starts, so a reload, a second click or a
+      // failed play cannot buy a second listen.
+      saveSitting(sitting);
+      return { sitting };
+    }),
   answerItem: (sectionId, itemId, chose) =>
     set((st) => {
       if (!st.sitting) return st;
