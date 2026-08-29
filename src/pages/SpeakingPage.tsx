@@ -9,6 +9,7 @@ import { TopicPicker, SPEAKING_TOPICS } from '../components/TopicPicker';
 import { CompletionCard } from '../components/CompletionCard';
 import { ErrorBox } from '../components/States';
 import { practiceTasksFor, pronunciationLinesFor, type PracticeSet, type PracticeTask } from '../lib/practiceTasks';
+import { SeenBefore } from '../components/SeenBefore';
 import { difficultyForSkill } from '../lib/difficulty';
 import { ts } from '../i18n';
 
@@ -401,6 +402,7 @@ function TaskMode({ task }: { task: PracticeTask }) {
           <p className="text-base leading-relaxed text-ink-primary">{prompt}</p>
           <p className="mt-3 text-xs text-ink-secondary">Speak for 1–2 minutes.</p>
         </div>
+        <SeenBefore taskId={task.id} taskTitle={task.title} verb="recorded" />
         <AudioRecorder onComplete={onRecorded} maxSeconds={120} label="Tap to start your 2-minute response" />
       </div>
       <div className="space-y-4">
@@ -411,6 +413,7 @@ function TaskMode({ task }: { task: PracticeTask }) {
           <CompletionCard
             skill="speaking"
             topic={task.title}
+            itemId={task.id}
             score={Math.round(result.overall_score)}
             onNext={() => { setResult(null); setErr(null); }}
             nextLabel="Record again"

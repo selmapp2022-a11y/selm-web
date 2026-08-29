@@ -34,6 +34,20 @@ export type Attempt = {
   skill: SkillKey;
   /** The task or family this belonged to, as the planner names it. */
   topic?: string;
+  /**
+   * The exact recording or task this attempt was about.
+   *
+   * Added 2026-08-29. `topic` is the planner's coordinate — `dialogue · B1` —
+   * and thirty-nine TCF recordings share eleven of them, so the topic cannot
+   * say WHICH recording was practised. Practice needs that to obey §4.3
+   * ("least-recently-served among unseen"): without it the selector has no
+   * memory and opens on the same recording forever, which is exactly the
+   * defect this field was added to fix.
+   *
+   * Optional, because attempts written before today do not carry it and an
+   * absent id is honestly "we do not know which one", not "recording 1".
+   */
+  itemId?: string;
   score?: number;
   total?: number;
   /** Epoch ms the work finished. */
@@ -60,6 +74,7 @@ function read(): Attempt[] {
       .map((e: any) => ({
         skill: e.skill as SkillKey,
         topic: typeof e.topic === 'string' ? e.topic : undefined,
+        itemId: typeof e.itemId === 'string' ? e.itemId : undefined,
         score: typeof e.score === 'number' ? e.score : undefined,
         total: typeof e.total === 'number' ? e.total : undefined,
         ts: e.ts as number,
@@ -97,10 +112,10 @@ export async function syncAttemptsFromBackend(): Promise<void> {
     const seen = new Set<string>();
     const merged: Attempt[] = [];
     for (const a of [...remote, ...local]) {
-      const k = `${a.skill}|${a.topic ?? ''}|${a.ts}`;
+      const k = `${a.skill}|${a.topic ?? ''}|${a.itemId ?? ''}|${a.ts}`;
       if (seen.has(k)) continue;
       seen.add(k);
-      merged.push({ skill: a.skill, topic: a.topic, score: a.score, total: a.total, ts: a.ts });
+      merged.push({ skill: a.skill, topic: a.topic, itemId: a.itemId, score: a.score, total: a.total, ts: a.ts });
     }
     merged.sort((x, y) => x.ts - y.ts);
     if (merged.length > MAX) merged.splice(0, merged.length - MAX);

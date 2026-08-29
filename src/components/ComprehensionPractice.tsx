@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CheckCircle2, XCircle, Headphones, BookOpen, RefreshCcw } from 'lucide-react';
 import clsx from 'clsx';
@@ -6,7 +6,9 @@ import { loadPlan, PLAN_EVENT } from '../exam/model/plan';
 import { resolveAudio } from '../exam/engine/audio';
 import { itemsOf } from '../exam/engine/comprehension';
 import type { ComprehensionSection, LanguageCode, Recording } from '../exam/model/types';
-import { recordAttempt, type SkillKey } from '../lib/attempts';
+import { getAttempts, recordAttempt, ATTEMPTS_EVENT, type SkillKey } from '../lib/attempts';
+import { practicable, practiceState, servePractice, type PracticeServe } from '../exam/engine/practicePool';
+import type { ServeState } from '../exam/engine/pool';
 import { isCompletionItem, isMatchingItem } from '../exam/model/types';
 import { markCompletion } from '../exam/engine/completion';
 import { isResponseCorrect } from '../exam/engine/comprehension';
@@ -64,10 +66,15 @@ export function ComprehensionPractice({ skill }: { skill: 'reading' | 'listening
 
       // A recording that was never rendered cannot carry listening questions.
       // Showing its script would turn a listening test into a reading test -
-      // the same rule SectionPage enforces, for the same reason.
-      const usable = section.delivery.audioPlaysOnce
-        ? section.recordings.filter((r) => !!r.audioPath)
-        : section.recordings;
+      // the same rule SectionPage enforces, for the same reason. A recording
+      // with no questions is dropped for a duller reason: it would be served
+      // as a turn of practice on which nothing can be answered.
+      //
+      // `practicable` is the shared filter, so the number the header prints
+      // is the number the selector can actually reach. When those two drifted
+      // apart in the inventory the row read "40 exists / 4 reachable" and was
+      // nonsense; the fix there was to count one thing, and it is the fix here.
+      const usable = practicable(section);
       if (!usable.length) { if (alive) setState({ kind: 'no-audio', examName }); return; }
       if (alive) setState({ kind: 'ready', examName, section, recordings: usable, lang });
     };
@@ -169,42 +176,103 @@ function Runner({
   section: ComprehensionSection;
   recordings: Recording[];
 }) {
-  // Easiest first. Practice is not a measurement, so there is no reason to
-  // open on a C2 recording and no reason to randomise; a ladder is what
-  // teaches.
-  const ordered = useMemo(() => {
-    const CEFR = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
-    return [...recordings].sort((a, b) => CEFR.indexOf(a.level) - CEFR.indexOf(b.level));
-  }, [recordings]);
+  // Which recording to serve is NOT this component's decision, and that is
+  // the fix. Until 2026-08-29 it was: sort easiest-first, `useState(0)`, read
+  // index 0 - and since component state does not survive a navigation, the
+  // index was 0 on every arrival. Thirty-nine TCF recordings served one.
+  //
+  // The rule now comes from `servePractice`, which is `pool.ts` §4.3 given a
+  // memory that outlives the page: the attempt log. See `practicePool.ts`.
+  const st = useRef<ServeState | null>(null);
+  // Set just before this component writes an attempt of its own, so the
+  // ATTEMPTS_EVENT that write fires does not restart the sitting the
+  // candidate is in the middle of. Only somebody ELSE's write - the backend
+  // sync landing - should reopen the bank.
+  const ownWrite = useRef(false);
+  const [current, setCurrent] = useState<PracticeServe | null>(null);
+  // Set when the candidate has finished the bank and asked to go round again,
+  // so the "you have done all of these" panel is shown once and not on every
+  // subsequent recording.
+  const [replaying, setReplaying] = useState(false);
 
-  const [cursor, setCursor] = useState(0);
   const [chosen, setChosen] = useState<Record<string, number | string>>({});
   const [marked, setMarked] = useState(false);
   const [tally, setTally] = useState({ correct: 0, total: 0 });
-  const [done, setDone] = useState(false);
 
-  const rec = ordered[cursor];
+  // Built from storage on arrival, and rebuilt when the backend sync lands -
+  // a candidate who practised on their phone this morning should not be
+  // handed the same recording on their laptop this afternoon.
+  useEffect(() => {
+    const open = () => {
+      if (ownWrite.current) { ownWrite.current = false; return; }
+      st.current = practiceState(recordings, getAttempts());
+      setCurrent(servePractice(recordings, st.current));
+      setReplaying(false);
+      setChosen({}); setMarked(false); setTally({ correct: 0, total: 0 });
+    };
+    open();
+    window.addEventListener(ATTEMPTS_EVENT, open);
+    return () => window.removeEventListener(ATTEMPTS_EVENT, open);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [recordings]);
+
+  const rec = current?.item ?? null;
   const items = useMemo(() => (rec ? itemsOf(section, rec.id) : []), [section, rec]);
   const isAudio = section.delivery.audioPlaysOnce;
   const family = section.families?.find((f) => f.id === rec?.family);
+  const noun = isAudio ? 'recording' : 'passage';
 
-  const restart = () => {
-    setCursor(0); setChosen({}); setMarked(false); setTally({ correct: 0, total: 0 }); setDone(false);
-  };
+  if (!current || !rec) {
+    return <div className="card p-6 text-sm text-ink-secondary">Loading…</div>;
+  }
 
-  if (done) {
+  /**
+   * The bank is finished, and the screen says so.
+   *
+   * The old code showed a score card here — "12 of 15", "Again" — which read
+   * as the end of an exercise and said nothing about the bank. It could not:
+   * it had no idea how large the bank was, because it never asked.
+   *
+   * The founder's ruling on the thin banks is the reason this panel names a
+   * number: *"a skill with one item should not present it as though there
+   * were more."* Four IELTS listening parts is one paper. Practising them a
+   * fifth time is not practising listening, and the candidate is the one
+   * person who cannot tell.
+   */
+  if (current.recycled && !replaying) {
     return (
-      <div className="card p-6 text-center">
-        <p className="font-display text-2xl font-bold text-navy">
-          {tally.correct} of {tally.total}
+      <div className="card p-6">
+        {tally.total > 0 && (
+          <p className="font-display text-2xl font-bold text-navy">
+            {tally.correct} of {tally.total}
+          </p>
+        )}
+        <p className={clsx('text-sm leading-relaxed text-ink-primary', tally.total > 0 && 'mt-3')}>
+          You have now practised every {noun} we have for {examName} {section.skill} — all{' '}
+          <strong>{current.total}</strong> of {current.total === 1 ? 'it' : 'them'}.
         </p>
-        <p className="mt-2 text-sm text-ink-secondary">
-          These are practice questions from the {examName} bank. Your score here is not a predicted
-          band — it is how you did on these questions today.
+        <p className="mt-2 text-sm leading-relaxed text-ink-secondary">
+          You may go through them again, and there is some use in that — spelling, the second
+          listen, the question you rushed. But a {noun} you have already answered mostly tests
+          whether you remember it, and remembering is not the skill the exam awards. We are saying
+          so rather than dealing you the same {noun} without comment.
         </p>
-        <button onClick={restart} className="btn-primary mt-4 inline-flex items-center gap-2">
-          <RefreshCcw className="h-4 w-4" /> Again
-        </button>
+        {tally.total > 0 && (
+          <p className="mt-2 text-sm text-ink-secondary">
+            The score above is how you did on these questions today. It is not a predicted band.
+          </p>
+        )}
+        <div className="mt-4 flex flex-wrap gap-3">
+          <button
+            onClick={() => { setReplaying(true); setChosen({}); setMarked(false); setTally({ correct: 0, total: 0 }); }}
+            className="btn-primary inline-flex items-center gap-2"
+          >
+            <RefreshCcw className="h-4 w-4" /> Go through them again
+          </button>
+          <Link to="/practice" className="btn-ghost inline-block border-2 border-surface-divider px-4 py-2">
+            Back to practice
+          </Link>
+        </div>
       </div>
     );
   }
@@ -233,10 +301,16 @@ function Runner({
     // it has to stay that exact string: Progress joins attempts to the
     // planner's coordinates to say what has NOT been practised, and a label
     // that drifts turns that list into "everything, forever".
+    //
+    // `itemId` is new, and it is what makes the selector above work: `topic`
+    // is a coordinate, and eleven of them carry thirty-nine TCF recordings,
+    // so the topic alone cannot say which one was practised.
     if (rec?.family) {
+      ownWrite.current = true;
       recordAttempt({
         skill: section.skill as SkillKey,
         topic: `${rec.family} · ${rec.level}`,
+        itemId: rec.id,
         score: right,
         total: items.length,
       });
@@ -244,16 +318,28 @@ function Runner({
   };
 
   const next = () => {
-    if (cursor + 1 >= ordered.length) { setDone(true); return; }
-    setCursor(cursor + 1); setChosen({}); setMarked(false);
+    if (!st.current) return;
+    const served = servePractice(recordings, st.current);
+    setCurrent(served);
+    if (served.recycled) setReplaying(false);
+    setChosen({}); setMarked(false);
   };
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between text-xs text-ink-secondary">
+        {/*
+          * Not "Recording 1 of 39". That line was true of a cursor and false
+          * of the candidate: it said 1 of 39 on the fortieth visit as loudly
+          * as on the first. What is worth counting is how much of the bank
+          * they have not met.
+          */}
         <span>
-          {isAudio ? 'Recording' : 'Passage'} {cursor + 1} of {ordered.length} · {items.length}{' '}
-          {items.length === 1 ? 'question' : 'questions'}
+          {replaying
+            ? `${current.total} ${noun}${current.total === 1 ? '' : 's'} in this bank · all practised`
+            : `${current.unseen} of ${current.total} ${noun}${current.total === 1 ? '' : 's'} left to practise`}
+          {' · '}
+          {items.length} {items.length === 1 ? 'question' : 'questions'}
         </span>
         <span className="chip">{rec.level}{family ? ` · ${family.label.en}` : ''}</span>
       </div>
@@ -411,7 +497,7 @@ function Runner({
 
       {marked ? (
         <button onClick={next} className="btn-primary w-full">
-          {cursor + 1 >= ordered.length ? 'Finish' : isAudio ? 'Next recording' : 'Next passage'}
+          {current.unseen <= 1 && !replaying ? 'Finish' : isAudio ? 'Next recording' : 'Next passage'}
         </button>
       ) : (
         <button

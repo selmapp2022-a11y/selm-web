@@ -6,6 +6,14 @@ import { type SkillKey, recordAttempt } from '../lib/attempts';
 type Props = {
   skill: SkillKey;
   topic?: string;
+  /**
+   * The exact task this attempt was about, when there is one.
+   *
+   * `topic` is the task's display title and two exams can share it — both
+   * call their first writing task "Task 1". The id cannot collide, and
+   * `SeenBefore` needs it to say "you have written this one before".
+   */
+  itemId?: string;
   score?: number;       // raw correct OR 0..100
   total?: number;       // out of (omit for free-form)
   onNext: () => void;
@@ -27,13 +35,13 @@ type Props = {
  * as readily as on 10 out of 10. A product whose entire claim is that it will
  * not tell a candidate something it cannot defend should not open with that.
  */
-export function CompletionCard({ skill, topic, score, total, onNext, nextLabel = 'Continue with another', extra }: Props) {
+export function CompletionCard({ skill, topic, itemId, score, total, onNext, nextLabel = 'Continue with another', extra }: Props) {
   // Record exactly once, even under React's double-invoked effects in dev.
   const written = useRef(false);
   useEffect(() => {
     if (written.current) return;
     written.current = true;
-    recordAttempt({ skill, topic, score, total });
+    recordAttempt({ skill, topic, itemId, score, total });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
