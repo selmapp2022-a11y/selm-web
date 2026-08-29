@@ -114,7 +114,26 @@ ok(varieties.size >= 4, 'at least four different accents across the four parts',
 ok(S.recordings.every((r) => !!r.variety && r.variety !== 'unknown'),
    'every part declares the variety it is meant to be spoken in');
 
-console.log('\n7. Scoring, end to end\n');
+console.log('\n7. Every part says which voices actually spoke it\n');
+ok(S.recordings.every((r) => !!r.voice), 'every part records the voice that produced it');
+ok(S.recordings.every((r) => r.voice?.requestedVariety === r.variety),
+   'no part was rendered in a variety other than the one asked for');
+// A monologue is one speaker plus the narrator; a dialogue is two plus the
+// narrator. The first manifest listed a voice for Part 2 and Part 4 that never
+// opened its mouth — the renderer resolved a second speaker whether or not the
+// part had one. A provenance record naming a voice that did not speak is the
+// same defect as one omitting a voice that did, and nothing caught it but
+// reading the file. This is what catches it now.
+ok(S.recordings.every((r) => (r.voice?.voiceIds?.length ?? 0) === (r.speakers ?? 1) + 1),
+   'the voices listed are exactly the speakers plus the narrator',
+   S.recordings.map((r) => `${r.id}:${r.voice?.voiceIds?.length}`).join(' '));
+const NARRATOR_ID = S.recordings[0]?.voice?.voiceIds?.slice(-1)[0];
+ok(!!NARRATOR_ID && S.recordings.every((r) => r.voice?.voiceIds?.slice(-1)[0] === NARRATOR_ID),
+   'the same narrator speaks every part', NARRATOR_ID ?? '');
+ok(new Set(S.recordings.map((r) => r.voice?.voiceId)).size === S.recordings.length,
+   'no two parts open with the same voice');
+
+console.log('\n8. Scoring, end to end\n');
 const answerAll = (f: (n: number) => 'right' | 'wrong' | 'near'): ItemAnswer[] =>
   S.items.map((i, n) => {
     const how = f(n);
@@ -145,7 +164,7 @@ ok(near.correct === 0,
 const blanks = scoreComprehension(S, S.items.map((i) => ({ itemId: i.id, chose: isCompletionItem(i) ? '   ' : null })));
 ok(blanks.answered === 0, 'whitespace typed into every box is not "answered"', `${blanks.answered}`);
 
-console.log('\n8. The plan the backend renders from cannot drift from this file\n');
+console.log('\n9. The plan the backend renders from cannot drift from this file\n');
 // The scripts live here, beside the questions asked about them. The renderer
 // runs on a server that cannot import TypeScript, so a generated JSON copy
 // ships with the backend — and a copy that nothing compares is a copy that
