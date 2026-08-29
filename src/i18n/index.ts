@@ -135,6 +135,27 @@ export function fmtCurrency(amount: number, lang: UiLang = uiLang()): string {
  * date a candidate sees goes through here, and no component calls
  * `toLocaleDateString` directly.
  */
+/**
+ * Keep `<html lang>` on the language the candidate chose.
+ *
+ * `index.html` hard-codes `lang="en"`, which is wrong the moment someone
+ * switches the interface to French — it is what a screen reader announces in
+ * and what the browser hyphenates by.
+ *
+ * It is also half of the date-input fix. Chrome renders `<input type="date">`
+ * with the numbering system of its own UI locale, so on a Persian-locale
+ * browser the field showed `۲۰۲۶/۱۲/dd` inside an English page. The document
+ * language alone does not override that — the INPUT needs its own `lang`, and
+ * `localeTag()` below is what those inputs pass.
+ */
+export function localeTag(lang: UiLang = uiLang()): string {
+  return lang === 'fr' ? 'fr-CA' : 'en-CA';
+}
+
+export function syncDocumentLang(lang: UiLang = uiLang()): void {
+  try { document.documentElement.lang = localeTag(lang); } catch { /* no document */ }
+}
+
 export function fmtDate(value: number | string | Date, lang: UiLang = uiLang()): string {
   const d = value instanceof Date ? value : new Date(value);
   if (Number.isNaN(d.getTime())) return '—';

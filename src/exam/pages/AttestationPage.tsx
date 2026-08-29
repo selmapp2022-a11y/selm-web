@@ -12,6 +12,7 @@ import { CONSENT_POINTS, isExpired, kindOf, type Attestation, type EntryMethod, 
 import { gapMonthsFrom, loadAttestations, newAttestationId, saveAttestation, withdrawAttestation } from '../model/attestationStore';
 import { toBenchmark } from '../engine/aggregate';
 import { formatScale, t } from '../model/format';
+import { localeTag } from '../../i18n';
 
 /**
  * Upload and type. §1.4, and the design is the point rather than a
@@ -643,6 +644,7 @@ export default function AttestationPage() {
           </label>
           <input
             type="month"
+              lang={localeTag(ui)}
             value={sat}
             onChange={(e) => setSat(e.target.value)}
             className="mt-1 w-full rounded-xl border-2 border-surface-divider px-4 py-3 text-sm"
@@ -769,6 +771,7 @@ export default function AttestationPage() {
             </label>
             <input
               type="month"
+              lang={localeTag(ui)}
               value={expiry}
               onChange={(e) => setExpiry(e.target.value)}
               className="mt-1 w-full rounded-xl border-2 border-surface-divider px-4 py-3 text-sm"

@@ -7,6 +7,7 @@ import { GOALS } from '../definitions';
 import { t } from '../model/format';
 import { daysUntil, loadPlan, savePlan } from '../model/plan';
 import { useDocumentTitle } from '../../lib/useDocumentTitle';
+import { localeTag } from '../../i18n';
 
 export default function GoalPage() {
   useDocumentTitle('My exam');
@@ -82,12 +83,18 @@ export default function GoalPage() {
           </div>
           <div className="min-w-0 flex-1">
             <span className="chip">{ui === 'en' ? 'Your exam date' : 'Votre date d\u2019examen'}</span>
+            {/* `lang` is not decoration. Chrome renders a date field in the
+                numbering system of ITS OWN UI locale, so on a Persian-locale
+                browser this showed `۲۰۲۶/۱۲/dd` inside an English page —
+                found by using the app, not by reading it. The attribute is
+                what pins the field to the language the candidate chose. */}
             <input
               type="date"
+              lang={localeTag(ui)}
               value={examDate}
               onChange={(e) => commitDate(e.target.value)}
               className="input mt-3 w-full"
-              aria-label={ui === 'en' ? 'Exam date' : 'Date de l\u2019examen'}
+              aria-label={ui === 'en' ? 'Exam date' : 'Date de l’examen'}
             />
             <p className="mt-2 text-xs leading-relaxed text-ink-secondary">
               {left === null

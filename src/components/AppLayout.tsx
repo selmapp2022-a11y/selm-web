@@ -6,6 +6,7 @@ import { PracticeLanguageBadge } from './PracticeLanguageBadge';
 import { useAuthStore } from '../store/authStore';
 import { syncAttemptsFromBackend } from '../lib/attempts';
 import { claimCandidateRecord } from '../lib/localRecord';
+import { syncDocumentLang, useUiLangValue } from '../i18n';
 import { Home, Dumbbell, ClipboardCheck, TrendingUp, Target, LogOut, Settings } from 'lucide-react';
 import clsx from 'clsx';
 
@@ -23,6 +24,11 @@ const navItems = [
 
 export function AppLayout() {
   const { user, logout } = useAuthStore();
+  // `index.html` hard-codes `lang="en"`. Keep the document on the language the
+  // candidate chose, so assistive technology announces it correctly and the
+  // browser's own date fields follow the app rather than the operating system.
+  const ui = useUiLangValue();
+  useEffect(() => { syncDocumentLang(ui); }, [ui]);
   const navigate = useNavigate();
   const handleLogout = () => { logout(); navigate('/login'); };
 
