@@ -16,6 +16,8 @@ import { TCF_CANADA } from '../definitions/tcf-canada';
 import { serveEpreuve, scoreComprehension, governingLevel, type ItemAnswer } from './comprehension';
 import type { ComprehensionSection } from '../model/types';
 import { TCF_VARIETY_PLAN, TCF_VARIETY_SHARES } from '../definitions/tcf-variety-plan';
+import { isChoiceItem, isCompletionItem } from '../model/types';
+import { normalise } from './completion';
 
 const sections = TCF_CANADA.sections.filter(
   (s): s is ComprehensionSection => s.kind === 'comprehension'
@@ -40,13 +42,31 @@ for (const s of sections) {
       Object.values(s.serve.byBand).reduce((a, b) => a + b, 0) === s.serve.count,
       `${s.id}: declared band profile sums to the declared length`,
     );
-  ok(s.items.every((i) => i.options.length === 4), `${s.id}: four options on every item`);
+  // Two kinds of item now exist. The four-option checks below apply to the
+  // choice items and are not weakened to accommodate the typed ones; the
+  // typed ones get their own, which are stricter where it matters.
+  const choice = s.items.filter(isChoiceItem);
+  const completion = s.items.filter(isCompletionItem);
+  ok(choice.every((i) => i.options.length === 4), `${s.id}: four options on every choice item`);
   ok(
-    s.items.every((i) => i.answer >= 0 && i.answer < i.options.length),
+    choice.every((i) => i.answer >= 0 && i.answer < i.options.length),
     `${s.id}: every key indexes a real option`
   );
   ok(new Set(s.items.map((i) => i.id)).size === s.items.length, `${s.id}: ids unique`);
-  ok(s.items.every((i) => new Set(i.options).size === 4), `${s.id}: no duplicate options`);
+  ok(choice.every((i) => new Set(i.options).size === 4), `${s.id}: no duplicate options`);
+  if (completion.length) {
+    ok(completion.every((i) => i.answer.accept.length > 0),
+       `${s.id}: every completion item accepts at least one form`);
+    // A cap that the accepted answer itself breaks would mark the key wrong.
+    ok(completion.every((i) => i.answer.accept.every((a) => a.trim().split(/\s+/).length <= i.answer.maxWords)),
+       `${s.id}: no accepted form is longer than its own word cap`);
+    ok(completion.every((i) => i.prompt.includes('___')),
+       `${s.id}: every completion item shows where the gap is`);
+    // The marker is a whitelist, so two forms that normalise to the same
+    // string are one form written twice — harmless, but it hides a typo.
+    ok(completion.every((i) => new Set(i.answer.accept.map((a) => normalise(a, i.answer.caseSensitive === true))).size === i.answer.accept.length),
+       `${s.id}: no accepted form is a duplicate of another`);
+  }
   ok(s.recordings.every((r) => r.script.trim().length > 0), `${s.id}: no empty script`);
   // Every question names material that exists, and every piece of material is
   // asked about. A recording with no questions is dead weight; a question
@@ -63,7 +83,7 @@ for (const s of sections) {
   const idx = s.recordings.map((r) => order.indexOf(r.level));
   ok(idx.every((v, n) => n === 0 || v >= idx[n - 1]), `${s.id}: difficulty never goes backwards`);
   // No item is answerable by picking the longest option every time.
-  const longest = s.items.filter(
+  const longest = choice.filter(
     (i) => i.options.indexOf([...i.options].sort((a, b) => b.length - a.length)[0]) === i.answer
   ).length;
   // Was `longest <= items.length / 3`, a bar with no basis that the bank
@@ -88,7 +108,16 @@ for (const s of sections) {
 
 console.log('2. Counting, and the difficulty profile\n');
 const answerAll = (s: ComprehensionSection, f: (level: string, n: number) => boolean): ItemAnswer[] =>
-  s.items.map((i, n) => ({ itemId: i.id, chose: f(i.level, n) ? i.answer : (i.answer + 1) % 4 }));
+  s.items.map((i, n) => {
+    const right = f(i.level, n);
+    if (isCompletionItem(i)) {
+      // A deliberate near-miss for the wrong case: one letter changed. If the
+      // marker were ever made generous this line alone would turn every
+      // "everything wrong" case below into a pass.
+      return { itemId: i.id, chose: right ? i.answer.accept[0] : `${i.answer.accept[0]}x` };
+    }
+    return { itemId: i.id, chose: right ? i.answer : (i.answer + 1) % 4 };
+  });
 
 for (const s of sections) {
   const perfect = scoreComprehension(s, answerAll(s, () => true));
@@ -115,7 +144,10 @@ for (const s of sections) {
   );
 
   // Unanswered is not the same as wrong.
-  const half = scoreComprehension(s, s.items.map((i, n) => ({ itemId: i.id, chose: n < 20 ? i.answer : null })));
+  const half = scoreComprehension(s, s.items.map((i, n) => ({
+    itemId: i.id,
+    chose: n < 20 ? (isCompletionItem(i) ? i.answer.accept[0] : i.answer) : null,
+  })));
   ok(half.answered === 20, `${s.id}: unanswered items counted as unanswered`, `${half.answered}`);
   ok(half.correct === 20, `${s.id}: unanswered items are not correct`, `${half.correct}`);
   console.log('');

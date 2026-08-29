@@ -31,8 +31,15 @@ export type Sitting = {
   at: number;
   /** Epoch ms the current section started, for the section clock. */
   sectionStartedAt: number;
-  /** Answers by section id, then by item id. */
-  answers: Record<string, Record<string, number | null>>;
+  /**
+   * Answers by section id, then by item id.
+   *
+   * `number` is an option index, `string` is what the candidate typed on a
+   * completion item, `null` is unanswered. Widened on 29 August 2026 when
+   * IELTS Listening's completion items arrived; every stored sitting written
+   * before then holds numbers and nulls and reads back unchanged.
+   */
+  answers: Record<string, Record<string, number | string | null>>;
   /** Section ids already submitted. */
   submitted: string[];
   /**
@@ -105,7 +112,7 @@ type ExamState = {
   recordSitting: (r: SittingRecord) => void;
   clearHistory: () => void;
   startSitting: (e: ExamDefinition) => void;
-  answerItem: (sectionId: string, itemId: string, chose: number | null) => void;
+  answerItem: (sectionId: string, itemId: string, chose: number | string | null) => void;
   /** Record that a recording has been played. Irreversible within a sitting. */
   markPlayed: (recordingId: string) => void;
   submitSection: (sectionId: string) => void;

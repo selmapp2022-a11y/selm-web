@@ -620,7 +620,10 @@ export type RenderedVoice = {
   renderedAt?: string;
 };
 
-export type ComprehensionItem = {
+/**
+ * What every comprehension item carries, whatever kind it is.
+ */
+type ComprehensionItemBase = {
   id: string;
   /** The recording this question is asked about. */
   recordingId: string;
@@ -634,12 +637,89 @@ export type ComprehensionItem = {
    */
   level: 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2';
   stem: string;
-  options: string[];
-  /** Index into `options`. Exactly one key per item. */
-  answer: number;
   /** What the item tests. Never shown during the section. */
   rationale?: string;
 };
+
+/**
+ * Four options, one key. The TCF Canada compréhension orale and compréhension
+ * écrite are exactly this, which is why it is the shape this codebase started
+ * with.
+ *
+ * `kind` is OPTIONAL and defaults to `'choice'` on purpose: every item written
+ * before 29 August 2026 is a valid `ChoiceItem` with no edit, so adding the
+ * second kind could not touch a single existing bank or a single stored
+ * result. That was the first of the four steps the ruling set.
+ */
+export type ChoiceItem = ComprehensionItemBase & {
+  kind?: 'choice';
+  options: string[];
+  /** Index into `options`. Exactly one key per item. */
+  answer: number;
+};
+
+/**
+ * A typed answer, capped at a few words, with spelling marked.
+ *
+ * IELTS Listening is mostly this: form, note, table, flow-chart, sentence and
+ * summary completion, plus short answers. **It is not a presentational variant
+ * of multiple choice.** Recognising the right answer among four is a weaker
+ * task than catching a word and spelling it, and a candidate who can do the
+ * first cannot be assumed to do the second — which is the whole thing this
+ * product exists to tell them before IRCC does.
+ */
+export type CompletionItem = ComprehensionItemBase & {
+  kind: 'completion';
+  /**
+   * The line the gap sits in, with `___` where the answer goes — e.g.
+   * `Surname: ___`. Shown to the candidate; `stem` stays the instruction.
+   */
+  prompt: string;
+  answer: CompletionAnswer;
+};
+
+/**
+ * How a typed answer is marked. A RULE, not a string.
+ *
+ * ── The one rule under all the others ─────────────────────────────────────
+ * **`accept` is a whitelist and nothing else is ever consulted.** No edit
+ * distance, no stemming, no phonetic match, no "close enough". IELTS marks
+ * spelling, so `recieve` is wrong and must be marked wrong.
+ *
+ * A forgiving matcher would score a candidate HIGHER here than the real exam
+ * will, and that is the one direction this product must never be wrong in: a
+ * candidate who books a test on our number and then fails theirs has been
+ * harmed by us, in the one way that costs them money and months.
+ *
+ * Everything the marker is allowed to do is listed in `completion.ts` and is
+ * limited to things that cannot forgive a spelling: trimming, collapsing
+ * whitespace, dropping surrounding punctuation, and case-folding unless this
+ * item says otherwise.
+ */
+export type CompletionAnswer = {
+  /**
+   * Every form that is correct, written out. Both `15` and `fifteen` if both
+   * are accepted; both `car park` and `carpark` if both are. If it is not in
+   * this list it is wrong.
+   */
+  accept: readonly string[];
+  /**
+   * The instruction's own cap — IELTS sets ONE, TWO or THREE WORDS AND/OR A
+   * NUMBER, and an over-long answer is marked wrong even when the right words
+   * are inside it. The cap is enforced, not just printed.
+   */
+  maxWords: 1 | 2 | 3;
+  /** IELTS does not mark case. Set true only where an item genuinely does. */
+  caseSensitive?: boolean;
+};
+
+export type ComprehensionItem = ChoiceItem | CompletionItem;
+
+/** Narrowing helpers, so no caller has to remember that `kind` is optional. */
+export const isCompletionItem = (i: ComprehensionItem): i is CompletionItem =>
+  (i as CompletionItem).kind === 'completion';
+export const isChoiceItem = (i: ComprehensionItem): i is ChoiceItem =>
+  !isCompletionItem(i);
 
 /**
  * What "exam conditions" actually means, as data rather than as behaviour

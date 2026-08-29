@@ -25,6 +25,7 @@
 import { TCF_CANADA } from '../definitions/tcf-canada';
 import type { ComprehensionSection } from '../model/types';
 import { segmentationFor, tokenSet, words } from './text';
+import { isChoiceItem } from '../model/types';
 
 const SEG = segmentationFor(TCF_CANADA.locale);
 const pad = (s: string, n: number) => (s + ' '.repeat(n)).slice(0, n);
@@ -44,15 +45,32 @@ for (const sec of sections) {
   // question is asked about.
   const recOf = (it: { recordingId: string }) =>
     sec.recordings.find((r) => r.id === it.recordingId);
-  console.log(`\n${'='.repeat(84)}\n${sec.id} — ${items.length} items`);
+  // The tendency analyses below — the length tell, key position, the echo —
+  // are all about four options and a key index. They are computed over the
+  // CHOICE items only, and the denominator says so: a section that is half
+  // typed answers would otherwise look as though its keys had drifted to
+  // position A when in fact half its items have no position at all.
+  const choiceItems = items.filter(isChoiceItem);
+  console.log(`\n${'='.repeat(84)}\n${sec.id} — ${items.length} items` +
+    (choiceItems.length === items.length ? '' : `  (${choiceItems.length} choice, ${items.length - choiceItems.length} completion)`));
 
   // ── structural, per item. These are defects, not tendencies. ──────────
   for (const it of items) {
     const p: string[] = [];
-    if (it.options.length !== 4) p.push(`${it.options.length} options`);
-    if (it.answer < 0 || it.answer >= it.options.length) p.push('answer out of range');
-    if (new Set(it.options.map((o) => o.trim().toLowerCase())).size !== it.options.length)
-      p.push('duplicate options');
+    // The option checks belong to choice items. A completion item has no
+    // options by construction, and reporting "0 options" for one would be this
+    // check misreading the model rather than finding a defect.
+    if (isChoiceItem(it)) {
+      if (it.options.length !== 4) p.push(`${it.options.length} options`);
+      if (it.answer < 0 || it.answer >= it.options.length) p.push('answer out of range');
+      if (new Set(it.options.map((o) => o.trim().toLowerCase())).size !== it.options.length)
+        p.push('duplicate options');
+    } else {
+      if (!it.answer.accept.length) p.push('no accepted answer');
+      if (!it.prompt.includes('___')) p.push('no gap in the prompt');
+      if (it.answer.accept.some((a) => a.trim().split(/\s+/).length > it.answer.maxWords))
+        p.push('an accepted form breaks its own word cap');
+    }
     if (!recOf(it)?.family) p.push('no family');
     if (!it.rationale) p.push('no rationale');
     if (!it.stem.trim().endsWith('?') && !it.stem.trim().endsWith(':')) p.push('stem is not a question');
@@ -61,35 +79,35 @@ for (const sec of sections) {
 
   // ── the length tell ──────────────────────────────────────────────────
   let longest = 0, shortest = 0;
-  for (const it of items) {
+  for (const it of choiceItems) {
     const lens = it.options.map((o) => words(o, SEG).length);
     const max = Math.max(...lens), min = Math.min(...lens);
     if (lens[it.answer] === max && lens.filter((l) => l === max).length === 1) longest += 1;
     if (lens[it.answer] === min && lens.filter((l) => l === min).length === 1) shortest += 1;
   }
-  console.log(`  key is the single LONGEST option : ${pad(String(longest), 4)} of ${items.length}  (${pct(longest, items.length)}, chance 25%)`);
-  console.log(`  key is the single SHORTEST option: ${pad(String(shortest), 4)} of ${items.length}  (${pct(shortest, items.length)}, chance 25%)`);
-  if (longest / items.length > 0.4) soft.push(`${sec.id}: the longest option is the key ${pct(longest, items.length)} of the time — a candidate can score above chance without reading the passage`);
-  if (shortest / items.length > 0.4) soft.push(`${sec.id}: the shortest option is the key ${pct(shortest, items.length)} of the time`);
+  console.log(`  key is the single LONGEST option : ${pad(String(longest), 4)} of ${choiceItems.length}  (${pct(longest, choiceItems.length)}, chance 25%)`);
+  console.log(`  key is the single SHORTEST option: ${pad(String(shortest), 4)} of ${choiceItems.length}  (${pct(shortest, choiceItems.length)}, chance 25%)`);
+  if (choiceItems.length && longest / choiceItems.length > 0.4) soft.push(`${sec.id}: the longest option is the key ${pct(longest, choiceItems.length)} of the time — a candidate can score above chance without reading the passage`);
+  if (choiceItems.length && shortest / choiceItems.length > 0.4) soft.push(`${sec.id}: the shortest option is the key ${pct(shortest, choiceItems.length)} of the time`);
 
   // ── position ─────────────────────────────────────────────────────────
   const pos = [0, 0, 0, 0];
-  for (const it of items) pos[it.answer] += 1;
-  console.log(`  key position A/B/C/D          : ${pos.join(' / ')}   (even would be ${(items.length / 4).toFixed(1)} each)`);
+  for (const it of choiceItems) pos[it.answer] += 1;
+  console.log(`  key position A/B/C/D          : ${pos.join(' / ')}   (even would be ${(choiceItems.length / 4).toFixed(1)} each)`);
   // A flat percentage bar is the wrong test and it let a real skew through:
   // 22 of 57 is 38.6%, under a 40% bar, and still 2.4 standard deviations
   // from chance. With n items and p = 1/4 the count has sd = sqrt(n·p·(1-p)),
   // so the question "is this more than luck" has an answer rather than a
   // preference. Two sd is the bar, which is about one false alarm in twenty.
-  const sd = Math.sqrt(items.length * 0.25 * 0.75);
-  const expected = items.length / 4;
+  const sd = Math.sqrt(choiceItems.length * 0.25 * 0.75);
+  const expected = choiceItems.length / 4;
   const z = (Math.max(...pos) - expected) / sd;
   console.log(`  worst position is ${z.toFixed(2)} sd from chance` + (z > 2 ? '   ← skewed' : ''));
-  if (z > 2) soft.push(`${sec.id}: keys cluster in position ${'ABCD'[pos.indexOf(Math.max(...pos))]} — ${Math.max(...pos)} of ${items.length}, ${z.toFixed(2)} sd from chance. A candidate who always guesses it scores ${pct(Math.max(...pos), items.length)} instead of 25%`);
+  if (choiceItems.length && z > 2) soft.push(`${sec.id}: keys cluster in position ${'ABCD'[pos.indexOf(Math.max(...pos))]} — ${Math.max(...pos)} of ${choiceItems.length}, ${z.toFixed(2)} sd from chance. A candidate who always guesses it scores ${pct(Math.max(...pos), choiceItems.length)} instead of 25%`);
 
   // ── does a distractor echo the passage more than the key does? ────────
   let echo = 0;
-  for (const it of items) {
+  for (const it of choiceItems) {
     const src = tokenSet(recOf(it)?.script ?? '', SEG);
     const overlap = it.options.map((o) => {
       const w = words(o, SEG).map((x) => x.toLowerCase()).filter((x) => x.length > 3);
@@ -98,7 +116,7 @@ for (const sec of sections) {
     const max = Math.max(...overlap);
     if (overlap[it.answer] < max && max > 0) echo += 1;
   }
-  console.log(`  a distractor echoes the passage more than the key: ${echo} of ${items.length} (${pct(echo, items.length)})`);
+  console.log(`  a distractor echoes the passage more than the key: ${echo} of ${choiceItems.length} (${pct(echo, choiceItems.length)})`);
   console.log('  (not a defect — it is how a good item defeats word-matching — but a bank at 100% is testing matching in reverse)');
 
   // ── per family × level, the planner's own coordinate ──────────────────

@@ -25,13 +25,39 @@
  * print a three-digit number.
  */
 import type { ComprehensionItem, ComprehensionSection, Localised, Recording } from '../model/types';
+import { isCompletionItem } from '../model/types';
+import { isCompletionCorrect } from './completion';
 import { newServeState, serve, type ServeState } from './pool';
 
 export const BANDS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'] as const;
 export type Band = (typeof BANDS)[number];
 
-/** One answer: the item, and the option index chosen. `null` = not answered. */
-export type ItemAnswer = { itemId: string; chose: number | null };
+/**
+ * One answer.
+ *
+ * `number` is an option index on a choice item; `string` is what the candidate
+ * typed on a completion item; `null` is not answered at all. The three are
+ * kept distinct because an empty string is a candidate who typed nothing and
+ * moved on, which is not the same fact as never reaching the question — and
+ * `''` and `null` must not collapse into each other on the way to the store.
+ */
+export type ItemResponse = number | string | null;
+export type ItemAnswer = { itemId: string; chose: ItemResponse };
+
+/**
+ * Is this response the key? The one place that answers it for both kinds.
+ *
+ * A choice item compares an index. A completion item goes through
+ * `markCompletion`, which is a whitelist and refuses to be generous — see
+ * `completion.ts` for why the asymmetry between marking too hard and marking
+ * too easy is the whole design.
+ */
+export function isResponseCorrect(item: ComprehensionItem, response: ItemResponse): boolean {
+  if (isCompletionItem(item)) {
+    return typeof response === 'string' && isCompletionCorrect(item.answer, response);
+  }
+  return typeof response === 'number' && response === item.answer;
+}
 
 export type BandResult = { band: Band; correct: number; total: number };
 
@@ -72,8 +98,18 @@ export function scoreComprehension(
   answers: ItemAnswer[],
   holdRatio: number = HOLD_RATIO
 ): ComprehensionResult {
-  const chosen = new Map(answers.map((a) => [a.itemId, a.chose]));
-  const isCorrect = (i: ComprehensionItem) => chosen.get(i.id) === i.answer;
+  const chosen = new Map<string, ItemResponse>(answers.map((a) => [a.itemId, a.chose]));
+  const isCorrect = (i: ComprehensionItem) => isResponseCorrect(i, chosen.get(i.id) ?? null);
+
+  // "Answered" means the candidate did something. For a typed item that is a
+  // non-empty string: someone who tabbed through leaving blanks answered
+  // nothing, and counting those as attempts would inflate every attempt figure
+  // on Progress with work that did not happen.
+  const wasAnswered = (i: ComprehensionItem) => {
+    const v = chosen.get(i.id);
+    if (v === null || v === undefined) return false;
+    return typeof v === 'string' ? v.trim().length > 0 : true;
+  };
 
   const byBand: BandResult[] = BANDS.map((band) => {
     const items = section.items.filter((i) => i.level === band);
@@ -94,7 +130,7 @@ export function scoreComprehension(
   return {
     section,
     total: section.items.length,
-    answered: section.items.filter((i) => chosen.get(i.id) !== null && chosen.get(i.id) !== undefined).length,
+    answered: section.items.filter(wasAnswered).length,
     correct: section.items.filter(isCorrect).length,
     byBand,
     held,

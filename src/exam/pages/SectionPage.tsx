@@ -8,6 +8,7 @@ import { resolveAudio } from '../engine/audio';
 import { serveEpreuve, itemsOf, itemsFor } from '../engine/comprehension';
 import { SectionClock, ProgressBar } from '../components/SectionClock';
 import { PlayOnce } from '../components/PlayOnce';
+import { isCompletionItem } from '../model/types';
 import type { ComprehensionItem, ComprehensionSection, LanguageCode, Recording } from '../model/types';
 
 /**
@@ -218,8 +219,8 @@ function OneRecording({
   recordings: Recording[];
   cursor: number;
   setCursor: (n: number) => void;
-  answers: Record<string, number | null>;
-  onChoose: (sectionId: string, itemId: string, chose: number | null) => void;
+  answers: Record<string, number | string | null>;
+  onChoose: (sectionId: string, itemId: string, chose: number | string | null) => void;
   ui: LanguageCode;
 }) {
   const { sitting, markPlayed } = useExam();
@@ -304,9 +305,50 @@ function Item({
   item: ComprehensionItem;
   n: number;
   sectionId: string;
-  chose: number | null;
-  onChoose: (sectionId: string, itemId: string, chose: number | null) => void;
+  chose: number | string | null;
+  onChoose: (sectionId: string, itemId: string, chose: number | string | null) => void;
 }) {
+  // A completion item is answered by typing, and is a different task from
+  // recognising one of four — see `model/types.ts`. It is rendered here rather
+  // than in a second component so that the two kinds cannot drift apart in
+  // spacing, numbering or focus order mid-exam.
+  if (isCompletionItem(item)) {
+    return (
+      <div className="card p-6">
+        <p className="font-medium text-ink-primary">
+          <span className="mr-2 text-ink-secondary">{n + 1}.</span>
+          {item.stem}
+        </p>
+        <label className="mt-3 flex flex-wrap items-center gap-2 text-sm text-ink-primary">
+          <span>{item.prompt.split('___')[0]}</span>
+          <input
+            type="text"
+            value={typeof chose === 'string' ? chose : ''}
+            onChange={(e) => onChoose(sectionId, item.id, e.target.value)}
+            className="input w-48 py-2"
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="off"
+            spellCheck={false}
+            aria-label={item.stem}
+          />
+          <span>{item.prompt.split('___')[1] ?? ''}</span>
+        </label>
+        {/* The cap is part of the question, not a hint: an over-long answer is
+            marked wrong even when the right words are inside it, so a
+            candidate who is not told is being set up to lose the mark. */}
+        <p className="mt-2 text-xs text-ink-secondary">
+          {item.answer.maxWords === 1
+            ? 'ONE WORD AND/OR A NUMBER'
+            : item.answer.maxWords === 2
+              ? 'NO MORE THAN TWO WORDS AND/OR A NUMBER'
+              : 'NO MORE THAN THREE WORDS AND/OR A NUMBER'}
+          {' · spelling is marked'}
+        </p>
+      </div>
+    );
+  }
+
   // The material is rendered by whoever owns the recording — once, above its
   // questions — rather than repeated under each of them.
   return (
@@ -316,7 +358,7 @@ function Item({
         {item.stem}
       </p>
       <div className="mt-3 space-y-2">
-        {item.options.map((o, i) => (
+        {item.options.map((o: string, i: number) => (
           <button
             key={i}
             onClick={() => onChoose(sectionId, item.id, chose === i ? null : i)}

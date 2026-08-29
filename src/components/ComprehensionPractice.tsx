@@ -7,6 +7,9 @@ import { resolveAudio } from '../exam/engine/audio';
 import { itemsOf } from '../exam/engine/comprehension';
 import type { ComprehensionSection, LanguageCode, Recording } from '../exam/model/types';
 import { recordAttempt, type SkillKey } from '../lib/attempts';
+import { isCompletionItem } from '../exam/model/types';
+import { markCompletion } from '../exam/engine/completion';
+import { isResponseCorrect } from '../exam/engine/comprehension';
 
 /**
  * Practice for a comprehension skill, served from THE EXAM'S OWN BANK.
@@ -174,7 +177,7 @@ function Runner({
   }, [recordings]);
 
   const [cursor, setCursor] = useState(0);
-  const [chosen, setChosen] = useState<Record<string, number>>({});
+  const [chosen, setChosen] = useState<Record<string, number | string>>({});
   const [marked, setMarked] = useState(false);
   const [tally, setTally] = useState({ correct: 0, total: 0 });
   const [done, setDone] = useState(false);
@@ -205,10 +208,16 @@ function Runner({
     );
   }
 
-  const allAnswered = items.every((i) => typeof chosen[i.id] === 'number');
+  // A typed item counts as answered only when something was typed. Tabbing
+  // through leaving blanks is not an attempt, and treating it as one would
+  // inflate every attempt figure on Progress with work that did not happen.
+  const allAnswered = items.every((i) => {
+    const v = chosen[i.id];
+    return typeof v === 'number' || (typeof v === 'string' && v.trim().length > 0);
+  });
 
   const mark = () => {
-    const right = items.filter((i) => chosen[i.id] === i.answer).length;
+    const right = items.filter((i) => isResponseCorrect(i, chosen[i.id] ?? null)).length;
     setTally((t) => ({ correct: t.correct + right, total: t.total + items.length }));
     setMarked(true);
     // Record the attempt.
@@ -263,6 +272,57 @@ function Runner({
 
       {items.map((item, n) => {
         const pick = chosen[item.id];
+
+        // A completion item is answered by typing, and the feedback after
+        // marking has to say what the accepted answer WAS — a candidate who
+        // typed `recieve` learns nothing from being told they are wrong, and
+        // the spelling is the thing being tested.
+        if (isCompletionItem(item)) {
+          const verdict = marked ? markCompletion(item.answer, typeof pick === 'string' ? pick : '') : null;
+          return (
+            <div key={item.id} className="card p-6">
+              <p className="font-medium text-ink-primary">
+                <span className="mr-2 text-ink-secondary">{n + 1}.</span>
+                {item.stem}
+              </p>
+              <label className="mt-3 flex flex-wrap items-center gap-2 text-sm text-ink-primary">
+                <span>{item.prompt.split('___')[0]}</span>
+                <input
+                  type="text"
+                  value={typeof pick === 'string' ? pick : ''}
+                  onChange={(e) => !marked && setChosen((c) => ({ ...c, [item.id]: e.target.value }))}
+                  disabled={marked}
+                  className={clsx('input w-48 py-2',
+                    marked && verdict?.correct && 'border-teal bg-teal/10',
+                    marked && verdict && !verdict.correct && 'border-red-400 bg-red-50')}
+                  autoComplete="off" autoCorrect="off" autoCapitalize="off" spellCheck={false}
+                  aria-label={item.stem}
+                />
+                <span>{item.prompt.split('___')[1] ?? ''}</span>
+              </label>
+              <p className="mt-2 text-xs text-ink-secondary">
+                {item.answer.maxWords === 1 ? 'ONE WORD AND/OR A NUMBER'
+                  : item.answer.maxWords === 2 ? 'NO MORE THAN TWO WORDS AND/OR A NUMBER'
+                  : 'NO MORE THAN THREE WORDS AND/OR A NUMBER'}
+                {' · spelling is marked'}
+              </p>
+              {marked && verdict && !verdict.correct && (
+                <p className="mt-2 text-sm text-red-700">
+                  {verdict.reason === 'too_many_words'
+                    ? `Too many words — the exam marks this wrong even when the answer is inside it. The answer was “${item.answer.accept[0]}”.`
+                    : `The answer was “${item.answer.accept[0]}”.`}
+                  {item.answer.accept.length > 1 && ` Also accepted: ${item.answer.accept.slice(1).map((a) => `“${a}”`).join(', ')}.`}
+                </p>
+              )}
+              {marked && verdict?.correct && (
+                <p className="mt-2 flex items-center gap-1.5 text-sm text-teal">
+                  <CheckCircle2 className="h-4 w-4" /> Correct
+                </p>
+              )}
+            </div>
+          );
+        }
+
         return (
           <div key={item.id} className="card p-6">
             <p className="font-medium text-ink-primary">
@@ -270,7 +330,7 @@ function Runner({
               {item.stem}
             </p>
             <div className="mt-3 space-y-2">
-              {item.options.map((o, i) => {
+              {item.options.map((o: string, i: number) => {
                 const isKey = i === item.answer;
                 const picked = pick === i;
                 return (
