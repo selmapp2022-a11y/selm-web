@@ -15,6 +15,7 @@
 import { TCF_CANADA } from '../definitions/tcf-canada';
 import { serveEpreuve, scoreComprehension, governingLevel, type ItemAnswer } from './comprehension';
 import type { ComprehensionSection } from '../model/types';
+import { TCF_VARIETY_PLAN, TCF_VARIETY_SHARES } from '../definitions/tcf-variety-plan';
 
 const sections = TCF_CANADA.sections.filter(
   (s): s is ComprehensionSection => s.kind === 'comprehension'
@@ -199,3 +200,51 @@ for (const s of sections) {
 
 console.log(bad === 0 ? '\nAll comprehension cases pass.' : `\n${bad} FAILURES`);
 if (bad !== 0) throw new Error(`${bad} comprehension cases failed`);
+
+// ── The variety plan for the re-render ──────────────────────────────────────
+//
+// Checked here rather than at render time, because a plan that fails its own
+// shares is a defect in a table someone can read — and the alternative is
+// discovering it after 39 files have been paid for and shipped.
+{
+  console.log('\n6. The variety plan for the 39 French recordings\n');
+  const plan = TCF_VARIETY_PLAN;
+  const shares = TCF_VARIETY_SHARES;
+
+  ok(plan.length === 39, 'the plan covers all 39 recordings', `${plan.length}`);
+
+  const counted: Record<string, number> = {};
+  for (const a of plan) counted[a.variety] = (counted[a.variety] ?? 0) + 1;
+  const matches = Object.entries(shares).every(([v, n]) => counted[v] === n);
+  ok(matches, 'the plan realises the shares FRENCH_VARIETY_MIX asks for',
+     Object.entries(counted).map(([v, n]) => `${v} ${n}`).join(', '));
+
+  // The majority must actually BE the majority — 'majority' in the mix is a
+  // claim about what a candidate hears, not a label on the biggest bucket.
+  const intl = counted['international'] ?? 0;
+  ok(intl > 39 / 2, 'international is a real majority, not merely the largest share',
+     `${intl}/39`);
+
+  // Belgian has no female voice on the account, so it cannot carry a dialogue.
+  const badBelgian = plan.filter((a) => a.variety === 'belgian' && a.speakers > 1);
+  ok(badBelgian.length === 0, 'Belgian is never assigned to a two-speaker recording',
+     badBelgian.length ? badBelgian.map((a) => a.id).join(', ') : 'none');
+
+  // And the one the first attempt got wrong: variety must not track difficulty.
+  const bands = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'] as const;
+  const intlPerBand = bands.map((b) => plan.filter((a) => a.level === b && a.variety === 'international').length);
+  ok(intlPerBand.every((n) => n > 0), 'the majority variety appears in every band',
+     bands.map((b, i) => `${b}:${intlPerBand[i]}`).join(' '));
+  const minorityBands = new Set(plan.filter((a) => a.variety !== 'international').map((a) => a.level));
+  ok(minorityBands.size >= 5, 'minority varieties are not confined to the hard bands',
+     `${minorityBands.size}/6 bands carry a minority variety`);
+
+  // Every id in the plan is a real recording, and every recording is planned.
+  // The plan covers the LISTENING bank only — the reading section has
+  // recordings too (passages), and they have no variety to be spoken in.
+  const listening = sections.filter((s) => s.skill === 'listening');
+  const bankIds = new Set(listening.flatMap((s) => s.recordings.map((r) => r.id)));
+  const planIds = new Set(plan.map((a) => a.id));
+  ok([...planIds].every((id) => bankIds.has(id)), 'every planned id is a real recording');
+  ok([...bankIds].every((id) => planIds.has(id)), 'every recording in the bank is planned');
+}
