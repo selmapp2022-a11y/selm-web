@@ -57,68 +57,51 @@ export type FrenchVoiceRole = {
  */
 export const TCF_VOICE_CAST: FrenchVoiceRole[] = [
   // --- international (majority) -------------------------------------------
-  // The vendor splits this across two labels, "Parisian" and "Standard".
-  // Both are matched, because the distinction is the uploader's and not one
-  // a candidate would hear.
   {
-    id: 'int-m-1',
-    variety: 'international',
-    gender: 'male',
-    vendorName: 'David - Professional Narrator',
-    why: 'Male in his fifties, neutral Parisian, deep and steady. The register the TCF plays for an announcement or an official recorded message.',
-  },
-  {
-    id: 'int-m-2',
-    variety: 'international',
-    gender: 'male',
-    vendorName: 'Antoine - Audiobook Narrator',
-    why: 'Young Parisian male. The other half of the majority variety: the candidate in a TCF conversation is as often a student as an official, and one age of voice for a whole variety makes the bank sound like one person.',
-  },
-  {
-    id: 'int-f-1',
-    variety: 'international',
-    gender: 'female',
-    vendorName: 'Julia - Warm French Narrator',
-    why: 'Young Parisian female, described as steady-paced with clear diction. Clarity over character, for the same reason it matters in English: comprehension items turn on numbers, times and names.',
-  },
-  {
-    id: 'int-f-2',
+    id: 'int-f',
     variety: 'international',
     gender: 'female',
     vendorName: 'Clémence - Advertising',
-    why: 'Parisian female, confident and brisk. The TCF plays advertisements and public announcements, which is a register the narration voices do not cover.',
+    why: 'Parisian female, confident and brisk. Chosen after the first candidate (Julia) was heard and rejected — the vendor description had recommended Julia warmly, which is the whole reason the listening gate exists.',
+  },
+  {
+    id: 'int-m',
+    variety: 'international',
+    gender: 'male',
+    vendorName: 'Antoine - Audiobook Narrator',
+    why: 'Young Parisian male. The second voice of the majority variety, and the one that makes its dialogues possible: two speakers of one variety, one female and one male.',
   },
 
   // --- quebecois (minority) -----------------------------------------------
-  {
-    id: 'qc-m',
-    variety: 'quebecois',
-    gender: 'male',
-    vendorName: 'Alexandre - Authentic French Canadian',
-    why: 'Québécois male. Chosen over the other seven the account holds because its description claims the accent plainly rather than as a character part — the same test used for the New Zealand voices in the IELTS cast.',
-  },
   {
     id: 'qc-f',
     variety: 'quebecois',
     gender: 'female',
     vendorName: 'Amélie - Young, Confident and Friendly',
-    why: 'Québécois female, described as "100% authentic Quebec accent". Added deliberately: the first pass through the library came away with eight Québécois males and no female, which would have made the minority variety sound like one gender.',
+    why: 'Québécois female, described as "100% authentic Quebec accent". Approved on first hearing.',
+  },
+  {
+    id: 'qc-m',
+    variety: 'quebecois',
+    gender: 'male',
+    vendorName: 'Alexandre - Authentic French Canadian',
+    why: 'Québécois male. Claims the accent plainly rather than as a character part, and held up when heard.',
   },
 
   // --- west_african (minority) --------------------------------------------
+  {
+    id: 'wa-f',
+    variety: 'west_african',
+    gender: 'female',
+    vendorName: 'Fatou - Radiant and Gentle',
+    why: 'West African female. The second choice: the first (Alimata) was rejected on hearing, and the only other African female already on the account describes itself as "Unnatural, Young and Unclear" — a self-description no exam should accept. Fatou was added from the library for this slot.',
+  },
   {
     id: 'wa-m',
     variety: 'west_african',
     gender: 'male',
     vendorName: 'Keli - Calm & Natural African',
-    why: 'Described as a Togolese accent — West African specifically, not "African" generally, which is what the mix asks for. The vendor facet is a single "African" label covering a continent, so the description is doing the work here.',
-  },
-  {
-    id: 'wa-f',
-    variety: 'west_african',
-    gender: 'female',
-    vendorName: 'Alimata - Professional and Welcoming',
-    why: 'West African female. The name is Sahelian and the description says conversational, which is the register the TCF plays this variety in.',
+    why: 'Togolese accent — West African specifically, not "African" generally, which is what the mix asks for. Approved on first hearing.',
   },
 
   // --- belgian (occasional) -----------------------------------------------
@@ -127,7 +110,7 @@ export const TCF_VOICE_CAST: FrenchVoiceRole[] = [
     variety: 'belgian',
     gender: 'male',
     vendorName: 'Christophe Géradon - Soft and Narrative',
-    why: 'Belgian male, described as a fifty-year-old with a slight Liège accent — a located claim rather than a generic one.',
+    why: 'Belgian male, a fifty-year-old with a slight Liège accent. The only Belgian voice, because the library holds no Belgian French female — see KNOWN_CAST_GAPS. Belgian is therefore assigned only to single-speaker recordings.',
   },
 
   // --- swiss (occasional) -------------------------------------------------
@@ -135,33 +118,60 @@ export const TCF_VOICE_CAST: FrenchVoiceRole[] = [
     id: 'ch-m',
     variety: 'swiss',
     gender: 'male',
-    vendorName: 'Peter - Clear, Engaging and Professional',
-    why: 'Swiss male, crisp and educational in register. The most-used Swiss French voice in the library by a wide margin, which is weak evidence of quality but the only evidence available without listening.',
+    vendorName: 'Romain - Joyful, Optimistic and engaging',
+    why: 'Swiss male. Chosen after the first candidate (Peter) was rejected on hearing, despite being the most-used Swiss French voice in the library by a wide margin. Popularity is not an ear.',
   },
   {
     id: 'ch-f',
     variety: 'swiss',
     gender: 'female',
     vendorName: 'Nathalie - Tender and Optimistic',
-    why: 'Swiss female, described as carrying small natural hesitations. Hesitations belong in a conversation item and are wrong in a monologue, so this voice is cast and not used everywhere.',
+    why: 'Swiss female, carrying small natural hesitations. Hesitations belong in a conversation item and are wrong in a monologue, so this voice is cast and not used everywhere.',
   },
 
   // --- acadian ------------------------------------------------------------
-  // Not in FRENCH_VARIETY_MIX. Held here deliberately: see ACADIAN_NOTE.
+  // Cast, NOT scheduled, and NOT heard — see ACADIAN_NOTE. Nothing schedules
+  // it, so nothing has been rendered with it; hear it before that changes.
   {
     id: 'ac-f',
     variety: 'acadian',
     gender: 'female',
     vendorName: 'Evangeline - Warm Acadian Conversational',
-    why: 'Acadian female. Present in the cast, absent from the mix — available the day someone decides the mix should carry it.',
+    why: 'Acadian female. Present in the cast, absent from the mix, and unheard — available the day someone decides the mix should carry it.',
   },
   {
     id: 'ac-m',
     variety: 'acadian',
     gender: 'male',
     vendorName: 'Seddik - French',
-    why: 'Acadian male. Same standing as the female: cast, not scheduled.',
+    why: 'Acadian male. Same standing as the female: cast, not scheduled, not heard.',
   },
+];
+
+/**
+ * The voices that were heard and rejected, and why that list matters.
+ *
+ * Three of the eight French candidates auditioned on 29 August 2026 did not
+ * survive being listened to:
+ *
+ *   Julia - Warm French Narrator      international, female
+ *   Peter - Clear, Engaging...        swiss, male
+ *   Alimata - Professional...         west african, female
+ *
+ * All three had been chosen FROM THE VENDOR'S OWN DESCRIPTIONS, and the
+ * descriptions were good: "warm, gentle, clear diction", "crisp, professional",
+ * "great for conversation". Peter is the most-used Swiss French voice in the
+ * library.
+ *
+ * **Three of eight is the number to remember.** It is the measured failure rate
+ * of choosing voices by reading about them, and it is why this file will not
+ * accept a voice that has not been heard — including, still, its own narrator
+ * equivalent in `ielts-voices.ts`.
+ */
+export const HEARD_AND_REJECTED = [
+  { vendorName: 'Julia - Warm French Narrator', variety: 'international' as SpeechVariety },
+  { vendorName: 'Peter - Clear, Engaging and Professional', variety: 'swiss' as SpeechVariety },
+  { vendorName: 'Alimata - Professional and Welcoming', variety: 'west_african' as SpeechVariety },
 ];
 
 /**
@@ -248,8 +258,12 @@ export const MIGRATION = {
    * Render ONE item per variety first, have it heard, then run the batch.
    * Rendering 39 files against a cast nobody has listened to would repeat
    * precisely the mistake the migration exists to correct.
+   *
+   * DONE, 29 August 2026. Eight candidates rendered on the production model
+   * with real lines from this bank, played back one at a time, five approved
+   * and three replaced. The batch may run.
    */
-  castHeard: false,
+  castHeard: true,
 } as const;
 
 /**

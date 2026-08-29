@@ -61,96 +61,51 @@ export type VoiceRole = {
  * different products.
  */
 export const IELTS_VOICE_CAST: VoiceRole[] = [
-  {
-    id: 'narrator',
-    voiceId: 'pqHfZKP75CvOlQylNhV4',
-    accent: 'north_american',
-    gender: 'male',
-    source: 'account',
-    publicOwnerId: null,
-    vendorName: 'Bill - Wise',
-    why: 'The voice that says "Now turn to Part 2". Older than every speaking role and never cast as a character, because a narrator a candidate could mistake for a speaker costs them the first sentence of the recording while they work out who is talking. The first choice here was Daniel, a British male, until a render test returned voice_not_found for it — see the note below: the voice LIST and the voices that actually render are not the same set.',
-  },
+  // ── British ───────────────────────────────────────────────────────────
   {
     id: 'br-m',
-    voiceId: 'JBFqnCBsd6RMkjVDRZzb',
+    voiceId: null,
     accent: 'british',
     gender: 'male',
     source: 'account',
     publicOwnerId: null,
-    vendorName: 'George - Warm',
-    why: 'British male. Middle-aged and warm, which suits the Part 3 tutor and the Part 1 official — the two roles a British male most often plays in this exam.',
+    vendorName: 'Jofra – Expressive & Neutral Narrator',
+    why: 'Neutral British narrator. Heard and approved 29 August 2026. Carries the Part 3 tutor and the Part 1 official — the two roles a British male most often plays in this exam.',
   },
   {
     id: 'br-f',
-    voiceId: 'Xb7hH8MSUJpSbSDYk0k2',
+    voiceId: null,
     accent: 'british',
     gender: 'female',
     source: 'account',
     publicOwnerId: null,
-    vendorName: 'Alice - Clear',
-    why: 'British female. Clear rather than characterful: Part 2 monologues carry dense factual detail (times, prices, room numbers) and clarity is what the item depends on.',
+    vendorName: 'Juliet - British, Natural and Engaging',
+    why: 'Neutral British female, described for e-learning and educational material rather than performance. Part 2 monologues carry dense factual detail — times, prices, room numbers — and clarity is what the item depends on.',
   },
-  {
-    id: 'au-m',
-    voiceId: 'IKne3meq5aSn9XLyUdCD',
-    accent: 'australian',
-    gender: 'male',
-    source: 'account',
-    publicOwnerId: null,
-    vendorName: 'Charlie - Deep',
-    why: 'The account holds exactly one Australian voice. Young, which fits a Part 3 student better than a Part 4 lecturer, so it is cast accordingly rather than used everywhere.',
-  },
-  {
-    id: 'au-f',
-    voiceId: 'zMK1eWY5DTw3Jjb8efU8',
-    accent: 'australian',
-    gender: 'female',
-    source: 'shared_library',
-    publicOwnerId: '77351c16498cbe9c449e0592dd6e',
-    vendorName: 'Emily - Calm, clear',
-    why: 'The account has no Australian female at all. Chosen for the same reason as the British female: Part 2 and Part 4 need clarity over character.',
-  },
+
+  // ── North American (United States) ────────────────────────────────────
   {
     id: 'na-m',
-    voiceId: 'nPczCjzI2devNBz1zQrb',
+    voiceId: null,
     accent: 'north_american',
     gender: 'male',
     source: 'account',
     publicOwnerId: null,
-    vendorName: 'Brian - Deep',
-    why: 'North American male, middle-aged. The Part 4 academic monologue is the longest single stretch in the test and wants a voice that holds attention without performing.',
+    vendorName: 'Russ – Deep, Smooth and Articulate',
+    why: 'Grounded and non-regional, with calm authority. The Part 4 academic monologue is the longest single stretch in the test and wants a voice that holds attention without performing.',
   },
   {
     id: 'na-f',
-    voiceId: 'EXAVITQu4vr4xnSDxMaL',
+    voiceId: null,
     accent: 'north_american',
     gender: 'female',
     source: 'account',
     publicOwnerId: null,
-    vendorName: 'Sarah - Mature',
-    why: 'North American female. Younger register, which is what Part 1 and Part 3 conversations mostly are — a student, a caller, an enquirer.',
+    vendorName: 'Heather - Warm, Raspy American Female',
+    why: 'Replaced a younger, brighter candidate the founder rejected in one word: it read as a boy rather than a woman. Age and register are not decoration in an exam — a candidate who cannot place the speaker cannot place the situation either.',
   },
-  {
-    id: 'nz-m',
-    voiceId: '1HGaTm3UFxAyxae5H0GU',
-    accent: 'new_zealand',
-    gender: 'male',
-    source: 'shared_library',
-    publicOwnerId: '9f19653a0f92ff6c8f990b4a1952cc08d502f8818ccd213b7827d1360efa7cf1',
-    vendorName: 'Max - New Zealand',
-    why: 'The account has no New Zealand voice at all, and IELTS names that accent explicitly. Of the forty in the shared library this one is labelled plainly New Zealand rather than a Kiwi character part, which is what a listening test needs.',
-  },
-  {
-    id: 'nz-f',
-    voiceId: 'ANYdMtqQZTRmq10Nw496',
-    accent: 'new_zealand',
-    gender: 'female',
-    source: 'shared_library',
-    publicOwnerId: '95955342bdf49ea4a069f3363ca37a87ae763e9a777c09c508ebc2950232b0bf',
-    vendorName: 'Ella - Casual New Zealand',
-    why: 'New Zealand female, casual register — Part 1 is everyday social, and a formal reading of "can I book the airport shuttle" is not what a candidate will meet.',
-  },
+
+  // ── Canadian ──────────────────────────────────────────────────────────
   {
     id: 'ca-m',
     voiceId: null,
@@ -158,8 +113,8 @@ export const IELTS_VOICE_CAST: VoiceRole[] = [
     gender: 'male',
     source: 'account',
     publicOwnerId: null,
-    vendorName: 'Barclay - Universal Narration',
-    why: 'Added 29 August 2026 because the founder asked why Canadian English was missing, and the honest answer was that "North American" had been read as "American". Every candidate this product serves is sitting IELTS to move to Canada; a bank with no Canadian voice in it is a strange thing to hand them. Measured and unhurried, so it can carry Part 4.',
+    vendorName: 'Dave - Deep, Warm and Approachable',
+    why: 'Mature Canadian male, conversational. Added because the founder asked why Canadian English was missing and the honest answer was that "North American" had been read as "American" — in an app whose candidates are all moving to Canada.',
   },
   {
     id: 'ca-f',
@@ -169,8 +124,56 @@ export const IELTS_VOICE_CAST: VoiceRole[] = [
     source: 'account',
     publicOwnerId: null,
     vendorName: 'Rebecca - Calm, Warm and Engaging',
-    why: 'Canadian female. Calm rather than bright, for the same reason as the British female: Part 2 carries the dense factual detail and clarity is what the item depends on.',
+    why: 'Canadian female. Calm rather than bright, for the same reason as the British female.',
   },
+
+  // ── Australian ────────────────────────────────────────────────────────
+  {
+    id: 'au-m',
+    voiceId: null,
+    accent: 'australian',
+    gender: 'male',
+    source: 'account',
+    publicOwnerId: null,
+    vendorName: 'Neil - Soft Australian accent',
+    why: 'Mid-range Australian male, metro accent. Replaces the single Australian voice the account happened to hold, which had been cast everywhere because it was the only one.',
+  },
+  {
+    id: 'au-f',
+    voiceId: null,
+    accent: 'australian',
+    gender: 'female',
+    source: 'account',
+    publicOwnerId: null,
+    vendorName: 'Emily - Calm, clear female Australian',
+    why: 'Australian female. Clear over characterful, as with the British and Canadian females.',
+  },
+
+  // ── New Zealand ───────────────────────────────────────────────────────
+  {
+    id: 'nz-m',
+    voiceId: null,
+    accent: 'new_zealand',
+    gender: 'male',
+    source: 'account',
+    publicOwnerId: null,
+    vendorName: 'Luke - New Zealand, Deep, and Steady',
+    why: 'Replaced the first New Zealand male, which the founder rejected. Described as an audiobook narrator with clear diction and professional pacing rather than a Kiwi character part — the same test that chose the first one, applied to a voice that survived hearing. NOTE: carries Live Moderation, which adds latency to a render but does not affect the audio.',
+  },
+  {
+    id: 'nz-f',
+    voiceId: null,
+    accent: 'new_zealand',
+    gender: 'female',
+    source: 'account',
+    publicOwnerId: null,
+    vendorName: 'Ella - Casual New Zealand Female',
+    why: 'New Zealand female, casual register — Part 1 is everyday social, and a formal reading of "can I book the airport shuttle" is not what a candidate will meet.',
+  },
+
+  // ── Irish and Scottish ────────────────────────────────────────────────
+  // ielts.org says "different accents, INCLUDING" the four it names. A floor,
+  // not a list. Cast sparingly, as occasional Part 1 or Part 3 speakers.
   {
     id: 'ie-m',
     voiceId: null,
@@ -179,7 +182,7 @@ export const IELTS_VOICE_CAST: VoiceRole[] = [
     source: 'account',
     publicOwnerId: null,
     vendorName: 'Darren - Calm and Deep',
-    why: 'IELTS says "different accents, INCLUDING" the four it names — a floor, not a list. Irish is one a candidate can meet, and meeting it for the first time on exam day costs them the recording. Cast sparingly, as an occasional Part 1 or Part 3 speaker.',
+    why: 'Irish male. A candidate can meet this variety, and meeting it for the first time on exam day costs them the recording.',
   },
   {
     id: 'sc-f',
@@ -189,9 +192,10 @@ export const IELTS_VOICE_CAST: VoiceRole[] = [
     source: 'account',
     publicOwnerId: null,
     vendorName: 'Claire - Warm and Measured',
-    why: 'Scottish female, for the same reason as the Irish male. "Measured" matters more here than anywhere else in the cast: an unfamiliar variety read quickly is a listening test of the wrong thing.',
+    why: 'Scottish female. Took three passes: rejected, then two alternatives rejected, then chosen after all on a second hearing. Recorded because it is the clearest evidence in this file that these judgements are not derivable from the vendor descriptions — the same voice, the same words, a different verdict.',
   },
 ];
+
 
 /**
  * The three voices that are NOT on the account yet.
@@ -205,6 +209,25 @@ export const IELTS_VOICE_CAST: VoiceRole[] = [
  * Kept as data rather than a comment so a pre-render check can assert it.
  */
 export const VOICES_TO_ADD = IELTS_VOICE_CAST.filter((v) => v.source === 'shared_library');
+
+/**
+ * The narrator — the ONE role still unheard, and it is deliberately empty.
+ *
+ * Twelve speaking voices were auditioned on 29 August 2026 and five were
+ * rejected. The narrator was not among them, so there is no approved voice for
+ * "Now turn to Part 2" and this file will not name one.
+ *
+ * It cannot simply borrow a speaking voice. The original reasoning holds: a
+ * narrator a candidate could mistake for a speaker costs them the first
+ * sentence of the recording while they work out who is talking. So it must be
+ * distinct from all twelve, older than every speaking role, and heard before it
+ * is cast — the same gate as the rest.
+ *
+ * Until then, `RENDER_VERIFIED` is empty and no IELTS listening bank should be
+ * rendered. A bank whose narrator was chosen from a list is the exact practice
+ * this whole exercise replaced.
+ */
+export const NARRATOR_PENDING = true;
 
 /** The cast a script may draw on for one part, by the exam's own structure. */
 export const PART_VOICES: Record<1 | 2 | 3 | 4, number> = {
@@ -257,6 +280,17 @@ export const PART_VOICES: Record<1 | 2 | 3 | 4, number> = {
  *    `vendorName`. Adding a voice in the ElevenLabs library is then the whole
  *    of giving the exam a new accent — no deploy, no edit to this file.
  */
-export const RENDER_VERIFIED = [
-  'narrator', 'br-m', 'br-f', 'au-m', 'na-m', 'na-f',
-] as const;
+/**
+ * Empty, and that is the honest state.
+ *
+ * It used to list six premade voices verified by rendering. Every one of them
+ * has been replaced: they were chosen from a list and never heard, and when the
+ * founder finally listened to a comparable set, five of twelve were rejected
+ * outright. A verification that the vendor returns audio is not a verification
+ * that the audio is right.
+ *
+ * The twelve voices above were each heard and approved. What is NOT yet done is
+ * a render test against the live key with the new ids resolved by name — and
+ * the narrator is not chosen at all. This stays empty until both are true.
+ */
+export const RENDER_VERIFIED = [] as const;
