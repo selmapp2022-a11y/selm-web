@@ -194,3 +194,18 @@ export async function comprehensionFamiliesFor(
   }
   return null;
 }
+
+/**
+ * The plan's exam name, in the exam's own language, for a practice heading.
+ *
+ * The comprehension pages need only this from the exam; `practiceTasksFor`
+ * would build the whole task list to hand back one string.
+ */
+export async function examNameForPractice(): Promise<string | null> {
+  const plan = loadPlan();
+  if (!plan?.examId) return null;
+  const defs = await import('../exam/definitions');
+  const exam = defs.EXAMS.find((e) => e.id === plan.examId);
+  if (!exam) return null;
+  return exam.name[exam.language] ?? exam.name.en;
+}

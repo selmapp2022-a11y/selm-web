@@ -112,7 +112,38 @@ const PLAN = loadPlan();
 const PLANNED_EXAM = PLAN && EXAMS.find((e) => e.id === PLAN.examId);
 const PLANNED_GOAL = PLAN && GOALS.find((g) => g.id === PLAN.goalId);
 
-const START = (RESTORED && EXAMS.find((e) => e.id === RESTORED.examId)) || PLANNED_EXAM || EXAMS[0];
+/**
+ * A stored plan can hold a destination and an exam that contradict each other,
+ * and until this ran the product printed the contradiction with a straight
+ * face: `IELTS General Training / Express Entry - French category / NCLC 7 in
+ * every skill`. NCLC is the FRENCH benchmark; IELTS is an English exam and
+ * cannot serve that category. Neither half is wrong alone. The pair is.
+ *
+ * The destination is the authority - the goal screen states the rule, "the
+ * exam is chosen from that, not the other way round" - so an exam that does
+ * not serve the stored goal is replaced by one that does, and the repair is
+ * written back so that every reader of the plan agrees, not just this store.
+ *
+ * Only ever acts when BOTH halves resolve. A plan with an empty goalId is
+ * onboarding mid-flight (step one saves the exam and leaves the destination
+ * blank on purpose, so Today stays empty and asks the second question);
+ * inventing a destination there would skip that question.
+ */
+const RECONCILED_EXAM =
+  PLANNED_GOAL && PLANNED_EXAM && !PLANNED_GOAL.exams.includes(PLANNED_EXAM.id)
+    ? EXAMS.find((e) => PLANNED_GOAL.exams.includes(e.id)) || PLANNED_EXAM
+    : PLANNED_EXAM;
+
+if (PLAN && PLANNED_GOAL && RECONCILED_EXAM && RECONCILED_EXAM.id !== PLAN.examId) {
+  savePlan({
+    goalId: PLANNED_GOAL.id,
+    examId: RECONCILED_EXAM.id,
+    examDate: PLAN.examDate ?? null,
+    examLocale: RECONCILED_EXAM.locale,
+  });
+}
+
+const START = (RESTORED && EXAMS.find((e) => e.id === RESTORED.examId)) || RECONCILED_EXAM || EXAMS[0];
 
 export const useExam = create<ExamState>((set) => ({
   exam: START,
@@ -123,8 +154,16 @@ export const useExam = create<ExamState>((set) => ({
   result: null,
   setExam: (exam) =>
     set((st) => {
-      savePlan({ goalId: st.goal.id, examId: exam.id, examDate: loadPlan()?.examDate ?? null, examLocale: exam.locale });
-      return { exam, taskId: firstTask(exam).id, response: null, result: null };
+      // The mirror of setGoal's guard. Without it the pair could still be
+      // driven apart from the exam side - choose the French Express Entry
+      // category, then choose IELTS anywhere else, and the plan kept
+      // goal=ee-french with exam=ielts-gt for good. Whichever half the
+      // candidate touches, the other follows.
+      const goal = st.goal.exams.includes(exam.id)
+        ? st.goal
+        : GOALS.find((g) => g.exams.includes(exam.id)) || st.goal;
+      savePlan({ goalId: goal.id, examId: exam.id, examDate: loadPlan()?.examDate ?? null, examLocale: exam.locale });
+      return { exam, goal, taskId: firstTask(exam).id, response: null, result: null };
     }),
   setTaskId: (taskId) => set({ taskId, response: null, result: null }),
   setGoal: (goal) =>

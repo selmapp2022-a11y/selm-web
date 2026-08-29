@@ -1,20 +1,21 @@
-import { useEffect, useRef, useState } from 'react';
-import { ClipboardPaste, Timer, RefreshCcw, CheckCircle2, XCircle } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { ClipboardPaste, RefreshCcw, CheckCircle2, XCircle } from 'lucide-react';
 import clsx from 'clsx';
-import { enhanceText, generateText, type ReadingText } from '../lib/reading';
+import { enhanceText, type ReadingText } from '../lib/reading';
 import { CompletionCard } from '../components/CompletionCard';
 import { difficultyForSkill } from '../lib/difficulty';
+import { ComprehensionPractice } from '../components/ComprehensionPractice';
+import { examNameForPractice } from '../lib/practiceTasks';
 
 /**
- * `daily` and `speed` — "Article of the day" and the speed reader — were
- * removed from the mode row on 2026-08-27. Both are general-learning
- * surfaces with no analogue in any exam this product prepares for: no
- * instrument tests words-per-minute, and no instrument gives the candidate a
- * news article of their choosing. The components below still exist and the
- * type still admits the values, so nothing is deleted and no user loses a
- * page mid-session; they are simply no longer offered.
+ * `daily` and `speed` - "Article of the day" and the speed reader - were
+ * removed from the mode row on 2026-08-27: no instrument tests
+ * words-per-minute, and none gives the candidate a news article of their
+ * choosing. On 2026-08-29 the page itself stopped being the paste tool, and
+ * both components went with the row, along with the shared ModeBtn - the page
+ * now leads with the exam's own reading section and offers "paste any text"
+ * as a labelled extra.
  */
-type Mode = 'paste' | 'daily' | 'speed';
 
 export default function ReadingPage() {
   // Was `user?.current_level` — one CEFR level per user, set by the adaptive
@@ -22,30 +23,47 @@ export default function ReadingPage() {
   // practice pages. Part 3 (replacement) §3: difficulty is per task, comes
   // from performance, and is never shown. See `lib/difficulty.ts`.
   const level = difficultyForSkill('reading');
-  const [mode, setMode] = useState<Mode>('paste');
+  // The exam's own reading section is the page; "paste any text" is a tool
+  // that supports it. It was the whole page until 2026-08-29, which meant the
+  // one screen labelled Reading could not open the exam's reading test - the
+  // bank existed and only the planner could reach it. Writing and Speaking
+  // already led with the exam's own tasks; this makes Reading agree.
+  const [aux, setAux] = useState<null | 'paste'>(null);
+  const [examName, setExamName] = useState<string | null>(null);
+  useEffect(() => { examNameForPractice().then(setExamName); }, []);
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="font-display text-3xl font-bold text-navy">Reading</h1>
-        <p className="mt-1 text-ink-secondary">Paste any text and read it at your level, with vocabulary support.</p>
+        <p className="mt-1 text-ink-secondary">
+          {examName ? `${examName} — read and answer, at your level.` : 'Read and answer, at your level.'}
+        </p>
       </div>
 
-      <div className="flex gap-2 rounded-2xl bg-surface-muted p-1.5">
-        <ModeBtn active={mode === 'paste'} onClick={() => setMode('paste')} icon={ClipboardPaste}>Paste any text</ModeBtn>
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="text-xs text-ink-secondary">Extra practice:</span>
+        <AuxBtn active={aux === 'paste'} onClick={() => setAux(aux === 'paste' ? null : 'paste')} icon={ClipboardPaste}>
+          Paste any text
+        </AuxBtn>
       </div>
 
-      {mode === 'paste' && <PasteMode level={level} />}
-      {mode === 'daily' && <DailyMode level={level} />}
-      {mode === 'speed' && <SpeedMode level={level} />}
+      {aux === 'paste' ? <PasteMode level={level} /> : <ComprehensionPractice skill="reading" />}
     </div>
   );
 }
 
-function ModeBtn({ active, onClick, icon: Icon, children }: any) {
+function AuxBtn({ active, onClick, icon: Icon, children }: any) {
   return (
-    <button onClick={onClick} className={clsx('flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition', active ? 'bg-white text-navy shadow-card' : 'text-ink-secondary hover:text-navy')}>
-      <Icon className="h-4 w-4" /> {children}
+    <button
+      onClick={onClick}
+      className={clsx(
+        'flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition',
+        active ? 'border-teal bg-teal/10 text-navy' : 'border-surface-divider text-ink-secondary hover:text-navy'
+      )}
+    >
+      <Icon className="h-3.5 w-3.5" />
+      {children}
     </button>
   );
 }
@@ -88,41 +106,6 @@ function PasteMode({ level }: { level: string }) {
       <button onClick={submit} disabled={loading || input.trim().length < 50} className="btn-primary mt-4 w-full">
         {loading ? 'Analyzing…' : 'Analyze and create exercises'}
       </button>
-    </div>
-  );
-}
-
-function DailyMode({ level }: { level: string }) {
-  const [, setTopic] = useState<string | null>(null);
-  const [text, setText] = useState<ReadingText | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [err, setErr] = useState<string | null>(null);
-
-  const TOPICS = ['Technology', 'Science', 'Travel', 'Health', 'Business', 'Culture', 'Environment', 'Education'];
-
-  const load = async (t: string) => {
-    setTopic(t); setLoading(true); setErr(null); setText(null);
-    try {
-      const r = await generateText(t.toLowerCase(), level);
-      setText(r);
-    } catch (e: any) {
-      setErr(e?.response?.data?.detail || 'Could not load article.');
-    } finally { setLoading(false); }
-  };
-
-  if (text) return <ReaderView text={text} onRetry={() => { setText(null); setTopic(null); }} />;
-  if (loading) return <div className="card flex h-64 items-center justify-center"><div className="h-8 w-8 animate-spin rounded-full border-2 border-teal/30 border-t-teal" /></div>;
-  if (err) return <div className="card p-6 text-center"><p className="mb-3 text-red-700">{err}</p><button onClick={() => setTopic(null)} className="btn-secondary">Back</button></div>;
-
-  return (
-    <div className="card p-8">
-      <h3 className="mb-2 font-display text-xl font-bold text-navy">Article of the day</h3>
-      <p className="mb-6 text-sm text-ink-secondary">Pick a topic — we'll generate a fresh article at level {level}.</p>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {TOPICS.map((t) => (
-          <button key={t} onClick={() => load(t)} className="btn-secondary justify-start">{t}</button>
-        ))}
-      </div>
     </div>
   );
 }
@@ -261,82 +244,5 @@ function renderWithClickableVocab(content: string, vocab: Map<string, any>, onCl
         return <span key={i}>{w}</span>;
       })}
     </p>
-  );
-}
-
-function SpeedMode({ level }: { level: string }) {
-  const [text, setText] = useState<ReadingText | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [running, setRunning] = useState(false);
-  const [elapsed, setElapsed] = useState(0);
-  const [done, setDone] = useState(false);
-  const startRef = useRef(0);
-
-  useEffect(() => {
-    if (!running) return;
-    const id = setInterval(() => setElapsed(Math.round((Date.now() - startRef.current) / 1000)), 250);
-    return () => clearInterval(id);
-  }, [running]);
-
-  const load = async () => {
-    setLoading(true); setText(null); setDone(false); setElapsed(0); setRunning(false);
-    try {
-      const r = await generateText('general', level);
-      setText(r);
-    } finally { setLoading(false); }
-  };
-
-  if (!text && !loading) {
-    return (
-      <div className="card p-10 text-center">
-        <Timer className="mx-auto mb-4 h-12 w-12 text-teal" />
-        <h3 className="mb-2 font-display text-xl font-bold text-navy">Reading speed trainer</h3>
-        <p className="mb-6 text-ink-secondary">Read at your own pace — we'll measure your words per minute (WPM).</p>
-        <button onClick={load} className="btn-primary">Get a passage</button>
-      </div>
-    );
-  }
-  if (loading) return <div className="card flex h-64 items-center justify-center"><div className="h-8 w-8 animate-spin rounded-full border-2 border-teal/30 border-t-teal" /></div>;
-  if (!text) return null;
-
-  const wordCount = text.content.split(/\s+/).filter(Boolean).length;
-  const wpm = elapsed > 0 ? Math.round((wordCount / elapsed) * 60) : 0;
-
-  return (
-    <div className="space-y-4">
-      <div className="card flex items-center justify-between p-4">
-        <div className="flex gap-6">
-          <div><div className="text-xs text-ink-secondary">Time</div><div className="font-mono text-xl font-bold text-navy">{Math.floor(elapsed/60)}:{String(elapsed%60).padStart(2,'0')}</div></div>
-          <div><div className="text-xs text-ink-secondary">Words</div><div className="text-xl font-bold text-navy">{wordCount}</div></div>
-          <div><div className="text-xs text-ink-secondary">WPM</div><div className="text-xl font-bold text-teal">{done ? wpm : '—'}</div></div>
-        </div>
-        {!running && !done && <button onClick={() => { startRef.current = Date.now(); setRunning(true); }} className="btn-accent">Start reading</button>}
-        {running && <button onClick={() => { setRunning(false); setDone(true); }} className="btn-primary">I'm done</button>}
-        {done && <button onClick={load} className="btn-secondary">Try another</button>}
-      </div>
-
-      <div className={clsx('card p-8 transition-opacity', !running && !done && 'opacity-30 blur-sm select-none')}>
-        <h3 className="mb-4 font-display text-xl font-bold text-navy">{text.title}</h3>
-        <p className="text-lg leading-relaxed text-ink-primary">{text.content}</p>
-      </div>
-
-      {done && (
-        <CompletionCard
-          skill="reading"
-          topic={`Speed read · ${wpm} WPM`}
-          score={Math.min(100, wpm)}
-          onNext={load}
-          nextLabel="Try another passage"
-          extra={
-            <div className="text-center">
-              <div className="font-display text-3xl font-bold text-teal">{wpm} WPM</div>
-              <p className="mt-1 text-sm text-ink-secondary">
-                {wpm < 150 ? 'Steady — keep practicing for fluency' : wpm < 250 ? 'Good — close to native speed' : 'Excellent — fluent reader speed'}
-              </p>
-            </div>
-          }
-        />
-      )}
-    </div>
   );
 }

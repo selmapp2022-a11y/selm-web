@@ -119,9 +119,22 @@ function familiesOf(exam: ExamDefinition, skill: SkillId): Array<{ family: strin
  * écrite · tâche 3 · NCLC 6, eight items — and the planner is supposed to say
  * so rather than imply otherwise.
  */
+/**
+ * How much practisable material sits behind a production task.
+ *
+ * This counted ONLY prescription practice items until 2026-08-29, and the
+ * prescription catalogue holds TCF cells and nothing else - so every IELTS
+ * task counted zero, and the plan told the candidate "not authored yet" about
+ * Writing Task 1 and Speaking Part 1 while /writing and /speaking rendered
+ * both of them correctly on the same build. The measure was wrong, not the
+ * content. A prescription is REMEDIATION, offered after a weak performance;
+ * an authored task is practisable the moment it exists.
+ *
+ * So the task itself counts as one, and prescription items add to it.
+ */
 function itemsForTask(examId: string, taskId: string): number {
   const entries = entriesFor(examId, taskId);
-  return entries.reduce((n, e) => n + e.cell.practiceItemIds.length, 0);
+  return 1 + entries.reduce((n, e) => n + e.cell.practiceItemIds.length, 0);
 }
 
 export type PlannerInput = {
@@ -277,7 +290,14 @@ export function buildPlan(input: PlannerInput): Plan {
     examId: exam.id,
     slots,
     order,
-    thin: slots.filter((s) => s.items < MIN_ITEMS_PER_COORDINATE),
+    // MIN_ITEMS_PER_COORDINATE is a COMPREHENSION rule: a family holding two
+    // questions cannot measure anything. A production task is one prompt, sat
+    // once, so holding it to four is a category error - and it is what made
+    // every authored IELTS task read as a gap. A task is thin only when it
+    // does not exist at all.
+    thin: slots.filter((s) =>
+      s.coordinate.kind === 'family' ? s.items < MIN_ITEMS_PER_COORDINATE : s.items === 0,
+    ),
     daysLeft,
     basis,
   };
@@ -296,7 +316,7 @@ export function shortfall(plan: Plan): Array<{ label: string; skill: SkillId; ha
       label: s.coordinate.label,
       skill: s.coordinate.skill,
       has: s.items,
-      needs: MIN_ITEMS_PER_COORDINATE - s.items,
+      needs: s.coordinate.kind === 'family' ? MIN_ITEMS_PER_COORDINATE - s.items : 1,
     }))
     .sort((a, b) => b.needs - a.needs);
 }

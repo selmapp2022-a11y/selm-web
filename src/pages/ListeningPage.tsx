@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Headphones, PenLine, RefreshCcw, CheckCircle2, XCircle } from 'lucide-react';
 import clsx from 'clsx';
 import { AudioPlayer } from '../components/AudioPlayer';
@@ -7,12 +7,12 @@ import { TopicPicker, LISTENING_TOPICS } from '../components/TopicPicker';
 import { CompletionCard } from '../components/CompletionCard';
 import { Loader, ErrorBox } from '../components/States';
 import { difficultyForSkill } from '../lib/difficulty';
+import { ComprehensionPractice } from '../components/ComprehensionPractice';
+import { examNameForPractice } from '../lib/practiceTasks';
 
-// Two tabs only — "Adaptive Practice" and "Dictation". The previous "News &
-// Stories" tab called the same backend with the same params as Adaptive
-// Practice (just a different label), so it was just a duplicate confusing
-// the UI. (Merged 2026-05-08.)
-type Mode = 'practice' | 'dictation';
+// "Adaptive Practice" and "Dictation" were the page's two tabs until
+// 2026-08-29, when the exam's own listening section took the page and both
+// became labelled extras. The shared ModeBtn went with the tab row.
 
 export default function ListeningPage() {
   // Was `user?.current_level` — one CEFR level per user, set by the adaptive
@@ -20,30 +20,53 @@ export default function ListeningPage() {
   // practice pages. Part 3 (replacement) §3: difficulty is per task, comes
   // from performance, and is never shown. See `lib/difficulty.ts`.
   const level = difficultyForSkill('listening');
-  const [mode, setMode] = useState<Mode>('practice');
+  // The exam's own listening section leads. Topic cards - Technology,
+  // Science, Sports - were the whole page until 2026-08-29, and no
+  // examination sets a topic; a candidate practising them believed they were
+  // preparing for their test. They remain, demoted and labelled as the
+  // general training they are, and when the exam has no listening section
+  // built the component says so rather than letting them stand in for it.
+  const [aux, setAux] = useState<null | 'practice' | 'dictation'>(null);
+  const [examName, setExamName] = useState<string | null>(null);
+  useEffect(() => { examNameForPractice().then(setExamName); }, []);
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="font-display text-3xl font-bold text-navy">Listening</h1>
-        <p className="mt-1 text-ink-secondary">Adaptive playback and dictation training.</p>
+        <p className="mt-1 text-ink-secondary">
+          {examName ? `${examName} — listen and answer, at your level.` : 'Listen and answer, at your level.'}
+        </p>
       </div>
 
-      <div className="flex gap-2 rounded-2xl bg-surface-muted p-1.5">
-        <ModeBtn active={mode === 'practice'} onClick={() => setMode('practice')} icon={Headphones}>Adaptive Practice</ModeBtn>
-        <ModeBtn active={mode === 'dictation'} onClick={() => setMode('dictation')} icon={PenLine}>Dictation</ModeBtn>
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="text-xs text-ink-secondary">Extra practice:</span>
+        <AuxBtn active={aux === 'practice'} onClick={() => setAux(aux === 'practice' ? null : 'practice')} icon={Headphones}>
+          General listening
+        </AuxBtn>
+        <AuxBtn active={aux === 'dictation'} onClick={() => setAux(aux === 'dictation' ? null : 'dictation')} icon={PenLine}>
+          Dictation
+        </AuxBtn>
       </div>
 
-      {mode === 'practice' && <PracticeWithPicker level={level} />}
-      {mode === 'dictation' && <DictationMode level={level} />}
+      {aux === null && <ComprehensionPractice skill="listening" />}
+      {aux === 'practice' && <PracticeWithPicker level={level} />}
+      {aux === 'dictation' && <DictationMode level={level} />}
     </div>
   );
 }
 
-function ModeBtn({ active, onClick, icon: Icon, children }: any) {
+function AuxBtn({ active, onClick, icon: Icon, children }: any) {
   return (
-    <button onClick={onClick} className={clsx('flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition', active ? 'bg-white text-navy shadow-card' : 'text-ink-secondary hover:text-navy')}>
-      <Icon className="h-4 w-4" /> {children}
+    <button
+      onClick={onClick}
+      className={clsx(
+        'flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition',
+        active ? 'border-teal bg-teal/10 text-navy' : 'border-surface-divider text-ink-secondary hover:text-navy'
+      )}
+    >
+      <Icon className="h-3.5 w-3.5" />
+      {children}
     </button>
   );
 }

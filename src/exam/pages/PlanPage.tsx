@@ -128,7 +128,7 @@ export default function PlanPage() {
                   </span>
                 ) : (
                   <span className="shrink-0 text-xs text-ink-secondary">
-                    {s.items} {ui === 'en' ? 'items' : 'items'}
+                    {s.items} {ui === 'en' ? (s.items === 1 ? 'item' : 'items') : 'items'}
                   </span>
                 )}
               </li>
