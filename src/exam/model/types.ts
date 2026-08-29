@@ -427,6 +427,49 @@ export type TaskDefinition = {
  * pattern within one piece of material, which is a better prescription signal
  * than anything the per-item model could produce.
  */
+/**
+ * The varieties a recording may be spoken in.
+ *
+ * Ruled 29 August 2026 (`SELM-RULING-french-dialect.md`) on one principle:
+ * **comfort on exam day comes from having practised the variety the exam
+ * plays, not the one the candidate speaks.** A candidate who practises a
+ * variety the exam does not use has been made less ready, not more, however
+ * well the choice flatters the market.
+ */
+export type SpeechVariety =
+  | 'international'
+  | 'quebecois'
+  | 'west_african'
+  | 'belgian'
+  | 'swiss'
+  | 'british'
+  | 'australian'
+  | 'new_zealand'
+  | 'north_american'
+  /** The file exists and nobody has established what it is. See `variety`. */
+  | 'unknown';
+
+/**
+ * How a French listening bank should be distributed across varieties.
+ *
+ * Weighted, not even. FEI's own TCF practice simulator — built with TV5MONDE
+ * by FEI's teams — draws its audio from Paris, Geneva, Dakar, Montreal and
+ * Brussels, so a mixture is what the instrument is rather than a compromise
+ * between two markets. Québécois is present and deliberately a minority:
+ * making it dominant is the Quebec option wearing the mixture's clothes, and
+ * it carries exactly the failure the principle forbids. The MIFI/UQAM project
+ * to build a Quebec adaptation of TCF *Québec* is itself evidence that TCF
+ * Canada does not already play Québécois — an inference, not a proof, and
+ * recorded here as one.
+ */
+export const FRENCH_VARIETY_MIX: Array<{ variety: SpeechVariety; share: 'majority' | 'minority' | 'occasional' }> = [
+  { variety: 'international', share: 'majority' },
+  { variety: 'quebecois', share: 'minority' },
+  { variety: 'west_african', share: 'minority' },
+  { variety: 'belgian', share: 'occasional' },
+  { variety: 'swiss', share: 'occasional' },
+];
+
 export type Recording = {
   id: string;
   /**
@@ -452,6 +495,23 @@ export type Recording = {
   script: string;
   /** Listening only: how many voices the script has. */
   speakers?: number;
+  /**
+   * Which variety of the language this recording is spoken in.
+   *
+   * Required on anything with audio, and the reason is a defect this project
+   * already shipped: 39 French recordings exist, and NOTHING anywhere records
+   * what variety they are in. It is not in the definition, not in the mp3
+   * metadata (only ffmpeg's encoder tag), and not recoverable from the vendor
+   * — the server key returns 401 on the generation history. Meanwhile
+   * `SectionPage` still told candidates the recordings were held "until the
+   * dialect question is settled". A fact that lives only in the audio is a
+   * fact nobody can check.
+   *
+   * `unknown` is therefore a real and honest value, not a placeholder to be
+   * filled in silently: it means the file exists and its variety has to be
+   * established by listening.
+   */
+  variety?: SpeechVariety;
   /**
    * Path to the rendered audio **within the audio store**, e.g.
    * `tcf-co/tcf-co-01.mp3` — not a full URL. `resolveAudio()` joins it with

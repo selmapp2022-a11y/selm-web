@@ -219,8 +219,8 @@ export const TCF_CANADA: ExamDefinition = {
         feedbackDuringSection: false,
       },
       provenance: {
-        en: 'Every item in this section was written for this product, to the published format — 39 questions, ordered by progressive difficulty — and no real exam question is reproduced. The A1-to-C2 banding is ours: the exam publishes that difficulty rises across the section and does not publish which item sits at which level.',
-        fr: "Tous les items de cette épreuve ont été rédigés pour ce produit, selon le format publié — 39 questions, à difficulté progressive — sans reproduire aucune question réelle d'examen. Le classement A1 à C2 est le nôtre : l'examen indique que la difficulté augmente, sans publier le niveau de chaque item.",
+        en: 'Every item in this section was written for this product, to the published format — 39 questions, ordered by progressive difficulty — and no real exam question is reproduced. The A1-to-C2 banding is ours: the exam publishes that difficulty rises across the section and does not publish which item sits at which level. Recordings use several French varieties — mostly international French, with Quebec and West African voices among them.',
+        fr: "Tous les items de cette épreuve ont été rédigés pour ce produit, selon le format publié — 39 questions, à difficulté progressive — sans reproduire aucune question réelle d'examen. Le classement A1 à C2 est le nôtre : l'examen indique que la difficulté augmente, sans publier le niveau de chaque item. Les enregistrements emploient plusieurs variétés de français — surtout du français international, avec des voix québécoises et ouest-africaines.",
       },
       families: [
         {
@@ -264,6 +264,7 @@ export const TCF_CANADA: ExamDefinition = {
         {
           id: "tcf-co-01-r",
           audioPath: "tcf-co/tcf-co-01.mp3",
+          variety: 'unknown',
           level: "A1",
           family: "annonce",
           speakers: 1,
@@ -272,6 +273,7 @@ export const TCF_CANADA: ExamDefinition = {
         {
           id: "tcf-co-02-r",
           audioPath: "tcf-co/tcf-co-02.mp3",
+          variety: 'unknown',
           level: "A1",
           family: "annonce",
           speakers: 1,
@@ -280,6 +282,7 @@ export const TCF_CANADA: ExamDefinition = {
         {
           id: "tcf-co-03-r",
           audioPath: "tcf-co/tcf-co-03.mp3",
+          variety: 'unknown',
           level: "A1",
           family: "annonce",
           speakers: 1,
@@ -288,6 +291,7 @@ export const TCF_CANADA: ExamDefinition = {
         {
           id: "tcf-co-04-r",
           audioPath: "tcf-co/tcf-co-04.mp3",
+          variety: 'unknown',
           level: "A1",
           family: "annonce",
           speakers: 1,
@@ -296,6 +300,7 @@ export const TCF_CANADA: ExamDefinition = {
         {
           id: "tcf-co-05-r",
           audioPath: "tcf-co/tcf-co-05.mp3",
+          variety: 'unknown',
           level: "A2",
           family: "dialogue",
           speakers: 2,
@@ -304,6 +309,7 @@ export const TCF_CANADA: ExamDefinition = {
         {
           id: "tcf-co-06-r",
           audioPath: "tcf-co/tcf-co-06.mp3",
+          variety: 'unknown',
           level: "A2",
           family: "expose",
           speakers: 1,
@@ -312,6 +318,7 @@ export const TCF_CANADA: ExamDefinition = {
         {
           id: "tcf-co-07-r",
           audioPath: "tcf-co/tcf-co-07.mp3",
+          variety: 'unknown',
           level: "A2",
           family: "annonce",
           speakers: 1,
@@ -320,6 +327,7 @@ export const TCF_CANADA: ExamDefinition = {
         {
           id: "tcf-co-08-r",
           audioPath: "tcf-co/tcf-co-08.mp3",
+          variety: 'unknown',
           level: "A2",
           family: "dialogue",
           speakers: 2,
@@ -328,6 +336,7 @@ export const TCF_CANADA: ExamDefinition = {
         {
           id: "tcf-co-09-r",
           audioPath: "tcf-co/tcf-co-09.mp3",
+          variety: 'unknown',
           level: "A2",
           family: "annonce",
           speakers: 1,
@@ -336,6 +345,7 @@ export const TCF_CANADA: ExamDefinition = {
         {
           id: "tcf-co-10-r",
           audioPath: "tcf-co/tcf-co-10.mp3",
+          variety: 'unknown',
           level: "A2",
           family: "dialogue",
           speakers: 2,
@@ -344,6 +354,7 @@ export const TCF_CANADA: ExamDefinition = {
         {
           id: "tcf-co-11-r",
           audioPath: "tcf-co/tcf-co-11.mp3",
+          variety: 'unknown',
           level: "B1",
           family: "dialogue",
           speakers: 2,
@@ -352,6 +363,7 @@ export const TCF_CANADA: ExamDefinition = {
         {
           id: "tcf-co-12-r",
           audioPath: "tcf-co/tcf-co-12.mp3",
+          variety: 'unknown',
           level: "B1",
           family: "expose",
           speakers: 1,
@@ -360,6 +372,7 @@ export const TCF_CANADA: ExamDefinition = {
         {
           id: "tcf-co-13-r",
           audioPath: "tcf-co/tcf-co-13.mp3",
+          variety: 'unknown',
           level: "B1",
           family: "dialogue",
           speakers: 2,
@@ -368,6 +381,7 @@ export const TCF_CANADA: ExamDefinition = {
         {
           id: "tcf-co-14-r",
           audioPath: "tcf-co/tcf-co-14.mp3",
+          variety: 'unknown',
           level: "B1",
           family: "expose",
           speakers: 1,
@@ -376,6 +390,7 @@ export const TCF_CANADA: ExamDefinition = {
         {
           id: "tcf-co-15-r",
           audioPath: "tcf-co/tcf-co-15.mp3",
+          variety: 'unknown',
           level: "B1",
           family: "dialogue",
           speakers: 2,
@@ -384,6 +399,7 @@ export const TCF_CANADA: ExamDefinition = {
         {
           id: "tcf-co-16-r",
           audioPath: "tcf-co/tcf-co-16.mp3",
+          variety: 'unknown',
           level: "B1",
           family: "dialogue",
           speakers: 2,
@@ -392,6 +408,7 @@ export const TCF_CANADA: ExamDefinition = {
         {
           id: "tcf-co-17-r",
           audioPath: "tcf-co/tcf-co-17.mp3",
+          variety: 'unknown',
           level: "B1",
           family: "expose",
           speakers: 1,
@@ -400,6 +417,7 @@ export const TCF_CANADA: ExamDefinition = {
         {
           id: "tcf-co-18-r",
           audioPath: "tcf-co/tcf-co-18.mp3",
+          variety: 'unknown',
           level: "B1",
           family: "dialogue",
           speakers: 2,
@@ -408,6 +426,7 @@ export const TCF_CANADA: ExamDefinition = {
         {
           id: "tcf-co-19-r",
           audioPath: "tcf-co/tcf-co-19.mp3",
+          variety: 'unknown',
           level: "B1",
           family: "dialogue",
           speakers: 2,
@@ -416,6 +435,7 @@ export const TCF_CANADA: ExamDefinition = {
         {
           id: "tcf-co-20-r",
           audioPath: "tcf-co/tcf-co-20.mp3",
+          variety: 'unknown',
           level: "B2",
           family: "expose",
           speakers: 1,
@@ -424,6 +444,7 @@ export const TCF_CANADA: ExamDefinition = {
         {
           id: "tcf-co-21-r",
           audioPath: "tcf-co/tcf-co-21.mp3",
+          variety: 'unknown',
           level: "B2",
           family: "dialogue",
           speakers: 2,
@@ -432,6 +453,7 @@ export const TCF_CANADA: ExamDefinition = {
         {
           id: "tcf-co-22-r",
           audioPath: "tcf-co/tcf-co-22.mp3",
+          variety: 'unknown',
           level: "B2",
           family: "expose",
           speakers: 1,
@@ -440,6 +462,7 @@ export const TCF_CANADA: ExamDefinition = {
         {
           id: "tcf-co-23-r",
           audioPath: "tcf-co/tcf-co-23.mp3",
+          variety: 'unknown',
           level: "B2",
           family: "expose",
           speakers: 1,
@@ -448,6 +471,7 @@ export const TCF_CANADA: ExamDefinition = {
         {
           id: "tcf-co-24-r",
           audioPath: "tcf-co/tcf-co-24.mp3",
+          variety: 'unknown',
           level: "B2",
           family: "dialogue",
           speakers: 2,
@@ -456,6 +480,7 @@ export const TCF_CANADA: ExamDefinition = {
         {
           id: "tcf-co-25-r",
           audioPath: "tcf-co/tcf-co-25.mp3",
+          variety: 'unknown',
           level: "B2",
           family: "dialogue",
           speakers: 2,
@@ -464,6 +489,7 @@ export const TCF_CANADA: ExamDefinition = {
         {
           id: "tcf-co-26-r",
           audioPath: "tcf-co/tcf-co-26.mp3",
+          variety: 'unknown',
           level: "B2",
           family: "expose",
           speakers: 1,
@@ -472,6 +498,7 @@ export const TCF_CANADA: ExamDefinition = {
         {
           id: "tcf-co-27-r",
           audioPath: "tcf-co/tcf-co-27.mp3",
+          variety: 'unknown',
           level: "B2",
           family: "expose",
           speakers: 1,
@@ -480,6 +507,7 @@ export const TCF_CANADA: ExamDefinition = {
         {
           id: "tcf-co-28-r",
           audioPath: "tcf-co/tcf-co-28.mp3",
+          variety: 'unknown',
           level: "B2",
           family: "expose",
           speakers: 1,
@@ -488,6 +516,7 @@ export const TCF_CANADA: ExamDefinition = {
         {
           id: "tcf-co-29-r",
           audioPath: "tcf-co/tcf-co-29.mp3",
+          variety: 'unknown',
           level: "B2",
           family: "dialogue",
           speakers: 2,
@@ -496,6 +525,7 @@ export const TCF_CANADA: ExamDefinition = {
         {
           id: "tcf-co-30-r",
           audioPath: "tcf-co/tcf-co-30.mp3",
+          variety: 'unknown',
           level: "C1",
           family: "expose",
           speakers: 1,
@@ -504,6 +534,7 @@ export const TCF_CANADA: ExamDefinition = {
         {
           id: "tcf-co-31-r",
           audioPath: "tcf-co/tcf-co-31.mp3",
+          variety: 'unknown',
           level: "C1",
           family: "expose",
           speakers: 1,
@@ -512,6 +543,7 @@ export const TCF_CANADA: ExamDefinition = {
         {
           id: "tcf-co-32-r",
           audioPath: "tcf-co/tcf-co-32.mp3",
+          variety: 'unknown',
           level: "C1",
           family: "expose",
           speakers: 1,
@@ -520,6 +552,7 @@ export const TCF_CANADA: ExamDefinition = {
         {
           id: "tcf-co-33-r",
           audioPath: "tcf-co/tcf-co-33.mp3",
+          variety: 'unknown',
           level: "C1",
           family: "dialogue",
           speakers: 2,
@@ -528,6 +561,7 @@ export const TCF_CANADA: ExamDefinition = {
         {
           id: "tcf-co-34-r",
           audioPath: "tcf-co/tcf-co-34.mp3",
+          variety: 'unknown',
           level: "C1",
           family: "expose",
           speakers: 1,
@@ -536,6 +570,7 @@ export const TCF_CANADA: ExamDefinition = {
         {
           id: "tcf-co-35-r",
           audioPath: "tcf-co/tcf-co-35.mp3",
+          variety: 'unknown',
           level: "C1",
           family: "expose",
           speakers: 1,
@@ -544,6 +579,7 @@ export const TCF_CANADA: ExamDefinition = {
         {
           id: "tcf-co-36-r",
           audioPath: "tcf-co/tcf-co-36.mp3",
+          variety: 'unknown',
           level: "C2",
           family: "expose",
           speakers: 1,
@@ -552,6 +588,7 @@ export const TCF_CANADA: ExamDefinition = {
         {
           id: "tcf-co-37-r",
           audioPath: "tcf-co/tcf-co-37.mp3",
+          variety: 'unknown',
           level: "C2",
           family: "expose",
           speakers: 1,
@@ -560,6 +597,7 @@ export const TCF_CANADA: ExamDefinition = {
         {
           id: "tcf-co-38-r",
           audioPath: "tcf-co/tcf-co-38.mp3",
+          variety: 'unknown',
           level: "C2",
           family: "expose",
           speakers: 1,
@@ -568,6 +606,7 @@ export const TCF_CANADA: ExamDefinition = {
         {
           id: "tcf-co-39-r",
           audioPath: "tcf-co/tcf-co-39.mp3",
+          variety: 'unknown',
           level: "C2",
           family: "expose",
           speakers: 1,
@@ -954,8 +993,8 @@ export const TCF_CANADA: ExamDefinition = {
       // The band profile of the original 39, kept as the épreuve's shape.
       serve: { count: 39, byBand: { A1: 4, A2: 6, B1: 9, B2: 10, C1: 6, C2: 4 } },
       provenance: {
-        en: 'Every item in this section was written for this product, to the published format — 39 questions, ordered by progressive difficulty — and no real exam question is reproduced. The A1-to-C2 banding is ours: the exam publishes that difficulty rises across the section and does not publish which item sits at which level.',
-        fr: "Tous les items de cette épreuve ont été rédigés pour ce produit, selon le format publié — 39 questions, à difficulté progressive — sans reproduire aucune question réelle d'examen. Le classement A1 à C2 est le nôtre : l'examen indique que la difficulté augmente, sans publier le niveau de chaque item.",
+        en: 'Every item in this section was written for this product, to the published format — 39 questions, ordered by progressive difficulty — and no real exam question is reproduced. The A1-to-C2 banding is ours: the exam publishes that difficulty rises across the section and does not publish which item sits at which level. Recordings use several French varieties — mostly international French, with Quebec and West African voices among them.',
+        fr: "Tous les items de cette épreuve ont été rédigés pour ce produit, selon le format publié — 39 questions, à difficulté progressive — sans reproduire aucune question réelle d'examen. Le classement A1 à C2 est le nôtre : l'examen indique que la difficulté augmente, sans publier le niveau de chaque item. Les enregistrements emploient plusieurs variétés de français — surtout du français international, avec des voix québécoises et ouest-africaines.",
       },
       families: [
         {

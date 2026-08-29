@@ -155,6 +155,17 @@ for (const s of sections) {
     new Set(s.recordings.map((r) => r.audioPath)).size === s.recordings.length,
     `${s.id}: no two recordings share a file`
   );
+  // Every recording with audio SAYS what variety it is spoken in. `unknown` is
+  // an honest answer and passes; a missing field does not, because that is how
+  // 39 French files came to exist with their variety recorded nowhere — not in
+  // the definition, not in the mp3 tags, and not recoverable from the vendor.
+  const noVariety = s.recordings.filter((r) => r.audioPath && !r.variety).map((r) => r.id);
+  ok(noVariety.length === 0, `${s.id}: every recording declares its variety`,
+     noVariety.length ? noVariety.slice(0, 5).join(', ') : 'all declared');
+  const unknown = s.recordings.filter((r) => r.variety === 'unknown').length;
+  if (unknown) {
+    console.log(`      ${s.id}: ${unknown} recording(s) declare variety 'unknown' — established by listening, not by guessing`);
+  }
 }
 
 console.log(bad === 0 ? '\nAll comprehension cases pass.' : `\n${bad} FAILURES`);

@@ -135,8 +135,8 @@ function Section({ section }: { section: ComprehensionSection }) {
               </p>
               <p className="mt-2 text-sm leading-relaxed text-ink-secondary">
                 {ui === 'en'
-                  ? 'The audio for these items has not been recorded yet. It is rendered once and stored, never generated while you wait — and the French recordings are held until the dialect question is settled, because recording them in a variety that turns out to be wrong would mean recording every item again. The written text of the items is deliberately not shown instead: reading a listening item is a different test.'
-                  : "L'audio de ces items n'est pas encore enregistré. Il est produit une fois puis stocké, jamais généré pendant votre attente — et les enregistrements français attendent que la question de la variété de français soit tranchée. Le texte des items n'est volontairement pas affiché à la place : lire un item d'écoute, c'est un autre test."}
+                  ? 'The audio for these recordings has not been made yet. It is rendered once and stored, never generated while you wait. The written script is deliberately not shown instead: reading a listening item is a different test.'
+                  : "L'audio de ces enregistrements n'est pas encore produit. Il est fabriqué une fois puis stocké, jamais généré pendant votre attente. Le script n'est volontairement pas affiché à la place : lire un enregistrement, c'est un autre test."}
               </p>
             </div>
           </div>
