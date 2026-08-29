@@ -22,8 +22,25 @@
 export type VoiceRole = {
   /** Stable name a script refers to, never the vendor's display name. */
   id: string;
-  voiceId: string;
-  accent: 'british' | 'australian' | 'new_zealand' | 'north_american';
+  /**
+   * The vendor id, when one was verified by rendering it.
+   *
+   * `null` means "resolve `vendorName` against the account at render time".
+   * That path exists because a hard-coded id is a promise this file cannot
+   * keep: `onwK4e9ZLuTAKqWWO3F9` is listed by `GET /v2/voices` and returns
+   * `voice_not_found` from text-to-speech (see the note at the foot of this
+   * file). The backend resolves names through
+   * `ElevenLabsTTSService.voice_id_for_name`.
+   */
+  voiceId: string | null;
+  accent:
+    | 'british'
+    | 'australian'
+    | 'new_zealand'
+    | 'north_american'
+    | 'canadian'
+    | 'irish'
+    | 'scottish';
   gender: 'male' | 'female';
   /** Where the voice comes from, and what has to happen before it can render. */
   source: 'account' | 'shared_library';
@@ -134,6 +151,46 @@ export const IELTS_VOICE_CAST: VoiceRole[] = [
     vendorName: 'Ella - Casual New Zealand',
     why: 'New Zealand female, casual register — Part 1 is everyday social, and a formal reading of "can I book the airport shuttle" is not what a candidate will meet.',
   },
+  {
+    id: 'ca-m',
+    voiceId: null,
+    accent: 'canadian',
+    gender: 'male',
+    source: 'account',
+    publicOwnerId: null,
+    vendorName: 'Barclay - Universal Narration',
+    why: 'Added 29 August 2026 because the founder asked why Canadian English was missing, and the honest answer was that "North American" had been read as "American". Every candidate this product serves is sitting IELTS to move to Canada; a bank with no Canadian voice in it is a strange thing to hand them. Measured and unhurried, so it can carry Part 4.',
+  },
+  {
+    id: 'ca-f',
+    voiceId: null,
+    accent: 'canadian',
+    gender: 'female',
+    source: 'account',
+    publicOwnerId: null,
+    vendorName: 'Rebecca - Calm, Warm and Engaging',
+    why: 'Canadian female. Calm rather than bright, for the same reason as the British female: Part 2 carries the dense factual detail and clarity is what the item depends on.',
+  },
+  {
+    id: 'ie-m',
+    voiceId: null,
+    accent: 'irish',
+    gender: 'male',
+    source: 'account',
+    publicOwnerId: null,
+    vendorName: 'Darren - Calm and Deep',
+    why: 'IELTS says "different accents, INCLUDING" the four it names — a floor, not a list. Irish is one a candidate can meet, and meeting it for the first time on exam day costs them the recording. Cast sparingly, as an occasional Part 1 or Part 3 speaker.',
+  },
+  {
+    id: 'sc-f',
+    voiceId: null,
+    accent: 'scottish',
+    gender: 'female',
+    source: 'account',
+    publicOwnerId: null,
+    vendorName: 'Claire - Warm and Measured',
+    why: 'Scottish female, for the same reason as the Irish male. "Measured" matters more here than anywhere else in the cast: an unfamiliar variety read quickly is a listening test of the wrong thing.',
+  },
 ];
 
 /**
@@ -179,14 +236,26 @@ export const PART_VOICES: Record<1 | 2 | 3 | 4, number> = {
  *    voice from the list without rendering it can therefore ship a cast that
  *    fails at the moment the bank is built.
  *
- * 2. **The server key cannot add voices from the shared library.**
- *    `POST /v1/voices/add/...` returns 401 `missing_perm:
- *    add_voice_from_voice_library` for all three. The key renders; it does not
- *    manage the library. So the Australian female and both New Zealand voices
- *    have to be added from the ElevenLabs web interface, or with a key that
- *    carries that permission, BEFORE the first render — otherwise the request
- *    falls back to a default voice and the recording is in the wrong accent,
- *    which a listener notices and a check does not.
+ * 2. **The server key could not add voices from the shared library — FIXED.**
+ *    `POST /v1/voices/add/...` returned 401 `missing_perm:
+ *    add_voice_from_voice_library` for all three, and `GET /v1/history`
+ *    returned 401 as well, which was the only route to recovering what variety
+ *    the 39 existing French recordings are. Both were the same cause: the key
+ *    "Unrelenting Sumatran Tiger" is a RESTRICTED key, and its Voices scope was
+ *    Read and its History scope was No Access. Raised to Voices=Write and
+ *    History=Read on 29 August 2026. Nothing else was widened.
+ *
+ *    The lesson outlives the fix: a 401 from this vendor names the missing
+ *    scope in the body. Reading it is faster than working around it, and the
+ *    workaround here — "a human must click Add in the web interface" — had
+ *    already been written into this file as though it were a property of the
+ *    product.
+ *
+ * 3. **A voice the account holds is addressable by name.** Since the catalogue
+ *    change in `elevenlabs_tts_service.py`, `voiceId: null` is a supported
+ *    entry: the backend reads `GET /v2/voices` (cached an hour) and matches
+ *    `vendorName`. Adding a voice in the ElevenLabs library is then the whole
+ *    of giving the exam a new accent — no deploy, no edit to this file.
  */
 export const RENDER_VERIFIED = [
   'narrator', 'br-m', 'br-f', 'au-m', 'na-m', 'na-f',

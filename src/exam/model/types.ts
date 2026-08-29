@@ -437,17 +437,53 @@ export type TaskDefinition = {
  * well the choice flatters the market.
  */
 export type SpeechVariety =
+  // French
   | 'international'
   | 'quebecois'
+  /** Maritime Canadian French. A real variety in Canada, and one an
+   *  immigration candidate can meet; kept separate from `quebecois` because
+   *  they do not sound alike. */
+  | 'acadian'
   | 'west_african'
   | 'belgian'
   | 'swiss'
+  // English
   | 'british'
   | 'australian'
   | 'new_zealand'
+  /** The United States. Kept distinct from `canadian`: IELTS writes "North
+   *  American", but a bank that only holds American voices has not covered
+   *  what that phrase includes, and this app's candidates are moving to
+   *  CANADA. Added 29 August 2026 at the founder's question — "why didn't you
+   *  take Canadian English?" — which had no good answer. */
   | 'north_american'
+  | 'canadian'
+  /** Irish and Scottish are native-speaker varieties of the kind IELTS draws
+   *  on, and the library carries them, so a candidate can practise them
+   *  instead of meeting one for the first time on exam day. */
+  | 'irish'
+  | 'scottish'
   /** The file exists and nobody has established what it is. See `variety`. */
   | 'unknown';
+
+/**
+ * The English varieties an IELTS listening bank should be spread across.
+ *
+ * ielts.org says the recordings carry "different accents, including British,
+ * Australian, New Zealand and North American" — *including*, so the four are a
+ * floor and not a list. Canadian is here because this product exists for
+ * people moving to Canada; Irish and Scottish because they are the other
+ * native varieties the exam draws on and the account can now speak them.
+ */
+export const ENGLISH_VARIETY_MIX: Array<{ variety: SpeechVariety; share: 'majority' | 'minority' | 'occasional' }> = [
+  { variety: 'british', share: 'majority' },
+  { variety: 'north_american', share: 'minority' },
+  { variety: 'canadian', share: 'minority' },
+  { variety: 'australian', share: 'minority' },
+  { variety: 'new_zealand', share: 'occasional' },
+  { variety: 'irish', share: 'occasional' },
+  { variety: 'scottish', share: 'occasional' },
+];
 
 /**
  * How a French listening bank should be distributed across varieties.
