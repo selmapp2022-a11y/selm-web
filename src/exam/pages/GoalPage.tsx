@@ -20,6 +20,29 @@ export default function GoalPage() {
   const onExamScale = goal.scaleId ? exam.scales.some((sc) => sc.id === goal.scaleId) : false;
   const sameSystem = goal.scaleId ? onExamScale : goal.system === exam.benchmark.system;
 
+  /**
+   * The other destinations that are sat on THIS SAME PAPER.
+   *
+   * ── The confusion this exists for ───────────────────────────────────────
+   * Found by the founder on 2026-08-29. He switched destination three times —
+   * Express Entry CLB 9, Canadian citizenship, Australia Competent English —
+   * opened Writing after each, and got the identical Task 1 every time. He
+   * reported it as the practice repeating, which is exactly what it looks
+   * like from the outside.
+   *
+   * It is not a repeat. Those three destinations are all sat on IELTS General
+   * Training; only the French category uses a different exam. So the paper is
+   * the same because THE PAPER IS THE SAME, and a candidate cannot be expected
+   * to deduce that from four rows in a list.
+   *
+   * The page already named the selected exam. Naming it was not enough: it
+   * answered "which exam is this?" and the question in front of the candidate
+   * was "why did nothing change?". This note answers the second one, and it is
+   * built from the goal data rather than written out, so a fifth destination
+   * added tomorrow appears here without anyone remembering to edit a sentence.
+   */
+  const sharingThisExam = GOALS.filter((g) => g.id !== goal.id && g.exams.includes(exam.id));
+
   const [examDate, setExamDate] = useState<string>(() => loadPlan()?.examDate ?? '');
   const [dateRejected, setDateRejected] = useState(false);
   const left = daysUntil(examDate || null);
@@ -174,6 +197,30 @@ export default function GoalPage() {
             {sameSystem ? `${goal.system} ${goal.requiredLevel}` : '—'}
           </dd>
         </dl>
+
+        {sharingThisExam.length > 0 && (
+          <p className="mt-4 rounded-xl bg-surface-muted px-4 py-3 text-xs leading-relaxed text-ink-secondary">
+            {ui === 'en' ? (
+              <>
+                {sharingThisExam.map((g) => t(g.label, ui)).join(sharingThisExam.length > 2 ? ', ' : ' and ')}
+                {sharingThisExam.length === 1 ? ' is' : ' are'} sat on this same paper. Changing your
+                destination changes the score you need —{' '}
+                {sharingThisExam.map((g) => `${g.system} ${g.requiredLevel}`).join(', ')} — and not
+                the questions. What you practise comes from the exam, so it will look identical
+                across those destinations, because it is.
+              </>
+            ) : (
+              <>
+                {sharingThisExam.map((g) => t(g.label, ui)).join(' et ')} se passe
+                {sharingThisExam.length === 1 ? '' : 'nt'} sur cette même épreuve. Changer de
+                destination change la note exigée —{' '}
+                {sharingThisExam.map((g) => `${g.system} ${g.requiredLevel}`).join(', ')} — et non
+                les questions. Ce que vous travaillez vient de l’examen : il sera identique d’une
+                de ces destinations à l’autre, parce qu’il l’est.
+              </>
+            )}
+          </p>
+        )}
 
         {!sameSystem && (
           <p className="mt-4 rounded-xl bg-surface-muted px-4 py-3 text-xs leading-relaxed text-ink-secondary">

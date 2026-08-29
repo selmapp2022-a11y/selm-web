@@ -3,6 +3,7 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { Logo } from './Logo';
 import { ThemeToggle } from './ThemeToggle';
 import { PracticeLanguageBadge } from './PracticeLanguageBadge';
+import { StaleBuild } from './StaleBuild';
 import { useAuthStore } from '../store/authStore';
 import { syncAttemptsFromBackend } from '../lib/attempts';
 import { claimCandidateRecord } from '../lib/localRecord';
@@ -138,6 +139,7 @@ export function AppLayout() {
       </nav>
 
       <main className="md:pl-64">
+        <StaleBuild />
         <div className="mx-auto max-w-6xl px-4 py-6 pb-24 md:px-8 md:py-10 md:pb-10">
           <Outlet />
         </div>
