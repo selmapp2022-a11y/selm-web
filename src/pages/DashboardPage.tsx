@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { EmptyState, Loader } from '../components/States';
 import { StandingRows, StandingNote, NotBuiltNote } from '../components/Standing';
+import { SectionHeading } from '../components/SectionHeading';
 import { useDocumentTitle } from '../lib/useDocumentTitle';
 import { loadHistory, type SittingRecord } from '../exam/model/history';
 import { PLAN_EVENT, daysUntil, loadPlan, type Plan } from '../exam/model/plan';
@@ -199,14 +200,15 @@ export default function DashboardPage() {
       </header>
 
       {/* 2 ── the next thing, from the plan: one button, straight into it (IA §4) */}
-      <section className="card p-6">
-        <div className="flex items-center gap-2 text-sm font-semibold text-teal">
+      <section className="card relative overflow-hidden border-l-4 border-l-teal p-6">
+        <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-teal/10" />
+        <div className="relative flex items-center gap-2 text-sm font-semibold text-teal">
           <Compass className="h-4 w-4" /> Do this next
         </div>
         {nextSlot && nextSkill ? (
           <div className="mt-3 flex flex-wrap items-center gap-4">
             <div className="min-w-[180px] flex-1">
-              <div className="font-display text-lg font-bold text-navy">{nextSlot.coordinate.label}</div>
+              <div className="font-display text-2xl font-bold text-navy dark:text-white">{nextSlot.coordinate.label}</div>
               <div className="mt-0.5 text-xs text-ink-secondary">
                 {builtPlan.basis === 'attestation'
                   ? 'Your weakest skill first — this is what moves your governing level.'
@@ -228,10 +230,9 @@ export default function DashboardPage() {
 
       {/* 2 ── the four skills, and which kind of number each one is */}
       <section className="space-y-3">
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="font-display text-xl font-bold text-navy">Where you stand</h2>
-          <span className="text-xs text-ink-secondary">Target: {target} in every skill</span>
-        </div>
+        <SectionHeading icon={Flag} meta={`Target: ${target} in every skill`}>
+          Where you stand
+        </SectionHeading>
 
         <StandingRows exam={exam} record={latest} target={target} />
         <StandingNote exam={exam} />
@@ -308,7 +309,7 @@ export default function DashboardPage() {
               plainly, with what to do meanwhile — not scattered as a footnote
               under a table where it reads as a caveat rather than a fact. */}
       <section className="space-y-3">
-        <h2 className="font-display text-xl font-bold text-navy">What is not built for your exam</h2>
+        <SectionHeading icon={ScrollText}>What is not built for your exam</SectionHeading>
         <NotBuiltNote exam={exam} />
         {gate.publishNumeric ? null : (
           <p className="rounded-xl bg-surface-muted px-4 py-3 text-xs leading-relaxed text-ink-secondary">

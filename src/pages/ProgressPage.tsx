@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Headphones, BookOpen, Mic, PenLine, Brain } from 'lucide-react';
+import { LineChart, ListChecks, Compass, MapPinned, CalendarPlus, FileText } from 'lucide-react';
+import { SectionHeading } from '../components/SectionHeading';
+import { lookFor } from '../lib/skillLook';
 import { StandingRows, StandingNote, NotBuiltNote } from '../components/Standing';
 import { ATTEMPTS_EVENT, attemptsBySkill, getAttempts, type SkillKey } from '../lib/attempts';
 import { loadHistory, type SittingRecord } from '../exam/model/history';
@@ -28,10 +30,6 @@ import type { Attestation } from '../exam/model/attestation';
  *
  * This page answers the same question Today answers, over time instead of now.
  */
-
-const SKILL_ICON: Record<SkillKey, any> = {
-  listening: Headphones, reading: BookOpen, speaking: Mic, writing: PenLine, vocabulary: Brain,
-};
 
 const SKILL_LABEL: Record<SkillKey, string> = {
   listening: 'Listening', reading: 'Reading', speaking: 'Speaking', writing: 'Writing', vocabulary: 'Vocabulary',
@@ -143,7 +141,7 @@ export default function ProgressPage() {
 
       {/* 1 ── score over time */}
       <section className="space-y-3">
-        <h2 className="font-display text-xl font-bold text-navy">Score over time</h2>
+        <SectionHeading icon={LineChart}>Score over time</SectionHeading>
 
         {/* Real results the candidate entered, on the exam's own scale, with
             the target drawn — because IRCC publishes the score→benchmark
@@ -161,7 +159,7 @@ export default function ProgressPage() {
 
       {/* 2 ── attempts */}
       <section className="space-y-3">
-        <h2 className="font-display text-xl font-bold text-navy">Attempts</h2>
+        <SectionHeading icon={ListChecks}>Attempts</SectionHeading>
         <p className="text-xs leading-relaxed text-ink-secondary">
           How much work you have done, and when. <strong>Counting attempts is not the same as
           awarding points for them</strong> — this is a record of what happened, not a score for
@@ -170,12 +168,15 @@ export default function ProgressPage() {
         <div className="card divide-y divide-surface-divider">
           {(['listening', 'reading', 'writing', 'speaking'] as SkillKey[]).map((k) => {
             const row = bySkill[k];
-            const Icon = SKILL_ICON[k];
+            const look = lookFor(k);
+            const Icon = look.icon;
             return (
               <div key={k} className="flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-4">
                 <div className="flex min-w-[150px] flex-1 items-center gap-3">
-                  <Icon className="h-4 w-4 shrink-0 text-ink-secondary" />
-                  <span className="font-display font-bold text-navy">{SKILL_LABEL[k]}</span>
+                  <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-white shadow-sm ${look.tile}`}>
+                    <Icon className="h-5 w-5" />
+                  </span>
+                  <span className="font-display font-bold text-navy dark:text-white">{SKILL_LABEL[k]}</span>
                 </div>
                 <div className="min-w-[120px] flex-1 text-sm tabular-nums text-ink-secondary">
                   {row.count === 0 ? 'None yet' : `${row.count} attempt${row.count === 1 ? '' : 's'}`}
@@ -200,10 +201,9 @@ export default function ProgressPage() {
 
       {/* 3 ── where you stand: the same rows as Today, from the same component */}
       <section className="space-y-3">
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="font-display text-xl font-bold text-navy">Where you stand</h2>
-          <span className="text-xs text-ink-secondary">Target: {target} in every skill</span>
-        </div>
+        <SectionHeading icon={Compass} meta={`Target: ${target} in every skill`}>
+          Where you stand
+        </SectionHeading>
         <StandingRows exam={exam} record={latest} target={target} />
         <StandingNote exam={exam} />
         <NotBuiltNote exam={exam} />
@@ -211,7 +211,7 @@ export default function ProgressPage() {
 
       {/* 4 ── the gap */}
       <section className="space-y-3">
-        <h2 className="font-display text-xl font-bold text-navy">What you have not practised yet</h2>
+        <SectionHeading icon={MapPinned}>What you have not practised yet</SectionHeading>
         {untouched.length === 0 ? (
           <div className="card p-6 text-sm text-ink-secondary">
             Every part of your plan has been attempted at least once.
@@ -272,13 +272,18 @@ function RealResults({ exam, goal, rows }: { exam: ExamDefinition; goal: Goal; r
 
   if (!any) {
     return (
-      <div className="card p-6">
-        <div className="text-sm font-semibold text-navy">No real result entered yet</div>
+      <div className="card flex flex-wrap items-start gap-4 border-l-4 border-l-teal p-6">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-teal/10 text-teal">
+          <FileText className="h-5 w-5" />
+        </span>
+        <div className="min-w-[220px] flex-1">
+        <div className="text-sm font-semibold text-navy dark:text-white">No real result entered yet</div>
         <p className="mt-1 text-xs leading-relaxed text-ink-secondary">
           A line needs points. Enter a past {t(exam.name, 'en')} score report and this shows your
           {' '}{goal.system} level per skill against the {goal.system} {goal.requiredLevel} you need.
         </p>
         <Link to="/goal" className="btn-secondary mt-3 inline-block">Enter a past result</Link>
+        </div>
       </div>
     );
   }
@@ -319,8 +324,12 @@ function PracticeSittings({ exam, rows, target }: { exam: ExamDefinition; rows: 
 
   if (rows.length < 2) {
     return (
-      <div className="card p-6">
-        <div className="text-sm font-semibold text-navy">
+      <div className="card flex flex-wrap items-start gap-4 border-l-4 border-l-amber-500 p-6">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600">
+          <CalendarPlus className="h-5 w-5" />
+        </span>
+        <div className="min-w-[220px] flex-1">
+        <div className="text-sm font-semibold text-navy dark:text-white">
           {rows.length === 0 ? 'No practice sitting yet' : 'One practice sitting so far'}
         </div>
         <p className="mt-1 text-xs leading-relaxed text-ink-secondary">
@@ -329,6 +338,7 @@ function PracticeSittings({ exam, rows, target }: { exam: ExamDefinition; rows: 
             : 'A second sitting is what turns a point into a line. Until then there is nothing here to draw, and drawing something anyway would be inventing a trend.'}
         </p>
         <Link to="/exam" className="btn-secondary mt-3 inline-block">Take a mock exam</Link>
+        </div>
       </div>
     );
   }

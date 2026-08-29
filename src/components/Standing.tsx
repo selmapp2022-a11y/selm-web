@@ -1,4 +1,5 @@
 import { ProgressBar } from '../exam/components/SectionClock';
+import { lookFor } from '../lib/skillLook';
 import { t } from '../exam/model/format';
 import type { SittingRecord } from '../exam/model/history';
 import type { ExamDefinition, SectionDefinition } from '../exam/model/types';
@@ -86,12 +87,19 @@ function SkillRow({
 }) {
   const counted = section.kind === 'comprehension';
   const v = record ? record.skills[section.id] : null;
+  // One hue per skill, the same hue everywhere that skill appears. See
+  // `lib/skillLook.ts` for why colour came back after the standardisation.
+  const look = lookFor((section as { skill?: string }).skill);
+  const Icon = look.icon;
 
   return (
     <div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-4">
+      <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-white shadow-sm ${look.tile}`}>
+        <Icon className="h-5 w-5" />
+      </span>
       <div className="min-w-[150px] flex-1">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="font-display font-bold text-navy">{t(section.name, 'en')}</span>
+          <span className="font-display font-bold text-navy dark:text-white">{t(section.name, 'en')}</span>
           {counted ? (
             <span className="rounded-full bg-teal/10 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide text-teal">
               counted

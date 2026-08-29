@@ -58,4 +58,4 @@ if (daysUntil(SIX_DIGIT, NOW) !== null) {
 }
 
 console.log(failed === 0 ? '\nAll exam-date cases pass.\n' : `\n${failed} FAILED\n`);
-if (failed) process.exit(1);
+if (failed) throw new Error(`${failed} exam-date case(s) failed`);
