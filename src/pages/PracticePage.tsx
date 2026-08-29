@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Mic, Headphones, BookOpen, PenLine, Brain, ChevronRight } from 'lucide-react';
 import { useDocumentTitle } from '../lib/useDocumentTitle';
+import { lookFor } from '../lib/skillLook';
 
 /**
  * SELM-IA.md §5 — one "start practising".
@@ -12,10 +13,10 @@ import { useDocumentTitle } from '../lib/useDocumentTitle';
  * so it is a card here rather than a sibling in the nav.
  */
 const SKILLS = [
-  { to: '/speaking',  label: 'Speaking',  icon: Mic,        blurb: 'Record the exam’s speaking tasks and get scored feedback.' },
-  { to: '/listening', label: 'Listening', icon: Headphones, blurb: 'The exam’s own listening questions, one at a time.' },
-  { to: '/reading',   label: 'Reading',   icon: BookOpen,   blurb: 'The exam’s own reading passages and questions.' },
-  { to: '/writing',   label: 'Writing',   icon: PenLine,    blurb: 'Write each exam task and get scored feedback.' },
+  { to: '/speaking',  skill: 'speaking',  label: 'Speaking',  icon: Mic,        blurb: 'Record the exam’s speaking tasks and get scored feedback.' },
+  { to: '/listening', skill: 'listening', label: 'Listening', icon: Headphones, blurb: 'The exam’s own listening questions, one at a time.' },
+  { to: '/reading',   skill: 'reading',   label: 'Reading',   icon: BookOpen,   blurb: 'The exam’s own reading passages and questions.' },
+  { to: '/writing',   skill: 'writing',   label: 'Writing',   icon: PenLine,    blurb: 'Write each exam task and get scored feedback.' },
 ] as const;
 
 export default function PracticePage() {
@@ -37,7 +38,10 @@ export default function PracticePage() {
             className="card flex items-center justify-between gap-4 p-5 text-left hover:shadow-cardHover"
           >
             <div className="flex items-center gap-4">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-navy to-teal text-white">
+              {/* The skill's own colour, from `lib/skillLook.ts`. Four cards
+                  in one teal made the hub read as a single object; the hue is
+                  what a candidate recognises on Today and Progress too. */}
+              <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-white shadow-sm ${lookFor(s.skill).tile}`}>
                 <s.icon className="h-5 w-5" />
               </div>
               <div>
