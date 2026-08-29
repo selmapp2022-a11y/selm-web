@@ -2,6 +2,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { ClipboardList, ChevronRight, History } from 'lucide-react';
 import { useExam } from '../state';
 import { t } from '../model/format';
+import { useDocumentTitle } from '../../lib/useDocumentTitle';
 
 /**
  * SELM-IA.md §2 (nav entry "Mock exam") and §3 (running a sitting is NOT on
@@ -10,6 +11,7 @@ import { t } from '../model/format';
  * destination and date.
  */
 export default function MockExamPage() {
+  useDocumentTitle('Mock exam');
   const { exam, ui, startSitting, sitting } = useExam();
   const nav = useNavigate();
   const canSit = exam.sections.some((s) => s.kind === 'comprehension');
@@ -17,11 +19,11 @@ export default function MockExamPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <header>
-        <div className="flex items-center gap-2 text-sm font-semibold text-teal">
-          <ClipboardList className="h-4 w-4" />
+        <h1 className="flex items-center gap-2 font-display text-3xl font-bold text-navy">
+          <ClipboardList className="h-6 w-6 text-teal" />
           {ui === 'en' ? 'Mock exam' : 'Examen blanc'}
-        </div>
-        <h1 className="mt-2 font-display text-3xl font-bold text-navy">{t(exam.name, ui)}</h1>
+        </h1>
+        <div className="mt-2 font-display text-xl font-bold text-navy">{t(exam.name, ui)}</div>
         <p className="mt-1 text-ink-secondary">
           {ui === 'en'
             ? `The whole exam, in the official order — ${exam.sections.length} sections, each timed, section boundaries you cannot cross backwards. It answers the one question a task cannot: are you ready to book.`

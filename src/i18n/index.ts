@@ -120,6 +120,47 @@ export function fmtCurrency(amount: number, lang: UiLang = uiLang()): string {
 }
 
 /**
+ * Dates, formatted in the language the candidate CHOSE.
+ *
+ * ── The defect this exists for ────────────────────────────────────────────
+ * Reported 29 August 2026: **dates rendered in Persian inside an English
+ * interface.** `new Date(x).toLocaleDateString()` with no locale argument
+ * follows the DEVICE, and the founder's phone is set to Persian. The app's
+ * numbers had already been given an explicit locale — §5.3, right above —
+ * and the dates were simply missed.
+ *
+ * It is the same rule §5.1 states for the interface itself: *the user
+ * chooses, not the device.* A francophone candidate on an English phone reads
+ * the app in French and must see French dates; the reverse holds too. Every
+ * date a candidate sees goes through here, and no component calls
+ * `toLocaleDateString` directly.
+ */
+export function fmtDate(value: number | string | Date, lang: UiLang = uiLang()): string {
+  const d = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(d.getTime())) return '—';
+  return new Intl.DateTimeFormat(lang === 'fr' ? 'fr-CA' : 'en-CA', {
+    year: 'numeric', month: 'short', day: 'numeric',
+  }).format(d);
+}
+
+export function fmtDateTime(value: number | string | Date, lang: UiLang = uiLang()): string {
+  const d = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(d.getTime())) return '—';
+  return new Intl.DateTimeFormat(lang === 'fr' ? 'fr-CA' : 'en-CA', {
+    year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
+  }).format(d);
+}
+
+/** A `YYYY-MM` sitting month, as a month and year rather than a raw string. */
+export function fmtMonth(yyyymm: string, lang: UiLang = uiLang()): string {
+  const [y, m] = yyyymm.split('-').map(Number);
+  if (!y || !m) return yyyymm;
+  return new Intl.DateTimeFormat(lang === 'fr' ? 'fr-CA' : 'en-CA', {
+    year: 'numeric', month: 'short',
+  }).format(new Date(Date.UTC(y, m - 1, 1)));
+}
+
+/**
  * React binding. Kept in this file rather than a separate hooks module
  * because a component that imports `ts` and forgets `useUiLang` will not
  * re-render on a language change, and the two being one import makes that

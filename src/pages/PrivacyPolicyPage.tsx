@@ -75,8 +75,14 @@ export default function PrivacyPolicyPage() {
                 sign in with Apple.
               </li>
               <li>
-                <strong>Learning progress</strong> — your CEFR level, XP,
-                streak, completed lessons, and saved vocabulary.
+                {/* Rewritten 29 August 2026, the same day the scoreboard was
+                    removed. A privacy policy that lists data the product no
+                    longer keeps is not a harmless leftover: it is the
+                    document a candidate is asked to rely on. */}
+                <strong>Your work</strong> — which practice tasks and exam
+                sections you have attempted and when, the results of the
+                sittings you complete, the exam and destination you chose, and
+                your saved vocabulary.
               </li>
               <li>
                 <strong>Text you write</strong> in Speaking, Writing, Reading,

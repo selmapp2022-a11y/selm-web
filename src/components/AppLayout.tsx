@@ -4,14 +4,15 @@ import { Logo } from './Logo';
 import { ThemeToggle } from './ThemeToggle';
 import { PracticeLanguageBadge } from './PracticeLanguageBadge';
 import { useAuthStore } from '../store/authStore';
-import { syncProgressFromBackend } from '../lib/progress';
+import { syncAttemptsFromBackend } from '../lib/attempts';
+import { claimCandidateRecord } from '../lib/localRecord';
 import { Home, Dumbbell, ClipboardCheck, TrendingUp, Target, LogOut, Settings } from 'lucide-react';
 import clsx from 'clsx';
 
-// `Progress` left this list on 2026-08-27. The page it opened is the XP,
-// level and achievement screen — the scoreboard of the product the company
-// is repositioning away from. The route still exists and nothing was deleted;
-// it is simply no longer one of the seven things the navigation offers.
+// Five entries, and each label is the word its page uses as a heading —
+// checked on 29 August 2026 after the founder observed that the app read as
+// assembled rather than designed. `Progress` is back in this list because the
+// page behind it is no longer the scoreboard it was: see `ProgressPage`.
 const navItems = [
   { to: '/', label: 'Today', icon: Home, end: true },
   { to: '/practice', label: 'Practice', icon: Dumbbell },
@@ -25,11 +26,14 @@ export function AppLayout() {
   const navigate = useNavigate();
   const handleLogout = () => { logout(); navigate('/login'); };
 
-  // Pull XP/streak/achievements from the backend once the user is signed in,
-  // so cleared cache or a fresh device shows the user's real progress instead
-  // of an empty slate.
+  // Bind this device's local record to whoever is signed in — discarding it
+  // first if it belonged to someone else — and only then pull from the
+  // backend. The order matters: syncing first would merge a previous
+  // candidate's attempts into this account and push them back up.
   useEffect(() => {
-    if (user) { void syncProgressFromBackend(); }
+    if (!user) return;
+    claimCandidateRecord(user.id);
+    void syncAttemptsFromBackend();
   }, [user?.id]);
 
   return (

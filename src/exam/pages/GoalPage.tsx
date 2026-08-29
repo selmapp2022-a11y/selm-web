@@ -6,8 +6,10 @@ import { useExam } from '../state';
 import { GOALS } from '../definitions';
 import { t } from '../model/format';
 import { daysUntil, loadPlan, savePlan } from '../model/plan';
+import { useDocumentTitle } from '../../lib/useDocumentTitle';
 
 export default function GoalPage() {
+  useDocumentTitle('My exam');
   const { exam, goal, setGoal, ui } = useExam();
   const nav = useNavigate();
 
@@ -28,8 +30,11 @@ export default function GoalPage() {
     <div className="space-y-6">
       <header>
         <h1 className="font-display text-3xl font-bold text-navy">
-          {ui === 'en' ? 'Where are you going, and what do you need?' : 'Où allez-vous, et que vous faut-il ?'}
+          {ui === 'en' ? 'My exam' : 'Mon examen'}
         </h1>
+        <p className="mt-1 font-display text-lg font-semibold text-navy">
+          {ui === 'en' ? 'Where are you going, and what do you need?' : 'Où allez-vous, et que vous faut-il ?'}
+        </p>
         <p className="mt-1 text-ink-secondary">
           {ui === 'en'
             ? 'The destination decides the required score. The exam is chosen from that, not the other way round.'

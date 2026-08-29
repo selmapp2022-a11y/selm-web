@@ -10,7 +10,8 @@ import {
   ScrollText,
 } from 'lucide-react';
 import { EmptyState, Loader } from '../components/States';
-import { ProgressBar } from '../exam/components/SectionClock';
+import { StandingRows, StandingNote, NotBuiltNote } from '../components/Standing';
+import { useDocumentTitle } from '../lib/useDocumentTitle';
 import { loadHistory, type SittingRecord } from '../exam/model/history';
 import { PLAN_EVENT, daysUntil, loadPlan, type Plan } from '../exam/model/plan';
 import { levelsShort, releaseGate } from '../exam/engine/aggregate';
@@ -22,7 +23,6 @@ import { t } from '../exam/model/format';
 import type {
   ExamDefinition,
   Goal,
-  SectionDefinition,
   SkillId,
 } from '../exam/model/types';
 
@@ -68,6 +68,7 @@ const PRACTICE: Record<SkillId, string> = {
 type Catalogue = { EXAMS: ExamDefinition[]; GOALS: Goal[] };
 
 export default function DashboardPage() {
+  useDocumentTitle('Today');
 
   const [cat, setCat] = useState<Catalogue | null>(null);
   const [catFailed, setCatFailed] = useState(false);
@@ -146,52 +147,54 @@ export default function DashboardPage() {
   const builtPlan = buildPlan({ exam, attestation, target: goal.requiredLevel, daysLeft: left });
   const nextSlot = builtPlan.slots.find((sl) => sl.items > 0) ?? builtPlan.slots[0] ?? null;
   const nextSkill = nextSlot?.coordinate.skill ?? null;
-  const counted = exam.sections.filter((s) => s.kind === 'comprehension').length;
 
-  // Both exams award four skills. Only the TCF definition carries all four
-  // sections; IELTS General Training has writing and speaking built and its
-  // two comprehension épreuves not yet authored. A page that lists two rows
-  // under the heading "where you stand" and says nothing about the other two
-  // is telling the candidate they have been measured on the whole exam.
-  const missing = 4 - exam.sections.length;
 
   return (
     <div className="mx-auto max-w-3xl space-y-8">
-      {/* 1 ── destination, exam, and the number that governs the plan */}
-      <header className="card p-6">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="min-w-[200px] flex-1">
-            <span className="chip">{t(goal.destination.label, 'en')}</span>
-            <h1 className="mt-3 font-display text-2xl font-bold text-navy sm:text-3xl">
-              {t(exam.name, 'en')}
-            </h1>
-            <p className="mt-1 text-sm text-ink-secondary">
-              {requirementLine(goal)}
-            </p>
+      {/* 1 ── where you are going. The page's own name leads, because the
+              navigation calls this screen Today and a page whose heading is a
+              different word reads as an app assembled rather than designed.
+              The countdown is the hero: it is the one number on this product
+              that is both certain and the reason the candidate is here. */}
+      <header className="space-y-4">
+        <h1 className="font-display text-3xl font-bold text-navy">Today</h1>
+
+        <div className="card overflow-hidden p-0">
+          <div className="flex flex-wrap items-stretch">
+            <div className="min-w-[220px] flex-1 p-6">
+              <span className="chip">{t(goal.destination.label, 'en')}</span>
+              <h2 className="mt-3 font-display text-2xl font-bold text-navy">
+                {t(exam.name, 'en')}
+              </h2>
+              <p className="mt-1 text-sm text-ink-secondary">
+                {requirementLine(goal)}
+              </p>
+              <a href={EXAM_HOME} className="mt-3 inline-block text-xs font-medium text-teal hover:underline">
+                Change exam, destination or date
+              </a>
+            </div>
+
+            <div className="flex min-w-[180px] flex-col items-center justify-center bg-gradient-to-br from-navy to-teal px-8 py-6 text-white">
+              {left === null ? (
+                <>
+                  <CalendarDays className="h-7 w-7 opacity-90" />
+                  <div className="mt-2 text-center text-sm font-semibold">No exam date set</div>
+                  <a href={EXAM_HOME} className="mt-1 text-xs underline opacity-90">Set one</a>
+                </>
+              ) : (
+                <>
+                  <div className="font-display text-6xl font-bold leading-none tabular-nums">
+                    {Math.abs(left)}
+                  </div>
+                  <div className="mt-2 text-center text-[11px] font-semibold uppercase tracking-widest opacity-90">
+                    {left >= 0
+                      ? `day${left === 1 ? '' : 's'} until your exam`
+                      : `day${left === -1 ? '' : 's'} since your exam`}
+                  </div>
+                </>
+              )}
+            </div>
           </div>
-          <div className="shrink-0 text-right">
-            {left === null ? (
-              <span className="inline-flex items-center gap-2 rounded-xl bg-surface-muted px-3 py-2 text-sm font-medium text-ink-secondary">
-                <CalendarDays className="h-4 w-4" /> No exam date set
-              </span>
-            ) : (
-              <>
-                <div className="font-display text-4xl font-bold tabular-nums text-navy">
-                  {Math.abs(left)}
-                </div>
-                <div className="text-[11px] font-semibold uppercase tracking-wider text-ink-secondary">
-                  {left >= 0
-                    ? `day${left === 1 ? '' : 's'} remaining`
-                    : `day${left === -1 ? '' : 's'} ago`}
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-        <div className="mt-4 flex flex-wrap items-center gap-2">
-          <a href={EXAM_HOME} className="text-xs font-medium text-teal hover:underline">
-            Change exam, destination or date
-          </a>
         </div>
       </header>
 
@@ -230,39 +233,15 @@ export default function DashboardPage() {
           <span className="text-xs text-ink-secondary">Target: {target} in every skill</span>
         </div>
 
-        <div className="card divide-y divide-surface-divider">
-          {exam.sections.map((s) => (
-            <SkillRow key={s.id} section={s} record={latest} target={target} />
-          ))}
-        </div>
-
-        {counted > 0 ? (
-          <p className="text-xs leading-relaxed text-ink-secondary">
-            Comprehension is <strong>counted</strong> — an exact number of correct answers against
-            our own item bank. Production is <strong>estimated</strong>, and no estimate is
-            published for it yet. The two are not the same kind of number and are never added
-            together.
-          </p>
-        ) : (
-          <p className="text-xs leading-relaxed text-ink-secondary">
-            Every section of this exam is <strong>production</strong> — writing and speaking — which
-            is estimated rather than counted, and no estimate is published for it yet.
-          </p>
-        )}
-
-        {missing > 0 && (
-          <p className="rounded-xl bg-surface-muted px-4 py-3 text-xs leading-relaxed text-ink-secondary">
-            {t(exam.name, 'en')} awards four skills. This product has {exam.sections.length} of them
-            built, so {missing === 1 ? 'the fourth is' : `the other ${missing} are`} not shown here —
-            not as a zero, and not as an estimate. Your real sitting will still be scored on all
-            four, and the lowest of those four is what your destination reads.
-          </p>
-        )}
+        <StandingRows exam={exam} record={latest} target={target} />
+        <StandingNote exam={exam} />
       </section>
 
-      {/* 3 ── the decision, stated against the evidence rather than as a verdict */}
+      {/* Still block 3: the decision, stated against the evidence rather than
+          as a verdict. It is the summary of where you stand, not a fifth
+          block — the ruling sets four and this is the last line of the third. */}
       <section className="space-y-3">
-        <h2 className="font-display text-xl font-bold text-navy">Are you ready to book?</h2>
+        <h3 className="font-display text-lg font-bold text-navy">Are you ready to book?</h3>
         <div className="card p-6">
           <div className="flex items-start gap-4">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-navy to-teal text-white shadow-md">
@@ -325,6 +304,29 @@ export default function DashboardPage() {
 
 
 
+      {/* 4 ── what this product has not built for this exam. Stated once,
+              plainly, with what to do meanwhile — not scattered as a footnote
+              under a table where it reads as a caveat rather than a fact. */}
+      <section className="space-y-3">
+        <h2 className="font-display text-xl font-bold text-navy">What is not built for your exam</h2>
+        <NotBuiltNote exam={exam} />
+        {gate.publishNumeric ? null : (
+          <p className="rounded-xl bg-surface-muted px-4 py-3 text-xs leading-relaxed text-ink-secondary">
+            No predicted score is published for {t(exam.name, 'en')} yet, in any skill.{' '}
+            {t(gate.reason, 'en')}{' '}
+            <strong>What to do meanwhile:</strong> practise the tasks the exam actually sets, sit
+            the mock exam to see the band your answers hold, and enter any past score report you
+            have — that is the one number here that comes from the awarding body rather than from
+            us.
+          </p>
+        )}
+        <div className="flex flex-wrap gap-2">
+          <Link to="/practice" className="btn-secondary">Practice</Link>
+          <Link to="/exam" className="btn-secondary">Mock exam</Link>
+          <a href={EXAM_HOME} className="btn-secondary">Enter a past result</a>
+        </div>
+      </section>
+
       {/* Upgrade to SELM Pro. This is the primary in-app entry point to the
           paywall and it stays on the dashboard: Apple's App Review has to be
           able to find the In-App Purchases without hunting through menus. */}
@@ -356,73 +358,4 @@ function requirementLine(goal: Goal): string {
     default:
       return `${t(goal.label, 'en')} · ${target} in every skill, and the lowest one governs`;
   }
-}
-
-
-/**
- * One skill, with the kind of number it produces stated on the row.
- *
- * The two chips are the ones the sitting-result page already uses — teal
- * `counted`, amber `not scored` — because a candidate who sees "counted" on
- * their result and something else here has been shown two vocabularies for
- * one idea.
- */
-function SkillRow({
-  section,
-  record,
-  target,
-}: {
-  section: SectionDefinition;
-  record: SittingRecord | null;
-  target: string;
-}) {
-  const counted = section.kind === 'comprehension';
-  const v = record ? record.skills[section.id] : null;
-
-  return (
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-4">
-      <div className="min-w-[150px] flex-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="font-display font-bold text-navy">{t(section.name, 'en')}</span>
-          {counted ? (
-            <span className="rounded-full bg-teal/10 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide text-teal">
-              counted
-            </span>
-          ) : (
-            <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide text-amber-700">
-              not scored
-            </span>
-          )}
-        </div>
-        <div className="mt-1 text-xs text-ink-secondary">
-          {counted
-            ? v
-              ? `Held through ${v.held ?? '—'}`
-              : 'Not sat yet'
-            : 'No calibrated scorer is bound to this section'}
-        </div>
-      </div>
-
-      <div className="min-w-[140px] flex-1">
-        {counted && v ? (
-          <>
-            <ProgressBar value={v.correct} total={v.total} />
-            <div className="mt-1 flex flex-col gap-0.5 text-[11px] tabular-nums text-ink-secondary sm:flex-row sm:justify-between">
-              <span>{v.correct}/{v.total} correct</span>
-              {/* The target is stated, and deliberately not drawn as a mark on
-                  this bar. The bar counts items; the target is a benchmark
-                  level, and the conversion between them is not published by
-                  the awarding body. Placing a mark would be drawing a
-                  conversion we do not have. */}
-              <span>needs {target}</span>
-            </div>
-          </>
-        ) : (
-          <div className="text-xs text-ink-secondary">
-            {counted ? `Needs ${target}` : `Needs ${target} — no number is published for this skill`}
-          </div>
-        )}
-      </div>
-    </div>
-  );
 }

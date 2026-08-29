@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Mic, Headphones, BookOpen, PenLine, Brain, ChevronRight } from 'lucide-react';
+import { useDocumentTitle } from '../lib/useDocumentTitle';
 
 /**
  * SELM-IA.md §5 — one "start practising".
@@ -18,6 +19,7 @@ const SKILLS = [
 ] as const;
 
 export default function PracticePage() {
+  useDocumentTitle('Practice');
   return (
     <div className="space-y-6">
       <header>

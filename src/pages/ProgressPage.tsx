@@ -1,280 +1,406 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Trophy, Star, Flame, Award, Mic, Headphones, BookOpen, PenLine, Brain, Calendar, ChevronRight, Lock } from 'lucide-react';
-import clsx from 'clsx';
-import { getSummary, getAchievements, getEvents, type ProgressSummary, type AchievementState, type SkillKey, PROGRESS_EVENT } from '../lib/progress';
-import { loadPlan, PLAN_EVENT } from '../exam/model/plan';
+import { Headphones, BookOpen, Mic, PenLine, Brain } from 'lucide-react';
+import { StandingRows, StandingNote, NotBuiltNote } from '../components/Standing';
+import { ATTEMPTS_EVENT, attemptsBySkill, getAttempts, type SkillKey } from '../lib/attempts';
+import { loadHistory, type SittingRecord } from '../exam/model/history';
+import { PLAN_EVENT, loadPlan, daysUntil } from '../exam/model/plan';
+import { loadAttestations, ATTESTATION_EVENT } from '../exam/model/attestationStore';
+import { buildPlan } from '../exam/engine/planner';
+import { useDocumentTitle } from '../lib/useDocumentTitle';
+import { fmtDate, fmtMonth, useUiLangValue } from '../i18n';
+import { t } from '../exam/model/format';
+import type { ExamDefinition, Goal, SkillId } from '../exam/model/types';
+import type { Attestation } from '../exam/model/attestation';
 
-const SKILL_META: Record<Exclude<SkillKey, 'vocabulary'>, { label: string; to: string; icon: any; color: string }> = {
-  speaking:  { label: 'Speaking',  to: '/speaking',  icon: Mic,        color: 'from-teal-500 to-teal-600' },
-  listening: { label: 'Listening', to: '/listening', icon: Headphones, color: 'from-navy to-navy-700' },
-  reading:   { label: 'Reading',   to: '/reading',   icon: BookOpen,   color: 'from-orange-500 to-orange-600' },
-  writing:   { label: 'Writing',   to: '/writing',   icon: PenLine,    color: 'from-purple-500 to-purple-600' },
+/**
+ * Progress, rebuilt 2026-08-29.
+ *
+ * What it replaced: `Level 16`, `3076 XP`, a day streak, a longest streak,
+ * `11/18 BADGES`, eighteen achievements, `English Champion`, and four skill
+ * cards each carrying an invented `Lv` and a rank of `Master` or `Apprentice`.
+ *
+ * **Two products with two philosophies were sitting behind one navigation
+ * bar.** Today says no number is published for any production skill because
+ * the conversion is not published; Progress awarded Level 16 for turning up.
+ * The scoreboard was removed rather than renamed — softening `Level 16` to
+ * `Activity 16` would have kept the number and lost only the honesty.
+ *
+ * This page answers the same question Today answers, over time instead of now.
+ */
+
+const SKILL_ICON: Record<SkillKey, any> = {
+  listening: Headphones, reading: BookOpen, speaking: Mic, writing: PenLine, vocabulary: Brain,
 };
 
+const SKILL_LABEL: Record<SkillKey, string> = {
+  listening: 'Listening', reading: 'Reading', speaking: 'Speaking', writing: 'Writing', vocabulary: 'Vocabulary',
+};
+
+const PRACTICE: Record<SkillId, string> = {
+  listening: '/listening', reading: '/reading', writing: '/writing', speaking: '/speaking',
+};
+
+type Catalogue = { EXAMS: ExamDefinition[]; GOALS: Goal[] };
+
 export default function ProgressPage() {
-  const [summary, setSummary] = useState<ProgressSummary>(() => getSummary());
-  const [achievements, setAchievements] = useState<AchievementState[]>(() => getAchievements());
-  const [events, setEvents] = useState(() => getEvents());
+  useDocumentTitle('Progress');
+  // Re-render when the candidate switches interface language, so the dates
+  // below follow the language they chose rather than the one they last saw.
+  useUiLangValue();
+
+  const [cat, setCat] = useState<Catalogue | null>(null);
+  const [plan, setPlan] = useState(() => loadPlan());
+  const [history, setHistory] = useState<SittingRecord[]>(() => loadHistory());
+  const [attestations, setAttestations] = useState<Attestation[]>(() => loadAttestations());
+  const [attempts, setAttempts] = useState(() => getAttempts());
+
+  useEffect(() => {
+    let alive = true;
+    import('../exam/definitions').then((m) => {
+      if (alive) setCat({ EXAMS: m.EXAMS, GOALS: m.GOALS });
+    });
+    return () => { alive = false; };
+  }, []);
 
   useEffect(() => {
     const refresh = () => {
-      setSummary(getSummary());
-      setAchievements(getAchievements());
-      setEvents(getEvents());
+      setPlan(loadPlan());
+      setHistory(loadHistory());
+      setAttestations(loadAttestations());
+      setAttempts(getAttempts());
     };
-    window.addEventListener(PROGRESS_EVENT, refresh);
+    window.addEventListener(ATTEMPTS_EVENT, refresh);
+    window.addEventListener(PLAN_EVENT, refresh);
+    window.addEventListener(ATTESTATION_EVENT, refresh);
     window.addEventListener('focus', refresh);
     return () => {
-      window.removeEventListener(PROGRESS_EVENT, refresh);
+      window.removeEventListener(ATTEMPTS_EVENT, refresh);
+      window.removeEventListener(PLAN_EVENT, refresh);
+      window.removeEventListener(ATTESTATION_EVENT, refresh);
       window.removeEventListener('focus', refresh);
     };
   }, []);
 
-  const unlockedCount = achievements.filter((a) => a.unlocked).length;
-  const recent = [...events].reverse().slice(0, 12);
+  const exam = cat && plan?.examId ? cat.EXAMS.find((e) => e.id === plan.examId) ?? null : null;
+  const goal = cat && plan?.goalId ? cat.GOALS.find((g) => g.id === plan.goalId) ?? null : null;
+  const target = goal ? `${goal.system} ${goal.requiredLevel}` : null;
+
+  const mine = useMemo(
+    () => (exam ? history.filter((h) => h.examId === exam.id) : []),
+    [history, exam],
+  );
+  const myAttestations = useMemo(
+    () => (exam ? attestations.filter((a) => a.examId === exam.id).sort((a, b) => (a.sat < b.sat ? -1 : 1)) : []),
+    [attestations, exam],
+  );
+  const bySkill = useMemo(() => attemptsBySkill(attempts), [attempts]);
+
+  const header = (
+    <div>
+      <h1 className="font-display text-3xl font-bold text-navy">Progress</h1>
+      <p className="mt-1 text-ink-secondary">
+        What you have done, and whether the line is moving.
+      </p>
+    </div>
+  );
+
+  if (!plan || !exam || !goal || !target) {
+    return (
+      <div className="space-y-6">
+        {header}
+        <div className="card p-6">
+          <p className="text-sm text-ink-primary">
+            Choose your exam and destination, and this page can show what your practice is for.
+            Until then there is nothing here to measure against — and a page that filled the space
+            anyway is exactly what this one replaced.
+          </p>
+          <Link to="/goal" className="btn-primary mt-4 inline-block">Choose my exam</Link>
+        </div>
+      </div>
+    );
+  }
+
+  const left = daysUntil(plan.examDate);
+  const built = buildPlan({
+    exam,
+    attestation: myAttestations[myAttestations.length - 1] ?? null,
+    target: goal.requiredLevel,
+    daysLeft: left,
+  });
+
+  // A coordinate the planner can emit that the candidate has never worked on.
+  // Matched by the label the planner itself prints, which is the same string
+  // `CompletionCard` records as a topic — so this is a real join, not a guess.
+  const touched = new Set(attempts.map((a) => a.topic).filter(Boolean) as string[]);
+  const untouched = built.slots.filter((s) => !touched.has(s.coordinate.label));
+
+  const latest = mine.length ? mine[mine.length - 1] : null;
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="font-display text-3xl font-bold text-navy">Your progress</h1>
-        <p className="mt-1 text-ink-secondary">What you have practised, and what it is for.</p>
-      </div>
+      {header}
 
-      <ExamAnchor />
+      {/* 1 ── score over time */}
+      <section className="space-y-3">
+        <h2 className="font-display text-xl font-bold text-navy">Score over time</h2>
 
-      {/* Practice activity.
-          This banner led the page and said "Level 16 · 3076 XP · 25 perfect",
-          which is the general app's scoreboard: it counts exercises finished
-          and answers nothing a candidate came here to ask. A person who needs
-          CLB 9 cannot tell from Level 16 whether they can book their test, and
-          a page that leads with it implies they can. It now sits below the
-          exam, under its own name, and says what it is not. */}
-      <div>
-        <h2 className="mb-3 font-display text-lg font-bold text-navy">Practice activity</h2>
-      <div className="rounded-3xl bg-gradient-to-br from-navy via-navy-700 to-teal p-6 text-white shadow-cardHover sm:p-8">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/15 backdrop-blur">
-              <Trophy className="h-8 w-8" />
-            </div>
-            <div>
-              <div className="text-xs uppercase tracking-widest opacity-80">Overall</div>
-              <div className="font-display text-3xl font-bold">Level {summary.level}</div>
-              <div className="text-sm opacity-90">{summary.totalXP} XP · {summary.totalExercises} exercises · {summary.perfectCount} perfect</div>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <BannerStat icon={Flame} value={summary.streak} label="day streak" />
-            <BannerStat icon={Calendar} value={summary.longestStreak} label="longest" />
-            <BannerStat icon={Award} value={`${unlockedCount}/${achievements.length}`} label="badges" />
-          </div>
-        </div>
-        <div className="mt-5">
-          <div className="mb-1 flex justify-between text-xs opacity-80">
-            <span>Progress to level {summary.level + 1}</span>
-            <span>{summary.xpThisLevel}/200 XP</span>
-          </div>
-          <div className="h-2.5 overflow-hidden rounded-full bg-white/20">
-            <div className="h-full rounded-full bg-white transition-all" style={{ width: `${(summary.xpThisLevel / 200) * 100}%` }} />
-          </div>
-        </div>
-        </div>
-        <p className="mt-2 text-xs leading-relaxed text-ink-secondary">
-          Exercises finished and days in a row. It is a record of effort, not a
-          predicted score — no level here means you have reached a band.
+        {/* Real results the candidate entered, on the exam's own scale, with
+            the target drawn — because IRCC publishes the score→benchmark
+            table and this exam definition carries it. */}
+        <RealResults exam={exam} goal={goal} rows={myAttestations} />
+
+        {/* Practice sittings are a SEPARATE series and are never plotted on
+            the same axis. A practice sitting produces a count of correct
+            answers and the CEFR band that count held; it does not produce a
+            score on the exam's published scale, because the conversion from
+            correct answers to that scale is not published — this product says
+            so on every results page and must not quietly assume one here. */}
+        <PracticeSittings exam={exam} rows={mine} target={target} />
+      </section>
+
+      {/* 2 ── attempts */}
+      <section className="space-y-3">
+        <h2 className="font-display text-xl font-bold text-navy">Attempts</h2>
+        <p className="text-xs leading-relaxed text-ink-secondary">
+          How much work you have done, and when. <strong>Counting attempts is not the same as
+          awarding points for them</strong> — this is a record of what happened, not a score for
+          having turned up.
         </p>
-      </div>
-
-      {/* Per-skill cards */}
-      <section>
-        <h2 className="mb-4 font-display text-xl font-bold text-navy">Skill progress</h2>
-        <div className="grid gap-4 sm:grid-cols-2">
-          {(Object.keys(SKILL_META) as Array<keyof typeof SKILL_META>).map((k) => {
-            const meta = SKILL_META[k];
-            const stats = summary.bySkill[k];
-            const pct = (stats.xpThisLevel / 120) * 100;
+        <div className="card divide-y divide-surface-divider">
+          {(['listening', 'reading', 'writing', 'speaking'] as SkillKey[]).map((k) => {
+            const row = bySkill[k];
+            const Icon = SKILL_ICON[k];
             return (
-              <Link key={k} to={meta.to} className="group card relative overflow-hidden p-6 transition-transform hover:-translate-y-0.5">
-                <div className="flex items-start gap-4">
-                  <div className={clsx('flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br text-white shadow-lg', meta.color)}>
-                    <meta.icon className="h-6 w-6" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-baseline justify-between gap-2">
-                      <h3 className="font-display text-lg font-bold text-navy">{meta.label}</h3>
-                      <span className="rounded-full bg-teal/10 px-2.5 py-0.5 text-xs font-bold text-teal">Lv {stats.level}</span>
-                    </div>
-                    <div className="text-sm text-ink-secondary">{stats.tier}</div>
-                  </div>
+              <div key={k} className="flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-4">
+                <div className="flex min-w-[150px] flex-1 items-center gap-3">
+                  <Icon className="h-4 w-4 shrink-0 text-ink-secondary" />
+                  <span className="font-display font-bold text-navy">{SKILL_LABEL[k]}</span>
                 </div>
-                <div className="mt-4">
-                  <div className="mb-1 flex justify-between text-xs">
-                    <span className="text-ink-secondary">{stats.count} exercises · {stats.xp} XP</span>
-                    <span className="font-semibold text-navy">{stats.xpThisLevel}/120</span>
-                  </div>
-                  <div className="h-2 overflow-hidden rounded-full bg-surface-muted">
-                    <div className="h-full rounded-full bg-navy transition-all" style={{ width: `${pct}%` }} />
-                  </div>
-                  {stats.bestPct != null && (
-                    <div className="mt-2 text-xs text-ink-secondary">Best score: <span className="font-semibold text-navy">{Math.round(stats.bestPct)}%</span></div>
-                  )}
-                  {stats.count === 0 && (
-                    <div className="mt-2 text-xs text-ink-secondary">No exercises yet — get started!</div>
+                <div className="min-w-[120px] flex-1 text-sm tabular-nums text-ink-secondary">
+                  {row.count === 0 ? 'None yet' : `${row.count} attempt${row.count === 1 ? '' : 's'}`}
+                  {row.lastAt !== null && (
+                    <span className="ml-2 text-xs">last {fmtDate(row.lastAt)}</span>
                   )}
                 </div>
-                <ChevronRight className="absolute right-5 top-5 h-5 w-5 text-ink-secondary transition-transform group-hover:translate-x-1 group-hover:text-teal" />
-              </Link>
+                <Link to={PRACTICE[k as SkillId] ?? '/practice'} className="text-sm font-medium text-teal hover:underline">
+                  {row.count === 0 ? 'Start' : 'Continue'}
+                </Link>
+              </div>
             );
           })}
         </div>
-
-        {summary.bySkill.vocabulary.count > 0 && (
-          <Link to="/vocabulary" className="card mt-4 flex items-center gap-4 p-5 hover:shadow-cardHover">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-100 text-purple-600"><Brain className="h-5 w-5" /></div>
-            <div className="flex-1">
-              <div className="font-display font-bold text-navy">Vocabulary</div>
-              <div className="text-xs text-ink-secondary">{summary.bySkill.vocabulary.count} reviews · {summary.bySkill.vocabulary.xp} XP</div>
-            </div>
-            <ChevronRight className="h-5 w-5 text-ink-secondary" />
-          </Link>
+        {bySkill.vocabulary.count > 0 && (
+          <p className="text-xs text-ink-secondary">
+            Vocabulary: {bySkill.vocabulary.count} review{bySkill.vocabulary.count === 1 ? '' : 's'}.
+            It supports the four skills and is not one of them.
+          </p>
         )}
       </section>
 
-      {/* Achievements */}
-      <section>
-        <div className="mb-4 flex items-baseline justify-between">
-          <h2 className="font-display text-xl font-bold text-navy">Achievements</h2>
-          <span className="text-sm text-ink-secondary">{unlockedCount} / {achievements.length} unlocked</span>
+      {/* 3 ── where you stand: the same rows as Today, from the same component */}
+      <section className="space-y-3">
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <h2 className="font-display text-xl font-bold text-navy">Where you stand</h2>
+          <span className="text-xs text-ink-secondary">Target: {target} in every skill</span>
         </div>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {achievements.map((a) => (
-            <div key={a.id} className={clsx(
-              'card flex items-start gap-3 p-4 transition',
-              a.unlocked ? 'border-teal/30 bg-gradient-to-br from-white to-teal/5' : 'opacity-60',
-            )}>
-              <div className={clsx('flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-2xl', a.unlocked ? 'bg-amber-100' : 'bg-surface-muted')}>
-                {a.unlocked ? a.emoji : <Lock className="h-5 w-5 text-ink-secondary" />}
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <h4 className="font-display font-bold text-navy">{a.title}</h4>
-                  {a.unlocked && <span className="rounded-full bg-teal/10 px-1.5 py-0.5 text-[10px] font-bold uppercase text-teal">Unlocked</span>}
-                </div>
-                <p className="text-xs text-ink-secondary">{a.description}</p>
-                {a.unlocked && a.unlockedAt && (
-                  <div className="mt-1 text-[11px] text-ink-secondary">Earned {new Date(a.unlockedAt).toLocaleDateString()}</div>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
+        <StandingRows exam={exam} record={latest} target={target} />
+        <StandingNote exam={exam} />
+        <NotBuiltNote exam={exam} />
       </section>
 
-      {/* Recent sessions */}
-      <section>
-        <h2 className="mb-4 font-display text-xl font-bold text-navy">Recent sessions</h2>
-        {recent.length === 0 ? (
-          <div className="card p-8 text-center text-ink-secondary">
-            No sessions yet. <Link to="/dashboard" className="font-semibold text-teal hover:underline">Start practicing →</Link>
+      {/* 4 ── the gap */}
+      <section className="space-y-3">
+        <h2 className="font-display text-xl font-bold text-navy">What you have not practised yet</h2>
+        {untouched.length === 0 ? (
+          <div className="card p-6 text-sm text-ink-secondary">
+            Every part of your plan has been attempted at least once.
           </div>
         ) : (
-          <div className="card divide-y divide-surface-divider overflow-hidden">
-            {recent.map((e, i) => {
-              const meta = (SKILL_META as any)[e.skill] as { label: string; icon: any; color: string } | undefined;
-              const pct = typeof e.score === 'number' && typeof e.total === 'number' && e.total > 0
-                ? Math.round((e.score / e.total) * 100)
-                : (typeof e.score === 'number' ? Math.round(e.score) : null);
-              return (
-                <div key={i} className="flex items-center gap-3 p-4">
-                  <div className={clsx('flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br text-white', meta?.color || 'from-purple-500 to-purple-600')}>
-                    {meta ? <meta.icon className="h-5 w-5" /> : <Brain className="h-5 w-5" />}
+          <>
+            <p className="text-xs leading-relaxed text-ink-secondary">
+              An untouched part of the exam predicts a low governing level better than a low score
+              on a part you have practised does. These are the {untouched.length} you have not
+              opened.
+            </p>
+            <div className="card divide-y divide-surface-divider">
+              {untouched.slice(0, 12).map((s) => (
+                <div key={s.coordinate.label} className="flex flex-wrap items-center gap-x-4 gap-y-1 px-5 py-3">
+                  <div className="min-w-[180px] flex-1">
+                    <div className="text-sm font-semibold text-navy">{s.coordinate.label}</div>
+                    <div className="text-xs text-ink-secondary">
+                      {SKILL_LABEL[s.coordinate.skill as SkillKey]}
+                      {s.items === 0 && ' · nothing is authored behind this yet'}
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <div className="text-sm font-semibold text-navy">{meta?.label || e.skill}{e.topic ? ` · ${e.topic}` : ''}</div>
-                    <div className="text-xs text-ink-secondary">{new Date(e.ts).toLocaleString()}{pct != null ? ` · ${pct}%` : ''}</div>
-                  </div>
-                  <div className="flex items-center gap-1 text-sm font-bold text-teal">
-                    <Star className="h-3.5 w-3.5" /> +{e.xp}
-                  </div>
+                  {s.items > 0 ? (
+                    <Link to={PRACTICE[s.coordinate.skill] ?? '/practice'} className="text-sm font-medium text-teal hover:underline">
+                      Open
+                    </Link>
+                  ) : (
+                    <span className="text-xs text-ink-secondary">not built</span>
+                  )}
                 </div>
-              );
-            })}
-          </div>
+              ))}
+            </div>
+            {untouched.length > 12 && (
+              <p className="text-xs text-ink-secondary">and {untouched.length - 12} more.</p>
+            )}
+          </>
         )}
       </section>
-    </div>
-  );
-}
-
-function BannerStat({ icon: Icon, value, label }: { icon: any; value: number | string; label: string }) {
-  return (
-    <div className="rounded-xl bg-white/15 px-4 py-3 text-center backdrop-blur">
-      <div className="font-display text-2xl font-bold"><Icon className="-mt-1 mr-1 inline h-5 w-5" />{value}</div>
-      <div className="text-[11px] uppercase tracking-wider opacity-80">{label}</div>
     </div>
   );
 }
 
 /**
- * What the practice is FOR, at the top of the page that measures it.
+ * Results from real sittings the candidate entered.
  *
- * Progress opened on "Level 16 · 3076 XP · 25 perfect" and never mentioned the
- * examination, the target, or the plan. A candidate who needs CLB 9 learns
- * nothing from Level 16 about whether they can book their test, and a page
- * that leads with it quietly implies that they can. This block names the
- * instrument and the number that governs, and sends the reader to the screen
- * that actually holds their standing rather than duplicating it here - one
- * page owns that answer.
+ * Plotted on the benchmark the awarding body reports, with the target drawn as
+ * a line — legitimate here and only here, because the score→benchmark table is
+ * published by IRCC and carried in the exam definition. Nothing is converted.
  */
-function ExamAnchor() {
-  const [row, setRow] = useState<{ exam: string; goal: string; target: string } | null>(null);
+function RealResults({ exam, goal, rows }: { exam: ExamDefinition; goal: Goal; rows: Attestation[] }) {
+  const skills: SkillId[] = ['listening', 'reading', 'writing', 'speaking'];
+  const points = skills.map((k) => ({
+    skill: k,
+    series: rows
+      .map((r) => ({ at: fmtMonth(r.sat), value: r.benchmark?.[k] ?? null }))
+      .filter((p) => typeof p.value === 'number') as Array<{ at: string; value: number }>,
+  }));
+  const any = points.some((p) => p.series.length > 0);
 
-  useEffect(() => {
-    let alive = true;
-    const read = async () => {
-      const plan = loadPlan();
-      if (!plan?.examId || !plan?.goalId) { if (alive) setRow(null); return; }
-      const defs = await import('../exam/definitions');
-      const exam = defs.EXAMS.find((e) => e.id === plan.examId);
-      const goal = defs.GOALS.find((g) => g.id === plan.goalId);
-      if (!exam || !goal) { if (alive) setRow(null); return; }
-      const lang = exam.language;
-      if (alive) {
-        setRow({
-          exam: exam.name[lang] ?? exam.name.en,
-          goal: goal.label[lang] ?? goal.label.en,
-          // Same shape Today uses: the benchmark system and the level it asks for.
-          target: `${goal.system} ${goal.requiredLevel}`,
-        });
-      }
-    };
-    read();
-    window.addEventListener(PLAN_EVENT, read);
-    return () => { alive = false; window.removeEventListener(PLAN_EVENT, read); };
-  }, []);
-
-  if (!row) {
+  if (!any) {
     return (
-      <div className="card p-5">
-        <p className="text-sm text-ink-primary">
-          Choose your exam and destination, and this page can tell you what your practice is for.
+      <div className="card p-6">
+        <div className="text-sm font-semibold text-navy">No real result entered yet</div>
+        <p className="mt-1 text-xs leading-relaxed text-ink-secondary">
+          A line needs points. Enter a past {t(exam.name, 'en')} score report and this shows your
+          {' '}{goal.system} level per skill against the {goal.system} {goal.requiredLevel} you need.
         </p>
-        <Link to="/goal" className="btn-primary mt-3 inline-block">Choose my exam</Link>
+        <Link to="/goal" className="btn-secondary mt-3 inline-block">Enter a past result</Link>
       </div>
     );
   }
 
   return (
-    <div className="card p-5">
-      <div className="text-xs uppercase tracking-widest text-ink-secondary">What this is for</div>
-      <div className="mt-1 font-display text-xl font-bold text-navy">{row.exam}</div>
-      <p className="mt-1 text-sm text-ink-secondary">
-        {row.goal}{row.target ? ` · ${row.target}` : ''} — and the lowest skill governs.
+    <div className="card space-y-4 p-5">
+      <div className="text-sm font-semibold text-navy">Your entered results · {goal.system}</div>
+      {points.filter((p) => p.series.length > 0).map((p) => (
+        <Series
+          key={p.skill}
+          label={SKILL_LABEL[p.skill as SkillKey]}
+          series={p.series}
+          target={goal.requiredLevel}
+          max={12}
+        />
+      ))}
+      {points.every((p) => p.series.length < 2) && (
+        <p className="text-xs leading-relaxed text-ink-secondary">
+          One result is a point, not a trend. A second entered result is what makes this a line.
+        </p>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Practice sittings — the band held, over time.
+ *
+ * No target line. The band a practice sitting holds is CEFR; the target is
+ * NCLC or CLB; and the bridge between them is printed by the awarding body but
+ * explicitly not used to compute anything in this codebase. Drawing the line
+ * would be performing that conversion in a chart instead of in a function,
+ * which is the same act with less scrutiny.
+ */
+function PracticeSittings({ exam, rows, target }: { exam: ExamDefinition; rows: SittingRecord[]; target: string }) {
+  const BANDS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+  const counted = exam.sections.filter((s) => s.kind === 'comprehension');
+
+  if (rows.length < 2) {
+    return (
+      <div className="card p-6">
+        <div className="text-sm font-semibold text-navy">
+          {rows.length === 0 ? 'No practice sitting yet' : 'One practice sitting so far'}
+        </div>
+        <p className="mt-1 text-xs leading-relaxed text-ink-secondary">
+          {rows.length === 0
+            ? 'This chart needs two sittings before it can show anything. It is left empty rather than filled with a number that would only be measuring how often you opened the app.'
+            : 'A second sitting is what turns a point into a line. Until then there is nothing here to draw, and drawing something anyway would be inventing a trend.'}
+        </p>
+        <Link to="/exam" className="btn-secondary mt-3 inline-block">Take a mock exam</Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className="card space-y-4 p-5">
+      <div className="text-sm font-semibold text-navy">Practice sittings · band held</div>
+      {counted.map((s) => {
+        const series = rows
+          .map((r) => {
+            const v = r.skills[s.id];
+            const held = v?.held ?? null;
+            const idx = held ? BANDS.indexOf(held) : -1;
+            return idx >= 0 ? { at: fmtDate(r.finishedAt), value: idx + 1 } : null;
+          })
+          .filter(Boolean) as Array<{ at: string; value: number }>;
+        if (series.length < 2) return null;
+        return (
+          <Series
+            key={s.id}
+            label={t(s.name, 'en')}
+            series={series}
+            max={6}
+            format={(v) => BANDS[v - 1] ?? '—'}
+          />
+        );
+      })}
+      <p className="text-xs leading-relaxed text-ink-secondary">
+        This is the CEFR band each sitting held. It is <strong>not</strong> plotted against your{' '}
+        {target} target: a practice sitting produces a count of correct answers, and the conversion
+        from that count to the exam's published scale is not released by the awarding body. A target
+        line here would be a conversion drawn rather than computed.
       </p>
-      <Link to="/" className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-teal">
-        Where you stand <ChevronRight className="h-4 w-4" />
-      </Link>
+    </div>
+  );
+}
+
+/** One skill's line. Small, honest, and readable without a legend. */
+function Series({
+  label, series, target, max, format,
+}: {
+  label: string;
+  series: Array<{ at: string; value: number }>;
+  target?: number;
+  max: number;
+  format?: (v: number) => string;
+}) {
+  const W = 260;
+  const H = 56;
+  const n = series.length;
+  const x = (i: number) => (n === 1 ? W / 2 : (i / (n - 1)) * (W - 12) + 6);
+  const y = (v: number) => H - 6 - (Math.min(v, max) / max) * (H - 12);
+  const path = series.map((p, i) => `${i === 0 ? 'M' : 'L'}${x(i).toFixed(1)},${y(p.value).toFixed(1)}`).join(' ');
+  const last = series[n - 1];
+
+  return (
+    <div className="flex flex-wrap items-center gap-4">
+      <div className="min-w-[110px] text-sm font-semibold text-navy">{label}</div>
+      <svg viewBox={`0 0 ${W} ${H}`} className="h-14 w-full max-w-[260px] flex-1" role="img"
+           aria-label={`${label}: ${series.map((p) => `${p.at} ${format ? format(p.value) : p.value}`).join(', ')}`}>
+        {typeof target === 'number' && (
+          <line x1={0} x2={W} y1={y(target)} y2={y(target)} className="stroke-amber-500" strokeWidth={1} strokeDasharray="4 3" />
+        )}
+        <path d={path} fill="none" className="stroke-teal" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+        {series.map((p, i) => (
+          <circle key={i} cx={x(i)} cy={y(p.value)} r={3} className="fill-teal" />
+        ))}
+      </svg>
+      <div className="min-w-[90px] text-right text-sm tabular-nums text-ink-secondary">
+        <span className="font-bold text-navy">{format ? format(last.value) : last.value}</span>
+        <div className="text-[11px]">{last.at}</div>
+      </div>
     </div>
   );
 }
