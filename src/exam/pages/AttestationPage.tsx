@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Check, ShieldCheck, Trash2, Upload } from 'lucide-react';
+import { Check, Loader2, ShieldCheck, Trash2, Upload } from 'lucide-react';
+import { readScoreReport, readFailureMessage, type ScoreReading } from '../../lib/scoreReport';
 import clsx from 'clsx';
 import { useExam } from '../state';
 import type { SkillId } from '../model/types';
@@ -111,7 +112,18 @@ export default function AttestationPage() {
   const [overallBand, setOverallBand] = useState('');
   const [cefr, setCefr] = useState('');
   const [studied, setStudied] = useState<boolean | null>(null);
-  const [imageState, setImageState] = useState<'none' | 'unread'>('none');
+  /**
+   * What happened to an uploaded score report.
+   *
+   * `unread` was the only outcome until 2026-08-29: the file was taken and
+   * discarded because nothing could read it. Now the marks are extracted and
+   * offered for checking, and `read` holds what came back so the candidate can
+   * see what was filled in on their behalf and change any of it. `failed`
+   * keeps the honest old behaviour - the typed values stand.
+   */
+  const [imageState, setImageState] = useState<'none' | 'reading' | 'read' | 'failed'>('none');
+  const [reading, setReading] = useState<ScoreReading | null>(null);
+  const [readError, setReadError] = useState<string | null>(null);
   const [consented, setConsented] = useState(false);
   const [saved, setSaved] = useState<Attestation | null>(null);
   const existing = loadAttestations().filter((a) => a.examId === exam.id);
@@ -187,11 +199,62 @@ export default function AttestationPage() {
    * image was offered, and lets it go — there is nowhere in `Attestation`
    * to put it even if someone tried.
    */
-  const takeImage = () => {
+  /**
+   * Upload, read, and PREFILL - never submit.
+   *
+   * The marks that come back are written into the same boxes the candidate
+   * would have typed, and the banner above them says so and asks them to
+   * check. Nothing is saved from this: `submit` still reads the form, so a
+   * misread band is corrected by typing over it, and the candidate's own
+   * values remain the source of truth exactly as they were before.
+   */
+  const takeImage = async () => {
     const f = fileRef.current?.files?.[0];
-    if (!f) return;
-    setImageState('unread');
     if (fileRef.current) fileRef.current.value = '';
+    if (!f) return;
+    setImageState('reading');
+    setReadError(null);
+    setReading(null);
+
+    const r = await readScoreReport(f);
+    if (!r.ok) {
+      setImageState('failed');
+      setReadError(readFailureMessage(r.reason));
+      return;
+    }
+
+    const got = r.reading;
+    setReading(got);
+    setImageState('read');
+
+    // The variant decides which boxes exist, so it is applied first.
+    if (isFrench) {
+      const v: Record<string, TcfVariantId> = {
+        canada: 'canada',
+        tout_public: 'tout-public',
+        quebec: 'quebec',
+      };
+      if (got.variant in v) setTcf(v[got.variant]);
+    } else if (got.variant === 'general_training' || got.variant === 'academic') {
+      setModule(got.variant === 'academic' ? 'academic' : 'general_training');
+    }
+
+    // Then the marks. A skill printed as not sat is recorded as not sat, not
+    // as a zero - the distinction the form already draws.
+    const nextScores: Record<string, string> = {};
+    const nextNotSat: Record<string, boolean> = {};
+    for (const row of got.scores) {
+      if (row.not_sat) { nextNotSat[row.skill] = true; continue; }
+      if (typeof row.mark === 'number') nextScores[row.skill] = String(row.mark);
+    }
+    setScores((prev) => ({ ...prev, ...nextScores }));
+    setNotSat((prev) => ({ ...prev, ...nextNotSat }));
+    if (typeof got.overall === 'number') setOverallBand(String(got.overall));
+    if (got.cefr) setCefr(got.cefr);
+    // Month and year only. The day is never requested; see the endpoint.
+    if (got.sat_year && got.sat_month) {
+      setSat(`${got.sat_year}-${String(got.sat_month).padStart(2, '0')}`);
+    }
   };
 
   const submit = () => {
@@ -399,6 +462,65 @@ export default function AttestationPage() {
           <input type="checkbox" checked={consented} onChange={(e) => setConsented(e.target.checked)} className="mt-1" />
           <span>{ui === 'en' ? 'I have read this and I agree.' : "J'ai lu ce qui précède et j'accepte."}</span>
         </label>
+      </section>
+
+      {/* The upload comes BEFORE the questions it can answer.
+          It sat at the foot of the score boxes until 2026-08-29, inside a
+          section that only renders once the candidate has already told us
+          which IELTS or which TCF they hold - so the document could never
+          choose the variant, which is the first thing it makes obvious and
+          the thing candidates most often get wrong about their own form.
+          Reading it first fills the variant, the marks, the overall and the
+          month; every one of them stays editable underneath. */}
+      <section className="rounded-xl border-2 border-surface-divider bg-white p-5">
+        <div className="rounded-xl border-2 border-dashed border-surface-divider p-4">
+          <button
+            type="button"
+            onClick={() => fileRef.current?.click()}
+            className="flex items-center gap-2 text-sm font-medium text-navy"
+          >
+            <Upload className="h-4 w-4" />
+            {ui === 'en' ? 'Upload your score report — we will fill in the marks' : 'Téléverser votre attestation — nous remplirons les notes'}
+          </button>
+          <input ref={fileRef} type="file" accept="image/*,application/pdf" className="hidden" onChange={takeImage} />
+
+          {imageState === 'reading' && (
+            <p className="mt-2 flex items-center gap-2 text-xs text-ink-secondary">
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              {ui === 'en' ? 'Reading the marks…' : 'Lecture des notes…'}
+            </p>
+          )}
+
+          {imageState === 'read' && reading && (
+            <div className="mt-3 rounded-xl border-2 border-teal bg-teal/5 p-3">
+              <p className="text-sm font-semibold text-navy">
+                {ui === 'en' ? 'Check what was read' : 'Vérifiez la lecture'}
+              </p>
+              <p className="mt-1 text-xs leading-relaxed text-ink-secondary">
+                {ui === 'en'
+                  ? 'The boxes below were filled in from your document. Read them against the page in your hand and correct anything that is wrong — what you leave in the boxes is what counts, not what was read.'
+                  : "Les cases ci-dessous ont été remplies à partir de votre document. Comparez-les à la page que vous avez sous les yeux et corrigez ce qui ne va pas — ce sont vos cases qui font foi, pas la lecture."}
+              </p>
+              {reading.confidence !== 'high' && (
+                <p className="mt-2 text-xs font-medium text-amber-700">
+                  {ui === 'en'
+                    ? 'The image was not perfectly legible, so check every number.'
+                    : "L'image n'était pas parfaitement lisible : vérifiez chaque chiffre."}
+                </p>
+              )}
+            </div>
+          )}
+
+          {imageState === 'failed' && readError && (
+            <p className="mt-2 text-xs leading-relaxed text-amber-700">{readError}</p>
+          )}
+
+          <p className="mt-2 text-xs text-ink-secondary">
+            {ui === 'en'
+              ? 'Never stored. It is read in the same moment it arrives and then discarded, and only the marks are taken from it — never your name, date of birth or candidate number.'
+              : "Jamais conservée : lue au moment même où elle arrive, puis détruite. Seules les notes en sont tirées — jamais votre nom, votre date de naissance ni votre numéro de candidat."}
+          </p>
+        </div>
       </section>
 
       {!isFrench && (
@@ -713,26 +835,6 @@ export default function AttestationPage() {
           </div>
         </div>
 
-        <div className="rounded-xl border-2 border-dashed border-surface-divider p-4">
-          <button
-            type="button"
-            onClick={() => fileRef.current?.click()}
-            className="flex items-center gap-2 text-sm font-medium text-navy"
-          >
-            <Upload className="h-4 w-4" />
-            {ui === 'en' ? 'Add a photo of the attestation (optional)' : "Ajouter une photo de l'attestation (facultatif)"}
-          </button>
-          <input ref={fileRef} type="file" accept="image/*,application/pdf" className="hidden" onChange={takeImage} />
-          <p className="mt-2 text-xs text-ink-secondary">
-            {imageState === 'unread'
-              ? ui === 'en'
-                ? 'Image received and discarded. Automatic reading is not available yet, so it is recorded as unread and your typed values stand — which is exactly what the design says should happen.'
-                : "Image reçue puis détruite. La lecture automatique n'est pas encore disponible : elle est donc notée comme non lue et vos valeurs saisies font foi — ce que le modèle prévoit précisément."
-              : ui === 'en'
-                ? 'Never stored. It is read in the same moment it arrives and then discarded.'
-                : "Jamais conservée. Elle est lue au moment même où elle arrive, puis détruite."}
-          </p>
-        </div>
       </section>
       )}
 
