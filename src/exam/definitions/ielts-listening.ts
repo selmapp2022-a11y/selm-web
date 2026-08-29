@@ -113,6 +113,10 @@ export const IELTS_LISTENING: ComprehensionSection = {
   // paper. The audio itself is about 21 minutes; the figure below is the
   // published 30 and is not our apportionment.
   timeLimitSec: 30 * 60,
+  sets: {
+    questions: 40,
+    source: 'ielts.org — Listening: 4 parts, 40 questions, about 30 minutes plus 10 minutes to transfer answers on paper.',
+  },
   scaleId: 'band',
   delivery: {
     // The whole argument of the listening ruling: the exam plays once, and a

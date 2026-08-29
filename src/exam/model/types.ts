@@ -807,7 +807,37 @@ export type ProductionSection = {
    * three tâches. Absent where the exam times each task instead.
    */
   timeLimitSec?: number;
+  /** What the real épreuve sets. See `PublishedLength`. */
+  sets: PublishedLength;
   tasks: TaskDefinition[];
+};
+
+/**
+ * What the REAL exam sets for this section, as the awarding body publishes it.
+ *
+ * ── Why this is data and not a comment ────────────────────────────────────
+ * The inventory has to report the GAP between what this product holds and
+ * what the exam actually asks for, and a gap needs both numbers. One of them
+ * was only ever in prose: the TCF compréhension écrite section carried
+ * `serve.count: 39` because 39 is what the épreuve sets, while the IELTS
+ * General Training reading section carried `serve.count: 6` because six is
+ * all that has been authored — the same field meaning two different things,
+ * distinguishable only by reading the comment above it.
+ *
+ * `serve` is what THIS PRODUCT presents. `sets` is what the exam sets. When
+ * they differ, the difference is the work still to do, and it is now
+ * countable rather than arguable.
+ *
+ * `source` is not optional. A published figure and a remembered one must not
+ * be able to look alike in this file.
+ */
+export type PublishedLength = {
+  /** Questions in one real sitting, where the section is counted. */
+  questions?: number;
+  /** Tasks or tâches in one real sitting, where the section is produced. */
+  tasks?: number;
+  /** Where these figures come from. */
+  source: string;
 };
 
 export type ComprehensionSection = {
@@ -819,6 +849,8 @@ export type ComprehensionSection = {
   timeLimitSec: number;
   /** True when the figure above is our division rather than a published one. */
   timeLimitApportioned?: true;
+  /** What the real épreuve sets. See `PublishedLength`. */
+  sets: PublishedLength;
   /** The scale this section is reported on, e.g. `co699`. */
   scaleId: string;
   delivery: DeliveryRules;

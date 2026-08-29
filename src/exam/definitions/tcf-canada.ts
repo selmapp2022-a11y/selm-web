@@ -200,6 +200,10 @@ export const TCF_CANADA: ExamDefinition = {
     {
       kind: 'comprehension',
       id: 'comprehension-orale',
+      sets: {
+        questions: 39,
+        source: "France Éducation international — TCF Canada, compréhension orale : 39 questions, 35 minutes.",
+      },
       skill: 'listening',
       name: { en: 'Listening comprehension', fr: 'Compréhension orale' },
       // Published: 35 minutes for the épreuve. FEI, TCF Canada page.
@@ -1257,6 +1261,10 @@ export const TCF_CANADA: ExamDefinition = {
     {
       kind: 'comprehension',
       id: 'comprehension-ecrite',
+      sets: {
+        questions: 39,
+        source: "France Éducation international — TCF Canada, compréhension écrite : 39 questions, 60 minutes.",
+      },
       skill: 'reading',
       name: { en: 'Reading comprehension', fr: 'Compréhension écrite' },
       // Published: 60 minutes for the épreuve. FEI, TCF Canada page.
@@ -2187,6 +2195,10 @@ export const TCF_CANADA: ExamDefinition = {
     {
       kind: 'production',
       id: 'expression-ecrite',
+      sets: {
+        tasks: 3,
+        source: "France Éducation international — TCF Canada, expression écrite : 3 tâches, 60 minutes.",
+      },
       skill: 'writing',
       name: { en: 'Written expression', fr: 'Expression écrite' },
       allowReplay: false,
@@ -2677,6 +2689,10 @@ export const TCF_CANADA: ExamDefinition = {
     {
       kind: 'production',
       id: 'expression-orale',
+      sets: {
+        tasks: 3,
+        source: "France Éducation international — TCF Canada, expression orale : 3 tâches, 12 minutes.",
+      },
       skill: 'speaking',
       name: { en: 'Spoken expression', fr: 'Expression orale' },
       allowReplay: false,

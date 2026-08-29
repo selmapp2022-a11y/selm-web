@@ -167,6 +167,10 @@ export const IELTS_GT: ExamDefinition = {
     {
       kind: 'production',
       id: 'writing',
+      sets: {
+        tasks: 2,
+        source: 'ielts.org — General Training Writing: 2 tasks in 60 minutes (a letter of at least 150 words, an essay of at least 250).',
+      },
       skill: 'writing',
       name: { en: 'Writing', fr: 'Expression écrite' },
       allowReplay: false,
@@ -462,6 +466,10 @@ export const IELTS_GT: ExamDefinition = {
     {
       kind: 'production',
       id: 'speaking',
+      sets: {
+        tasks: 3,
+        source: 'ielts.org — Speaking: 3 parts, 11 to 14 minutes, face to face with an examiner.',
+      },
       skill: 'speaking',
       name: { en: 'Speaking', fr: 'Expression orale' },
       allowReplay: false,
@@ -757,6 +765,10 @@ export const IELTS_GT: ExamDefinition = {
     {
       kind: 'comprehension',
       id: 'reading',
+      sets: {
+        questions: 40,
+        source: 'ielts.org — General Training Reading: 40 questions in 60 minutes, three sections rising in difficulty.',
+      },
       skill: 'reading',
       name: { en: 'Reading', fr: 'Compréhension écrite' },
       // Published: 60 minutes, 40 questions, three sections rising in difficulty.

@@ -175,11 +175,25 @@ function attestationLevel(exam: ExamDefinition, a: Attestation | null, skill: Sk
   return cefrIndexFor(exam, lvl);
 }
 
-export function buildPlan(input: PlannerInput): Plan {
-  const { exam, attestation, target, daysLeft } = input;
-  const want = input.slots ?? 30;
-
-  // Every coordinate this exam can emit, grouped by skill.
+/**
+ * Every coordinate this exam can emit, grouped by skill, with how much sits
+ * behind each one.
+ *
+ * Split out of `buildPlan` on 29 August 2026 so the content inventory counts
+ * REACHABILITY with the planner's own function rather than a copy of it. A
+ * second implementation of "what can the plan address" would answer the
+ * question the inventory exists to ask, and would be free to drift from the
+ * planner while still looking authoritative — which is the worst shape a
+ * measurement can have.
+ *
+ * `here` is the candidate's CEFR index for the skill, or null. It affects only
+ * the ORDER of the comprehension coordinates, never which ones exist, so the
+ * inventory passes null and gets the full set.
+ */
+export function coordinatesFor(
+  exam: ExamDefinition,
+  here: (skill: SkillId) => number | null = () => null,
+): Map<SkillId, Array<{ coordinate: Coordinate; items: number }>> {
   const perSkill = new Map<SkillId, Array<{ coordinate: Coordinate; items: number }>>();
   for (const a of exam.awards) {
     const list: Array<{ coordinate: Coordinate; items: number }> = [];
@@ -188,23 +202,10 @@ export function buildPlan(input: PlannerInput): Plan {
         coordinate: { kind: 'task', skill: a.skill, taskId: t.id, label: t.name[exam.language] },
         items: itemsForTask(exam.id, t.id),
       });
-    // Comprehension coordinates are ordered by DISTANCE FROM THE CANDIDATE,
-    // not by the ladder.
-    //
-    // Found by running the planner: a candidate at NCLC 5 was being handed
-    // `annonce · A1` and `annonce · C2` in the same twelve slots. Both are
-    // real coordinates and both are useless to them — one is years behind,
-    // the other years ahead, and the plan has six weeks. §4.5 sizes a plan
-    // to the days remaining; spending them on levels the candidate is not
-    // at is the same waste as teaching a level the exam does not test.
-    //
-    // Without an attestation there is no candidate level, so the ladder's
-    // own order stands and the material adapts silently from performance
-    // instead — Part 3 §3.
-    const here = attestationLevel(exam, attestation, a.skill);
+    const at = here(a.skill);
     const fams = familiesOf(exam, a.skill).map((f) => ({
       ...f,
-      distance: here === null ? CEFR.indexOf(f.level) : Math.abs(CEFR.indexOf(f.level) - here),
+      distance: at === null ? CEFR.indexOf(f.level) : Math.abs(CEFR.indexOf(f.level) - at),
     }));
     fams.sort((x, y) => x.distance - y.distance || y.items - x.items);
     for (const f of fams)
@@ -213,6 +214,24 @@ export function buildPlan(input: PlannerInput): Plan {
         items: f.items,
       });
     if (list.length) perSkill.set(a.skill, list);
+  }
+  return perSkill;
+}
+
+export function buildPlan(input: PlannerInput): Plan {
+  const { exam, attestation, target, daysLeft } = input;
+  const want = input.slots ?? 30;
+
+  // Every coordinate this exam can emit, grouped by skill.
+  const perSkill = coordinatesFor(exam, (skill) => attestationLevel(exam, attestation, skill));
+  {
+    // Comprehension coordinates are ordered by DISTANCE FROM THE CANDIDATE,
+    // not by the ladder — see `coordinatesFor`, which now owns that ordering.
+    //
+    // Found by running the planner: a candidate at NCLC 5 was being handed
+    // `annonce · A1` and `annonce · C2` in the same twelve slots. Both are
+    // real coordinates and both are useless to them — one is years behind,
+    // the other years ahead, and the plan has six weeks.
   }
 
   // Skill order. With marks, worst-first by distance to target — the
