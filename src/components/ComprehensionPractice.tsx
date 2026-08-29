@@ -6,6 +6,7 @@ import { loadPlan, PLAN_EVENT } from '../exam/model/plan';
 import { resolveAudio } from '../exam/engine/audio';
 import { itemsOf } from '../exam/engine/comprehension';
 import type { ComprehensionSection, LanguageCode, Recording } from '../exam/model/types';
+import { recordAttempt, type SkillKey } from '../lib/attempts';
 
 /**
  * Practice for a comprehension skill, served from THE EXAM'S OWN BANK.
@@ -210,6 +211,26 @@ function Runner({
     const right = items.filter((i) => chosen[i.id] === i.answer).length;
     setTally((t) => ({ correct: t.correct + right, total: t.total + items.length }));
     setMarked(true);
+    // Record the attempt.
+    //
+    // Until 29 August 2026 nothing here recorded anything: only Speaking and
+    // Writing went through `CompletionCard`, so listening and reading practice
+    // left no trace at all. The old scoreboard hid it — a candidate who read
+    // for an hour still watched a number go up, because vocabulary and the
+    // other two skills were feeding it.
+    //
+    // The topic is the planner's own coordinate label, `family · level`, and
+    // it has to stay that exact string: Progress joins attempts to the
+    // planner's coordinates to say what has NOT been practised, and a label
+    // that drifts turns that list into "everything, forever".
+    if (rec?.family) {
+      recordAttempt({
+        skill: section.skill as SkillKey,
+        topic: `${rec.family} · ${rec.level}`,
+        score: right,
+        total: items.length,
+      });
+    }
   };
 
   const next = () => {
