@@ -295,3 +295,34 @@ export const MIGRATION = {
  * French section of the library.
  */
 export const CROSS_LANGUAGE_NOTE = true;
+
+/**
+ * There is no French narrator, and that is a difference between the two exams
+ * rather than an omission in this file.
+ *
+ * `ielts-voices.ts` casts a narrator — the voice that says *"Now turn to Part
+ * two. You will hear a talk given by a museum guide. First, you have some time
+ * to look at questions eleven to twenty."* In IELTS those sentences are INSIDE
+ * the recording. The candidate hears them, which is why the role exists, why it
+ * has to be older than every speaking voice, and why it was auditioned on its
+ * own line.
+ *
+ * The TCF listening section as built here delivers that information on screen
+ * instead. From `tcf-canada.ts`:
+ *
+ *     questionAfterAudio: true        the question comes AFTER the audio
+ *     presentation: 'one_at_a_time'   one recording, then its question
+ *
+ * So each of the 39 recordings is only the material — an announcement, a
+ * dialogue, an exposé. There is no sentence for a narrator to read, and casting
+ * one "for symmetry with IELTS" would put a voice into the exam that the exam
+ * has no line for.
+ *
+ * ONE HONEST CAVEAT. The real TCF does number its items in the audio; this
+ * product substitutes on-screen presentation for that, a delivery decision
+ * already taken in the exam definition. **If `questionAfterAudio` or
+ * `presentation` ever changes, or spoken item numbering is added, a French
+ * narrator becomes necessary** — and it goes through the same gate as every
+ * other voice here: chosen, rendered on the real line, and heard.
+ */
+export const NO_FRENCH_NARRATOR_BY_DESIGN = true;
