@@ -891,3 +891,56 @@ export const IELTS_GT: ExamDefinition = {
     },
   ],
 };
+
+/**
+ * WHY THERE IS NO LISTENING SECTION IN THIS FILE, AND WHAT IT WOULD TAKE.
+ *
+ * The IELTS narrator was the last unheard voice and it is now cast, so the
+ * blocker on the listening bank was expected to be gone. It is not. The
+ * remaining blocker is not audio, not voices and not authoring effort — it is
+ * the item model, and it is the same rule this codebase adopted on 29 August
+ * 2026 for the practice pages:
+ *
+ *     Nothing may offer the same skill in a form the exam does not set.
+ *
+ * `ComprehensionItem` can express exactly one thing: a stem, four options, and
+ * the index of the key. That is the right model for the TCF Canada
+ * compréhension orale, whose items really are four-option multiple choice, and
+ * it is why the 39-recording French bank is a faithful section.
+ *
+ * **IELTS Listening is not predominantly multiple choice.** Its 40 questions
+ * are mostly completion — form, note, table, flow-chart, sentence and summary —
+ * plus matching and plan/map/diagram labelling, with multiple choice a minority
+ * of one part or less. A completion answer is TYPED, capped at three words
+ * and/or a number, and **spelling is marked**.
+ *
+ * So the demand is different in kind, not merely in presentation. Recognising
+ * the right answer among four is a weaker task than catching a word and
+ * spelling it, and a candidate who can do the first cannot be assumed to do the
+ * second. Forty multiple-choice questions over four IELTS scripts would
+ * therefore be a substitute for the exam's own task — the precise thing the
+ * ruling refused when it removed `General listening`, `Dictation` and
+ * `Paste any text` — with the aggravating factor that a substitute labelled
+ * "IELTS Listening" does not even carry the label that made those honest.
+ *
+ * WHAT IT WOULD TAKE, so this is one decision rather than an investigation:
+ *
+ * 1. `ComprehensionItem` becomes a discriminated union — `kind: 'choice'`
+ *    (today's item, unchanged, so every existing bank and every existing
+ *    result is untouched) and `kind: 'completion'`.
+ * 2. A completion item needs an answer RULE, not an answer string: the set of
+ *    accepted spellings, whether a number may be written in digits or words,
+ *    the word cap, and case-insensitivity. IELTS marks spelling, so
+ *    "recieve" is wrong and must be marked wrong — which means the rule has to
+ *    be a whitelist of correct forms, never a fuzzy match.
+ * 3. `ItemAnswer.chose` becomes an option index OR typed text, which reaches
+ *    the answer store and the results view, not only the engine.
+ * 4. `comprehension.ts` scores the two kinds side by side; the band logic above
+ *    it does not change, because a correct answer is a correct answer.
+ *
+ * Until that exists, an IELTS listening bank should not be authored, and
+ * `/listening` is right to say the skill is not built. The audio, the cast and
+ * the narrator are ready and will not need redoing — the missing piece is what
+ * a candidate is asked to DO with what they heard.
+ */
+export const IELTS_LISTENING_BLOCKED_ON_ITEM_MODEL = true;
