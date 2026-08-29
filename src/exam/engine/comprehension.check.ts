@@ -248,3 +248,29 @@ if (bad !== 0) throw new Error(`${bad} comprehension cases failed`);
   ok([...planIds].every((id) => bankIds.has(id)), 'every planned id is a real recording');
   ok([...bankIds].every((id) => planIds.has(id)), 'every recording in the bank is planned');
 }
+
+// The committed copy the backend renders from must still be this table.
+//
+// The re-render runs on the server, so the plan is committed into
+// selmapp/backend/scripts/. Two copies of a decision is a drift waiting to
+// happen — and the drift would be invisible, because both files would still
+// parse and the wrong one would still render 39 perfectly good files.
+{
+  // tsconfig lists only `vite/client` in `types`, because this project is a
+  // browser bundle and pulling node types into it would let a component import
+  // `fs` and typecheck. This file is a check script run with tsx, never bundled
+  // — so the node import is correct here and the suppression is narrow.
+  // @ts-expect-error - node built-in, not in the browser type set
+  const fs = await import('node:fs');
+  const path = '../selmapp/backend/scripts/tcf-variety-plan.json';
+  if (fs.existsSync(path)) {
+    const shipped = JSON.parse(fs.readFileSync(path, 'utf-8')) as Array<{ id: string; variety: string }>;
+    const here = new Map(TCF_VARIETY_PLAN.map((a) => [a.id, a.variety]));
+    const drift = shipped.filter((r) => here.get(r.id) !== r.variety);
+    ok(shipped.length === TCF_VARIETY_PLAN.length && drift.length === 0,
+       'the plan the backend renders from matches this table',
+       drift.length ? drift.map((r) => r.id).join(', ') : `${shipped.length} rows agree`);
+  } else {
+    console.log('      (backend copy not present in this checkout — skipped)');
+  }
+}

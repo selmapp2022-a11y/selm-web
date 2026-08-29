@@ -2,7 +2,14 @@
  * Turn the frozen variety plan plus the bank's scripts into the JSON the
  * backend re-render script eats.
  *
- *   node scripts/emit-variety-plan.mjs > /tmp/plan.json
+ *   node scripts/emit-variety-plan.mjs > ../selmapp/backend/scripts/tcf-variety-plan.json
+ *
+ * The output is COMMITTED, into the backend, on purpose. The re-render runs on
+ * the server — that is where the API key lives — and a plan file that has to be
+ * carried there by hand is a step that will one day be done with a stale copy.
+ * Committing it means the container already has the plan the moment it deploys,
+ * and `comprehension.check.ts` asserts the JSON still matches this table, so
+ * the two cannot drift in silence.
  *
  * Two sources, joined here rather than duplicated: `tcf-variety-plan.ts` holds
  * WHICH variety each recording becomes, and `tcf-canada.ts` holds the script.
