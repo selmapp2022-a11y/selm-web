@@ -61,6 +61,18 @@ export type VoiceRole = {
  * different products.
  */
 export const IELTS_VOICE_CAST: VoiceRole[] = [
+  // ── The narrator ──────────────────────────────────────────────────────
+  {
+    id: 'narrator',
+    voiceId: null,
+    accent: 'british',
+    gender: 'male',
+    source: 'account',
+    publicOwnerId: null,
+    vendorName: 'James - English Storyteller',
+    why: 'The voice that says "Now turn to Part 2". A sixty-year-old English male with a neutral accent — OLDER THAN EVERY SPEAKING ROLE and cast as none of them, because a narrator a candidate could mistake for a speaker costs them the first sentence of the recording while they work out who is talking. Heard 29 August 2026 on the real narrator line, not a sample sentence: "Now turn to Part two. You will hear a talk given by a museum guide..." NOTE: this voice ships with a very low default stability, and the vendor warns below 30% that output becomes unstable. A narrator must be the most predictable voice in the test — raise stability on every narrator render.',
+  },
+
   // ── British ───────────────────────────────────────────────────────────
   {
     id: 'br-m',
@@ -211,23 +223,15 @@ export const IELTS_VOICE_CAST: VoiceRole[] = [
 export const VOICES_TO_ADD = IELTS_VOICE_CAST.filter((v) => v.source === 'shared_library');
 
 /**
- * The narrator — the ONE role still unheard, and it is deliberately empty.
+ * The narrator was the last unheard role. It is now cast.
  *
- * Twelve speaking voices were auditioned on 29 August 2026 and five were
- * rejected. The narrator was not among them, so there is no approved voice for
- * "Now turn to Part 2" and this file will not name one.
- *
- * It cannot simply borrow a speaking voice. The original reasoning holds: a
- * narrator a candidate could mistake for a speaker costs them the first
- * sentence of the recording while they work out who is talking. So it must be
- * distinct from all twelve, older than every speaking role, and heard before it
- * is cast — the same gate as the rest.
- *
- * Until then, `RENDER_VERIFIED` is empty and no IELTS listening bank should be
- * rendered. A bank whose narrator was chosen from a list is the exact practice
- * this whole exercise replaced.
+ * Kept as `false` rather than deleted, because the reasoning is the useful part:
+ * the narrator could not simply borrow a speaking voice, so it needed its own
+ * audition, on its own line — the real "Now turn to Part 2", not the sentence
+ * the twelve speaking voices were judged on. A narrator judged on dialogue is a
+ * narrator judged on the wrong thing.
  */
-export const NARRATOR_PENDING = true;
+export const NARRATOR_PENDING = false;
 
 /** The cast a script may draw on for one part, by the exam's own structure. */
 export const PART_VOICES: Record<1 | 2 | 3 | 4, number> = {
