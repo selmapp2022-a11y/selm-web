@@ -34,7 +34,7 @@ export function AppLayout() {
 
   return (
     <div className="min-h-screen bg-surface-app">
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-surface-divider bg-white md:block">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-surface-divider bg-white dark:border-slate-700 dark:bg-slate-900 md:block">
         <div className="flex h-full flex-col">
           <div className="px-6 pb-3 pt-6"><Logo /></div>
           <div className="mb-2 px-4"><PracticeLanguageBadge /></div>
@@ -85,9 +85,20 @@ export function AppLayout() {
         </div>
       </aside>
 
-      <header className="sticky top-0 z-20 flex items-center justify-between border-b border-surface-divider bg-white/80 px-4 py-3 backdrop-blur md:hidden">
-        <div className="flex items-center gap-2"><Logo /><PracticeLanguageBadge compact /></div>
-        <div className="flex items-center gap-2">
+      {/* The mobile header, rebuilt 2026-08-29 because it broke on a phone.
+          It carried the FULL logo — wordmark plus the "KNOW YOUR SCORE"
+          tagline, which is letter-spaced and therefore wide — next to the
+          language badge, next to three icon buttons and a theme switcher, all
+          in one row. On a 390px screen that does not fit: the tagline wrapped
+          to three lines and the badge sat on top of it.
+          The symbol carries the brand here; the wordmark is still in the
+          sidebar where there is room for it. */}
+      <header className="sticky top-0 z-20 flex items-center justify-between gap-2 border-b border-surface-divider bg-white/80 px-4 py-3 backdrop-blur dark:border-slate-700 dark:bg-slate-900/80 md:hidden">
+        <div className="flex min-w-0 items-center gap-2">
+          <Logo variant="symbol" className="h-8 w-8 shrink-0 rounded-xl" />
+          <PracticeLanguageBadge compact />
+        </div>
+        <div className="flex shrink-0 items-center gap-2">
           <ThemeToggle />
           {/* Gear icon → Settings → Delete Account. Required so
               iPhone users (Apple's phone reviewers) can reach the
@@ -102,7 +113,7 @@ export function AppLayout() {
       </header>
 
       {/* Bottom nav for mobile */}
-      <nav className="fixed bottom-0 left-0 right-0 z-30 flex border-t border-surface-divider bg-white md:hidden">
+      <nav className="fixed bottom-0 left-0 right-0 z-30 flex border-t border-surface-divider bg-white dark:border-slate-700 dark:bg-slate-900 md:hidden">
         {navItems.map((item) => (
           <NavLink
             key={item.to}

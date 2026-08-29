@@ -55,15 +55,17 @@ export function PracticeLanguageBadge({ compact = false }: { compact?: boolean }
           : 'Your exam decides the language of every skill. Tap to change it.'
       }
       className={
-        'flex items-center gap-1.5 rounded-full border border-surface-divider bg-white px-3 py-1 text-xs font-medium text-ink-secondary transition hover:border-teal hover:text-navy ' +
-        (compact ? '' : 'w-full justify-center')
+        // `whitespace-nowrap` because "IELTS in English" broke across two
+        // lines inside the pill on a phone, which read as two controls.
+        'flex items-center gap-1.5 whitespace-nowrap rounded-full border border-surface-divider bg-white px-3 py-1 dark:border-slate-700 dark:bg-slate-800 text-xs font-medium text-ink-secondary transition hover:border-teal hover:text-navy ' +
+        (compact ? 'min-w-0 shrink' : 'w-full justify-center')
       }
     >
       <Languages className="h-3.5 w-3.5 shrink-0 text-teal" />
       <span className="font-semibold uppercase tracking-wide text-navy dark:text-white">
         {examLabel}
       </span>
-      <span>{langLabel}</span>
+      <span className="truncate">{langLabel}</span>
       <ChevronRight className="h-3.5 w-3.5 shrink-0 opacity-60" />
     </NavLink>
   );
