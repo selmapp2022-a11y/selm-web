@@ -86,7 +86,16 @@ export function daysUntil(isoDate: string | null, now: Date = new Date()): numbe
   if (!isoDate) return null;
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(isoDate);
   if (!m) return null;
-  const target = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+  const [y, mo, d] = [Number(m[1]), Number(m[2]), Number(m[3])];
+  const target = new Date(y, mo - 1, d);
+  // A `Date` built from out-of-range parts ROLLS OVER rather than failing:
+  // `new Date(2026, 12, 15)` is January 2027, so `2026-13-15` returned 139
+  // days instead of nothing. A mistyped month silently moved the candidate's
+  // exam a year into the future, and the countdown looked entirely normal.
+  // Found by the case table in `examDate.check.ts`, not by anyone reading this.
+  if (target.getFullYear() !== y || target.getMonth() !== mo - 1 || target.getDate() !== d) {
+    return null;
+  }
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   return Math.round((target.getTime() - today.getTime()) / 86_400_000);
 }

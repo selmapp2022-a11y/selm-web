@@ -7,7 +7,7 @@ import { GOALS } from '../definitions';
 import { t } from '../model/format';
 import { daysUntil, loadPlan, savePlan } from '../model/plan';
 import { useDocumentTitle } from '../../lib/useDocumentTitle';
-import { localeTag } from '../../i18n';
+import { fmtDate, localeTag } from '../../i18n';
 
 export default function GoalPage() {
   useDocumentTitle('My exam');
@@ -21,9 +21,37 @@ export default function GoalPage() {
   const sameSystem = goal.scaleId ? onExamScale : goal.system === exam.benchmark.system;
 
   const [examDate, setExamDate] = useState<string>(() => loadPlan()?.examDate ?? '');
+  const [dateRejected, setDateRejected] = useState(false);
   const left = daysUntil(examDate || null);
+
+  /**
+   * Store the exam date, and ONLY a date this application can read back.
+   *
+   * ── The defect this exists for ──────────────────────────────────────────
+   * Found on 29 August 2026 by typing into this field on the deployed build.
+   * A browser date input accepts years far beyond four digits, so a slip of
+   * one keystroke produced `202610-12-15`. `savePlan` wrote it. `daysUntil`
+   * requires `\d{4}-\d{2}-\d{2}` and returned null for it. Today then said
+   * **"No exam date set"** while this page still displayed a date.
+   *
+   * Nothing raised, nothing was said, and the candidate's countdown — the one
+   * number on this product that is both certain and the reason they are here —
+   * simply vanished. A wrong date is recoverable because the candidate can see
+   * it; a date the app cannot read looks identical to never having entered one.
+   *
+   * So the window is stated twice: `min`/`max` on the field, so the browser
+   * refuses out of range, and this guard, because an attribute is a request
+   * and this is the promise.
+   */
   const commitDate = (v: string) => {
     setExamDate(v);
+    if (v && daysUntil(v) === null) {
+      // Keep what they typed on screen so they can correct it, and do not
+      // store something that would read back as no date at all.
+      setDateRejected(true);
+      return;
+    }
+    setDateRejected(false);
     savePlan({ goalId: goal.id, examId: exam.id, examDate: v || null, examLocale: exam.locale });
   };
 
@@ -91,11 +119,29 @@ export default function GoalPage() {
             <input
               type="date"
               lang={localeTag(ui)}
+              min="2000-01-01"
+              max="2100-12-31"
               value={examDate}
               onChange={(e) => commitDate(e.target.value)}
               className="input mt-3 w-full"
               aria-label={ui === 'en' ? 'Exam date' : 'Date de l’examen'}
             />
+            {/* The field itself is drawn by the browser, which renders its
+                digits in the OPERATING SYSTEM's numbering — on a Persian-locale
+                Mac it shows `۲۰۲۶/۱۰/۱۵` inside an English page, and neither
+                `lang` nor `<html lang>` overrides that. This line is the app
+                saying the date back in the language the candidate chose, so
+                what is stored is never in doubt. */}
+            {!dateRejected && examDate && left !== null && (
+              <p className="mt-2 text-sm font-semibold text-navy">{fmtDate(`${examDate}T00:00:00`, ui)}</p>
+            )}
+            {dateRejected && (
+              <p className="mt-2 text-sm font-semibold text-amber-600">
+                {ui === 'en'
+                  ? 'That is not a date this app can read, so it has not been saved. Check the year.'
+                  : "Cette date n’est pas lisible par l’application : elle n’a pas été enregistrée. Vérifiez l’année."}
+              </p>
+            )}
             <p className="mt-2 text-xs leading-relaxed text-ink-secondary">
               {left === null
                 ? ui === 'en'
