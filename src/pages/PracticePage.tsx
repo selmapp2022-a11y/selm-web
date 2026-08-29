@@ -12,8 +12,8 @@ import { Mic, Headphones, BookOpen, PenLine, Brain, ChevronRight } from 'lucide-
  */
 const SKILLS = [
   { to: '/speaking',  label: 'Speaking',  icon: Mic,        blurb: 'Record the exam’s speaking tasks and get scored feedback.' },
-  { to: '/listening', label: 'Listening', icon: Headphones, blurb: 'Comprehension exercises at your level.' },
-  { to: '/reading',   label: 'Reading',   icon: BookOpen,   blurb: 'Read and answer, at your level.' },
+  { to: '/listening', label: 'Listening', icon: Headphones, blurb: 'The exam’s own listening questions, one at a time.' },
+  { to: '/reading',   label: 'Reading',   icon: BookOpen,   blurb: 'The exam’s own reading passages and questions.' },
   { to: '/writing',   label: 'Writing',   icon: PenLine,    blurb: 'Write each exam task and get scored feedback.' },
 ] as const;
 
