@@ -58,14 +58,52 @@ import { newServeState, serve, type ServeResult, type ServeState } from './pool'
 const BANDS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
 
 /**
- * The bank in teaching order: easiest first, and within a band the bank's own
- * order, which is the order it was authored and reviewed in.
+ * The bank in the order this candidate should meet it.
+ *
+ * `here` is their CEFR index — measured if they have a score, otherwise the
+ * band their destination requires (`candidateLevel` in the planner owns that
+ * decision; this file does not repeat it). Nearest band first, and within a
+ * band the bank's own order, which is the order it was authored and reviewed
+ * in.
+ *
+ * ── Why this is not the ladder any more ─────────────────────────────────
+ * It was, until 2026-08-29, and the comment defending it read *"there is no
+ * reason to open on a C2 recording and no reason to randomise; a ladder is
+ * what teaches."* Half of that is still true — randomising is still wrong.
+ * The other half was answering a question nobody asked.
+ *
+ * The founder's: *"every exam has a level, and the questions and the practice
+ * have to differ."* A candidate who needs CLB 9 and a candidate who needs
+ * CLB 4 were being served the identical A1 notice, from the identical bank,
+ * because the ladder starts where the bank starts rather than where the
+ * candidate is. The planner had ordered its coordinates by distance from the
+ * candidate since it was written; practice never asked.
+ *
+ * A tie — two bands equally far, one above and one below — resolves DOWNWARD.
+ * Consolidating the band beneath the target is useful; the band above it is
+ * not yet theirs.
+ *
+ * `here === null` keeps the old ladder, and that is not a leftover: the
+ * inventory and the checks count a bank belonging to nobody, and giving them
+ * a candidate's ordering would make a measurement depend on whose screen it
+ * was taken from.
  */
-export function ladder(recordings: readonly Recording[]): Recording[] {
+export function orderFor(recordings: readonly Recording[], here: number | null): Recording[] {
   const at = new Map(recordings.map((r, n) => [r.id, n]));
-  return [...recordings].sort(
-    (a, b) => BANDS.indexOf(a.level) - BANDS.indexOf(b.level) || at.get(a.id)! - at.get(b.id)!,
-  );
+  const key = (r: Recording) => {
+    const i = BANDS.indexOf(r.level);
+    if (here === null) return [i, 0] as const;
+    return [Math.abs(i - here), i > here ? 1 : 0] as const;
+  };
+  return [...recordings].sort((a, b) => {
+    const ka = key(a), kb = key(b);
+    return ka[0] - kb[0] || ka[1] - kb[1] || at.get(a.id)! - at.get(b.id)!;
+  });
+}
+
+/** The bank easiest-first, for anything counting a bank rather than serving one. */
+export function ladder(recordings: readonly Recording[]): Recording[] {
+  return orderFor(recordings, null);
 }
 
 /**
@@ -95,6 +133,8 @@ export function practiceState(
 }
 
 export type PracticeServe = ServeResult<Recording> & {
+  /** The band this serve was ordered around, or null when nobody's. */
+  here: number | null;
   /** How many of this bank the candidate has never practised, before this serve. */
   unseen: number;
   /** The whole bank. */
@@ -107,11 +147,15 @@ export type PracticeServe = ServeResult<Recording> & {
  * Mutates `st`, exactly as `serve` does, so a sitting that presses "next"
  * five times gets five different recordings without going back to storage.
  */
-export function servePractice(recordings: readonly Recording[], st: ServeState): PracticeServe {
-  const order = ladder(recordings);
+export function servePractice(
+  recordings: readonly Recording[],
+  st: ServeState,
+  here: number | null = null,
+): PracticeServe {
+  const order = orderFor(recordings, here);
   const unseen = order.filter((r) => !st.seen.has(r.id)).length;
   const result = serve(order, st);
-  return { ...result, unseen, total: order.length };
+  return { ...result, unseen, total: order.length, here };
 }
 
 /**

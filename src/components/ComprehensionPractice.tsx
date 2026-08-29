@@ -8,6 +8,8 @@ import { itemsOf } from '../exam/engine/comprehension';
 import type { ComprehensionSection, LanguageCode, Recording } from '../exam/model/types';
 import { getAttempts, recordAttempt, ATTEMPTS_EVENT, type SkillKey } from '../lib/attempts';
 import { practicable, practiceState, servePractice, type PracticeServe } from '../exam/engine/practicePool';
+import { candidateLevel, cefrTag, type CandidateLevel } from '../exam/engine/planner';
+import { loadAttestations } from '../exam/model/attestationStore';
 import type { ServeState } from '../exam/engine/pool';
 import { isCompletionItem, isMatchingItem } from '../exam/model/types';
 import { markCompletion } from '../exam/engine/completion';
@@ -40,13 +42,26 @@ import { MatchingBank } from './MatchingBank';
  * practice: the rationale is the teaching, and withholding it here would waste
  * the item.
  */
+/** The exam's name, for a sentence that reads better with it than without. */
+const state0Name = (n: string) => n;
+
 export function ComprehensionPractice({ skill }: { skill: 'reading' | 'listening' }) {
   const [state, setState] = useState<
     | { kind: 'loading' }
     | { kind: 'no-plan' }
     | { kind: 'no-section'; examName: string }
     | { kind: 'no-audio'; examName: string }
-    | { kind: 'ready'; examName: string; section: ComprehensionSection; recordings: Recording[]; lang: LanguageCode }
+    | {
+        kind: 'ready';
+        examName: string;
+        section: ComprehensionSection;
+        recordings: Recording[];
+        lang: LanguageCode;
+        /** The band to serve at, and whether it is measured or the destination's. */
+        level: CandidateLevel;
+        /** One sentence naming the band and where it came from, for the screen. */
+        levelNote: string;
+      }
   >({ kind: 'loading' });
 
   useEffect(() => {
@@ -76,7 +91,34 @@ export function ComprehensionPractice({ skill }: { skill: 'reading' | 'listening
       // nonsense; the fix there was to count one thing, and it is the fix here.
       const usable = practicable(section);
       if (!usable.length) { if (alive) setState({ kind: 'no-audio', examName }); return; }
-      if (alive) setState({ kind: 'ready', examName, section, recordings: usable, lang });
+
+      // WHICH BAND, and this is the point of the screen.
+      //
+      // The founder, 2026-08-29: *"every exam has a level, and the questions
+      // and the practice have to differ."* Three destinations sit the same
+      // IELTS paper and need CLB 9, CLB 4 and band 6 — three different levels,
+      // known from the moment the destination is picked, and until today read
+      // by the plan and by nothing that chose material. Everyone started at
+      // A1.
+      //
+      // `candidateLevel` is the planner's own function: a measured level when
+      // there is a score, the destination's required level when there is not.
+      // Not a copy of it — the two must never disagree about where someone is.
+      const goal = defs.goalById(plan.goalId ?? '');
+      const att = loadAttestations()
+        .filter((x) => x.examId === exam.id)
+        .sort((x, y) => (x.sat < y.sat ? 1 : -1))[0] ?? null;
+      const level = candidateLevel(exam, att, goal?.requiredLevel ?? 0, skill);
+      // Said out loud, with its source. "At your level" was on this page as a
+      // subtitle for weeks while every candidate got A1; a claim that cannot
+      // be checked from the screen is the kind this product does not make.
+      const levelNote =
+        level.basis === 'attestation'
+          ? `Served around ${cefrTag(level.index)} — the level your last ${state0Name(examName)} result puts you at.`
+          : goal
+            ? `Served around ${cefrTag(level.index)} — the level ${goal.system} ${goal.requiredLevel} asks for. Enter a past result and this follows your marks instead.`
+            : `Served around ${cefrTag(level.index)}.`;
+      if (alive) setState({ kind: 'ready', examName, section, recordings: usable, lang, level, levelNote });
     };
     read();
     window.addEventListener(PLAN_EVENT, read);
@@ -149,7 +191,15 @@ export function ComprehensionPractice({ skill }: { skill: 'reading' | 'listening
     );
   }
 
-  return <Runner examName={state.examName} section={state.section} recordings={state.recordings} />;
+  return (
+    <Runner
+      examName={state.examName}
+      section={state.section}
+      recordings={state.recordings}
+      level={state.level}
+      levelNote={state.levelNote}
+    />
+  );
 }
 
 /**
@@ -171,10 +221,14 @@ function Runner({
   examName,
   section,
   recordings,
+  level,
+  levelNote,
 }: {
   examName: string;
   section: ComprehensionSection;
   recordings: Recording[];
+  level: CandidateLevel;
+  levelNote: string;
 }) {
   // Which recording to serve is NOT this component's decision, and that is
   // the fix. Until 2026-08-29 it was: sort easiest-first, `useState(0)`, read
@@ -206,7 +260,7 @@ function Runner({
     const open = () => {
       if (ownWrite.current) { ownWrite.current = false; return; }
       st.current = practiceState(recordings, getAttempts());
-      setCurrent(servePractice(recordings, st.current));
+      setCurrent(servePractice(recordings, st.current, level.index));
       setReplaying(false);
       setChosen({}); setMarked(false); setTally({ correct: 0, total: 0 });
     };
@@ -214,7 +268,7 @@ function Runner({
     window.addEventListener(ATTEMPTS_EVENT, open);
     return () => window.removeEventListener(ATTEMPTS_EVENT, open);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [recordings]);
+  }, [recordings, level.index]);
 
   const rec = current?.item ?? null;
   const items = useMemo(() => (rec ? itemsOf(section, rec.id) : []), [section, rec]);
@@ -319,7 +373,7 @@ function Runner({
 
   const next = () => {
     if (!st.current) return;
-    const served = servePractice(recordings, st.current);
+    const served = servePractice(recordings, st.current, level.index);
     setCurrent(served);
     if (served.recycled) setReplaying(false);
     setChosen({}); setMarked(false);
@@ -343,6 +397,8 @@ function Runner({
         </span>
         <span className="chip">{rec.level}{family ? ` · ${family.label.en}` : ''}</span>
       </div>
+
+      <p className="text-xs leading-relaxed text-ink-secondary">{levelNote}</p>
 
       <div className="card p-6">
         {isAudio ? (

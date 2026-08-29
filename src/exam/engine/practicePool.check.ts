@@ -18,7 +18,9 @@
  * and leaves two recordings sharing an id, this fails rather than the app
  * quietly serving one of them forever.
  */
-import { ladder, practicable, practiceState, servePractice } from './practicePool';
+import { ladder, orderFor, practicable, practiceState, servePractice } from './practicePool';
+import { candidateLevel, cefrTag } from './planner';
+import { GOALS } from '../definitions';
 import type { Attempt } from '../../lib/attempts';
 import type { ComprehensionSection, Recording } from '../model/types';
 import { EXAMS } from '../definitions';
@@ -137,6 +139,49 @@ for (const exam of EXAMS) {
       walked[0], ladder(bank)[0].id);
   }
 }
+
+console.log('\n7. The band is the candidate\'s, not the bank\'s\n');
+
+// The founder, three times on 2026-08-29: "every exam has a level, and the
+// questions and the practice have to differ." Two destinations, one paper,
+// two required levels — CLB 9 and CLB 4. If they open on the same passage
+// the complaint stands, whatever the selector does afterwards.
+const gt = EXAMS.find((e) => e.id === 'ielts-gt')!;
+const gtReading = practicable(
+  gt.sections.find((x) => x.kind === 'comprehension' && x.skill === 'reading') as ComprehensionSection,
+);
+
+const goalFor = (id: string) => GOALS.find((g) => g.id === id)!;
+const bandFor = (goalId: string) =>
+  candidateLevel(gt, null, goalFor(goalId).requiredLevel, 'reading');
+
+const clb9 = bandFor('ee-english');
+const clb4 = bandFor('citizenship');
+t('CLB 9 and CLB 4 do not resolve to the same band', clb9.index === clb4.index, false);
+t('CLB 9 sits above CLB 4', clb9.index > clb4.index, true);
+t('with no score, the basis is the destination', clb9.basis, 'target');
+
+const firstFor = (index: number) => servePractice(gtReading, practiceState(gtReading, []), index).item?.id;
+const a9 = firstFor(clb9.index);
+const a4 = firstFor(clb4.index);
+console.log(`     CLB 9 -> ${cefrTag(clb9.index)} opens on ${a9};  CLB 4 -> ${cefrTag(clb4.index)} opens on ${a4}`);
+t('the two destinations do NOT open on the same passage', a9 === a4, false);
+
+// And each opens at its own band, not at the bottom of the bank.
+const levelOf = (id?: string) => gtReading.find((r) => r.id === id)?.level;
+t('CLB 9 opens at its own band', levelOf(a9), cefrTag(clb9.index));
+t('CLB 4 opens at its own band', levelOf(a4), cefrTag(clb4.index));
+t('neither opens on the easiest passage in the bank', a9 === ladder(gtReading)[0].id && a4 === ladder(gtReading)[0].id, false);
+
+// A tie resolves downward: consolidating the band beneath is useful, the band
+// above is not yet theirs.
+const TIE = [rec('below', 'B1'), rec('above', 'C1')];
+t('a tie resolves downward', orderFor(TIE, 3 /* B2 */)[0].id, 'below');
+
+// And a bank belonging to nobody is still counted on the ladder, so the
+// inventory does not depend on whose screen it was taken from.
+t('here === null is still the ladder', orderFor(BANK, null).map((r) => r.id),
+  ['r-a1', 'r-a2', 'r-b1', 'r-c1']);
 
 console.log(failed === 0
   ? '\nAll practice-pool cases pass — including the four that fail if the memory lives in the page.\n'

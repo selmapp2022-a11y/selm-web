@@ -37,8 +37,17 @@ export default function GoalPage() {
    *
    * The page already named the selected exam. Naming it was not enough: it
    * answered "which exam is this?" and the question in front of the candidate
-   * was "why did nothing change?". This note answers the second one, and it is
-   * built from the goal data rather than written out, so a fifth destination
+   * was "why did nothing change?".
+   *
+   * ── And the first version of this note was wrong ────────────────────────
+   * It said the destination changes the score you need "and not the
+   * questions". That was true when it was written and false hours later: the
+   * same day, practice began serving at the band the destination requires, so
+   * CLB 9 and CLB 4 now meet different passages out of the one bank. Left
+   * alone it would have been a sentence on the deployed product contradicting
+   * what the product does — which is the failure this page exists to prevent.
+   *
+   * Built from the goal data rather than written out, so a fifth destination
    * added tomorrow appears here without anyone remembering to edit a sentence.
    */
   const sharingThisExam = GOALS.filter((g) => g.id !== goal.id && g.exams.includes(exam.id));
@@ -203,20 +212,22 @@ export default function GoalPage() {
             {ui === 'en' ? (
               <>
                 {sharingThisExam.map((g) => t(g.label, ui)).join(sharingThisExam.length > 2 ? ', ' : ' and ')}
-                {sharingThisExam.length === 1 ? ' is' : ' are'} sat on this same paper. Changing your
-                destination changes the score you need —{' '}
-                {sharingThisExam.map((g) => `${g.system} ${g.requiredLevel}`).join(', ')} — and not
-                the questions. What you practise comes from the exam, so it will look identical
-                across those destinations, because it is.
+                {sharingThisExam.length === 1 ? ' is' : ' are'} sat on this same paper — the same
+                sections, the same task types, the same bank. What changes with your destination is
+                the level you need — yours is {goal.system} {goal.requiredLevel}, theirs{' '}
+                {sharingThisExam.map((g) => `${g.system} ${g.requiredLevel}`).join(', ')} — and
+                practice follows it: you are served material at your band, not at the bottom of the
+                bank. So the exam is shared and the work is not.
               </>
             ) : (
               <>
                 {sharingThisExam.map((g) => t(g.label, ui)).join(' et ')} se passe
-                {sharingThisExam.length === 1 ? '' : 'nt'} sur cette même épreuve. Changer de
-                destination change la note exigée —{' '}
-                {sharingThisExam.map((g) => `${g.system} ${g.requiredLevel}`).join(', ')} — et non
-                les questions. Ce que vous travaillez vient de l’examen : il sera identique d’une
-                de ces destinations à l’autre, parce qu’il l’est.
+                {sharingThisExam.length === 1 ? '' : 'nt'} sur cette même épreuve — mêmes sections,
+                mêmes types de tâches, même banque. Ce que la destination change, c’est le niveau
+                exigé — le vôtre est {goal.system} {goal.requiredLevel}, le leur{' '}
+                {sharingThisExam.map((g) => `${g.system} ${g.requiredLevel}`).join(', ')} — et
+                l’entraînement le suit : on vous sert du matériel à votre niveau, pas au bas de la
+                banque. L’examen est commun ; le travail ne l’est pas.
               </>
             )}
           </p>
