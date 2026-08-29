@@ -37,6 +37,27 @@ export const EN = {
   'onboarding.neverBlocked':
     'Skipping changes nothing about what you can use. You will be asked again later, and never blocked.',
 
+  // The language each exam is sat in. It is the first thing a candidate who
+  // wants to learn French needs to see, and the exam names do not carry it:
+  // nothing on "TCF Canada" says French, and a candidate reading the two
+  // titles has no way to tell which one teaches which language.
+  'onboarding.inLanguage': 'in {language}',
+  'examLang.en': 'English',
+  'examLang.fr': 'French',
+
+  // Which exam the candidate actually SAT, which need not be the one they are
+  // preparing for.
+  'onboarding.yesThis': 'Yes — I sat {exam}',
+  'onboarding.yesOther': 'I sat a different exam',
+  'onboarding.otherTitle': 'Which exam did you sit?',
+  'onboarding.otherSameLang':
+    'We can read marks from this one. It is not built yet, so its marks cannot be entered here today.',
+  'onboarding.otherCrossLang':
+    'That result measures {language}, and you are preparing for an exam in {target}. Marks from one language cannot say anything about your level in the other, so they would not make your plan better — they would make it wrong.',
+  'onboarding.switchTo': 'Prepare for {exam} instead',
+  'onboarding.continueWithout': 'Continue without marks',
+  'onboarding.back': 'Back',
+
   'practice.chooseExamFirst': 'Choose your exam first',
   'practice.writingNeedsExam':
     'Writing practice is the tasks of the exam you are sitting — its instructions, its word bands, its clock. Without an exam there is nothing honest to practise against.',

@@ -50,6 +50,21 @@ export const FR: FrenchDict = {
   'onboarding.neverBlocked':
     "Passer cette étape ne change rien à ce que vous pouvez utiliser. La question reviendra plus tard, et ne bloque jamais.",
 
+  'onboarding.inLanguage': 'en {language}',
+  'examLang.en': 'anglais',
+  'examLang.fr': 'français',
+
+  'onboarding.yesThis': "Oui — j'ai passé le {exam}",
+  'onboarding.yesOther': "J'ai passé un autre examen",
+  'onboarding.otherTitle': 'Quel examen avez-vous passé ?',
+  'onboarding.otherSameLang':
+    "Nous savons lire cet examen. Il n'est pas encore construit : ses notes ne peuvent donc pas être saisies ici aujourd'hui.",
+  'onboarding.otherCrossLang':
+    "Ce résultat mesure {language}, et vous préparez un examen en {target}. Des notes obtenues dans une langue ne disent rien de votre niveau dans l'autre : elles ne rendraient pas votre plan meilleur, elles le rendraient faux.",
+  'onboarding.switchTo': 'Préparer le {exam} à la place',
+  'onboarding.continueWithout': 'Continuer sans notes',
+  'onboarding.back': 'Retour',
+
   'practice.chooseExamFirst': "Choisissez d'abord votre examen",
   'practice.writingNeedsExam':
     "L'entraînement à l'écrit reprend les tâches de l'examen que vous passez : ses consignes, ses bornes de mots, son minutage. Sans examen, il n'y a rien d'honnête à travailler.",

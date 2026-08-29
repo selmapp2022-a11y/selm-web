@@ -48,6 +48,8 @@ export default function OnboardingPage() {
   // Default destination per exam, so choosing an exam yields a complete plan
   // and the candidate lands on Today rather than looping on the empty state.
   const [goalOf, setGoalOf] = useState<Record<string, string>>({});
+  /** The exam the candidate says they SAT, when it is not the one chosen. */
+  const [whichSat, setWhichSat] = useState<Row | null>(null);
 
   useEffect(() => {
     // Lazy, for the same reason `practiceTasks.ts` is lazy: the definitions
@@ -89,6 +91,19 @@ export default function OnboardingPage() {
   // The second answer completes the plan with the exam's default destination
   // (changeable later on My exam), so the candidate lands on Today. 'Yes' then
   // goes to the score form; 'No' lets Today take over with the plan.
+  /** They sat a different exam and would rather prepare for that one. */
+  const switchTo = (r: Row) => {
+    import('../exam/model/plan').then(({ savePlan, loadPlan }) => {
+      savePlan({
+        goalId: goalOf[r.id] ?? '',
+        examId: r.id,
+        examDate: loadPlan()?.examDate ?? null,
+        examLocale: r.locale,
+      });
+      nav('/attestation');
+    });
+  };
+
   const finish = (satBefore: boolean) => {
     if (!chosen) return;
     import('../exam/model/plan').then(({ savePlan, loadPlan }) => {
@@ -121,7 +136,17 @@ export default function OnboardingPage() {
                 className="card flex items-center justify-between gap-4 p-5 text-left hover:shadow-cardHover"
               >
                 <div>
-                  <div className="font-display text-lg font-bold text-navy">{r.name}</div>
+                  <div className="font-display text-lg font-bold text-navy">
+                    {r.name}{' '}
+                    {/* The exam decides the language of every skill, and until
+                        2026-08-29 this screen never said which language that
+                        was. Nothing on "TCF Canada" reads as French, so a
+                        candidate who came to learn French had no signpost at
+                        the one moment the choice is made. */}
+                    <span className="text-sm font-medium text-ink-secondary">
+                      {t('onboarding.inLanguage', { language: t(r.language === 'fr' ? 'examLang.fr' : 'examLang.en') })}
+                    </span>
+                  </div>
                   {missing.length === 0 ? (
                     <div className="mt-1 text-sm text-teal">{t('onboarding.complete')}</div>
                   ) : (
@@ -148,6 +173,51 @@ export default function OnboardingPage() {
     );
   }
 
+  const others = rows.filter((r) => r.id !== chosen.id);
+
+  // "Have you sat IT before?" assumed the exam sat was the exam being prepared
+  // for. A candidate who holds a TCF result and is now preparing for IELTS had
+  // no key to say so, and the honest answer is not to take those marks
+  // quietly: a French result measures French, and using it to plan an English
+  // exam would not improve the plan, it would falsify it. So the question now
+  // asks WHICH exam, and says plainly what can be done with each answer.
+  if (whichSat) {
+    const cross = whichSat.language !== chosen.language;
+    return (
+      <div className="mx-auto max-w-2xl space-y-6 py-8">
+        <div className="flex items-center gap-2 text-sm text-teal">
+          <Check className="h-4 w-4" /> {chosen.name}
+        </div>
+        <header>
+          <h1 className="font-display text-3xl font-bold text-navy">{whichSat.name}</h1>
+          <p className="mt-3 text-ink-secondary">
+            {cross
+              ? t('onboarding.otherCrossLang', {
+                  language: t(whichSat.language === 'fr' ? 'examLang.fr' : 'examLang.en'),
+                  target: t(chosen.language === 'fr' ? 'examLang.fr' : 'examLang.en'),
+                })
+              : t('onboarding.otherSameLang')}
+          </p>
+        </header>
+        <div className="flex flex-wrap gap-3">
+          <button type="button" onClick={() => switchTo(whichSat)} className="btn-primary">
+            {t('onboarding.switchTo', { exam: whichSat.name })}
+          </button>
+          <button
+            type="button"
+            onClick={() => finish(false)}
+            className={clsx('btn-ghost border-2 border-surface-divider px-5 py-3')}
+          >
+            {t('onboarding.continueWithout')}
+          </button>
+        </div>
+        <button type="button" onClick={() => setWhichSat(null)} className="text-sm text-ink-secondary underline">
+          {t('onboarding.back')}
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto max-w-2xl space-y-6 py-8">
       <div className="flex items-center gap-2 text-sm text-teal">
@@ -158,11 +228,30 @@ export default function OnboardingPage() {
         <p className="mt-1 text-ink-secondary">{t('onboarding.satBeforeHelp')}</p>
       </header>
       <div className="flex flex-wrap gap-3">
-        <button type="button" onClick={() => finish(true)} className="btn-primary">{t('onboarding.yes')}</button>
+        <button type="button" onClick={() => finish(true)} className="btn-primary">
+          {t('onboarding.yesThis', { exam: chosen.name })}
+        </button>
         <button type="button" onClick={() => finish(false)} className={clsx('btn-ghost border-2 border-surface-divider px-5 py-3')}>
           {t('onboarding.no')}
         </button>
       </div>
+      {others.length > 0 && (
+        <div className="border-t border-surface-divider pt-4">
+          <p className="text-sm font-medium text-navy">{t('onboarding.otherTitle')}</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {others.map((o) => (
+              <button
+                key={o.id}
+                type="button"
+                onClick={() => setWhichSat(o)}
+                className="rounded-full border-2 border-surface-divider px-4 py-2 text-sm font-medium text-ink-secondary hover:border-navy/40 hover:text-navy"
+              >
+                {o.name} <span className="text-xs">{t('onboarding.inLanguage', { language: t(o.language === 'fr' ? 'examLang.fr' : 'examLang.en') })}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
       <p className="text-xs text-ink-secondary">{t('onboarding.neverBlocked')}</p>
     </div>
   );
