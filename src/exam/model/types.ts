@@ -599,6 +599,15 @@ export type Recording = {
 export type RenderedVoice = {
   /** The vendor id that actually rendered. Not the one that was asked for. */
   voiceId: string;
+  /**
+   * Every voice that spoke, in turn order, where more than one did.
+   *
+   * A dialogue is rendered by two voices alternating by turn, so a single
+   * `voiceId` describes only half of it. `voiceId` stays the first speaker so
+   * that a single-voice reader of this field is never wrong, merely partial.
+   * Absent on single-speaker recordings, where `voiceId` is the whole truth.
+   */
+  voiceIds?: readonly string[];
   /** Display name at render time, for tracing. Names change; ids do not. */
   vendorName?: string;
   /** The cast role, e.g. `qc-f`, so a bank can be re-cast without re-listening. */
