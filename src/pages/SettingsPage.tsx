@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { AlertTriangle, Trash2, User as UserIcon, Mail, Shield, LogOut } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { deleteAccount, tokenStore } from '../lib/api';
-import { Languages, GraduationCap } from 'lucide-react';
+import { Languages } from 'lucide-react';
 import { setUiLang, ts, useUiLangValue } from '../i18n';
 
 // Settings page — Build 37 / v2.0.6.
@@ -89,27 +89,6 @@ export default function SettingsPage() {
         </div>
       </section>
 
-      {/* IA §3: the exam is chosen in exactly ONE place — /goal. This used to
-          hold its own exam selector; it now links there, so there is one source
-          of truth for which exam (and therefore which language) is active. */}
-      <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-        <h2 className="mb-1 flex items-center gap-2 text-lg font-bold text-navy dark:text-white">
-          <GraduationCap className="h-5 w-5 text-navy" />
-          {uiLangNow === 'fr' ? 'Langue de pratique' : 'Practice language'}
-        </h2>
-        <p className="mb-3 text-sm text-ink-secondary dark:text-slate-400">
-          {uiLangNow === 'fr'
-            ? "L'examen que vous préparez décide de la langue de TOUTES les épreuves. Français = TCF, anglais = IELTS. Il se change au même endroit que votre examen, destination et date."
-            : 'The exam you are preparing for decides the language of EVERY skill. French = TCF, English = IELTS. You change it in the same place as your exam, destination and date.'}
-        </p>
-        <button
-          type="button"
-          onClick={() => navigate('/goal')}
-          className="rounded-xl border-2 border-teal bg-teal/10 px-4 py-2.5 text-sm font-semibold text-navy dark:text-white"
-        >
-          {uiLangNow === 'fr' ? 'Ouvrir « Mon examen »' : 'Open “My exam”'}
-        </button>
-      </section>
 
       {/* Interface language — Part 5 §5.1.
           The user chooses. The device locale is the initial suggestion and
