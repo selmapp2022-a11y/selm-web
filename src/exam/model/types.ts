@@ -713,13 +713,61 @@ export type CompletionAnswer = {
   caseSensitive?: boolean;
 };
 
-export type ComprehensionItem = ChoiceItem | CompletionItem;
+/**
+ * One question that chooses from a bank SHARED with its neighbours.
+ *
+ * This is IELTS matching, and plan/map/diagram labelling, which are the same
+ * mechanism with a different picture: a lettered list of five to eight
+ * options, and several questions that each take one of them.
+ *
+ * It is not a four-option `ChoiceItem` with more options bolted on. The bank
+ * is shared, so a candidate who places one answer has changed the odds on the
+ * others — and where `reusable` is false, has removed an option entirely.
+ * Flattening it into independent four-option questions would make the task
+ * easier than the exam's in a way no label could undo.
+ */
+export type MatchingItem = ComprehensionItemBase & {
+  kind: 'matching';
+  /** The `MatchingGroup` whose bank this question draws from. */
+  groupId: string;
+  /** The id of the correct option in that bank, e.g. `'C'`. */
+  answer: string;
+};
+
+/**
+ * The shared bank a set of matching questions draws from.
+ *
+ * `figureSvg` is what makes plan and map labelling possible: the options are
+ * positions on a drawing, and the drawing ships INLINE with the exam
+ * definition rather than as a fetched asset, so a section cannot render
+ * half-built because an image 404'd mid-sitting.
+ */
+export type MatchingGroup = {
+  id: string;
+  /** The recording these questions are asked about. */
+  recordingId: string;
+  /** The instruction as the exam prints it, e.g. "Label the map below." */
+  instruction: string;
+  options: Array<{ id: string; label: string }>;
+  /** An inline SVG plan, map or diagram the options sit on. Optional. */
+  figureSvg?: string;
+  /**
+   * Whether one option may answer more than one question. IELTS states this
+   * explicitly on the paper ("You may use any letter more than once"), so it
+   * is data rather than a convention, and the screen prints what it says.
+   */
+  reusable?: boolean;
+};
+
+export type ComprehensionItem = ChoiceItem | CompletionItem | MatchingItem;
 
 /** Narrowing helpers, so no caller has to remember that `kind` is optional. */
 export const isCompletionItem = (i: ComprehensionItem): i is CompletionItem =>
   (i as CompletionItem).kind === 'completion';
+export const isMatchingItem = (i: ComprehensionItem): i is MatchingItem =>
+  (i as MatchingItem).kind === 'matching';
 export const isChoiceItem = (i: ComprehensionItem): i is ChoiceItem =>
-  !isCompletionItem(i);
+  !isCompletionItem(i) && !isMatchingItem(i);
 
 /**
  * What "exam conditions" actually means, as data rather than as behaviour
@@ -817,6 +865,14 @@ export type ComprehensionSection = {
   recordings: Recording[];
   /** The questions, each naming the recording it is asked about. */
   items: ComprehensionItem[];
+  /**
+   * The shared option banks any `MatchingItem` in `items` draws from.
+   *
+   * Kept beside the items rather than inside them because the bank belongs to
+   * the SET: five questions sharing one list of seven options is the task, and
+   * copying the list onto each question would let the copies drift.
+   */
+  matchingGroups?: MatchingGroup[];
 };
 
 export type SectionDefinition = ProductionSection | ComprehensionSection;

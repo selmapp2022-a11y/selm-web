@@ -16,7 +16,7 @@ import { TCF_CANADA } from '../definitions/tcf-canada';
 import { serveEpreuve, scoreComprehension, governingLevel, type ItemAnswer } from './comprehension';
 import type { ComprehensionSection } from '../model/types';
 import { TCF_VARIETY_PLAN, TCF_VARIETY_SHARES } from '../definitions/tcf-variety-plan';
-import { isChoiceItem, isCompletionItem } from '../model/types';
+import { isChoiceItem, isCompletionItem, isMatchingItem } from '../model/types';
 import { normalise } from './completion';
 
 const sections = TCF_CANADA.sections.filter(
@@ -116,6 +116,11 @@ const answerAll = (s: ComprehensionSection, f: (level: string, n: number) => boo
       // "everything wrong" case below into a pass.
       return { itemId: i.id, chose: right ? i.answer.accept[0] : `${i.answer.accept[0]}x` };
     }
+    if (isMatchingItem(i)) {
+      const g = s.matchingGroups?.find((x) => x.id === i.groupId);
+      const other = g?.options.find((o) => o.id !== i.answer)?.id ?? 'ZZ';
+      return { itemId: i.id, chose: right ? i.answer : other };
+    }
     return { itemId: i.id, chose: right ? i.answer : (i.answer + 1) % 4 };
   });
 
@@ -146,7 +151,9 @@ for (const s of sections) {
   // Unanswered is not the same as wrong.
   const half = scoreComprehension(s, s.items.map((i, n) => ({
     itemId: i.id,
-    chose: n < 20 ? (isCompletionItem(i) ? i.answer.accept[0] : i.answer) : null,
+    chose: n < 20
+      ? (isCompletionItem(i) ? i.answer.accept[0] : isMatchingItem(i) ? i.answer : i.answer)
+      : null,
   })));
   ok(half.answered === 20, `${s.id}: unanswered items counted as unanswered`, `${half.answered}`);
   ok(half.correct === 20, `${s.id}: unanswered items are not correct`, `${half.correct}`);

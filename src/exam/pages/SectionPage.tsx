@@ -8,8 +8,8 @@ import { resolveAudio } from '../engine/audio';
 import { serveEpreuve, itemsOf, itemsFor } from '../engine/comprehension';
 import { SectionClock, ProgressBar } from '../components/SectionClock';
 import { PlayOnce } from '../components/PlayOnce';
-import { isCompletionItem } from '../model/types';
-import type { ComprehensionItem, ComprehensionSection, LanguageCode, Recording } from '../model/types';
+import { isCompletionItem, isMatchingItem } from '../model/types';
+import type { ComprehensionItem, ComprehensionSection, LanguageCode, MatchingGroup, Recording } from '../model/types';
 
 /**
  * One comprehension section, run under the exam's own delivery rules.
@@ -160,6 +160,7 @@ function Section({ section }: { section: ComprehensionSection }) {
                     sectionId={section.id}
                     chose={answers[item.id] ?? null}
                     onChoose={answerItem}
+                    groups={section.matchingGroups}
                   />
                 ))}
               </li>
@@ -272,6 +273,7 @@ function OneRecording({
             sectionId={section.id}
             chose={answers[item.id] ?? null}
             onChoose={onChoose}
+                    groups={section.matchingGroups}
           />
         ))}
 
@@ -301,13 +303,44 @@ function Item({
   sectionId,
   chose,
   onChoose,
+  groups,
 }: {
   item: ComprehensionItem;
   n: number;
   sectionId: string;
   chose: number | string | null;
   onChoose: (sectionId: string, itemId: string, chose: number | string | null) => void;
+  groups?: MatchingGroup[];
 }) {
+  if (isMatchingItem(item)) {
+    const group = groups?.find((g) => g.id === item.groupId);
+    const picked = typeof chose === 'string' ? chose : null;
+    return (
+      <div className="card p-6">
+        <p className="font-medium text-ink-primary">
+          <span className="mr-2 text-ink-secondary">{n + 1}.</span>
+          {item.stem}
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {(group?.options ?? []).map((o) => (
+            <button
+              key={o.id}
+              onClick={() => onChoose(sectionId, item.id, picked === o.id ? null : o.id)}
+              className={clsx(
+                'rounded-xl border-2 px-4 py-2 text-sm font-semibold transition-all',
+                picked === o.id
+                  ? 'border-teal bg-teal/10 text-navy'
+                  : 'border-surface-divider bg-white text-ink-secondary hover:border-navy/40',
+              )}
+            >
+              {o.id}
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   // A completion item is answered by typing, and is a different task from
   // recognising one of four — see `model/types.ts`. It is rendered here rather
   // than in a second component so that the two kinds cannot drift apart in

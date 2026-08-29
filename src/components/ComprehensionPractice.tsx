@@ -7,9 +7,10 @@ import { resolveAudio } from '../exam/engine/audio';
 import { itemsOf } from '../exam/engine/comprehension';
 import type { ComprehensionSection, LanguageCode, Recording } from '../exam/model/types';
 import { recordAttempt, type SkillKey } from '../lib/attempts';
-import { isCompletionItem } from '../exam/model/types';
+import { isCompletionItem, isMatchingItem } from '../exam/model/types';
 import { markCompletion } from '../exam/engine/completion';
 import { isResponseCorrect } from '../exam/engine/comprehension';
+import { MatchingBank } from './MatchingBank';
 
 /**
  * Practice for a comprehension skill, served from THE EXAM'S OWN BANK.
@@ -270,6 +271,11 @@ function Runner({
         )}
       </div>
 
+      {/* Any shared bank belonging to this recording, above its questions. */}
+      {(section.matchingGroups ?? [])
+        .filter((g) => g.recordingId === rec.id)
+        .map((g) => <MatchingBank key={g.id} group={g} />)}
+
       {items.map((item, n) => {
         const pick = chosen[item.id];
 
@@ -319,6 +325,46 @@ function Runner({
                   <CheckCircle2 className="h-4 w-4" /> Correct
                 </p>
               )}
+            </div>
+          );
+        }
+
+        // Matching draws from a bank shared with its neighbours — the same
+        // mechanism as plan and map labelling. The bank is rendered ONCE,
+        // above the group, by `MatchingBank` below; each question here is the
+        // lettered choice from it.
+        if (isMatchingItem(item)) {
+          const group = section.matchingGroups?.find((g) => g.id === item.groupId);
+          const picked = typeof pick === 'string' ? pick : null;
+          return (
+            <div key={item.id} className="card p-6">
+              <p className="font-medium text-ink-primary">
+                <span className="mr-2 text-ink-secondary">{n + 1}.</span>
+                {item.stem}
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {(group?.options ?? []).map((o) => {
+                  const isKey = o.id === item.answer;
+                  const isPicked = picked === o.id;
+                  return (
+                    <button
+                      key={o.id}
+                      onClick={() => !marked && setChosen((c) => ({ ...c, [item.id]: o.id }))}
+                      disabled={marked}
+                      className={clsx(
+                        'rounded-xl border-2 px-4 py-2 text-sm font-semibold transition-all',
+                        !marked && isPicked && 'border-teal bg-teal/10 text-navy',
+                        !marked && !isPicked && 'border-surface-divider bg-white text-ink-secondary hover:border-navy/40',
+                        marked && isKey && 'border-teal bg-teal/10 text-navy',
+                        marked && isPicked && !isKey && 'border-red-400 bg-red-50 text-red-800',
+                        marked && !isPicked && !isKey && 'border-surface-divider bg-white text-ink-secondary opacity-60',
+                      )}
+                    >
+                      {o.id}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           );
         }

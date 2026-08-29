@@ -25,7 +25,7 @@
  * print a three-digit number.
  */
 import type { ComprehensionItem, ComprehensionSection, Localised, Recording } from '../model/types';
-import { isCompletionItem } from '../model/types';
+import { isCompletionItem, isMatchingItem } from '../model/types';
 import { isCompletionCorrect } from './completion';
 import { newServeState, serve, type ServeState } from './pool';
 
@@ -55,6 +55,11 @@ export type ItemAnswer = { itemId: string; chose: ItemResponse };
 export function isResponseCorrect(item: ComprehensionItem, response: ItemResponse): boolean {
   if (isCompletionItem(item)) {
     return typeof response === 'string' && isCompletionCorrect(item.answer, response);
+  }
+  if (isMatchingItem(item)) {
+    // The option's id, exactly. A letter is not a spelling test, so there is
+    // nothing to normalise beyond case and surrounding space.
+    return typeof response === 'string' && response.trim().toUpperCase() === item.answer.trim().toUpperCase();
   }
   return typeof response === 'number' && response === item.answer;
 }

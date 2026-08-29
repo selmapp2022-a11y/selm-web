@@ -25,7 +25,7 @@
 import { TCF_CANADA } from '../definitions/tcf-canada';
 import type { ComprehensionSection } from '../model/types';
 import { segmentationFor, tokenSet, words } from './text';
-import { isChoiceItem } from '../model/types';
+import { isChoiceItem, isCompletionItem } from '../model/types';
 
 const SEG = segmentationFor(TCF_CANADA.locale);
 const pad = (s: string, n: number) => (s + ' '.repeat(n)).slice(0, n);
@@ -65,11 +65,15 @@ for (const sec of sections) {
       if (it.answer < 0 || it.answer >= it.options.length) p.push('answer out of range');
       if (new Set(it.options.map((o) => o.trim().toLowerCase())).size !== it.options.length)
         p.push('duplicate options');
-    } else {
+    } else if (isCompletionItem(it)) {
       if (!it.answer.accept.length) p.push('no accepted answer');
       if (!it.prompt.includes('___')) p.push('no gap in the prompt');
       if (it.answer.accept.some((a) => a.trim().split(/\s+/).length > it.answer.maxWords))
         p.push('an accepted form breaks its own word cap');
+    } else {
+      const g = sec.matchingGroups?.find((x) => x.id === it.groupId);
+      if (!g) p.push('names a matching group that does not exist');
+      else if (!g.options.some((o) => o.id === it.answer)) p.push('key is not one of the group\'s options');
     }
     if (!recOf(it)?.family) p.push('no family');
     if (!it.rationale) p.push('no rationale');
