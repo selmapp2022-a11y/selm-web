@@ -16,5 +16,11 @@
     "noEmit": true,
     "types": ["vite/client"]
   },
-  "include": ["src"]
+  "include": ["src"],
+  // The authoring runners are node scripts, not application code: they read a
+  // batch file from disk and are run with `npx tsx`. They are excluded so the
+  // app's type-check does not need @types/node — and so a `process` or an
+  // `fs` import can never reach the bundle, which is the reason the exclusion
+  // is by NAME rather than by directory.
+  "exclude": ["src/**/*.run.ts"]
 }

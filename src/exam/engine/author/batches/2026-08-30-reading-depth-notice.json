@@ -1,0 +1,523 @@
+[
+ {
+  "id": "gt-r-a1-04-r",
+  "family": "notice",
+  "level": "A1",
+  "freshness": "current",
+  "script": "LAUNDRY ROOM\n\nOpen every day, 7 am to 10 pm.\n\nThe machines take the building card only. There is no coin slot.\n\nPlease take your washing out as soon as the machine stops. Clothes left after 10 pm are put in the basket by the door.\n\nIf a machine does not start, write the number on the sheet by the sink. Do not use the machine again.",
+  "items": [
+   {
+    "stem": "When does the laundry room close?",
+    "options": [
+     "7 am",
+     "10 pm",
+     "When the machines stop",
+     "Every day"
+    ],
+    "correct": 1,
+    "rationale": "The notice gives the hours as 7 am to 10 pm, so 10 pm is the closing time."
+   },
+   {
+    "stem": "How do you pay?",
+    "options": [
+     "With coins",
+     "With the building card",
+     "At the door",
+     "You do not pay"
+    ],
+    "correct": 1,
+    "rationale": "It says the machines take the building card only and that there is no coin slot."
+   },
+   {
+    "stem": "What happens to clothes left after 10 pm?",
+    "options": [
+     "They stay in the machine",
+     "They are moved to a basket",
+     "They are washed again",
+     "They are thrown away"
+    ],
+    "correct": 1,
+    "rationale": "The notice says clothes left after 10 pm are put in the basket by the door."
+   },
+   {
+    "stem": "A machine does not start. What should you do?",
+    "options": [
+     "Try the machine again",
+     "Report the number",
+     "Wait until morning",
+     "Use your card twice"
+    ],
+    "correct": 1,
+    "rationale": "You write the number on the sheet by the sink, and the notice tells you not to use that machine again."
+   }
+  ]
+ },
+ {
+  "id": "gt-r-a1-05-r",
+  "family": "notice",
+  "level": "A1",
+  "freshness": "current",
+  "script": "THIS STOP IS CLOSED\n\nWork on the road starts on Monday.\n\nBuses do not stop here for two weeks.\n\nPlease walk to the next stop, outside the post office.\n\nThe number and the times do not change.",
+  "items": [
+   {
+    "stem": "Why is the stop closed?",
+    "options": [
+     "Because of road work",
+     "Because the bus has changed",
+     "Because the post office is closed",
+     "Because it is Monday"
+    ],
+    "correct": 0,
+    "rationale": "The notice says work on the road starts on Monday and buses will not stop here."
+   },
+   {
+    "stem": "Where should you wait instead?",
+    "options": [
+     "At the next stop",
+     "At the road work",
+     "At home",
+     "At the bus station"
+    ],
+    "correct": 0,
+    "rationale": "It tells passengers to walk to the next stop, outside the post office."
+   },
+   {
+    "stem": "What is not changing?",
+    "options": [
+     "The place you wait",
+     "The bus and its times",
+     "The road outside",
+     "The two weeks of work"
+    ],
+    "correct": 1,
+    "rationale": "The last line says the number and the times do not change."
+   }
+  ]
+ },
+ {
+  "id": "gt-r-a1-06-r",
+  "family": "notice",
+  "level": "A1",
+  "freshness": "current",
+  "script": "SELF-SERVICE DESK\n\nScan your card first. Then put your books on the grey square, one at a time.\n\nWait for the green light before you take a book off.\n\nThe machine does not take money. Pay any charges at the front desk.\n\nReturning books? Use the box outside. It is open all night.",
+  "items": [
+   {
+    "stem": "What do you scan first?",
+    "options": [
+     "Your books",
+     "Your card",
+     "The grey square",
+     "The green light"
+    ],
+    "correct": 1,
+    "rationale": "The first line says to scan your card first, and the books after that."
+   },
+   {
+    "stem": "When can you take a book off the square?",
+    "options": [
+     "At once",
+     "After the green light",
+     "After you pay",
+     "When the desk is open"
+    ],
+    "correct": 1,
+    "rationale": "The notice says to wait for the green light before taking a book off."
+   },
+   {
+    "stem": "Where do you pay a charge?",
+    "options": [
+     "At the machine",
+     "At the front desk",
+     "In the box outside",
+     "You cannot pay"
+    ],
+    "correct": 1,
+    "rationale": "The machine does not take money; charges are paid at the front desk."
+   },
+   {
+    "stem": "When can you return books?",
+    "options": [
+     "Only in the day",
+     "At any time of night",
+     "Only at the front desk",
+     "Only with a card"
+    ],
+    "correct": 1,
+    "rationale": "Returns go in the box outside, which the notice says is open all night."
+   }
+  ]
+ },
+ {
+  "id": "gt-r-a2-04-r",
+  "family": "notice",
+  "level": "A2",
+  "freshness": "current",
+  "script": "BIN STORE — WHAT GOES WHERE\n\nBLUE BIN: paper, card, tins and clean plastic bottles. Please rinse anything that has held food and squash the bottles flat.\n\nGREEN BIN: food waste only. Use the bags on the shelf. Loose food waste is not collected.\n\nGREY BIN: everything else.\n\nGlass is not collected from this building. There is a glass bank at the end of the street, beside the chemist.\n\nLarge items are not taken away with the bins. Ring the number on the door and a collection will be arranged, usually within five working days.",
+  "items": [
+   {
+    "stem": "What must you do with a plastic bottle before putting it in the blue bin?",
+    "options": [
+     "Fill it with water",
+     "Rinse it and squash it flat",
+     "Put it in a bag",
+     "Leave the lid on"
+    ],
+    "correct": 1,
+    "rationale": "The blue bin instructions say to rinse anything that has held food and to squash bottles flat."
+   },
+   {
+    "stem": "Where does food waste go?",
+    "options": [
+     "In the grey bin",
+     "In a bag in the green bin",
+     "Loose in the green bin",
+     "In the glass bank"
+    ],
+    "correct": 1,
+    "rationale": "Food waste goes in the green bin in the bags provided; loose food waste is not collected."
+   },
+   {
+    "stem": "Where do you take glass?",
+    "options": [
+     "The blue bin",
+     "The grey bin",
+     "The glass bank down the street",
+     "Nowhere, it is collected"
+    ],
+    "correct": 2,
+    "rationale": "Glass is not collected from the building; the notice points to the glass bank beside the chemist."
+   },
+   {
+    "stem": "How do you get rid of a large item?",
+    "options": [
+     "Leave it beside the bins",
+     "Telephone to arrange collection",
+     "Wait for the next collection",
+     "Take it to the glass bank"
+    ],
+    "correct": 1,
+    "rationale": "Large items are not taken with the bins; you ring the number on the door to arrange a collection."
+   },
+   {
+    "stem": "How long does a large-item collection usually take?",
+    "options": [
+     "The same day",
+     "About five working days",
+     "Two weeks",
+     "It is not said"
+    ],
+    "correct": 1,
+    "rationale": "The notice says a collection is usually arranged within five working days."
+   }
+  ]
+ },
+ {
+  "id": "gt-r-a2-05-r",
+  "family": "notice",
+  "level": "A2",
+  "freshness": "current",
+  "script": "PRESCRIPTION DESK\n\nWe are open Monday to Friday, from 9 am until 6 pm. On Saturday we close at 1 pm. We do not open on Sunday.\n\nPlease bring a card or a passport with your photo on it. We cannot hand your medicine over without one.\n\nIf you are collecting for another person, bring a short note signed by them.\n\nYour medicine stays at this desk for seven days. After that it returns to the counter inside the shop. You can still collect it there, although the wait is normally longer.\n\nThe machine on the wall is only for repeat orders. If your order is new, please join the queue here.",
+  "items": [
+   {
+    "stem": "When does the desk shut on Saturday?",
+    "options": [
+     "At nine in the morning",
+     "At one in the afternoon",
+     "At six in the evening",
+     "It does not open"
+    ],
+    "correct": 1,
+    "rationale": "Saturday hours run from 9 am to 1 pm; Sunday is the closed day."
+   },
+   {
+    "stem": "What must you always bring?",
+    "options": [
+     "A note from a friend",
+     "A photo card or passport",
+     "Your old medicine",
+     "Money for the machine"
+    ],
+    "correct": 1,
+    "rationale": "The notice asks for a card or passport with your photo on it every time."
+   },
+   {
+    "stem": "You are picking up for your neighbour. What else do you need?",
+    "options": [
+     "Your neighbour with you",
+     "A short signed note",
+     "A second photo card",
+     "Nothing else"
+    ],
+    "correct": 1,
+    "rationale": "As well as photo identification, you bring a short note from that person with their name signed."
+   },
+   {
+    "stem": "Where is your medicine after seven days?",
+    "options": [
+     "Still at this desk",
+     "At the counter inside",
+     "Sent back to the doctor",
+     "Thrown away"
+    ],
+    "correct": 1,
+    "rationale": "It moves to the counter inside the shop, where it can still be collected, though the wait is normally longer."
+   },
+   {
+    "stem": "What is the wall machine for?",
+    "options": [
+     "New orders",
+     "Repeat orders",
+     "Paying money",
+     "Photo cards"
+    ],
+    "correct": 1,
+    "rationale": "The machine handles repeat orders only and cannot take a new one."
+   }
+  ]
+ },
+ {
+  "id": "gt-r-a2-06-r",
+  "family": "notice",
+  "level": "A2",
+  "freshness": "current",
+  "script": "LANE SWIMMING — PLEASE READ BEFORE YOU GET IN\n\nThree lanes are marked. The lane nearest the window is slow, the middle lane is medium, and the lane by the steps is fast. Choose by how fast you actually swim, not by how far.\n\nSwim anticlockwise. Keep to the right of your lane so that people can pass on your left.\n\nStop at the end of the lane, not in the middle. If you need to rest, move into the corner so the lane stays clear.\n\nThe lanes come out at half past seven for the club. The pool stays open, but the whole of it is then general swimming.",
+  "items": [
+   {
+    "stem": "Which lane is the fast one?",
+    "options": [
+     "The one by the window",
+     "The middle one",
+     "The one by the steps",
+     "Any of them"
+    ],
+    "correct": 2,
+    "rationale": "The notice puts slow by the window, medium in the middle and fast by the steps."
+   },
+   {
+    "stem": "How should you choose a lane?",
+    "options": [
+     "By how far you swim",
+     "By how fast you swim",
+     "By which is emptiest",
+     "By where you get in"
+    ],
+    "correct": 1,
+    "rationale": "It says to choose by how fast you actually swim, not by how far."
+   },
+   {
+    "stem": "Where do you rest?",
+    "options": [
+     "In the middle of the lane",
+     "In the corner at the end",
+     "Outside the pool",
+     "On the steps"
+    ],
+    "correct": 1,
+    "rationale": "You stop at the end rather than the middle, and move into the corner so the lane stays clear."
+   },
+   {
+    "stem": "What happens at half past seven?",
+    "options": [
+     "The pool closes",
+     "The lanes are taken out",
+     "The club swims in one lane",
+     "Swimming becomes slower"
+    ],
+    "correct": 1,
+    "rationale": "The lanes come out for the club and the whole pool becomes general swimming; it does not close."
+   }
+  ]
+ },
+ {
+  "id": "gt-r-b1-04-r",
+  "family": "notice",
+  "level": "B1",
+  "freshness": "current",
+  "script": "NEW ENTRY CARDS — FROM THE FIRST OF THE MONTH\n\nThe old keys stop working on the first. Everyone has been issued a card; if you have not collected yours, it is at reception and you will need to sign for it.\n\nThe card opens the main door, the side door and the store room. It does not open the roof access, which now requires a second card held by the duty supervisor.\n\nHold the card flat against the reader and wait for the light to turn green. A red light twice usually means the card has been kept next to a phone. Give it a few seconds and try once more before assuming it has failed.\n\nIf the card genuinely will not work, do not prop the door open and do not follow someone else through. Use the intercom by the main door. Between six in the evening and seven in the morning the intercom rings the security desk rather than reception, and it may take a minute to be answered.\n\nA lost card must be reported the same day, even if you expect to find it. The first replacement is free.",
+  "items": [
+   {
+    "stem": "What does the new card not open?",
+    "options": [
+     "The main door",
+     "The side door",
+     "The store room",
+     "The roof access"
+    ],
+    "correct": 3,
+    "rationale": "The card opens the main door, side door and store room; roof access needs a second card held by the duty supervisor."
+   },
+   {
+    "stem": "The reader shows red twice. What does the notice suggest?",
+    "options": [
+     "The card has failed",
+     "The card may have been next to a phone",
+     "The door is locked for the night",
+     "You need the supervisor's card"
+    ],
+    "correct": 1,
+    "rationale": "Two red lights usually mean the card has been kept next to a phone, and you should wait a few seconds and try again."
+   },
+   {
+    "stem": "Your card will not work at all. What should you do?",
+    "options": [
+     "Prop the door open",
+     "Follow a colleague through",
+     "Use the intercom",
+     "Go to the roof entrance"
+    ],
+    "correct": 2,
+    "rationale": "The notice forbids propping the door and following someone through, and directs you to the intercom."
+   },
+   {
+    "stem": "You press the intercom at nine in the evening. Who answers?",
+    "options": [
+     "Reception",
+     "The security desk",
+     "The duty supervisor",
+     "Nobody until seven"
+    ],
+    "correct": 1,
+    "rationale": "Between six in the evening and seven in the morning the intercom rings the security desk rather than reception."
+   },
+   {
+    "stem": "You think you have mislaid your card but expect it to turn up. What does the notice ask?",
+    "options": [
+     "Wait a day before reporting it",
+     "Report it the same day",
+     "Report it only if it is not found",
+     "Collect a second card first"
+    ],
+    "correct": 1,
+    "rationale": "A lost card must be reported the same day even if you expect to find it."
+   }
+  ]
+ },
+ {
+  "id": "gt-r-b1-05-r",
+  "family": "notice",
+  "level": "B1",
+  "freshness": "current",
+  "script": "BOOKING A ROOM AT THE COMMUNITY CENTRE\n\nRooms may be booked up to eight weeks ahead. Bookings are taken in person or by telephone during office hours; the form on the website tells us you are interested but does not hold the room.\n\nThe hall and the two upstairs rooms are charged by the hour. The small meeting room off the entrance is free for groups of six or fewer, and it is the only room that can be booked for the same day.\n\nYour booking includes fifteen minutes before and after for setting up and clearing away. If you need longer, say so when you book; asking on the day will usually not be possible because another group follows.\n\nChairs and tables are in the store under the stairs and must go back there. The kitchen may be used for tea and coffee. It may not be used for cooking, and the oven is disconnected.\n\nCancel at least two working days ahead and there is no charge. After that the room is charged in full, whether or not it is used, unless the centre itself has to close.",
+  "items": [
+   {
+    "stem": "What does filling in the website form do?",
+    "options": [
+     "It books the room",
+     "It tells the centre you are interested",
+     "It cancels a booking",
+     "It reserves the hall only"
+    ],
+    "correct": 1,
+    "rationale": "The form registers interest; it does not hold the room, which is booked in person or by telephone."
+   },
+   {
+    "stem": "Which room can be booked for the same day?",
+    "options": [
+     "The hall",
+     "Either upstairs room",
+     "The small meeting room",
+     "Any of them"
+    ],
+    "correct": 2,
+    "rationale": "The small meeting room off the entrance is the only room bookable on the day."
+   },
+   {
+    "stem": "What is included in the time you book?",
+    "options": [
+     "An extra hour",
+     "Fifteen minutes each side",
+     "Nothing extra",
+     "Use of the oven"
+    ],
+    "correct": 1,
+    "rationale": "Bookings include fifteen minutes before and after for setting up and clearing away."
+   },
+   {
+    "stem": "What may the kitchen be used for?",
+    "options": [
+     "Cooking a meal",
+     "Tea and coffee",
+     "Storing chairs",
+     "Nothing at all"
+    ],
+    "correct": 1,
+    "rationale": "Tea and coffee are allowed; cooking is not, and the oven is disconnected."
+   },
+   {
+    "stem": "You cancel the morning before your booking. What happens?",
+    "options": [
+     "Nothing is owed",
+     "You pay the whole price",
+     "You pay half",
+     "The booking moves"
+    ],
+    "correct": 1,
+    "rationale": "Free cancellation requires at least two working days; later than that the room is charged in full."
+   }
+  ]
+ },
+ {
+  "id": "gt-r-b1-06-r",
+  "family": "notice",
+  "level": "B1",
+  "freshness": "current",
+  "script": "VISITORS TO THE SITE — READ AT THE GATE\n\nEvery visitor signs in at the cabin, including anyone who has been here before. The signing-in sheet is how we know who is on site if the alarm sounds, and a name that is not on it is a person nobody will look for.\n\nA hard hat, boots with a toe cap and a high-visibility jacket are required past the yellow line. Hats and jackets are lent at the cabin. Boots are not, so a visitor in ordinary shoes will be asked to stay on the near side of the line, where most deliveries can still be dealt with.\n\nDo not walk under the crane, even when it is still. The area is marked on the ground and the marks are kept clear for a reason.\n\nIf the alarm sounds, walk to the gate you came in by and wait on the pavement. Do not collect belongings and do not use a vehicle, as the access road is kept clear for the fire service.\n\nPhotography is allowed of your own work only. Photographs of the site as a whole need the site manager's agreement, and that is not something the cabin can give you.",
+  "items": [
+   {
+    "stem": "Who has to sign in?",
+    "options": [
+     "First-time visitors",
+     "Every visitor",
+     "Only contractors",
+     "Anyone going past the yellow line"
+    ],
+    "correct": 1,
+    "rationale": "The notice says every visitor signs in, including those who have been on site before."
+   },
+   {
+    "stem": "Why does the notice say the sheet matters?",
+    "options": [
+     "It records the hours people work",
+     "It shows who is owed payment",
+     "It names who might still be inside",
+     "It is required by the crane operator"
+    ],
+    "correct": 2,
+    "rationale": "The sheet is how the site knows who is present if the alarm sounds; a name not on it is a person nobody will look for."
+   },
+   {
+    "stem": "A visitor arrives in ordinary shoes. What happens?",
+    "options": [
+     "Boots are lent at the cabin",
+     "They keep to the near side",
+     "They are sent away",
+     "They may pass in a hard hat"
+    ],
+    "correct": 1,
+    "rationale": "Hats and jackets are lent but boots are not, so the visitor stays on the near side, where most deliveries can be handled."
+   },
+   {
+    "stem": "What should you do if the alarm sounds?",
+    "options": [
+     "Fetch your belongings first",
+     "Drive out along the road",
+     "Leave by the gate you entered",
+     "Shelter beneath the crane"
+    ],
+    "correct": 2,
+    "rationale": "You walk to the gate you entered by and wait on the pavement, without collecting belongings or using a vehicle."
+   },
+   {
+    "stem": "What may you photograph without asking?",
+    "options": [
+     "The whole site",
+     "Your own work",
+     "The crane",
+     "Nothing"
+    ],
+    "correct": 1,
+    "rationale": "Photography of your own work is allowed; photographs of the site as a whole need the site manager's agreement."
+   }
+  ]
+ }
+]
