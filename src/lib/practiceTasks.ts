@@ -19,7 +19,7 @@
  */
 import { loadPlan } from '../exam/model/plan';
 import type { Attempt } from './attempts';
-import { seedFor, servePrompt, type ServedPrompt } from '../exam/engine/productionPool';
+import { promptsOf, seedFor, servePrompt, type ServedPrompt } from '../exam/engine/productionPool';
 import { scoreNeededFor } from '../exam/engine/planner';
 import type { LanguageCode, TaskDefinition } from '../exam/model/types';
 
@@ -172,14 +172,26 @@ export async function practiceTasksFor(
  *
  * The five that were here were English CEFR specimens — *"Climate change is
  * one of the most pressing issues of our generation"* — and belonged to no
- * exam. **These come from the exam's own task instructions**, which are
- * real sentences in the right language, written for this candidate's exam,
- * and already reviewed as part of the definition.
+ * exam. **These come from the exam's own material**: real sentences in the
+ * right language, written for this candidate's exam, already reviewed as part
+ * of the definition.
  *
- * It is a stopgap and says so: §2.2's own wording is that every surface
- * should GENERATE against the exam, and generation needs a model key, which
- * is not bound. What this removes is the English hard-coding. What it does
- * not do is make the sentences varied — the exam supplies six, not sixty.
+ * Two things changed on 30 August, both because the founder opened the page
+ * on three English destinations and got the same sentence on all three:
+ *
+ *  1. **Every situation is read, not just `task.prompt`.** The tasks grew
+ *     three situations each in Task 4; this function was still reading the
+ *     first one, so a bank that had quadrupled produced the same six lines.
+ *  2. **The list is rotated by destination**, the same way `servePrompt`
+ *     rotates situations — by POSITION among the destinations that sit this
+ *     exam, so three destinations take three different starts by
+ *     construction rather than by a hash that can collide.
+ *
+ * It is still a stopgap and still says so: §2.2's wording is that every
+ * surface should GENERATE against the exam, and generation needs a model key
+ * that is not bound here. What this removes is the English hard-coding and
+ * the single frozen sentence. What it does not do is make the sentences
+ * unlimited — the exam supplies what the bank holds, and no more.
  */
 export async function pronunciationLinesFor(): Promise<{ lang: LanguageCode; lines: string[] } | null> {
   const plan = loadPlan();
@@ -194,23 +206,39 @@ export async function pronunciationLinesFor(): Promise<{ lang: LanguageCode; lin
   // of the language. Prompts are prose; instructions are rubric. Take the
   // prose first and drop anything that is plainly counting words or minutes.
   const RUBRIC = /\b(\d+\s*(words|mots|minutes?)|at least|au moins|environ|spend about)\b/i;
+  // Bullet lists addressed to the writer — "In your letter: say what the
+  // course was…", "You should say: what it is, how you came to have it…" —
+  // are rubric too, and worse as read-aloud material than the sentence above
+  // them: they are a comma-separated list of things to cover, not a sentence
+  // anyone would say. They read as prose to the length filter, so they need
+  // naming.
+  const CHECKLIST = /^(in your letter|dans votre lettre|you should say|write about the following|vous devez)\b/i;
   const take = (text: string) => {
     for (const sentence of text.split(/(?<=[.!?])\s+|\n+/)) {
       const clean = sentence.trim().replace(/^[—–-]\s*/, '');
       if (clean.length < 40 || clean.length > 220) continue;
-      if (RUBRIC.test(clean)) continue;
+      if (RUBRIC.test(clean) || CHECKLIST.test(clean)) continue;
       if (!lines.includes(clean)) lines.push(clean);
     }
   };
   for (const s of exam.sections) {
     if (s.kind !== 'production') continue;
-    for (const t of s.tasks) take(t.prompt[lang]);
+    // EVERY situation, not the declared one alone.
+    for (const t of s.tasks) for (const p of promptsOf(t)) take(p.prompt[lang]);
   }
   if (lines.length === 0) {
     for (const s of exam.sections) {
       if (s.kind !== 'production') continue;
       for (const t of s.tasks) take(t.instruction[lang]);
     }
+  }
+  // Rotate by destination. Same list, different starting point — the sentences
+  // themselves are not banded, and inventing a level difference the exam does
+  // not make is the mistake this codebase already refused once.
+  if (lines.length > 1) {
+    const sharing = defs.GOALS.filter((g) => g.exams.includes(exam.id)).map((g) => g.id);
+    const at = seedFor(sharing, plan.goalId) % lines.length;
+    lines.push(...lines.splice(0, at));
   }
   return { lang, lines };
 }

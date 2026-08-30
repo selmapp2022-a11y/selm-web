@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { Mic, MessageSquare, Trophy, RefreshCcw, Volume2, Play } from 'lucide-react';
+import { Mic, Trophy, RefreshCcw, Volume2, Play } from 'lucide-react';
 import clsx from 'clsx';
 import { AudioRecorder } from '../components/AudioRecorder';
 import { SpeechResults } from '../components/SpeechResults';
-import { assessRealtime, assessFreeform, audioConversation, type SpeechAssessment } from '../lib/speaking';
+import { assessRealtime, assessFreeform, type SpeechAssessment } from '../lib/speaking';
 import { aiTTS, browserTTS, stopBrowserTTS } from '../lib/tts';
-import { TopicPicker, SPEAKING_TOPICS } from '../components/TopicPicker';
 import { CompletionCard } from '../components/CompletionCard';
 import { ErrorBox } from '../components/States';
 import { practiceTasksFor, pronunciationLinesFor, type PracticeSet, type PracticeTask } from '../lib/practiceTasks';
@@ -33,12 +32,13 @@ export default function SpeakingPage() {
   const level = difficultyForSkill('speaking');
   // The tabs are the EXAM's tasks, built from the exam definition — TCF Canada
   // shows tâche 1·2·3, IELTS shows Part 1·2·3 — never a fixed "IELTS Speaking"
-  // label on a French page. Pronunciation and live conversation are kept, but
-  // demoted below the main row as auxiliary practice, because they are general
-  // exercises and not the exam's tasks.
+  // label on a French page. Pronunciation is kept but demoted below the main
+  // row as auxiliary practice, because it drills a component of the skill and
+  // is not the exam's task. Live conversation is gone — see the note further
+  // down: it was the exam's own skill in a form no exam sets.
   const [set, setSet] = useState<PracticeSet | null | 'loading'>('loading');
   const [taskIdx, setTaskIdx] = useState(0);
-  const [aux, setAux] = useState<null | 'pronunciation' | 'conversation'>(null);
+  const [aux, setAux] = useState<null | 'pronunciation'>(null);
 
   useEffect(() => { practiceTasksFor('speaking', getAttempts()).then(setSet); }, []);
   useEffect(() => () => stopBrowserTTS(), []);
@@ -82,12 +82,10 @@ export default function SpeakingPage() {
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs text-ink-secondary">Extra practice:</span>
             <AuxBtn active={aux === 'pronunciation'} onClick={() => setAux('pronunciation')} icon={Volume2}>Pronunciation</AuxBtn>
-            <AuxBtn active={aux === 'conversation'} onClick={() => setAux('conversation')} icon={MessageSquare}>Conversation</AuxBtn>
           </div>
 
           {activeTask && <TaskMode task={activeTask} need={set && set !== 'loading' ? set.need : null} />}
           {aux === 'pronunciation' && <PronunciationMode level={level} />}
-          {aux === 'conversation' && <ConversationMode level={level} />}
         </>
       )}
     </div>
@@ -178,10 +176,15 @@ function PronunciationMode({ level }: { level: string }) {
     });
   }, [level]);
 
+  // Next in the list, not a random other one. `pronunciationLinesFor` already
+  // rotated the list for this destination, and drawing at random from it threw
+  // that ordering away and could hand back a sentence twice while others had
+  // never been seen — the same defect the comprehension pool was fixed for.
   const newPrompt = () => {
-    const others = (lines ?? []).filter((t) => t !== prompt?.text);
-    if (!others.length) return;
-    setPrompt({ level, text: others[Math.floor(Math.random() * others.length)] });
+    const ls = lines ?? [];
+    if (ls.length < 2) return;
+    const at = ls.indexOf(prompt?.text ?? '');
+    setPrompt({ level, text: ls[(at + 1) % ls.length] });
     setResult(null); setErr(null);
   };
 
@@ -248,132 +251,24 @@ function PronunciationMode({ level }: { level: string }) {
   );
 }
 
-// Topic-specific opener so the user has something concrete to respond to. No
-// scripted dialogue any more — just one greeting + question, then the user
-// drives the conversation by speaking freely.
-const CONVERSATION_OPENERS: Record<string, string> = {
-  travel: "Hi! Tell me about a trip you really enjoyed. Where did you go and what made it memorable?",
-  food: "Hi! What's a meal you love cooking or eating? Tell me about it.",
-  work: "Hi! Tell me about your job — or a job you'd love to do. What's a typical day like?",
-  movies: "Hi! What's the last movie or show you watched? Did you enjoy it? Why?",
-  hobbies: "Hi! What do you like to do in your free time? How did you get into it?",
-  daily_routine: "Hi! Walk me through your typical day, from morning until evening.",
-  shopping: "Hi! Tell me about the last thing you bought. Why did you choose it?",
-  health: "Hi! What do you do to stay healthy? Tell me about your routine.",
-  family: "Hi! Tell me a little about your family or the people closest to you.",
-  music: "Hi! What kind of music do you love? Who's an artist you'd recommend?",
-  sports: "Hi! Do you play or follow any sports? Tell me about it.",
-  school: "Hi! What's a subject you've enjoyed studying — or are studying now? Tell me why.",
-};
-
-function ConversationMode({ level: _level }: { level: string }) {
-  const [topic, setTopic] = useState<string | null>(null);
-  const [topicLabel, setTopicLabel] = useState<string>('');
-  // Each turn: AI opener / AI follow-up, then user transcript, then AI reply.
-  const [turns, setTurns] = useState<Array<{ kind: 'ai' | 'user'; text: string }>>([]);
-  const [loading, setLoading] = useState(false);
-  const [err, setErr] = useState<string | null>(null);
-
-  const startTopic = (value: string, label: string) => {
-    const opener =
-      CONVERSATION_OPENERS[value] ||
-      `Hi! Let's chat about ${label.toLowerCase()}. What comes to mind first?`;
-    setTopic(value);
-    setTopicLabel(label);
-    setTurns([{ kind: 'ai', text: opener }]);
-    setErr(null);
-  };
-
-  const onUserAudio = async (blob: Blob) => {
-    setLoading(true); setErr(null);
-    try {
-      const ctx = `${topicLabel || topic || 'general conversation'} — friendly free-form practice`;
-      // Send the conversation so far back to the backend so the AI remembers
-      // what was said and continues the dialogue. Without this, every turn
-      // was treated as the first turn and the AI restarted from a greeting.
-      const history = turns.map((t) =>
-        t.kind === 'user'
-          ? ({ type: 'user_audio', transcription: t.text } as const)
-          : ({ type: 'ai_response', response: t.text } as const)
-      );
-      const data = await audioConversation(blob, ctx, history);
-      const userText = (data.transcript || '').trim();
-      const aiText = (data.ai_response || '').trim();
-      setTurns((t) => {
-        const next = [...t];
-        if (userText) next.push({ kind: 'user', text: userText });
-        else next.push({ kind: 'user', text: '(We could not hear you clearly — try again.)' });
-        if (aiText) next.push({ kind: 'ai', text: aiText });
-        return next;
-      });
-    } catch (e: any) {
-      setErr(e?.response?.data?.detail || e?.message || 'Could not process audio.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (!topic) {
-    return (
-      <TopicPicker
-        topics={SPEAKING_TOPICS}
-        title="Pick a conversation topic"
-        subtitle="Chat freely with your AI coach. No script — just speak in your own words and you'll get a transcript, a reply, and gentle corrections."
-        onPick={(value, t) => startTopic(value, t.label)}
-      />
-    );
-  }
-
-  return (
-    <div className="space-y-4">
-      <div className="card p-6">
-        <div className="mb-3 flex items-center justify-between">
-          <span className="chip">Topic: {topicLabel || topic}</span>
-          <button
-            onClick={() => { setTopic(null); setTurns([]); setErr(null); }}
-            className="btn-ghost text-sm"
-          >
-            Change topic
-          </button>
-        </div>
-        <p className="text-sm italic text-ink-secondary">
-          Speak naturally — your AI coach will reply, ask follow-ups, and quietly correct any mistakes.
-        </p>
-      </div>
-
-      <div className="card p-6">
-        <div className="mb-4 flex items-center justify-between">
-          <h4 className="font-display font-bold text-navy">Conversation</h4>
-        </div>
-        <div className="space-y-3">
-          {turns.map((t, i) => {
-            if (t.kind === 'ai') {
-              return (
-                <div key={i} className="rounded-xl border-l-4 border-teal bg-teal/5 p-3">
-                  <div className="mb-1 flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase text-teal">Coach</span>
-                    <PlayButton text={t.text} />
-                  </div>
-                  <p className="text-sm text-ink-primary">{t.text}</p>
-                </div>
-              );
-            }
-            return (
-              <div key={i} className="ml-8 rounded-xl bg-navy p-3 text-white">
-                <div className="mb-1 text-xs font-bold uppercase opacity-70">You said</div>
-                <p className="text-sm">{t.text}</p>
-              </div>
-            );
-          })}
-          {loading && <Loading text="Listening and thinking…" />}
-        </div>
-        {err && <div className="mt-3 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">{err}</div>}
-      </div>
-
-      <AudioRecorder onComplete={onUserAudio} maxSeconds={30} label="Tap and speak your reply" />
-    </div>
-  );
-}
+// ConversationMode and its topic openers were deleted here, for the same
+// reason the Listening topic cards and the Reading paste tool were deleted on
+// 29 August:
+//
+//   **Nothing may offer the SAME SKILL in a form the exam does not set.**
+//
+// Free-form chat with an AI on "Travel / Food & Cooking / Work Life" IS
+// speaking. It is the same skill the exam sets, offered in a form no exam
+// sets: no task, no timing, no level, no criteria, and — the plain evidence —
+// the identical three topic cards for Express Entry CLB 9, for Australia band
+// 6, and for TCF Canada. A candidate cannot tell a substitute from the real
+// thing; that is why they came to us, so an honest label would only have
+// recorded that we knew.
+//
+// Pronunciation is kept and is not the same case: it drills a COMPONENT of
+// speaking (sounds and stress on a line the exam itself sets), it cannot be
+// mistaken for the exam's task, and it renders only when the exam's tasks are
+// present. See `lib/practiceTasks.ts` for why its lines are still a stopgap.
 
 function TaskMode({ task, need }: { task: PracticeTask; need: PracticeSet['need'] }) {
   const prompt = task.instruction + '\n\n' + task.prompt;
