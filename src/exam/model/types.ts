@@ -523,6 +523,19 @@ export type Freshness = 'timeless' | 'current' | 'dated';
 export type Recording = {
   /** §D. Absent on material authored before the field existed. */
   freshness?: Freshness;
+  /**
+   * Whether this passage is part of the MEASURING INSTRUMENT or part of the
+   * bank being measured.
+   *
+   * An `anchor` is what the statistical veto compares new material against.
+   * It is deliberately a small, fixed set — one per band — and accepted items
+   * never join it: an instrument that absorbs what it measures widens by
+   * exactly the amount each item strays, and the hundredth item ends up
+   * measured against ninety-nine of its own siblings.
+   *
+   * Absent means `item`, which is the strict path: all three layers.
+   */
+  role?: 'anchor' | 'item';
   id: string;
   /**
    * The CEFR band the RECORDING is written to. **Ours, not the exam's.** TCF

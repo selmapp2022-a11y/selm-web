@@ -51,12 +51,37 @@ for (const r of sec.recordings) {
   t(`${r.id} ${r.level} ${r.family} — ${words(r.script ?? '', SEG).length}w, ${items.length}q`, v.reasons, []);
 }
 
-console.log('\n2. Every passage says when it was written for\n');
+console.log('\n2. Every non-anchor passage clears the statistical veto\n');
+
+/**
+ * Layer 3, run over the bank rather than at the moment a batch was written.
+ *
+ * The anchors are the instrument and are exempt — with one passage per band
+ * their neighbours ARE the envelope, and an instrument cannot be measured
+ * against itself. Everything else must sit inside on at least three of the
+ * four measures, which is the same bar `runVeto` enforces at ingest. Running
+ * it here as well is not duplication: ingest asks whether an item may enter,
+ * and this asks whether the bank still holds together after it did.
+ */
+const ANCHOR_SET: Anchor[] = sec.recordings
+  .filter((r) => r.role === 'anchor')
+  .map((r) => ({ id: r.id, level: r.level as Anchor['level'], script: r.script ?? '' }));
+t('the anchor ladder covers every band',
+  ANCHOR_SET.map((a) => a.level).sort(), ['A1', 'A2', 'B1', 'B2', 'C1', 'C2']);
+const items = sec.recordings.filter((r) => r.role !== 'anchor');
+if (!items.length) console.log('     (no non-anchor passages yet — the ladder is all there is)');
+for (const r of items) {
+  const v = runVeto(r.script ?? '', r.level as Anchor['level'], ANCHOR_SET, gt.locale);
+  t(`${r.id} ${r.level} sits inside the ladder (${v.measured?.inside}/4)`, v.pass, true);
+  if (!v.pass) console.log('      ', v.reasons.join('; '));
+}
+
+console.log('\n3. Every passage says when it was written for\n');
 for (const r of sec.recordings) t(`${r.id} carries a freshness`, typeof r.freshness === 'string', true);
 t('none is dated', sec.recordings.filter((r) => r.freshness === 'dated').length, 0);
 
-console.log('\n3. The ladder rises, measured rather than asserted\n');
-const ANCHORS: Anchor[] = sec.recordings.map((r) => ({ id: r.id, level: r.level as Anchor['level'], script: r.script ?? '' }));
+console.log('\n4. The ladder rises, measured rather than asserted\n');
+const ANCHORS: Anchor[] = sec.recordings.filter((r) => r.role === 'anchor').map((r) => ({ id: r.id, level: r.level as Anchor['level'], script: r.script ?? '' }));
 for (const a of ANCHORS) {
   const p = profile(a.script, gt.locale);
   console.log(`     ${a.id.padEnd(14)} ${a.level}  ${String(words(a.script, SEG).length).padStart(3)}w  ` +
@@ -115,7 +140,7 @@ for (const a of ANCHORS) {
   console.log(`       ${a.id.padEnd(14)} inside ${v.measured?.inside}/4  ${v.pass ? '' : v.reasons.join('; ')}`);
 }
 
-console.log('\n4. The tells that only appear across a bank\n');
+console.log('\n5. The tells that only appear across a bank\n');
 const choices = sec.items.filter(isChoiceItem);
 const pos = [0, 0, 0, 0];
 let longest = 0;
@@ -133,7 +158,7 @@ console.log(`     key is the single longest option: ${longest} of ${choices.leng
 t('keys do not cluster in one position beyond chance', z <= 2, true);
 t('the longest option is not the key more than 40% of the time', longest / choices.length <= 0.4, true);
 
-console.log('\n5. The bank is what the inventory will count\n');
+console.log('\n6. The bank is what the inventory will count\n');
 t('every item names a passage that exists',
   sec.items.every((i) => sec.recordings.some((r) => r.id === i.recordingId)), true);
 t('every passage carries at least one item',
