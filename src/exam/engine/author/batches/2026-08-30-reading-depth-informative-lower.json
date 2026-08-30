@@ -1,0 +1,353 @@
+[
+ {
+  "id": "gt-r-a1-10-r",
+  "family": "informative",
+  "level": "A1",
+  "freshness": "current",
+  "script": "HOW LONG FOOD KEEPS IN A FRIDGE\n\nMilk keeps for about five days after you open it.\n\nCooked rice keeps for one day only. Cool it fast and put it in the fridge.\n\nHard cheese keeps for three weeks. Soft cheese keeps for one week.\n\nEggs do not go in the fridge door. The door is the warmest part.\n\nA fridge should be at five degrees or colder.",
+  "items": [
+   {
+    "stem": "How long does opened milk keep?",
+    "options": [
+     "One day",
+     "About five days",
+     "Three weeks",
+     "One week"
+    ],
+    "correct": 1,
+    "rationale": "The first line gives about five days for milk once it has been opened, which is shorter than cheese and longer than rice."
+   },
+   {
+    "stem": "Which food keeps for the shortest time?",
+    "options": [
+     "Milk",
+     "Hard cheese",
+     "Cooked rice",
+     "Soft cheese"
+    ],
+    "correct": 2,
+    "rationale": "Cooked rice is given one day only, which is less than the milk, the soft cheese and the hard cheese."
+   },
+   {
+    "stem": "Why should eggs not go in the door?",
+    "options": [
+     "The door is warmest",
+     "The door is too small",
+     "Eggs break there",
+     "The door is cold"
+    ],
+    "correct": 0,
+    "rationale": "The note says the door is the warmest part of the fridge, which is why eggs are kept elsewhere."
+   },
+   {
+    "stem": "How cold should a fridge be?",
+    "options": [
+     "Ten degrees",
+     "Five degrees or colder",
+     "One degree only",
+     "It does not say"
+    ],
+    "correct": 1,
+    "rationale": "The last line gives five degrees or colder as the temperature a fridge should run at."
+   }
+  ]
+ },
+ {
+  "id": "gt-r-a1-11-r",
+  "family": "informative",
+  "level": "A1",
+  "freshness": "current",
+  "script": "CITY BIKES\n\nThere are 40 stations in the city. Every station is open all day and all night.\n\nThe first 30 minutes are free. After that you pay by the hour.\n\nYou need the app. There is no card reader on the bike.\n\nThe bikes are green. The blue ones are electric and cost more.\n\nYou can leave a bike at any station, not only the one you took it from.",
+  "items": [
+   {
+    "stem": "How many stations are there?",
+    "options": [
+     "Thirty",
+     "Forty",
+     "Four",
+     "It does not say"
+    ],
+    "correct": 1,
+    "rationale": "The first line gives forty stations; thirty is the number of free minutes, which is a different figure."
+   },
+   {
+    "stem": "What is free?",
+    "options": [
+     "The app",
+     "The first half hour",
+     "The blue bikes",
+     "Every ride"
+    ],
+    "correct": 1,
+    "rationale": "The first thirty minutes cost nothing, and time after that is paid by the hour."
+   },
+   {
+    "stem": "What do the blue bikes have?",
+    "options": [
+     "A card reader",
+     "A motor",
+     "Two seats",
+     "A basket"
+    ],
+    "correct": 1,
+    "rationale": "The blue bikes are described as electric, which is why they cost more than the green ones."
+   },
+   {
+    "stem": "Where can you leave a bike?",
+    "options": [
+     "Only where you took it",
+     "At any station",
+     "At any street corner",
+     "At the app office"
+    ],
+    "correct": 1,
+    "rationale": "The last line says a bike may be left at any station, not only the one it came from."
+   }
+  ]
+ },
+ {
+  "id": "gt-r-a1-12-r",
+  "family": "informative",
+  "level": "A1",
+  "freshness": "current",
+  "script": "THE TOWN MUSEUM\n\nThe museum is 100 years old this year.\n\nIt is open from Wednesday to Sunday. It is closed on Monday and Tuesday.\n\nEntry is free on the first Sunday of the month. On other days it costs six pounds.\n\nThere are three floors. The top floor is about the river.\n\nBags go in the lockers by the door. The lockers are free.",
+  "items": [
+   {
+    "stem": "When is the museum closed?",
+    "options": [
+     "Monday and Tuesday",
+     "Every Sunday",
+     "In the summer",
+     "On the first Sunday"
+    ],
+    "correct": 0,
+    "rationale": "It opens from Wednesday to Sunday, so Monday and Tuesday are the two closed days."
+   },
+   {
+    "stem": "When is entry free?",
+    "options": [
+     "On every Wednesday",
+     "One Sunday each month",
+     "On all open days",
+     "On no day at all"
+    ],
+    "correct": 1,
+    "rationale": "Entry costs nothing on the first Sunday of each month and six pounds on other open days."
+   },
+   {
+    "stem": "What is on the top floor?",
+    "options": [
+     "The river",
+     "The lockers",
+     "The shop",
+     "The old photographs"
+    ],
+    "correct": 0,
+    "rationale": "Of the three floors, the top one is described as being about the river."
+   },
+   {
+    "stem": "What do the lockers cost?",
+    "options": [
+     "Six pounds",
+     "One pound",
+     "Nothing",
+     "They are not for bags"
+    ],
+    "correct": 2,
+    "rationale": "Bags go in the lockers by the door, and the note says the lockers are free."
+   }
+  ]
+ },
+ {
+  "id": "gt-r-a2-10-r",
+  "family": "informative",
+  "level": "A2",
+  "freshness": "current",
+  "script": "BORROWING E-BOOKS FROM THE LIBRARY\n\nMembers can borrow six e-books at a time. A loan lasts twenty-one days and then ends automatically, so nothing is ever returned late and there are no charges.\n\nThe library buys a fixed number of copies of each title. If every copy is out, you join a queue. The average wait is eleven days, though a popular title can take much longer.\n\nYou can return a book early, and doing so passes it to the next person in the queue immediately.\n\nAudiobooks work in the same way, but they count separately: six e-books and six audiobooks, not six in total.\n\nThe app works without a signal once a book has been downloaded.",
+  "items": [
+   {
+    "stem": "How long is a loan?",
+    "options": [
+     "Eleven days",
+     "Twenty-one days",
+     "Six days",
+     "Until you finish it"
+    ],
+    "correct": 1,
+    "rationale": "A loan runs for twenty-one days and then closes by itself, which is why nothing is returned late."
+   },
+   {
+    "stem": "Why are there no late charges?",
+    "options": [
+     "Members pay in advance",
+     "The loan ends by itself",
+     "The library forgives them",
+     "Books are never late"
+    ],
+    "correct": 1,
+    "rationale": "The loan ends automatically at the end of the period, so a book cannot be kept beyond it."
+   },
+   {
+    "stem": "What happens if all copies are out?",
+    "options": [
+     "You buy the book",
+     "You join a queue",
+     "You choose another title",
+     "You wait a year"
+    ],
+    "correct": 1,
+    "rationale": "The library holds a fixed number of copies, and readers queue when they are all lent out."
+   },
+   {
+    "stem": "How many items can a member have?",
+    "options": [
+     "Six in total",
+     "Six of each kind",
+     "Twelve e-books",
+     "Eleven of each kind"
+    ],
+    "correct": 1,
+    "rationale": "Audiobooks are counted separately, so a member may hold six e-books and six audiobooks."
+   },
+   {
+    "stem": "What does returning a book early do?",
+    "options": [
+     "It shortens the queue at once",
+     "It saves money",
+     "It adds a day to the next loan",
+     "It cancels your membership"
+    ],
+    "correct": 0,
+    "rationale": "An early return passes the copy straight to the next person waiting."
+   }
+  ]
+ },
+ {
+  "id": "gt-r-a2-11-r",
+  "family": "informative",
+  "level": "A2",
+  "freshness": "current",
+  "script": "WATER AT HOME\n\nAn average bath holds about eighty litres. A shower delivers roughly nine litres a minute, so nine minutes matches a bath.\n\nA power shower is different. It can deliver fifteen litres a minute, which means a long one uses more than a bath holds.\n\nA dripping tap wastes five thousand litres a year. The washer inside usually costs less than a pound.\n\nAbout a third of household water is flushed away. Older toilets use nine litres, although newer ones manage on four or six.\n\nGarden watering is a small part of the year, but a large part of a summer week.",
+  "items": [
+   {
+    "stem": "How long can a shower run before it matches a bath?",
+    "options": [
+     "Four minutes",
+     "Nine minutes",
+     "Fifteen minutes",
+     "Eighty minutes"
+    ],
+    "correct": 1,
+    "rationale": "At nine litres a minute, nine minutes of showering reaches the eighty litres an average bath holds."
+   },
+   {
+    "stem": "What is different about a power shower?",
+    "options": [
+     "It runs colder",
+     "It uses more each minute",
+     "It cannot be timed",
+     "It fills a bath"
+    ],
+    "correct": 1,
+    "rationale": "A power shower can use fifteen litres a minute, so a long one passes the water a bath holds."
+   },
+   {
+    "stem": "What does the passage say about a dripping tap?",
+    "options": [
+     "It cannot be mended",
+     "The part is cheap",
+     "It wastes little",
+     "It affects the garden"
+    ],
+    "correct": 1,
+    "rationale": "The washer inside usually costs under a pound, against about five thousand litres wasted a year."
+   },
+   {
+    "stem": "How much household water goes down the toilet?",
+    "options": [
+     "About a third",
+     "About a half",
+     "About a tenth",
+     "Nine litres a day"
+    ],
+    "correct": 0,
+    "rationale": "Roughly a third of what a household uses is flushed, whatever the age of the toilet."
+   },
+   {
+    "stem": "What does the passage say about garden watering?",
+    "options": [
+     "It never matters much",
+     "It rises sharply in summer",
+     "It uses most household water",
+     "It has been falling lately"
+    ],
+    "correct": 1,
+    "rationale": "Over a whole year it is small, but in a summer week it becomes a large share."
+   }
+  ]
+ },
+ {
+  "id": "gt-r-a2-12-r",
+  "family": "informative",
+  "level": "A2",
+  "freshness": "current",
+  "script": "BICYCLES LEFT AT THE STATION\n\nThe racks outside the station are free and nobody books a space. Cycles may be left for up to seven days.\n\nEvery Tuesday a member of staff marks the wheel of any cycle that has not moved. If the mark is still there the following Tuesday, the cycle is counted as abandoned.\n\nAbandoned cycles are removed to the depot on Wetherby Road and kept for a further month. The owner pays nothing to collect one, but must describe it before it is handed over.\n\nAfter that month the cycles are given to a workshop that repairs them and passes them to a local charity.\n\nA cycle with a lock cut by staff is photographed first, and the photograph is kept with the record.",
+  "items": [
+   {
+    "stem": "How long may a cycle be left?",
+    "options": [
+     "One day",
+     "Up to a week",
+     "One month",
+     "There is no limit"
+    ],
+    "correct": 1,
+    "rationale": "The racks allow up to seven days, after which the marking process begins."
+   },
+   {
+    "stem": "How does the station find abandoned cycles?",
+    "options": [
+     "By reading the locks",
+     "By marking a wheel each Tuesday",
+     "By asking owners",
+     "By counting the racks"
+    ],
+    "correct": 1,
+    "rationale": "A wheel is marked on a Tuesday, and a mark still there a week later means the cycle has not moved."
+   },
+   {
+    "stem": "What must an owner do to get a cycle back?",
+    "options": [
+     "Pay a small charge",
+     "Describe it to staff",
+     "Bring the receipt",
+     "Come on a Tuesday"
+    ],
+    "correct": 1,
+    "rationale": "Collection costs nothing, but the owner has to describe the cycle before it is handed over."
+   },
+   {
+    "stem": "What happens after the month at the depot?",
+    "options": [
+     "The cycles are sold",
+     "They go to a repair workshop",
+     "They are returned to the racks",
+     "They are destroyed"
+    ],
+    "correct": 1,
+    "rationale": "They pass to a workshop that repairs them and then to a local charity."
+   },
+   {
+    "stem": "Why is a photograph taken?",
+    "options": [
+     "To sell the cycle",
+     "To keep with the record",
+     "To send to the owner",
+     "To show the charity"
+    ],
+    "correct": 1,
+    "rationale": "A cycle whose lock is cut is photographed, and that photograph is filed with the record of the removal."
+   }
+  ]
+ }
+]

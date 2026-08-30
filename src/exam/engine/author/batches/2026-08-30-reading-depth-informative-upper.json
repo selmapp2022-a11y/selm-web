@@ -1,0 +1,452 @@
+[
+ {
+  "id": "gt-r-b1-10-r",
+  "family": "informative",
+  "level": "B1",
+  "freshness": "current",
+  "script": "WHY POSTCODES EXIST\n\nA postcode is not an address. It is an instruction to a machine, and the difference explains most of what people find odd about it.\n\nWhen a letter is scanned, the machine does not read the street name. It reads the postcode, converts it to a number that stands for a delivery walk, and prints that number along the bottom edge of the envelope in ink that is easy for a second machine to read. Everything after that is sorting by number.\n\nBecause the unit is the delivery walk rather than the neighbourhood, a postcode can cover two hundred houses in a terrace and eight in a valley. Neighbours on opposite sides of one street sometimes have different codes, which surprises people who assume the code describes where they live. It describes how the post gets there.\n\nThe last two letters were added because the first part alone was not specific enough to separate one walk from another in a large town. In small villages the second part does very little work, and a letter addressed with the village name and the code alone usually arrives.\n\nThe system now has uses nobody planned. Insurers price by postcode, deliveries are routed by it, and services decide catchment areas with it. None of that was in the design, and some of it sits awkwardly with a code whose boundaries were drawn around the convenience of a person carrying a bag.",
+  "items": [
+   {
+    "stem": "What does the passage say a postcode is?",
+    "options": [
+     "A short form of an address",
+     "An instruction to a machine",
+     "A name for a neighbourhood",
+     "A number given to a street"
+    ],
+    "correct": 1,
+    "rationale": "The opening states that it is not an address but an instruction to a machine, and calls that the source of most confusion."
+   },
+   {
+    "stem": "What does the machine read on the envelope?",
+    "options": [
+     "The street name",
+     "The postcode",
+     "The house number",
+     "The town"
+    ],
+    "correct": 1,
+    "rationale": "It reads the code, turns it into a number for a delivery walk and prints that number for a second machine."
+   },
+   {
+    "stem": "Why do the areas covered vary so much?",
+    "options": [
+     "Towns are denser than villages",
+     "The unit is a delivery walk",
+     "The codes were drawn by hand",
+     "Older areas were coded first"
+    ],
+    "correct": 1,
+    "rationale": "Because the unit is the walk rather than the neighbourhood, one code may cover two hundred houses or eight."
+   },
+   {
+    "stem": "Why were the last two letters added?",
+    "options": [
+     "To make codes memorable",
+     "To separate walks in large towns",
+     "To mark the county",
+     "To help villages"
+    ],
+    "correct": 1,
+    "rationale": "The first part alone could not tell one delivery walk from another in a large town."
+   },
+   {
+    "stem": "What does the passage say about the newer uses?",
+    "options": [
+     "They were part of the design",
+     "They were not planned for",
+     "They have been abandoned",
+     "They apply only to insurers"
+    ],
+    "correct": 1,
+    "rationale": "Pricing, routing and catchment areas were none of them in the design, and some sit awkwardly with boundaries drawn for a person carrying a bag."
+   }
+  ]
+ },
+ {
+  "id": "gt-r-b1-11-r",
+  "family": "informative",
+  "level": "B1",
+  "freshness": "current",
+  "script": "HEAT PUMPS AND BOILERS ARE NOT THE SAME MACHINE\n\nA gas boiler makes heat. A heat pump moves it, and almost every practical difference follows from that sentence.\n\nBecause it moves heat rather than making it, a heat pump can deliver more energy as warmth than it draws as electricity. Three units of heat for one unit of power is ordinary. That ratio falls as the outside air gets colder, which is why the same machine that is efficient in October is less so in February.\n\nA boiler heats water to about seventy degrees and sends it round the house in short bursts. A heat pump produces water at forty-five or fifty and runs for much longer. Radiators sized for seventy degrees are therefore often too small, and a house that changes system without changing radiators feels cool even when the machine is working correctly.\n\nThe running pattern also differs. A boiler is switched on when a room is cold. A heat pump is left running, because bringing a cold house up is slower and costs more than holding it steady. People who use one as they used the other usually conclude that it does not work.\n\nInsulation matters more than the machine. A poorly insulated house loses heat faster than a heat pump can supply it at low temperature, and the answer in that case is not a larger pump.",
+  "items": [
+   {
+    "stem": "What is the basic difference described?",
+    "options": [
+     "One is newer than the other",
+     "One makes heat, one moves it",
+     "One uses water, one uses air",
+     "One is cheaper to install"
+    ],
+    "correct": 1,
+    "rationale": "The passage opens by saying a boiler makes heat while a pump moves it, and says the practical differences follow from that."
+   },
+   {
+    "stem": "Why does efficiency fall in winter?",
+    "options": [
+     "The machine wears out",
+     "The outside air is colder",
+     "The water is hotter",
+     "The house is emptier"
+    ],
+    "correct": 1,
+    "rationale": "The ratio of heat delivered to power drawn drops as outside air gets colder, so February is worse than October."
+   },
+   {
+    "stem": "Why can a house feel cool after a change of system?",
+    "options": [
+     "The radiators are too small",
+     "The pump is undersized",
+     "The water is too hot",
+     "The pipes are too long"
+    ],
+    "correct": 0,
+    "rationale": "Radiators sized for seventy-degree water are often too small for water at forty-five or fifty."
+   },
+   {
+    "stem": "How should a heat pump be run?",
+    "options": [
+     "Switched on when cold",
+     "Left running steadily",
+     "Only in the evening",
+     "At the highest setting"
+    ],
+    "correct": 1,
+    "rationale": "Raising a cold house is slow and expensive, so the machine is left holding a steady temperature."
+   },
+   {
+    "stem": "What does the passage say matters most?",
+    "options": [
+     "The size of the pump",
+     "The insulation of the house",
+     "The age of the radiators",
+     "The cost of electricity"
+    ],
+    "correct": 1,
+    "rationale": "A poorly insulated house loses heat faster than the pump can supply it, and a larger pump is not the answer."
+   }
+  ]
+ },
+ {
+  "id": "gt-r-b1-12-r",
+  "family": "informative",
+  "level": "B1",
+  "freshness": "current",
+  "script": "HOW A FOOD BANK ACTUALLY WORKS\n\nMost food banks do not hand food to whoever asks. They work through referrals: a school, a doctor, a housing officer or a support worker issues a voucher, and the voucher is exchanged for a parcel. The reason is not suspicion. A referral puts somebody in contact with the person who can address the cause, and a parcel on its own does not.\n\nA standard parcel holds three days of food for the household size on the voucher. Most people who come are given two or three parcels in a year. A small number need more, and those are the cases the referral system is meant to catch early.\n\nDonations arrive unevenly. December brings far more than the centre can store, and the shortage months are usually June and July, when donations fall and school meals stop at the same time. Centres therefore hold stock rather than distribute everything that comes in, which sometimes looks like hoarding to a visitor who has just carried in a box.\n\nWhat runs short is rarely tinned food. It is nappies, washing powder, sanitary products and tinned meat, because they are expensive to buy and easy to forget when donating.\n\nMost centres will not take fresh food unless it can be given out the same day, and none can take anything opened, however clean.",
+  "items": [
+   {
+    "stem": "Why do food banks use referrals?",
+    "options": [
+     "To check people are honest",
+     "To connect people with help",
+     "To limit the number of visits",
+     "To satisfy the donors"
+    ],
+    "correct": 1,
+    "rationale": "The passage says the reason is not suspicion: a referral brings someone into contact with a person who can address the cause."
+   },
+   {
+    "stem": "What does a standard parcel contain?",
+    "options": [
+     "A week of food",
+     "Three days of food",
+     "Whatever is left over",
+     "Only tinned food"
+    ],
+    "correct": 1,
+    "rationale": "A parcel holds three days of food, sized to the household named on the voucher."
+   },
+   {
+    "stem": "Which months are hardest?",
+    "options": [
+     "June and July",
+     "December and January",
+     "March and April",
+     "September and October"
+    ],
+    "correct": 0,
+    "rationale": "Donations fall in June and July at the same time as school meals stop."
+   },
+   {
+    "stem": "Why do centres hold stock back?",
+    "options": [
+     "To cover the lean months",
+     "To keep prices down",
+     "Because of the rules",
+     "To reduce waste"
+    ],
+    "correct": 0,
+    "rationale": "December brings more than can be stored and the shortage comes later, so stock is held rather than given out at once."
+   },
+   {
+    "stem": "What is most often in short supply?",
+    "options": [
+     "Tinned vegetables",
+     "Washing powder and nappies",
+     "Bread and milk",
+     "Rice and pasta"
+    ],
+    "correct": 1,
+    "rationale": "What runs short is rarely tinned food; it is the expensive household items donors forget."
+   },
+   {
+    "stem": "What will centres not accept?",
+    "options": [
+     "Anything already opened",
+     "Anything tinned",
+     "Anything donated in June",
+     "Anything from a school"
+    ],
+    "correct": 0,
+    "rationale": "Nothing opened can be taken, however clean, and fresh food only if it can go out that day."
+   }
+  ]
+ },
+ {
+  "id": "gt-r-b2-07-r",
+  "family": "informative",
+  "level": "B2",
+  "freshness": "current",
+  "script": "WHERE A BUS IS COUNTED AS LATE\n\nPunctuality figures for buses look straightforward and are not, and the reason is that a bus is a moving object measured at a fixed point.\n\nThe simplest method records departures from the first stop. It is cheap, it is easy to audit, and it measures the thing passengers care least about. Almost nobody boards at the terminus. A route can leave on time every morning and still be unusable at the middle of its run, and for years the published figure said nothing about that.\n\nThe method now more common samples timing points along the route — typically four or five, chosen because they are recognisable rather than because they are where most people wait. A bus is on time if it arrives between one minute early and five minutes late. The tolerance is wider on the late side because a bus that runs early cannot be caught, and a passenger who misses one that came early waits the full interval, which is worse than a short delay.\n\nThis creates an effect that is easy to misread. On a frequent route, operators are judged on the gap between buses rather than on the timetable, because a passenger on a five-minute service does not consult one. Two buses arriving together is then a failure even if both are within tolerance of their own times, and a route can post good punctuality and poor regularity at once.\n\nThe deeper problem is that the measurement changes the behaviour. A driver who is running early and knows the timing point is ahead will wait, and waiting at a stop with passengers aboard is unpopular and looks like poor service, while being a driver doing exactly what the measure asks. Every figure of this kind eventually acquires a set of practices designed around it, and those practices are usually invisible in the figure itself.",
+  "items": [
+   {
+    "stem": "What is wrong with measuring at the first stop?",
+    "options": [
+     "It is expensive to do",
+     "Few passengers board there",
+     "Drivers can influence it",
+     "It cannot be audited"
+    ],
+    "correct": 1,
+    "rationale": "Almost nobody boards at the terminus, so a route can leave on time and still be unusable in the middle of its run."
+   },
+   {
+    "stem": "How are timing points chosen?",
+    "options": [
+     "Where most people wait",
+     "Because they are recognisable",
+     "By the operator each week",
+     "At equal distances"
+    ],
+    "correct": 1,
+    "rationale": "They are typically four or five points chosen for being recognisable rather than for passenger numbers."
+   },
+   {
+    "stem": "Why is the tolerance wider for lateness?",
+    "options": [
+     "Late buses are more common",
+     "An early bus cannot be caught",
+     "Drivers prefer it",
+     "The timetable allows it"
+    ],
+    "correct": 1,
+    "rationale": "A passenger who misses a bus that came early waits the whole interval, which is worse than a short delay."
+   },
+   {
+    "stem": "What can happen on a frequent route?",
+    "options": [
+     "Two buses arriving together",
+     "Every bus running early",
+     "The timetable being ignored",
+     "No bus reaching the terminus"
+    ],
+    "correct": 0,
+    "rationale": "Buses can each be within tolerance of their own times and still arrive together, which is a failure of the gap rather than of punctuality."
+   },
+   {
+    "stem": "Why do passengers on frequent routes not use the timetable?",
+    "options": [
+     "It is not published",
+     "The service is too frequent",
+     "The stops are unmarked",
+     "The route changes daily"
+    ],
+    "correct": 1,
+    "rationale": "On a five-minute service a passenger does not consult a timetable, so operators are judged on the gap between buses."
+   },
+   {
+    "stem": "What does the passage say measurement does?",
+    "options": [
+     "It reflects behaviour exactly",
+     "It changes the behaviour measured",
+     "It has no effect on drivers",
+     "It replaces the timetable"
+    ],
+    "correct": 1,
+    "rationale": "A driver running early waits at the timing point, which the measure rewards and passengers dislike."
+   },
+   {
+    "stem": "What does the writer say about such practices?",
+    "options": [
+     "They are obvious in the figure",
+     "They rarely show in the figure",
+     "They are forbidden",
+     "They improve regularity"
+    ],
+    "correct": 1,
+    "rationale": "Practices designed around a measure are usually invisible in the measure itself."
+   }
+  ]
+ },
+ {
+  "id": "gt-r-b2-08-r",
+  "family": "informative",
+  "level": "B2",
+  "freshness": "current",
+  "script": "THE ORDER IN WHICH PATIENTS ARE SEEN\n\nAn emergency department does not work through a queue, and the single most common complaint about one comes from assuming that it does.\n\nOn arrival a patient is assessed, usually within fifteen minutes, and placed in one of five categories. The categories are not about how ill someone feels; they are about how quickly a condition will deteriorate without treatment. A patient in severe pain from a broken wrist may wait several hours behind someone who looks comfortable, because chest pain of a certain kind can become fatal in that time and a wrist cannot.\n\nCategories are reviewed rather than fixed. A patient waiting is reassessed at intervals, and a category can move in either direction. Moving up is what the system is designed to catch; moving down happens too, and is rarely noticed by anyone but the staff.\n\nThe figure most often published is the share of patients dealt with inside four hours. It was introduced to make a real problem visible, and it did. It also produced two effects nobody intended. Departments became busiest in the fifteen minutes before each four-hour mark, and admitting a patient to a ward stops the clock, so the measure gently rewards admission over sending someone home with a plan.\n\nStaff will say that the informative number is not the average wait but the spread. A department with a two-hour average and a small spread is running well. A department with the same average and a long tail has a group of patients waiting very much longer than the figure suggests, and they are usually the ones with no clear category — the patients whose condition does not deteriorate and does not resolve, which is the hardest kind to place in a system built around how fast things get worse.",
+  "items": [
+   {
+    "stem": "What decides the category?",
+    "options": [
+     "How ill a patient feels",
+     "How fast a condition may worsen",
+     "How long a patient has waited",
+     "The order of arrival"
+    ],
+    "correct": 1,
+    "rationale": "Categories reflect how quickly a condition deteriorates without treatment, not the pain the patient reports."
+   },
+   {
+    "stem": "What happens to a category while waiting?",
+    "options": [
+     "It is fixed at arrival",
+     "It is reviewed and may change",
+     "It rises automatically",
+     "It is set by the patient"
+    ],
+    "correct": 1,
+    "rationale": "Patients are reassessed at intervals and a category can move in either direction."
+   },
+   {
+    "stem": "Which change is rarely noticed?",
+    "options": [
+     "A category moving up",
+     "A category moving down",
+     "A change of staff",
+     "A change of ward"
+    ],
+    "correct": 1,
+    "rationale": "Moving up is what the system exists to catch; moving down happens too and is noticed only by staff."
+   },
+   {
+    "stem": "What effect did the four-hour figure have?",
+    "options": [
+     "It hid a real problem",
+     "It made a real problem visible",
+     "It lengthened every wait",
+     "It removed the categories"
+    ],
+    "correct": 1,
+    "rationale": "It was introduced to make a genuine problem visible and did so, while also producing two unintended effects."
+   },
+   {
+    "stem": "Why does the measure favour admission?",
+    "options": [
+     "Wards have spare beds",
+     "Admitting stops the clock",
+     "Patients ask to be admitted",
+     "Sending people home is slower"
+    ],
+    "correct": 1,
+    "rationale": "The four-hour clock stops on admission, so the measure gently rewards it over discharge with a plan."
+   },
+   {
+    "stem": "What do staff regard as more informative?",
+    "options": [
+     "The average wait",
+     "The spread of waits",
+     "The number of arrivals",
+     "The busiest hour"
+    ],
+    "correct": 1,
+    "rationale": "Two departments can share an average while one has a long tail of much longer waits."
+   },
+   {
+    "stem": "Which patients wait longest?",
+    "options": [
+     "Those in the top category",
+     "Those with no clear category",
+     "Those arriving at night",
+     "Those who are admitted"
+    ],
+    "correct": 1,
+    "rationale": "Patients whose condition neither deteriorates nor resolves are hardest to place in a system built around how fast things worsen."
+   }
+  ]
+ },
+ {
+  "id": "gt-r-b2-09-r",
+  "family": "informative",
+  "level": "B2",
+  "freshness": "current",
+  "script": "WHAT A RECYCLING RATE COUNTS\n\nA household recycling rate is a fraction, and almost every argument about one is really an argument about what belongs in the two halves of it.\n\nThe top of the fraction is not what was recycled. It is what was collected for recycling and sent onward, weighed at the point it leaves the local authority. Material rejected later — a load contaminated by one bag of the wrong thing, a bale that finds no buyer — has already been counted by the time it is rejected. Estimates of how much is lost after counting vary from three per cent to a quarter, and the range itself tells you how weakly it is measured.\n\nWeight, not volume, is the unit, and that single choice shapes behaviour. Glass and garden waste are heavy; plastic film is light. An authority that introduces a garden waste collection will see its rate rise substantially without a single household changing what it does with a plastic tray, and an authority that persuades residents to switch from glass bottles to cartons will watch its rate fall while its environmental position improves.\n\nThe bottom of the fraction is household waste, which sounds simple and is not. Some authorities include waste from street bins and small businesses; others do not. Comparisons across borders are therefore harder than the published tables imply, and the tables rarely say so.\n\nNone of this makes the figure worthless. It moves in the right direction when real things improve, and a place that doubles its rate has almost certainly done something. It is a poor instrument for ranking neighbours and a reasonable one for watching a single place over time, which is the opposite of how it is usually used.",
+  "items": [
+   {
+    "stem": "What is at the top of the fraction?",
+    "options": [
+     "What was actually recycled",
+     "What was collected and sent on",
+     "What was thrown away",
+     "What was rejected"
+    ],
+    "correct": 1,
+    "rationale": "The figure counts material weighed as it leaves the authority, before any later rejection is known."
+   },
+   {
+    "stem": "What does the range of loss estimates show?",
+    "options": [
+     "The loss is small",
+     "It is weakly measured",
+     "The figures are falsified",
+     "Loss is rising"
+    ],
+    "correct": 1,
+    "rationale": "Estimates from three per cent to a quarter are said to show how weakly the loss is measured."
+   },
+   {
+    "stem": "Why does a garden waste collection raise the rate?",
+    "options": [
+     "It reduces contamination",
+     "Garden waste is heavy",
+     "Residents recycle more",
+     "It is counted twice"
+    ],
+    "correct": 1,
+    "rationale": "Weight is the unit, so heavy material lifts the rate without any change in what is done with light material."
+   },
+   {
+    "stem": "What happens if households switch to cartons?",
+    "options": [
+     "The rate rises",
+     "The rate falls",
+     "Nothing changes",
+     "Contamination rises"
+    ],
+    "correct": 1,
+    "rationale": "Cartons are lighter than glass, so the measured rate falls even though the environmental position improves."
+   },
+   {
+    "stem": "Why are comparisons difficult?",
+    "options": [
+     "Authorities count different things",
+     "The tables are secret",
+     "Rates change monthly",
+     "Weights are estimated"
+    ],
+    "correct": 0,
+    "rationale": "Some authorities include street bins and small businesses in household waste and others do not, which the tables rarely state."
+   },
+   {
+    "stem": "What does the writer say the figure is good for?",
+    "options": [
+     "Ranking one place against another",
+     "Watching one place over time",
+     "Setting national targets",
+     "Measuring contamination"
+    ],
+    "correct": 1,
+    "rationale": "It is called a poor instrument for ranking neighbours and a reasonable one for following a single place across years."
+   }
+  ]
+ }
+]

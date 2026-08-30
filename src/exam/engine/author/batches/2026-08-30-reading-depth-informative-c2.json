@@ -1,0 +1,260 @@
+[
+ {
+  "id": "gt-r-c2-02-r",
+  "family": "informative",
+  "level": "C2",
+  "freshness": "timeless",
+  "script": "PREDICTION AND FORECAST ARE NOT THE SAME WORD\n\nTide tables are published years in advance and are, within their terms, extraordinarily accurate. Weather forecasts are published days in advance and are not. The difference is not that one science is more mature than the other, and treating it as though it were leads to a persistent misunderstanding of what each kind of statement is claiming.\n\nA tide is driven by the positions of the moon and the sun, which are known. The forces are periodic, the periods are stable over any interval a table cares about, and the response of a particular harbour to those forces can be characterised by observing it for a year and extracting a set of constants. Once those constants exist, the calculation is arithmetic. Nothing about next March's tide depends on what happens in February. This is prediction in its strict sense: the future state is a function of a clock.\n\nThe atmosphere is not periodic and its future state depends on its present one in a way that resists exactly this treatment. Two states that differ by less than the instruments can distinguish diverge, and the rate at which they diverge sets a horizon beyond which no improvement in computing power helps. That horizon is a property of the system rather than of the technique, which is why forecasting has improved steadily for fifty years without the ten-day forecast becoming the two-day one.\n\nSo the tide table is a prediction and the weather report is a forecast, and the words are worth keeping apart. What complicates the picture, and what the confident language of tide tables conceals, is that harbours are not only driven by astronomy. A deep low-pressure system raises sea level; a sustained onshore wind piles water against a coast. On the North Sea coast the difference between the predicted tide and the observed one has exceeded two metres, which is more than the difference between an ordinary high tide and an ordinary low one.\n\nThe consequence is a hybrid quantity that neither word describes well. The published number for tomorrow's high water is a prediction with a forecast bolted onto it: astronomy for the shape, meteorology for the offset. Coastal warning services state the two components separately for precisely this reason, and the separation is the honest part. The astronomical figure will not change and can be printed a decade ahead. The surge component cannot be printed at all until a few days before, and carries the horizon of every other atmospheric statement.\n\nWhat generalises is the underlying test. Ask what the future state depends on. If it depends on a clock, the confident language of prediction is earned. If it depends on the present state, and small differences in that state grow, the language belongs to forecasting however sophisticated the model — and any published number that mixes the two should say which part is which.",
+  "items": [
+   {
+    "stem": "Why can tides be given years ahead?",
+    "options": [
+     "Instruments are more accurate at sea",
+     "The driving forces are periodic and known",
+     "Harbours change very slowly",
+     "The calculation uses more computing power"
+    ],
+    "correct": 1,
+    "rationale": "The moon and sun move on stable periods, and once a harbour's constants are known the future state follows by arithmetic."
+   },
+   {
+    "stem": "What sets the limit on weather forecasting?",
+    "options": [
+     "The cost of computing",
+     "A property of the atmosphere itself",
+     "The number of instruments",
+     "The length of the record"
+    ],
+    "correct": 1,
+    "rationale": "Nearby states diverge, and the rate of divergence sets a horizon that belongs to the system rather than the method."
+   },
+   {
+    "stem": "What does the writer say about fifty years of progress?",
+    "options": [
+     "It has removed the horizon",
+     "It has not turned ten days into two",
+     "It has been slower than expected",
+     "It has changed the definition"
+    ],
+    "correct": 1,
+    "rationale": "Forecasting has improved steadily without the ten-day forecast becoming as good as the two-day one, because the horizon is not a technique."
+   },
+   {
+    "stem": "What can make an observed tide differ from the table?",
+    "options": [
+     "Errors in the constants",
+     "Pressure and wind",
+     "A change in the moon",
+     "Faults in the instrument"
+    ],
+    "correct": 1,
+    "rationale": "Low pressure raises sea level and a sustained onshore wind piles water up, which on the North Sea has exceeded two metres."
+   },
+   {
+    "stem": "Why is the two-metre figure given?",
+    "options": [
+     "It is the usual tidal range",
+     "It exceeds an ordinary tidal range",
+     "It is the largest ever recorded",
+     "It is the depth of the harbour"
+    ],
+    "correct": 1,
+    "rationale": "The comparison is made to show the departure can be larger than the whole difference between an ordinary high and low tide."
+   },
+   {
+    "stem": "Why do warning services separate the two components?",
+    "options": [
+     "To simplify the arithmetic",
+     "Because they carry different horizons",
+     "Because the law requires it",
+     "To reduce the published figure"
+    ],
+    "correct": 1,
+    "rationale": "The astronomical part can be printed a decade ahead while the surge cannot be given until days before, so separating them is the honest presentation."
+   },
+   {
+    "stem": "What test does the writer offer at the end?",
+    "options": [
+     "How sophisticated the model is",
+     "What the future state rests on",
+     "The length of the record kept",
+     "The authority that publishes it"
+    ],
+    "correct": 1,
+    "rationale": "If the future depends on a clock the language of prediction is earned; if it depends on a present state whose small differences grow, it is forecasting."
+   }
+  ]
+ },
+ {
+  "id": "gt-r-c2-03-r",
+  "family": "informative",
+  "level": "C2",
+  "freshness": "timeless",
+  "script": "THE HOUR THAT HAD TO BE INVENTED\n\nBefore the railways, every town kept its own noon. The sun reached its highest point over Bristol about ten minutes after it reached its highest point over London, and both towns set their clocks accordingly, with no inconvenience to anyone. A traveller between them took long enough that the discrepancy never presented itself as a problem to be solved.\n\nWhat made it a problem was not speed as such but the timetable. A coach that took two days did not need the two towns to agree what o'clock it was; a train that took two hours did, because a single printed table had to state a departure and an arrival in one system of time or become a document that could not be read. The railways therefore adopted a common time, generally that of the capital, and printed it. For some decades the result was a country in which the station clock and the church clock disagreed by a few minutes and both were correct, each within its own convention.\n\nThe familiar account has the church yielding to the station, and it did, but the sequence is more interesting than the outcome. Legal time changed last, not first. Courts continued for years to rule that a document timed at a particular hour meant local solar time, which meant a contract signed at the station and a contract signed across the road could be timed differently on the same afternoon. The standardisation was accomplished by practice, by printing, and by the ordinary desire not to miss a train, and the law arrived afterwards to describe what had already happened.\n\nThe international system that followed has a similar character. Zones an hour wide are a convenience rather than a discovery, and they fit the world imperfectly: many boundaries follow political lines rather than meridians, several territories use offsets of thirty or forty-five minutes, and one country that spans five geographic zones keeps a single time throughout, which means the sun rises at very different clock hours at its two ends.\n\nNone of this is dysfunction. It is the ordinary result of a system whose purpose is coordination rather than description. A zone boundary that ran down the middle of a city would be astronomically defensible and practically absurd, and the fact that the boundaries bend around such cases is evidence that the system is doing its job. The instructive point is that the quantity being standardised was never the position of the sun. It was the ability of two people who cannot see each other to agree on when to do something, and that ability is worth more than accuracy to a few minutes.",
+  "items": [
+   {
+    "stem": "Why was local time not a problem before the railways?",
+    "options": [
+     "Clocks were inaccurate",
+     "Travel was slow enough",
+     "Few people travelled",
+     "Towns kept the same time"
+    ],
+    "correct": 1,
+    "rationale": "A journey of two days never brought the discrepancy to anyone's attention as something needing a solution."
+   },
+   {
+    "stem": "What made a common time necessary?",
+    "options": [
+     "The speed of the trains",
+     "The printed timetable",
+     "A change in the law",
+     "The invention of the telegraph"
+    ],
+    "correct": 1,
+    "rationale": "A single table had to give a departure and an arrival in one system, or it could not be read at all."
+   },
+   {
+    "stem": "What does the writer find more interesting than the outcome?",
+    "options": [
+     "The order in which it happened",
+     "The cost of the change",
+     "The role of the church",
+     "The design of the clocks"
+    ],
+    "correct": 0,
+    "rationale": "Legal time changed last rather than first, and the writer calls that sequence more interesting than the result."
+   },
+   {
+    "stem": "What could happen while the courts held to solar time?",
+    "options": [
+     "Trains ran to two timetables",
+     "Same-day contracts bore different times",
+     "Station clocks had to be removed",
+     "Church clocks were declared illegal"
+    ],
+    "correct": 1,
+    "rationale": "A document signed at the station and one signed across the road could bear different times on the same day."
+   },
+   {
+    "stem": "What does the writer say achieved the standardisation?",
+    "options": [
+     "Legislation",
+     "Practice and printing",
+     "Astronomical measurement",
+     "International agreement"
+    ],
+    "correct": 1,
+    "rationale": "It came about through practice, printing and the wish not to miss a train, with the law describing it afterwards."
+   },
+   {
+    "stem": "How does the writer regard the irregular zone boundaries?",
+    "options": [
+     "As a fault to be corrected",
+     "As evidence the system works",
+     "As politically motivated errors",
+     "As a recent development"
+    ],
+    "correct": 1,
+    "rationale": "A boundary through the middle of a city would be defensible astronomically and absurd practically, so bending around such cases shows the system doing its job."
+   },
+   {
+    "stem": "What does the writer say was being standardised?",
+    "options": [
+     "The position of the sun",
+     "The accuracy of clocks",
+     "The ability to agree when",
+     "The length of an hour"
+    ],
+    "correct": 2,
+    "rationale": "The quantity was never solar position but the ability of people who cannot see each other to agree on when to act."
+   }
+  ]
+ },
+ {
+  "id": "gt-r-c2-04-r",
+  "family": "informative",
+  "level": "C2",
+  "freshness": "timeless",
+  "script": "WHY LEGAL TRANSLATION RESISTS THE MACHINE\n\nMachine translation has become very good at a particular task: producing, from a sentence in one language, a sentence in another that a reader will accept as saying the same thing. Legal translation is a different task that looks identical from outside, and the gap between them is where the difficulties live.\n\nA contract is not primarily a description. It is an instrument that will be read adversarially by someone looking for the reading that favours them, and its words have been chosen, often over several rounds, to close off readings that a fluent paraphrase reopens. A translator who renders a clause into natural, idiomatic prose has done the job asked of a novelist and the opposite of the job asked here, because the awkwardness in the original was frequently doing work.\n\nThe deeper obstacle is that legal terms are not labels for things but positions within a system, and systems differ. There is no French word that means what the English word consideration means, not because French lacks vocabulary but because French contract law does not require the concept: the doctrine sits inside a structure that the other system builds differently. The competent translator does not find the equivalent term. There is none. What is done instead is a decision — to keep the source term and gloss it, to use a near-neighbour and accept a shift, or to restructure the clause so the function survives even though the words do not — and each of those decisions has consequences a court may later examine.\n\nThis is why the profession's output is often not a translation in the ordinary sense. Bilingual jurisdictions do not translate statutes; they draft them twice, with both versions authoritative and neither derived from the other, precisely so that no version is a rendering of another with the losses a rendering entails. Where a translation must be made, it is frequently accompanied by a statement of which version governs in the event of conflict — an admission, built into the practice, that the two documents are not expected to be identical.\n\nNone of this means the machine has no place. It is very useful for reading: a lawyer who needs to know what a foreign filing is about, quickly, is well served. It is useful for the first pass of a long, repetitive schedule. What it cannot do is make the decisions described above, because those are not linguistic decisions at all but judgements about which of two legal systems a sentence is going to have to live in — and a system that produces fluent output has no way of signalling that this is what it has silently decided.\n\nThe risk, then, is not mistranslation of the obvious kind. It is fluency: an output that reads well, gives no sign of the choice it made, and is therefore harder to check than a clumsy one would have been.",
+  "items": [
+   {
+    "stem": "What task does the writer say machines do well?",
+    "options": [
+     "Choosing between legal systems",
+     "Producing an acceptable sentence in another language",
+     "Drafting statutes in two languages",
+     "Deciding which version governs"
+    ],
+    "correct": 1,
+    "rationale": "The machine is good at rendering a sentence a reader will accept as saying the same thing, which is a different task from legal translation."
+   },
+   {
+    "stem": "Why is idiomatic prose a problem in a contract?",
+    "options": [
+     "It is harder to read",
+     "It may reopen closed readings",
+     "It takes longer to produce",
+     "Courts forbid it"
+    ],
+    "correct": 1,
+    "rationale": "Wording was chosen over several rounds to shut off readings, and a fluent paraphrase can let them back in."
+   },
+   {
+    "stem": "Why is there no French equivalent for one English term?",
+    "options": [
+     "French vocabulary is smaller",
+     "That law is built differently",
+     "The term is very recent",
+     "Translators disagree about it"
+    ],
+    "correct": 1,
+    "rationale": "The doctrine sits inside a structure that French contract law builds another way, so no term occupies the same position."
+   },
+   {
+    "stem": "What does a competent translator do instead?",
+    "options": [
+     "Find the nearest word",
+     "Make a decision with consequences",
+     "Leave the clause out",
+     "Ask the court"
+    ],
+    "correct": 1,
+    "rationale": "The choice is to gloss, to accept a shift, or to restructure so the function survives, and a court may examine any of them."
+   },
+   {
+    "stem": "Why do bilingual jurisdictions draft twice?",
+    "options": [
+     "To save professional time",
+     "So neither version is derived",
+     "Because translators are scarce",
+     "To satisfy both languages equally"
+    ],
+    "correct": 1,
+    "rationale": "Both versions are authoritative and neither is a rendering, which avoids the losses a rendering entails."
+   },
+   {
+    "stem": "What does a governing-version clause admit?",
+    "options": [
+     "That one language is superior",
+     "That the documents may differ",
+     "That translation is forbidden",
+     "That the contract is provisional"
+    ],
+    "correct": 1,
+    "rationale": "Naming which version prevails in a conflict concedes that the two are not expected to be identical."
+   },
+   {
+    "stem": "What does the writer identify as the real risk?",
+    "options": [
+     "Obvious errors of vocabulary",
+     "Output that reads too well",
+     "Slow production of drafts",
+     "Refusal to use machines"
+    ],
+    "correct": 1,
+    "rationale": "Fluent output gives no sign of the choice it made and is harder to check than a clumsy version would be."
+   }
+  ]
+ }
+]
