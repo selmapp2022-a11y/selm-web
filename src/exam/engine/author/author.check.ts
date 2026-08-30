@@ -52,6 +52,33 @@ const bp = blueprintsFor(gt, reading).find((b) => b.family === 'informative' && 
 
 const ANCHORS: Anchor[] = reading.recordings.map((r) => ({ id: r.id, level: r.level as Anchor['level'], script: r.script ?? '' }));
 
+/**
+ * SIX PLACEHOLDER PASSAGES, FROZEN HERE ON PURPOSE.
+ *
+ * Two cases below assert that an instrument has to be built before it can
+ * measure: against an anchor set of stubs, a sound candidate is refused by the
+ * veto, and is admitted only as an anchor, unmeasured and marked for review.
+ *
+ * They used to read that from `ANCHORS`, which is the shipped bank — and that
+ * worked only while the shipped bank WAS six stubs of 16 to 45 words. On
+ * 30 August the reading bank passed fifty passages and both cases went green
+ * for the wrong reason: the bank had become a real ladder, so the veto had
+ * something to measure against and passed. A case that stops testing its claim
+ * by being fixed is worse than one that fails, because nothing says so.
+ *
+ * The fixture is therefore frozen. It is what the bank looked like on
+ * 29 August, kept as a fixture rather than read from a bank that will keep
+ * growing, so the claim stays testable for as long as it is worth making.
+ */
+const STUBS: Anchor[] = [
+  { id: 'stub-a1', level: 'A1', script: 'No entry. Staff only.' },
+  { id: 'stub-a2', level: 'A2', script: 'Please close the gate behind you. The dogs get out.' },
+  { id: 'stub-b1', level: 'B1', script: 'The library is closed on Monday. Books may be returned to the box by the door at any time.' },
+  { id: 'stub-b2', level: 'B2', script: 'Tickets bought online are cheaper than tickets bought at the door, and must be shown on a phone or printed.' },
+  { id: 'stub-c1', level: 'C1', script: 'The committee has decided to postpone the decision until the survey is complete, which is expected in the spring.' },
+  { id: 'stub-c2', level: 'C2', script: 'Applicants are reminded that the deadline is final and that late submissions will not be considered under any circumstances.' },
+];
+
 const choice = (over: Partial<ComprehensionItem> = {}): ComprehensionItem => ({
   id: 'x-1', recordingId: 'x', level: 'B2',
   stem: 'What does the scheme require of tenants?',
@@ -204,8 +231,10 @@ for (const a of ANCHORS) {
 }
 const monotone = ANCHORS.every((a, i) => i === 0 || profile(ANCHORS[i - 1].script, gt.locale).meanSentenceWords <= profile(a.script, gt.locale).meanSentenceWords);
 console.log(`     do they rise monotonically in sentence length? ${monotone ? 'yes' : 'NO — the instrument is not graded'}`);
-console.log('     six passages of 16 to 45 words are not an instrument. Filling this bank');
-console.log('     is what makes the veto worth running on the next one.');
+console.log(`     ${ANCHORS.length} passages. On 29 August this was six, of 16 to 45 words, and`);
+console.log('     that was not an instrument. Filling the bank is what made the veto');
+console.log('     worth running — and it is why the two cases below now use a frozen');
+console.log('     fixture rather than reading the bank they were written against.');
 
 console.log('\n4. Ingest runs the layers in order, and records who judged\n');
 const verdict = (over: Partial<AnchorVerdict> = {}): AnchorVerdict =>
@@ -232,13 +261,15 @@ if (ok.ok) {
 const other = ingest({ candidate: good(), blueprint: bp, section: reading, anchors: LADDER, anchorVerdict: verdict({ judge: 'a-different-judge' }), locale: gt.locale });
 t('a different judge clears the self-judged flag', other.ok && other.accepted.selfJudged, false);
 
-// The instrument has to be built before it can measure: against the six
+// The instrument has to be built before it can measure: against a set of
 // stubs the same sound candidate is refused, and as an ANCHOR it is admitted,
-// unmeasured and marked for review.
-const asItem = ingest({ candidate: good(), blueprint: bp, section: reading, anchors: ANCHORS, anchorVerdict: verdict(), locale: gt.locale });
+// unmeasured and marked for review. Measured against STUBS rather than the
+// shipped bank — see the note on the fixture. The shipped bank is now a real
+// ladder, and reading this case from it made it pass for the wrong reason.
+const asItem = ingest({ candidate: good(), blueprint: bp, section: reading, anchors: STUBS, anchorVerdict: verdict(), locale: gt.locale });
 t('against the placeholder anchors, an item is refused by the veto',
   asItem.ok === false && asItem.rejected.layer === 'veto', true);
-const asAnchor = ingest({ candidate: good(), blueprint: bp, section: reading, anchors: ANCHORS, anchorVerdict: verdict(), locale: gt.locale, role: 'anchor' });
+const asAnchor = ingest({ candidate: good(), blueprint: bp, section: reading, anchors: STUBS, anchorVerdict: verdict(), locale: gt.locale, role: 'anchor' });
 t('the same candidate is admitted AS AN ANCHOR', asAnchor.ok, true);
 if (asAnchor.ok) {
   t('an anchor is always sent for review', asAnchor.accepted.needsReview, true);

@@ -1,0 +1,551 @@
+[
+ {
+  "id": "gt-r-b2-10-r",
+  "family": "argued",
+  "level": "B2",
+  "freshness": "current",
+  "script": "TAKE THE BINS OUT OF THE PARK\n\nThe proposal sounds like a joke and is not. Several parks have removed their bins entirely and found that litter fell. I think the policy is right, and I think the usual explanation of why it works is wrong.\n\nThe explanation offered by its supporters is that a bin gives people permission to bring rubbish, and that removing it removes the permission. Park managers I have spoken to say something narrower and more convincing: the problem was never the rubbish people carried in, it was the rubbish that came out of the bins. An overflowing bin on a warm Sunday is emptied by birds within the hour, and one bag of picnic waste becomes forty metres of scattered litter that then has to be picked up by hand.\n\nOpponents make two arguments. The first is that removing bins simply moves the problem to the streets outside the gates, and the councils that have published figures do report a small rise there. The second is that the policy asks more of the public than it should, and I think this one deserves more respect than it usually receives. A parent with a pushchair and a bag of nappies is being asked to carry something unpleasant a long way, and telling them it is good for the park is not an answer to their complaint.\n\nMy own position is that the policy works and should be adopted with two conditions. Bins should be kept at the gates, where they are emptied on the way past and where nobody has to carry waste far. And the councils that adopt it should publish the street figures rather than the park figures, since the park figures are the ones that flatter them.\n\nWhat should not be claimed is that this teaches responsibility. There is no evidence for that, and the people making the claim have not looked for any.",
+  "items": [
+   {
+    "stem": "What does the writer think of the policy?",
+    "options": [
+     "It should be rejected",
+     "It is right, for other reasons",
+     "It is untested so far",
+     "It works only in summer"
+    ],
+    "correct": 1,
+    "rationale": "The writer says the policy is right while rejecting the explanation its supporters give for why it works."
+   },
+   {
+    "stem": "What explanation do supporters give?",
+    "options": [
+     "Birds cause most of the mess",
+     "A bin gives permission to bring rubbish",
+     "Councils save money",
+     "Parks are cleaner in winter"
+    ],
+    "correct": 1,
+    "rationale": "That is the supporters' account, and the writer sets it aside in favour of what the park managers describe."
+   },
+   {
+    "stem": "What do the park managers say?",
+    "options": [
+     "The bins themselves spill",
+     "People bring too much in",
+     "Nobody uses the bins",
+     "Litter is falling anyway"
+    ],
+    "correct": 0,
+    "rationale": "Their narrower account is that an overflowing bin is opened by birds and scatters, so the waste comes out rather than in."
+   },
+   {
+    "stem": "What do published figures show about nearby streets?",
+    "options": [
+     "A small rise in litter",
+     "No change at all",
+     "A large fall",
+     "Nothing has been published"
+    ],
+    "correct": 0,
+    "rationale": "The councils that published figures report a small rise outside the gates, which is the opponents' first argument."
+   },
+   {
+    "stem": "Which objection does the writer respect most?",
+    "options": [
+     "The cost to councils",
+     "The burden on a parent",
+     "The loss of park staff",
+     "The effect on birds"
+    ],
+    "correct": 1,
+    "rationale": "The writer says the argument about what the policy asks of the public deserves more respect than it usually gets."
+   },
+   {
+    "stem": "What two conditions does the writer set?",
+    "options": [
+     "Bins at gates, and street figures",
+     "More staff, and fewer picnics",
+     "A trial period, and a survey",
+     "Signs, and higher fines"
+    ],
+    "correct": 0,
+    "rationale": "Bins are to stay at the gates, and the councils are to publish the street figures rather than the flattering park ones."
+   },
+   {
+    "stem": "What claim does the writer reject?",
+    "options": [
+     "That litter has fallen",
+     "That the policy teaches responsibility",
+     "That birds open bins",
+     "That streets are affected"
+    ],
+    "correct": 1,
+    "rationale": "There is no evidence for the responsibility claim and, the writer says, its makers have not looked for any."
+   }
+  ]
+ },
+ {
+  "id": "gt-r-b2-11-r",
+  "family": "argued",
+  "level": "B2",
+  "freshness": "current",
+  "script": "THE HELMET ARGUMENT IS NOT THE ARGUMENT PEOPLE THINK\n\nAsk whether cycle helmets should be compulsory and you will get an answer about whether helmets work. Those are different questions, and running them together is why the debate never moves.\n\nThat helmets reduce head injury in a fall is not seriously disputed. The studies vary in how much, and the honest summary is that the protection is real and smaller than the safety campaigns suggest. I take that as settled and it is not what I want to argue about.\n\nThe question a law asks is different. A law does not put a helmet on a cyclist. It changes who cycles. Where compulsion has been introduced, cycling numbers have fallen — sharply at first, partly recovering later — and the fall is concentrated among occasional riders, teenagers and people using shared bicycles. Supporters of compulsion point out, correctly, that a fall in cycling is not itself a health outcome. Opponents reply that the health benefit of cycling is large and well measured, and that a policy which reduces cycling has to be set against that.\n\nMy own view is that the case for compulsion has not been made, and I want to be careful about what that does and does not mean. It does not mean helmets are useless; I wear one. It does not mean the studies are wrong. It means that the effect a law has on who rides is the part that decides the answer, and it is the part that receives the least attention from both sides.\n\nWhat I would ask of anyone arguing either way is a single sentence: what would change your mind? Those who say nothing would are not making an argument about evidence, whatever the evidence they cite.",
+  "items": [
+   {
+    "stem": "What does the writer say is the real question?",
+    "options": [
+     "Whether helmets protect",
+     "Who a law stops riding",
+     "How much helmets cost",
+     "Which studies to believe"
+    ],
+    "correct": 1,
+    "rationale": "Protection is treated as settled; the writer argues the law's effect on who cycles is what decides the matter."
+   },
+   {
+    "stem": "What does the writer accept about protection?",
+    "options": [
+     "It is real but smaller than claimed",
+     "It has been disproved",
+     "It applies only to children",
+     "It cannot be measured"
+    ],
+    "correct": 0,
+    "rationale": "The writer calls the protection real and smaller than the safety campaigns suggest, and treats it as settled."
+   },
+   {
+    "stem": "Who does the fall in cycling most affect?",
+    "options": [
+     "Daily commuters",
+     "Occasional riders",
+     "Racing cyclists",
+     "Delivery riders"
+    ],
+    "correct": 1,
+    "rationale": "The reported fall is concentrated among occasional riders, teenagers and users of shared bicycles."
+   },
+   {
+    "stem": "What point do supporters make correctly?",
+    "options": [
+     "Less cycling is not a health outcome",
+     "Helmets prevent all injuries",
+     "Cycling is falling anyway",
+     "Laws are easy to enforce"
+    ],
+    "correct": 0,
+    "rationale": "The writer grants that supporters are right that a fall in cycling is not in itself a health outcome."
+   },
+   {
+    "stem": "What is the writer's own position?",
+    "options": [
+     "Compulsion is proven wrong",
+     "The case has not been made",
+     "Helmets should be banned",
+     "The studies are unreliable"
+    ],
+    "correct": 1,
+    "rationale": "The writer says the case for compulsion has not been made, while stating plainly what that does not mean."
+   },
+   {
+    "stem": "What does the writer ask of both sides?",
+    "options": [
+     "A better study",
+     "What would change their mind",
+     "A trial in one city",
+     "Agreement on the figures"
+    ],
+    "correct": 1,
+    "rationale": "Anyone who cannot say what would change their mind is not, in the writer's view, arguing about evidence."
+   }
+  ]
+ },
+ {
+  "id": "gt-r-b2-12-r",
+  "family": "argued",
+  "level": "B2",
+  "freshness": "current",
+  "script": "KEEP PRIMARY HOMEWORK, BUT STOP PRETENDING\n\nThe research on homework in primary schools is unusually clear, and it says that the effect on attainment is close to nothing. Several countries have abolished it on that basis. I think the research is right and the conclusion drawn from it is too quick.\n\nWhat the studies measure is attainment, and attainment is not the only reason a school might set work. Teachers I have asked give three others: that a short task tells a parent what the class is doing, that reading at home is different in kind from reading in a room with thirty children, and that the habit of finishing something small without supervision is worth having before secondary school, where nobody will remind you.\n\nThe first of those is the strongest and is almost never stated. A worksheet is a poor learning instrument and an excellent window: it is often the only thing a working parent sees of the curriculum all term. Defending homework on that ground is honest. Defending it on attainment, when the evidence says otherwise, is not.\n\nThe objection I find hardest is about fairness. A child with a quiet table and an adult who can help gets a different task from a child with neither, and the second child is marked on the same work. Schools that have thought about this set tasks that need no equipment and no adult, and mark completion rather than quality. That is a real answer, and it is not what most schools do.\n\nSo: keep it, keep it short, and change the reason given. A ten-minute task defended as a window into the classroom is defensible. The same task defended as raising results is a claim the school's own inspectors could check and would not support.",
+  "items": [
+   {
+    "stem": "What does the writer accept about the research?",
+    "options": [
+     "It is right about attainment",
+     "It was poorly designed",
+     "It applies only abroad",
+     "It has been overturned"
+    ],
+    "correct": 0,
+    "rationale": "The writer calls the research right and objects only to the speed of the conclusion drawn from it."
+   },
+   {
+    "stem": "How many other reasons do teachers give?",
+    "options": [
+     "One",
+     "Two",
+     "Three",
+     "Four"
+    ],
+    "correct": 2,
+    "rationale": "Three are listed: a window for parents, reading at home, and the habit of unsupervised completion."
+   },
+   {
+    "stem": "Which reason does the writer call strongest?",
+    "options": [
+     "The reading at home",
+     "The window for parents",
+     "The habit of finishing",
+     "The preparation for secondary"
+    ],
+    "correct": 1,
+    "rationale": "The writer calls it the strongest and notes it is almost never stated aloud."
+   },
+   {
+    "stem": "What objection does the writer find hardest?",
+    "options": [
+     "The cost to schools",
+     "The unfairness between homes",
+     "The workload for teachers",
+     "The length of tasks"
+    ],
+    "correct": 1,
+    "rationale": "A child with a quiet table and an adult to help is marked on the same work as a child with neither."
+   },
+   {
+    "stem": "What do thoughtful schools do about it?",
+    "options": [
+     "Set no work at all",
+     "Mark completion, not quality",
+     "Provide equipment",
+     "Ask parents to sign"
+    ],
+    "correct": 1,
+    "rationale": "They set tasks needing no adult and no equipment, and mark whether the work was done rather than how well."
+   },
+   {
+    "stem": "What does the writer conclude?",
+    "options": [
+     "Abolish it entirely",
+     "Keep it and change the reason",
+     "Extend it to weekends",
+     "Leave it to parents"
+    ],
+    "correct": 1,
+    "rationale": "Keep it short and defend it as a window into the classroom, not as something that raises results."
+   }
+  ]
+ },
+ {
+  "id": "gt-r-c1-02-r",
+  "family": "argued",
+  "level": "C1",
+  "freshness": "current",
+  "script": "THE PAPER FORM IS NOT NOSTALGIA\n\nEvery few years an administration announces that a service will be digital by default, and the phrase does a great deal of quiet work. Default implies an alternative that remains available, and in practice the alternative is allowed to decay until using it is a punishment. I want to argue that maintaining the non-digital route is not a concession to the past but a condition of the digital one working at all, and that the argument usually made against it is answering a different objection.\n\nThe case for digital delivery is strong and I am not disputing it. It is cheaper per transaction, it is available at three in the morning, and it removes a category of error that arises from handwriting. Those advantages are real and they accrue to the majority immediately.\n\nThe objection I am not making is the familiar one about older people. It is true as far as it goes and it is not the important part, partly because it solves itself slowly and partly because it invites the reply that has been given for twenty years: that the population is becoming more confident every year, so the problem is temporary. Treated as a problem about age, this is a waiting game, and waiting is what has been done.\n\nThe objection I am making is structural. A digital route fails for a proportion of users in every cohort, and it fails for reasons that have nothing to do with confidence: an address the validator will not accept, a name with a character the form rejects, a phone number that has moved with the person and no longer matches the record, an identity check that requires a document the applicant is applying in order to obtain. These are not user failures. They are cases the system did not model, and no amount of training makes them go away, because the person has done nothing wrong.\n\nA maintained alternative is what turns those cases from crises into inconveniences. It is also, and this is the part administrations consistently miss, the best instrument they have for finding out what is wrong with the digital route. A service that keeps a staffed counter learns weekly which fields defeat people. A service that has closed it learns nothing, because the people it is failing have simply stopped appearing in its figures — and a completion rate calculated on those who completed will look excellent.\n\nThe usual reply is cost, and it is not a serious reply as stated, because it compares the cost of the counter with nothing rather than with the cost of the failures the counter absorbs. What would be a serious reply is a costed estimate of both, and I have not seen one published. Until somebody produces it, closing the alternative is not an efficiency. It is a transfer of cost onto people who have the least capacity to absorb it, and a decision to stop measuring whether that is happening.",
+  "items": [
+   {
+    "stem": "What does the writer say the phrase does?",
+    "options": [
+     "It describes the service exactly",
+     "It implies an alternative that then decays",
+     "It reassures older users",
+     "It saves money at once"
+    ],
+    "correct": 1,
+    "rationale": "Default implies something remains available, while in practice the alternative is left to decay until it is a punishment."
+   },
+   {
+    "stem": "What does the writer concede?",
+    "options": [
+     "Digital delivery has real advantages",
+     "Paper is cheaper per transaction",
+     "Errors are rare online",
+     "The change was unnecessary"
+    ],
+    "correct": 0,
+    "rationale": "The writer accepts that digital delivery is cheaper, always open and removes handwriting errors."
+   },
+   {
+    "stem": "Why is the argument about age set aside?",
+    "options": [
+     "It is untrue",
+     "It invites a waiting reply",
+     "It is rarely made",
+     "It applies only abroad"
+    ],
+    "correct": 1,
+    "rationale": "Framed as a problem of age it invites the answer that confidence is rising, which turns it into a waiting game."
+   },
+   {
+    "stem": "What kind of failures does the writer describe?",
+    "options": [
+     "Failures of user confidence",
+     "Cases nobody designed for",
+     "Deliberate refusals to comply",
+     "Errors made in handwriting"
+    ],
+    "correct": 1,
+    "rationale": "Rejected characters, moved numbers and documents one is applying to obtain are cases the design did not anticipate."
+   },
+   {
+    "stem": "What second use does the writer give the counter?",
+    "options": [
+     "It trains new staff",
+     "It shows what defeats people",
+     "It reduces fraud",
+     "It speeds up payment"
+    ],
+    "correct": 1,
+    "rationale": "A staffed counter tells a service weekly which fields defeat users, which a closed one cannot."
+   },
+   {
+    "stem": "Why will a completion rate look good?",
+    "options": [
+     "The service has improved",
+     "Those failing stop appearing",
+     "Fewer people apply overall",
+     "Staff record it wrongly"
+    ],
+    "correct": 1,
+    "rationale": "People the service fails stop showing up in its figures, so a rate computed on those who completed flatters it."
+   },
+   {
+    "stem": "What does the writer say about the cost reply?",
+    "options": [
+     "It is decisive",
+     "It compares against nothing",
+     "It has been costed fully",
+     "It applies only to small services"
+    ],
+    "correct": 1,
+    "rationale": "It sets the counter's cost against nothing rather than against the cost of the failures the counter absorbs."
+   },
+   {
+    "stem": "What would make the reply serious?",
+    "options": [
+     "A published estimate of both",
+     "A trial in one region",
+     "Support from ministers",
+     "A survey of users"
+    ],
+    "correct": 0,
+    "rationale": "The writer asks for a costed estimate of both sides and says no such thing has been published."
+   }
+  ]
+ },
+ {
+  "id": "gt-r-c1-03-r",
+  "family": "argued",
+  "level": "C1",
+  "freshness": "current",
+  "script": "RANK THE UNIVERSITIES, BUT PUBLISH THE WEIGHTS\n\nThe standard case against university rankings is that they compress incommensurable things into one number. It is a good argument and it has been made for thirty years without effect, which ought to tell its makers something. Rankings persist because they answer a question people are actually asking, badly, and the alternative on offer — a dashboard of twenty indicators — answers no question at all for the person it is aimed at.\n\nI want to defend ranking and attack the way it is done, because the two are usually conflated and the conflation protects the compilers.\n\nStart with what a ranking is. It is a weighted sum. Somebody has decided that research output is worth this much and student satisfaction that much, and every subsequent digit is a consequence of that decision. The decision is a value judgement, not a measurement, and there is nothing wrong with a value judgement being made — a prospective student makes one when they choose. What is wrong is that the judgement is made by the compiler, presented as arithmetic, and in several major rankings not fully disclosed.\n\nDefenders reply that the methodology is published. Some of it is. What is often withheld is the reputational survey: who was asked, how many replied, and how the responses were weighted by region. In at least one widely cited table this component is the largest single input, and the response rate has not been stated. A number whose largest input cannot be examined is not a measurement of anything; it is an opinion with decimal places.\n\nThe deeper problem is the one rankings cause rather than the one they contain. An institution that improves its position by improving what is measured has improved something. An institution that improves its position by recruiting differently, or by reclassifying staff, or by choosing which students to count, has improved nothing and cannot be distinguished from the first by anyone reading the table. Compilers know this and respond by changing the methodology, which moves institutions up and down for reasons unconnected to anything they did, and is then reported as change.\n\nSo my position is neither abolition nor acceptance. Publish the ranking, publish the weights, publish the response rates, and publish what each institution's position would be under three other plausible weightings. If a university sits in the top ten under one set of weights and outside the top fifty under another, that is the most useful thing a prospective student could be told, and it is precisely what the single number is constructed to hide.",
+  "items": [
+   {
+    "stem": "What does the writer say about the standard objection?",
+    "options": [
+     "It is wrong",
+     "It is good but ineffective",
+     "It is rarely made",
+     "It has succeeded"
+    ],
+    "correct": 1,
+    "rationale": "The writer calls it a good argument made for thirty years without effect, which ought to tell its makers something."
+   },
+   {
+    "stem": "Why do rankings persist?",
+    "options": [
+     "They answer a real question badly",
+     "They are legally required",
+     "They are cheap to produce",
+     "Universities demand them"
+    ],
+    "correct": 0,
+    "rationale": "They answer a question people are actually asking, while a dashboard of twenty indicators answers none."
+   },
+   {
+    "stem": "What does the writer say a ranking is?",
+    "options": [
+     "A measurement",
+     "A weighted sum",
+     "A survey",
+     "An estimate"
+    ],
+    "correct": 1,
+    "rationale": "Someone decides what each component is worth, and every digit after that follows from the decision."
+   },
+   {
+    "stem": "What is wrong with the value judgement?",
+    "options": [
+     "It is made at all",
+     "It is presented as arithmetic",
+     "It changes each year",
+     "Students cannot make one"
+    ],
+    "correct": 1,
+    "rationale": "The objection is not that a judgement is made but that the compiler's judgement is presented as calculation and often not disclosed."
+   },
+   {
+    "stem": "What is often withheld?",
+    "options": [
+     "The list of universities",
+     "The reputational survey detail",
+     "The publication date",
+     "The cost of compiling"
+    ],
+    "correct": 1,
+    "rationale": "Who was asked, how many replied and how responses were weighted by region are frequently not stated."
+   },
+   {
+    "stem": "Why does the writer call one number an opinion?",
+    "options": [
+     "It comes from students",
+     "Its largest input cannot be examined",
+     "It is calculated abroad",
+     "It changes too slowly"
+    ],
+    "correct": 1,
+    "rationale": "If the biggest single component's response rate is unstated, the figure cannot be examined as a measurement."
+   },
+   {
+    "stem": "What cannot a reader distinguish?",
+    "options": [
+     "Real improvement from reclassification",
+     "One country from another",
+     "Old data from new",
+     "Public from private institutions"
+    ],
+    "correct": 0,
+    "rationale": "Improving what is measured and improving the position by recruiting or reclassifying look identical in the table."
+   },
+   {
+    "stem": "What does the writer propose?",
+    "options": [
+     "Abolishing the tables",
+     "Publishing weights and alternatives",
+     "Ranking by subject only",
+     "Letting universities compile them"
+    ],
+    "correct": 1,
+    "rationale": "Publish the weights, the response rates, and each institution's position under three other plausible weightings."
+   },
+   {
+    "stem": "Why would the alternative weightings help?",
+    "options": [
+     "They are cheaper to compute",
+     "They reveal how unstable a position is",
+     "They favour smaller institutions",
+     "They replace the survey"
+    ],
+    "correct": 1,
+    "rationale": "A university in the top ten under one weighting and outside the top fifty under another tells a student what the single number hides."
+   }
+  ]
+ },
+ {
+  "id": "gt-r-c1-04-r",
+  "family": "argued",
+  "level": "C1",
+  "freshness": "current",
+  "script": "THE OPEN PLAN ARGUMENT HAS BEEN WON AND NOTHING HAS CHANGED\n\nThere is now a substantial literature on open-plan offices and it points one way. Measured face-to-face interaction falls rather than rises when walls come down; written messaging increases; reported concentration falls; and the effect is largest for work that requires holding several things in mind at once. I accept this literature and I want to argue that citing it has achieved nothing, and to say why.\n\nThe reason is that the literature answers a question nobody with authority is asking. The decision to open a floor is not made by weighing interaction against concentration. It is made by dividing a rent by a headcount. An open floor holds more people per square metre than a cellular one, the saving is large and appears in a document, and the cost appears as a diffuse reduction in the quality of work that appears in no document at all. An argument that produces evidence on the second will not move a decision made on the first, and repeating the evidence more loudly does not change which column it lands in.\n\nDefenders of open plan usually make a claim about collaboration. I think this claim is largely sincere and largely wrong, and the studies are clear enough that I will not restate them. What interests me more is a second defence, made less often and harder to answer: that cellular offices allocate a scarce good — a door — by seniority, and that removing doors removes a visible hierarchy. That is true. It is also true that what replaced the door was not equality but a booking system for meeting rooms, which allocates the same scarce good by diary skill and confidence, and that the people disadvantaged by the second system are not obviously the same people who were disadvantaged by the first.\n\nWhat I would put in place of the argument is a measurement, because the asymmetry above is a measurement problem before it is a design problem. Organisations that have taken the trouble to measure output on work requiring sustained attention — code review, drafting, analysis — before and after a move have found effects large enough to appear in a budget. Very few take that trouble, and the ones that do are usually looking for something else and find it by accident.\n\nSo the recommendation is narrow and, I think, achievable. Do not argue about walls. Ask any organisation proposing a move to state, in advance, what it expects to happen to a named measure of output, and to publish the figure afterwards. Most will decline, and the declining is itself informative: an organisation unwilling to name a number in advance is not making the decision on the grounds it is giving.",
+  "items": [
+   {
+    "stem": "What does the writer accept?",
+    "options": [
+     "The literature's findings",
+     "That collaboration improves",
+     "That rent is irrelevant",
+     "That doors should return"
+    ],
+    "correct": 0,
+    "rationale": "The writer accepts the literature and argues instead that citing it has achieved nothing."
+   },
+   {
+    "stem": "How is the decision actually made?",
+    "options": [
+     "By weighing concentration",
+     "By dividing rent by headcount",
+     "By consulting staff",
+     "By copying other firms"
+    ],
+    "correct": 1,
+    "rationale": "The saving appears in a document while the cost appears as a diffuse loss of quality that appears in none."
+   },
+   {
+    "stem": "Why does more evidence not help?",
+    "options": [
+     "It is disputed",
+     "It lands in the wrong column",
+     "It is too recent",
+     "It is not published"
+    ],
+    "correct": 1,
+    "rationale": "Evidence about work quality does not move a decision taken on cost per square metre."
+   },
+   {
+    "stem": "What does the writer say about the collaboration claim?",
+    "options": [
+     "Sincere but mistaken",
+     "Deliberately dishonest",
+     "Recently proved",
+     "Impossible to test"
+    ],
+    "correct": 0,
+    "rationale": "The writer calls it largely sincere and largely wrong, and declines to restate studies already clear."
+   },
+   {
+    "stem": "Which defence does the writer find harder?",
+    "options": [
+     "That open plan saves money",
+     "That doors mark hierarchy",
+     "That staff prefer it",
+     "That it suits new firms"
+    ],
+    "correct": 1,
+    "rationale": "Cellular offices allocate a door by seniority, and removing doors removes a visible hierarchy, which the writer grants is true."
+   },
+   {
+    "stem": "What replaced the door?",
+    "options": [
+     "Equality of space",
+     "A room booking system",
+     "Fixed desks",
+     "Home working"
+    ],
+    "correct": 1,
+    "rationale": "Meeting rooms are allocated by diary skill and confidence, which disadvantages a different group from the one seniority disadvantaged."
+   },
+   {
+    "stem": "What have organisations that measured found?",
+    "options": [
+     "No measurable effect",
+     "Effects large enough to budget",
+     "Improvements in output",
+     "Results too varied to use"
+    ],
+    "correct": 1,
+    "rationale": "Where output on sustained-attention work was measured before and after a move, the effects were large enough to appear in a budget."
+   },
+   {
+    "stem": "What does the writer recommend?",
+    "options": [
+     "Restoring cellular offices",
+     "Naming a measure in advance",
+     "Consulting the literature",
+     "Delaying all moves"
+    ],
+    "correct": 1,
+    "rationale": "Ask the organisation to state in advance what it expects a named output measure to do, and to publish it afterwards."
+   },
+   {
+    "stem": "Why is a refusal informative?",
+    "options": [
+     "It shows the move is costly",
+     "It shows the stated grounds are false",
+     "It shows the staff disagree",
+     "It shows the measure is wrong"
+    ],
+    "correct": 1,
+    "rationale": "An organisation unwilling to name a number in advance is not deciding on the grounds it is giving."
+   }
+  ]
+ }
+]
