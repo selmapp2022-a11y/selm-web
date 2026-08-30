@@ -88,30 +88,28 @@ export const TCF_VOICE_CAST: FrenchVoiceRole[] = [
     why: 'Québécois male. Claims the accent plainly rather than as a character part, and held up when heard.',
   },
 
-  // --- west_african (minority) --------------------------------------------
-  {
-    id: 'wa-f',
-    variety: 'west_african',
-    gender: 'female',
-    vendorName: 'Fatou - Radiant and Gentle',
-    why: 'West African female. The second choice: the first (Alimata) was rejected on hearing, and the only other African female already on the account describes itself as "Unnatural, Young and Unclear" — a self-description no exam should accept. Fatou was added from the library for this slot.',
-  },
-  {
-    id: 'wa-m',
-    variety: 'west_african',
-    gender: 'male',
-    vendorName: 'Keli - Calm & Natural African',
-    why: 'Togolese accent — West African specifically, not "African" generally, which is what the mix asks for. Approved on first hearing.',
-  },
-
-  // --- belgian (occasional) -----------------------------------------------
-  {
-    id: 'be-m',
-    variety: 'belgian',
-    gender: 'male',
-    vendorName: 'Christophe Géradon - Soft and Narrative',
-    why: 'Belgian male, a fifty-year-old with a slight Liège accent. The only Belgian voice, because the library holds no Belgian French female — see KNOWN_CAST_GAPS. Belgian is therefore assigned only to single-speaker recordings.',
-  },
+  // ── WEST AFRICAN AND BELGIAN WERE CAST HERE, AND ARE OUT ────────────────
+  //
+  // Removed 31 August 2026 on the founder's ruling: *"for the French exam, the
+  // practice and the lessons, use only Québécois, Parisian and Swiss — only
+  // those three."*
+  //
+  // Both were auditioned and both passed. Fatou was the second West African
+  // female, chosen after Alimata was rejected by ear; Keli was approved on
+  // first hearing and is Togolese specifically rather than "African"
+  // generally, which is what the old mix asked for. Christophe Géradon was the
+  // only Belgian voice on the library, and the reason Belgian was confined to
+  // monologues. Naming them here rather than deleting the lines is the point:
+  // if the ruling is ever revisited, the work of choosing them does not have
+  // to be done again, and neither does the work of learning that the library
+  // holds no Belgian French female voice.
+  //
+  //   wa-f  Fatou - Radiant and Gentle
+  //   wa-m  Keli - Calm & Natural African
+  //   be-m  Christophe Géradon - Soft and Narrative
+  //
+  // Nine recordings were spoken by them and are re-rendered — see
+  // `tcf-variety-plan.ts`.
 
   // --- swiss (occasional) -------------------------------------------------
   {
@@ -129,23 +127,16 @@ export const TCF_VOICE_CAST: FrenchVoiceRole[] = [
     why: 'Swiss female, carrying small natural hesitations. Hesitations belong in a conversation item and are wrong in a monologue, so this voice is cast and not used everywhere.',
   },
 
-  // --- acadian ------------------------------------------------------------
-  // Cast, NOT scheduled, and NOT heard — see ACADIAN_NOTE. Nothing schedules
-  // it, so nothing has been rendered with it; hear it before that changes.
-  {
-    id: 'ac-f',
-    variety: 'acadian',
-    gender: 'female',
-    vendorName: 'Evangeline - Warm Acadian Conversational',
-    why: 'Acadian female. Present in the cast, absent from the mix, and unheard — available the day someone decides the mix should carry it.',
-  },
-  {
-    id: 'ac-m',
-    variety: 'acadian',
-    gender: 'male',
-    vendorName: 'Seddik - French',
-    why: 'Acadian male. Same standing as the female: cast, not scheduled, not heard.',
-  },
+  // ── ACADIAN WAS CAST AND NEVER SCHEDULED, AND IS NOW OUT ────────────────
+  //
+  // Same ruling. It was in the cast and in no plan: `ACADIAN_NOTE` recorded
+  // that Maritime French is a real variety a candidate for Canada can meet,
+  // and that nothing scheduled it, so nothing had been rendered with it and
+  // nobody had heard it. It cost nothing to keep and now costs nothing to
+  // drop — the only thing lost is the two names, which are here:
+  //
+  //   ac-f  Evangeline - Warm Acadian Conversational
+  //   ac-m  Seddik - French
 ];
 
 /**

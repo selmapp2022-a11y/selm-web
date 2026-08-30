@@ -1,50 +1,72 @@
 /**
  * Which variety each of the 39 TCF listening recordings is to be spoken in.
  *
- * Ruled 29 August 2026 (`SELM-RULINGS-voices.md` §1): the 39 are re-rendered
- * rather than identified, because they were made in one batch from one cast —
- * whatever variety they turn out to be, they are all the SAME one, and
- * `FRENCH_VARIETY_MIX` requires a weighted mixture. Identification cannot
- * produce a mixture; only re-rendering can.
+ * ── NARROWED TO THREE ON 31 AUGUST 2026, BY THE FOUNDER ────────────────────
  *
- * This table is DATA, not a computation, on purpose. A function that assigned
- * varieties at render time would have to be re-run and re-read to be checked,
- * and a reviewer could not see at a glance that Quebecois appears at B1 as
- * well as C1. It was produced by the method described below and then frozen.
+ *   «لطفا برای آزمون و تمرین‌ها و درس‌های فرانسه فقط از لهجهٔ کبکی و پاریسی و
+ *    سوییسی استفاده کن — فقط همین ۳ لهجه.»
  *
- * ## The shares
+ *   "For the French exam, the practice and the lessons, use only Québécois,
+ *    Parisian and Swiss — only those three."
  *
- * Twenty international, seven Quebecois, six West African, three Belgian,
- * three Swiss. That is `FRENCH_VARIETY_MIX` turned into counts: international
- * a clear majority at 51%, Quebecois and West African clear minorities at 18%
- * and 15%, Belgian and Swiss occasional at 8% each.
+ * West African and Belgian are out of the bank, and Acadian — which was cast
+ * but never scheduled — is out of the cast. `international` is the entry the
+ * founder calls *Parisian*: standard France French, the Paris register, and
+ * the name in the data is kept because thirty-nine recordings and their
+ * provenance already carry it. It is labelled Parisian everywhere a person
+ * reads it.
  *
- * ## Spread across the bands, which is the part that is easy to get wrong
+ * ── WHAT THIS OVERRULES, STATED PLAINLY ────────────────────────────────────
+ * The previous plan followed FEI's own TCF practice simulator, which draws its
+ * audio from Paris, Geneva, Dakar, Montreal and Brussels. Dropping Dakar and
+ * Brussels means the bank no longer mirrors that spread, and a candidate who
+ * meets a West African voice in a real TCF sitting will not have met one here.
+ * **That is a product decision and it is the founder's to take** — unlike the
+ * IELTS accent question, no examining body publishes a required accent list
+ * for TCF. It is recorded rather than argued because the next person to read
+ * this file will otherwise re-derive the old mixture from the same source.
  *
- * The first attempt distributed the shares across the bank in level order and
- * produced a bank where a candidate met NO Quebecois below B1 and no
- * international at C2. That is not the mixture the ruling asked for — it is
- * the mixture correlated with difficulty, which would teach a candidate that
- * unfamiliar accents are a hard-band problem. Real exams do not work that way.
+ * ── The shares, after the narrowing ────────────────────────────────────────
+ * Twenty-two Parisian, twelve Québécois, five Swiss — 56% / 31% / 13%.
+ * Parisian stays a clear majority and Québécois stays a real minority rather
+ * than becoming the bank: making it dominant is the Quebec option wearing the
+ * mixture's clothes, and the MIFI/UQAM project to build a Quebec adaptation of
+ * TCF *Québec* is itself evidence that TCF Canada does not already play
+ * Québécois. An inference, not a proof, and recorded as one.
  *
- * So the shares are applied INSIDE each band by largest remainder, and the
- * majority is interleaved so two minority recordings rarely sit adjacent.
- * West African appears in all six bands; Quebecois in four; international in
- * all six, as the majority everywhere.
+ * ── Spread across the bands, which is the part that is easy to get wrong ────
+ * The first attempt at this table distributed the shares across the bank in
+ * LEVEL ORDER and produced a bank where a candidate met no Québécois below B1
+ * and no Parisian at C2 — the mixture correlated with difficulty, which would
+ * teach a candidate that an unfamiliar accent is a hard-band problem. Real
+ * exams do not work that way, and the founder restated the constraint when he
+ * asked for the re-render: *"the distribution must be applied inside each
+ * band, not in level order."*
  *
- * ## One constraint from the account, not from the exam
+ * So the nine reassigned recordings were placed band by band, keeping the
+ * band's own composition, never by walking the list:
  *
- * The ElevenLabs library holds seven Belgian French voices and they are all
- * male (`KNOWN_CAST_GAPS` in `french-voices.ts`). A two-speaker dialogue needs
- * two voices of one variety, so **Belgian is assigned only to single-speaker
- * recordings.** That is a limit of the account written into the data rather
- * than met at render time, when the renderer would substitute a voice of
- * another variety and the file would play perfectly and wrongly.
+ *              A1    A2    B1    B2    C1    C2
+ *   parisian    2     3     5     6     3     3
+ *   québécois   1     2     3     3     2     1
+ *   swiss       1     1     1     1     1     0
  *
- * One manual correction after the method ran: `tcf-co-01-r` and `tcf-co-02-r`
- * both came out Belgian, which would have opened the bank — the first two
- * recordings any candidate hears — with an occasional variety. `tcf-co-02-r`
- * was swapped with `tcf-co-07-r`.
+ * Québécois is now in every band, which it was not before. Swiss is in five of
+ * six and absent only from C2, where the bank holds four recordings.
+ *
+ * ── This table is DATA, not a computation ──────────────────────────────────
+ * A function that assigned varieties at render time would have to be re-run
+ * and re-read to be checked, and a reviewer could not see at a glance that
+ * Québécois appears at A1 as well as C1 — which is the property that matters
+ * and the one a computation would hide.
+ *
+ * ── One constraint from the account, not from the exam ─────────────────────
+ * A two-speaker dialogue needs two voices of ONE variety. All three remaining
+ * varieties have a male and a female voice on the account, so — unlike the
+ * Belgian case this file used to carry — no recording is barred from being a
+ * dialogue. The rule stays asserted anyway, because the cast can change and
+ * the renderer would substitute silently: the file would play perfectly and
+ * be in the wrong accent, and nothing on the screen would say so.
  */
 
 import type { SpeechVariety } from '../model/types';
@@ -58,14 +80,14 @@ export type VarietyAssignment = {
 };
 
 export const TCF_VARIETY_PLAN: VarietyAssignment[] = [
-  { id: 'tcf-co-01-r', level: 'A1', speakers: 1, variety: 'belgian' },
+  { id: 'tcf-co-01-r', level: 'A1', speakers: 1, variety: 'quebecois' },
   { id: 'tcf-co-02-r', level: 'A1', speakers: 1, variety: 'international' },
   { id: 'tcf-co-03-r', level: 'A1', speakers: 1, variety: 'international' },
-  { id: 'tcf-co-04-r', level: 'A1', speakers: 1, variety: 'west_african' },
+  { id: 'tcf-co-04-r', level: 'A1', speakers: 1, variety: 'swiss' },
   { id: 'tcf-co-05-r', level: 'A2', speakers: 2, variety: 'international' },
   { id: 'tcf-co-06-r', level: 'A2', speakers: 1, variety: 'quebecois' },
-  { id: 'tcf-co-07-r', level: 'A2', speakers: 1, variety: 'belgian' },
-  { id: 'tcf-co-08-r', level: 'A2', speakers: 2, variety: 'west_african' },
+  { id: 'tcf-co-07-r', level: 'A2', speakers: 1, variety: 'swiss' },
+  { id: 'tcf-co-08-r', level: 'A2', speakers: 2, variety: 'quebecois' },
   { id: 'tcf-co-09-r', level: 'A2', speakers: 1, variety: 'international' },
   { id: 'tcf-co-10-r', level: 'A2', speakers: 2, variety: 'international' },
   { id: 'tcf-co-11-r', level: 'B1', speakers: 2, variety: 'international' },
@@ -73,7 +95,7 @@ export const TCF_VARIETY_PLAN: VarietyAssignment[] = [
   { id: 'tcf-co-13-r', level: 'B1', speakers: 2, variety: 'international' },
   { id: 'tcf-co-14-r', level: 'B1', speakers: 1, variety: 'quebecois' },
   { id: 'tcf-co-15-r', level: 'B1', speakers: 2, variety: 'international' },
-  { id: 'tcf-co-16-r', level: 'B1', speakers: 2, variety: 'west_african' },
+  { id: 'tcf-co-16-r', level: 'B1', speakers: 2, variety: 'international' },
   { id: 'tcf-co-17-r', level: 'B1', speakers: 1, variety: 'international' },
   { id: 'tcf-co-18-r', level: 'B1', speakers: 2, variety: 'quebecois' },
   { id: 'tcf-co-19-r', level: 'B1', speakers: 2, variety: 'swiss' },
@@ -82,28 +104,26 @@ export const TCF_VARIETY_PLAN: VarietyAssignment[] = [
   { id: 'tcf-co-22-r', level: 'B2', speakers: 1, variety: 'international' },
   { id: 'tcf-co-23-r', level: 'B2', speakers: 1, variety: 'quebecois' },
   { id: 'tcf-co-24-r', level: 'B2', speakers: 2, variety: 'international' },
-  { id: 'tcf-co-25-r', level: 'B2', speakers: 2, variety: 'west_african' },
+  { id: 'tcf-co-25-r', level: 'B2', speakers: 2, variety: 'quebecois' },
   { id: 'tcf-co-26-r', level: 'B2', speakers: 1, variety: 'international' },
-  { id: 'tcf-co-27-r', level: 'B2', speakers: 1, variety: 'belgian' },
+  { id: 'tcf-co-27-r', level: 'B2', speakers: 1, variety: 'international' },
   { id: 'tcf-co-28-r', level: 'B2', speakers: 1, variety: 'international' },
   { id: 'tcf-co-29-r', level: 'B2', speakers: 2, variety: 'swiss' },
   { id: 'tcf-co-30-r', level: 'C1', speakers: 1, variety: 'international' },
   { id: 'tcf-co-31-r', level: 'C1', speakers: 1, variety: 'quebecois' },
   { id: 'tcf-co-32-r', level: 'C1', speakers: 1, variety: 'international' },
-  { id: 'tcf-co-33-r', level: 'C1', speakers: 2, variety: 'west_african' },
+  { id: 'tcf-co-33-r', level: 'C1', speakers: 2, variety: 'quebecois' },
   { id: 'tcf-co-34-r', level: 'C1', speakers: 1, variety: 'international' },
   { id: 'tcf-co-35-r', level: 'C1', speakers: 1, variety: 'swiss' },
   { id: 'tcf-co-36-r', level: 'C2', speakers: 1, variety: 'international' },
   { id: 'tcf-co-37-r', level: 'C2', speakers: 1, variety: 'international' },
   { id: 'tcf-co-38-r', level: 'C2', speakers: 1, variety: 'international' },
-  { id: 'tcf-co-39-r', level: 'C2', speakers: 1, variety: 'west_african' },
+  { id: 'tcf-co-39-r', level: 'C2', speakers: 1, variety: 'quebecois' },
 ];
 
 /** The shares this plan realises, for a check to assert against. */
 export const TCF_VARIETY_SHARES: Record<string, number> = {
-  international: 20,
-  quebecois: 7,
-  west_african: 6,
-  belgian: 3,
-  swiss: 3,
+  international: 22,
+  quebecois: 12,
+  swiss: 5,
 };

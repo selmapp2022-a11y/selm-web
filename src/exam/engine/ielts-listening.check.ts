@@ -242,24 +242,52 @@ const PLAN_PATH = '../selmapp/backend/scripts/ielts-listening-plan.json';
 if (!fs.existsSync(PLAN_PATH)) {
   ok(false, 'the backend plan is missing', PLAN_PATH);
 } else try {
-  const plan = JSON.parse(fs.readFileSync(PLAN_PATH, 'utf-8')) as Array<{ id: string; variety: string; speakers: number; body: string[]; narratorIntro: string; narratorOutro: string }>;
-  // The plan is the RENDER manifest, so it holds a row for every recording
-  // that has audio and nothing for one that does not. A script waiting on the
-  // variety gate has nothing to render and correctly has no row; when it is
-  // rendered it gains one, and this line starts requiring it.
-  ok(plan.length === RENDERED.length, 'the plan has one row per rendered part', `${plan.length} rows, ${RENDERED.length} rendered`);
-  ok(UNRENDERED.every((r) => !plan.some((x) => x.id === r.id)),
-     'and no row for a script that has not been rendered', `${UNRENDERED.length} unrendered`);
+  const plan = JSON.parse(fs.readFileSync(PLAN_PATH, 'utf-8')) as Array<{ id: string; variety: string; speakers: number; rendered: boolean; keep: boolean; body: string[]; narratorIntro: string; narratorOutro: string }>;
+  // ── WHAT THE PLAN IS FOR CHANGED ON 31 AUGUST, and the assertions with it.
+  //
+  // It was the RENDER MANIFEST: a row for every recording that had audio, and
+  // nothing for one that did not. Correct while nothing was waiting to be
+  // rendered. Now twelve scripts are waiting, and the plan is what the
+  // renderer works FROM — so a plan that held only what was already rendered
+  // would be a plan that could never render anything.
+  //
+  // The three claims are therefore: it holds every recording, every row is
+  // word for word the script the questions were written against, and each row
+  // agrees with this file about whether audio exists. The last one is what
+  // stops a re-run silently re-spending on the four that were heard.
+  ok(plan.length === S.recordings.length, 'the plan holds every recording', `${plan.length} rows, ${S.recordings.length} in the bank`);
+  ok(S.recordings.every((r) => plan.some((x) => x.id === r.id)), 'and none is missing from it');
+  ok(plan.filter((x) => x.rendered).map((x) => x.id).sort().join(',') === RENDERED.map((r) => r.id).sort().join(','),
+     'the plan and this file agree on what has been rendered', `${plan.filter((x) => x.rendered).length} rendered, ${UNRENDERED.length} waiting`);
+  // `rendered && !keep` is audio that exists in a variety the plan no longer
+  // allows. It must be named, because the renderer's default is to skip
+  // anything already rendered and it would skip exactly the file that has to
+  // be redone.
+  ok(plan.filter((x) => x.rendered && !x.keep).map((x) => x.id).join(',') === 'gt-l-p4',
+     'and on which rendered file the accent ruling made stale',
+     plan.filter((x) => x.rendered && !x.keep).map((x) => x.id).join(', ') || 'none');
   let agree = 0;
-  for (const r of RENDERED) {
+  for (const r of S.recordings) {
     const row = plan.find((x) => x.id === r.id);
     if (!row) { ok(false, `${r.id}: missing from the plan`); continue; }
     const rebuilt = [row.narratorIntro, ...row.body, row.narratorOutro].join('\n');
-    const same = rebuilt.trim() === r.script.trim()
-      && row.variety === r.variety && row.speakers === (r.speakers ?? 1);
+    const same = rebuilt.trim() === r.script.trim() && row.speakers === (r.speakers ?? 1);
     if (same) agree++; else ok(false, `${r.id}: the plan and this file disagree`);
   }
-  ok(agree === RENDERED.length, 'every rendered part matches this file word for word', `${agree}/${RENDERED.length}`);
+  ok(agree === S.recordings.length, 'every script matches this file word for word', `${agree}/${S.recordings.length}`);
+  // A RENDERED recording's `variety` is a record of what spoke it. An
+  // unrendered one has none, and the plan carries what it is SUPPOSED to be.
+  // Comparing the two would demand a recording declare its accent before
+  // anyone had chosen it, which is the `unknown` defect the ruling exists to
+  // prevent.
+  // A KEPT rendered recording must be planned as the variety it was actually
+  // spoken in. `gt-l-p4` is the exception and is excluded by `keep`, not by
+  // name: it was spoken Irish and is planned Canadian, which is the whole
+  // reason it is being re-rendered. Excluding it by name would make this line
+  // stop noticing the next one.
+  const keptRendered = RENDERED.filter((r) => plan.find((x) => x.id === r.id)?.keep);
+  ok(keptRendered.every((r) => plan.find((x) => x.id === r.id)?.variety === r.variety),
+     'and every KEPT rendered part is planned as the variety it was actually spoken in', `${keptRendered.length} kept`);
 } catch (e) {
   ok(false, 'the backend plan could not be read', String(e).slice(0, 120));
 }

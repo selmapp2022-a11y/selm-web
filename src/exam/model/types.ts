@@ -544,21 +544,28 @@ export const ENGLISH_VARIETY_MIX: Array<{ variety: SpeechVariety; share: 'majori
 /**
  * How a French listening bank should be distributed across varieties.
  *
- * Weighted, not even. FEI's own TCF practice simulator — built with TV5MONDE
- * by FEI's teams — draws its audio from Paris, Geneva, Dakar, Montreal and
- * Brussels, so a mixture is what the instrument is rather than a compromise
- * between two markets. Québécois is present and deliberately a minority:
- * making it dominant is the Quebec option wearing the mixture's clothes, and
- * it carries exactly the failure the principle forbids. The MIFI/UQAM project
- * to build a Quebec adaptation of TCF *Québec* is itself evidence that TCF
- * Canada does not already play Québécois — an inference, not a proof, and
- * recorded here as one.
+ * THREE, NARROWED FROM FIVE ON 31 AUGUST 2026 by the founder: *"for the French
+ * exam, the practice and the lessons, use only Québécois, Parisian and Swiss —
+ * only those three."* `international` is the entry he calls Parisian.
+ *
+ * What that overrules is worth keeping, because the source is still there and
+ * the next reader will find it: FEI's own TCF practice simulator — built with
+ * TV5MONDE by FEI's teams — draws its audio from Paris, Geneva, Dakar,
+ * Montreal and Brussels. West African and Belgian were in this list because
+ * the instrument has them. **No examining body publishes a required accent
+ * list for TCF**, so the narrowing is a product decision and it is the
+ * founder's to take — which is not true of IELTS, where ielts.org names four
+ * accents and they stayed.
+ *
+ * Weighted, not even, and Québécois is deliberately a minority: making it
+ * dominant is the Quebec option wearing the mixture's clothes, and it carries
+ * exactly the failure the principle forbids. The MIFI/UQAM project to build a
+ * Quebec adaptation of TCF *Québec* is itself evidence that TCF Canada does
+ * not already play Québécois — an inference, not a proof, and recorded as one.
  */
 export const FRENCH_VARIETY_MIX: Array<{ variety: SpeechVariety; share: 'majority' | 'minority' | 'occasional' }> = [
   { variety: 'international', share: 'majority' },
   { variety: 'quebecois', share: 'minority' },
-  { variety: 'west_african', share: 'minority' },
-  { variety: 'belgian', share: 'occasional' },
   { variety: 'swiss', share: 'occasional' },
 ];
 

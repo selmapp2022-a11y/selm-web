@@ -245,8 +245,24 @@ for (const s of sections) {
      substituted.length ? substituted.slice(0, 5).join(' | ') : 'none substituted');
 }
 
-console.log(bad === 0 ? '\nAll comprehension cases pass.' : `\n${bad} FAILURES`);
-if (bad !== 0) throw new Error(`${bad} comprehension cases failed`);
+// THE SUMMARY USED TO STAND HERE, and everything below it was unenforceable.
+//
+// Sections 6 and 7 come after this line — the variety plan and the drift check
+// against the copy the backend renders from — and the second of those lives
+// inside an `await (async () => …)` block, so it ran AFTER the process had
+// already decided it had passed. On 31 August it printed
+//
+//     FAIL the plan the backend renders from matches this table
+//
+// against nine reassigned recordings, and `echo $?` said 0.
+//
+// A check that reports a failure and exits zero is worse than no check: CI is
+// green, the line scrolls past, and the thing it was guarding is unguarded.
+// Same shape as `author.check.ts` going green for the wrong reason, from the
+// other direction — that one stopped asserting, this one stopped being heard.
+//
+// The summary is now at the END OF THE FILE, after the async block has been
+// awaited.
 
 // ── The variety plan for the re-render ──────────────────────────────────────
 //
@@ -321,3 +337,6 @@ if (bad !== 0) throw new Error(`${bad} comprehension cases failed`);
     console.log('      (backend copy not present in this checkout — skipped)');
   }
 }
+
+console.log(bad === 0 ? '\nAll comprehension cases pass.' : `\n${bad} FAILURES`);
+if (bad !== 0) throw new Error(`${bad} comprehension cases failed`);
