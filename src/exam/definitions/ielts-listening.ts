@@ -117,6 +117,34 @@ export const IELTS_LISTENING: ComprehensionSection = {
     questions: 40,
     source: 'ielts.org — Listening: 4 parts, 40 questions, about 30 minutes plus 10 minutes to transfer answers on paper.',
   },
+  /**
+   * THE PAPER IS FOUR PARTS, WHATEVER THE BANK HOLDS.
+   *
+   * Until 31 August this section had no `serve` spec, which means the whole
+   * bank is the épreuve — correct while the bank held exactly one of each
+   * part, and a trap the moment a second was written: a fifth recording would
+   * have silently made the exam fifty questions long. That is the defect
+   * found in the TCF on 28 August, waiting here for the first author.
+   *
+   * BY FAMILY, NOT BY BAND, and that is not a preference. Our banding puts the
+   * discussion and the lecture both at C1, so `byBand: { B1:1, B2:1, C1:2 }`
+   * is satisfied by two discussions and no lecture — a paper without Part 4.
+   * The exam publishes its paper as one of each PART, so that is what is
+   * declared, and `serveEpreuve` returns them in the order the parts play.
+   *
+   * The founder's condition on growing this bank: *"the variety has to be at
+   * the level of the PART. A candidate who sits Part 1 again must hear a
+   * completely different recording, not the same one with the questions
+   * shuffled."* That is what drawing a whole recording per family does: the
+   * ten questions travel with the recording, because half a part cannot be
+   * served, and the durable memory in `model/epreuve.ts` makes the second
+   * sitting draw a different one.
+   */
+  serve: {
+    count: 4,
+    byBand: {},
+    byFamily: { transactional: 1, briefing: 1, discussion: 1, lecture: 1 },
+  },
   scaleId: 'band',
   delivery: {
     // The whole argument of the listening ruling: the exam plays once, and a

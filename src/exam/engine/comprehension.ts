@@ -205,6 +205,31 @@ export function serveEpreuve(
   if (!spec) return bank;
   const state = st ?? newServeState();
   const out: Recording[] = [];
+  const at = new Map(bank.map((r, n) => [r.id, n]));
+
+  // ── A PAPER DEFINED BY PART, not by level ────────────────────────────
+  // IELTS Listening is Part 1 to Part 4 and every candidate sits all four.
+  // Two of ours sit at C1, so drawing by band could return two discussions
+  // and no lecture. Where the section declares `byFamily` it governs, and the
+  // order returned is the exam's own — the order the families are declared
+  // in, which is the order the parts are played.
+  if (spec.byFamily) {
+    const order = (section.families ?? []).map((f) => f.id);
+    for (const family of order) {
+      const want = spec.byFamily[family] ?? 0;
+      const pool = bank.filter((r) => r.family === family);
+      for (let n = 0; n < want; n++) {
+        const { item } = serve(pool, state);
+        if (item) out.push(item);
+      }
+    }
+    return out.sort(
+      (a, b) =>
+        order.indexOf(String(a.family)) - order.indexOf(String(b.family)) ||
+        (at.get(a.id)! - at.get(b.id)!),
+    );
+  }
+
   for (const band of BANDS) {
     const want = spec.byBand[band] ?? 0;
     const pool = bank.filter((r) => r.level === band);
@@ -214,7 +239,6 @@ export function serveEpreuve(
     }
   }
   // Ladder order, and stable within a band on the bank's own order.
-  const at = new Map(bank.map((r, n) => [r.id, n]));
   return out.sort(
     (a, b) =>
       BANDS.indexOf(a.level as Band) - BANDS.indexOf(b.level as Band) ||

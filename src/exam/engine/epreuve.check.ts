@@ -49,24 +49,59 @@ for (const exam of EXAMS) {
     const papers = [sit(section), sit(section), sit(section)];
     const ids = papers.map((p) => p.map((r) => r.id).join(','));
 
-    must(ids[0] !== ids[1], 'sitting 2 is not sitting 1');
-    must(ids[1] !== ids[2], 'sitting 3 is not sitting 2');
-    must(ids[0] !== ids[2], 'sitting 3 is not sitting 1');
+    // ── WHETHER THE PAPER CAN MOVE AT ALL ─────────────────────────────
+    // A coordinate holding one recording cannot produce a second paper, and
+    // saying so is the point: IELTS listening holds exactly one of each part
+    // today, so its épreuve is the same four recordings every time and will
+    // be until the bank grows. Asserting difference there would fail for a
+    // true reason and teach nothing; asserting nothing would hide it. So the
+    // check states which case it is in, and starts demanding difference the
+    // moment the bank can supply it.
+    const spec = section.serve!;
+    // A paper moves if ANY coordinate holds more than the paper takes from it.
+    // Not if every coordinate could supply two whole papers — the first
+    // version of this line asked for that and called the TCF bank frozen when
+    // it plainly is not: 61 documents against an épreuve of 39 moves twenty-two
+    // of them, without any single band holding twice what it is asked for.
+    const coordinates = spec.byFamily
+      ? Object.entries(spec.byFamily).map(([f, want]) => ({ k: f, have: section.recordings.filter((r) => r.family === f).length, want }))
+      : Object.entries(spec.byBand).filter(([, n]) => n).map(([b, want]) => ({ k: b, have: section.recordings.filter((r) => r.level === b).length, want }));
+    const canMove = coordinates.some((c) => c.have > c.want);
+    if (canMove) {
+      must(ids[0] !== ids[1], 'sitting 2 is not sitting 1');
+      must(ids[1] !== ids[2], 'sitting 3 is not sitting 2');
+      must(ids[0] !== ids[2], 'sitting 3 is not sitting 1');
+    } else {
+      must(ids[0] === ids[1] && ids[1] === ids[2],
+        `the bank holds exactly one paper (${coordinates.map((c) => `${c.k} ${c.have}/${c.want}`).join(', ')}) so every sitting is the same — and this line becomes a difference test the moment any coordinate has a spare`);
+    }
 
     for (let n = 0; n < papers.length; n++) {
       const p = papers[n];
-      // The PUBLISHED shape does not move with the candidate or the sitting.
-      const profile = Object.fromEntries(
-        BANDS.map((b) => [b, p.filter((r) => r.level === b).length]).filter(([, c]) => (c as number) > 0),
-      );
-      const want = Object.fromEntries(Object.entries(section.serve!.byBand).filter(([, c]) => (c ?? 0) > 0));
-      must(
-        JSON.stringify(profile) === JSON.stringify(want),
-        `sitting ${n + 1} keeps the published band profile ${JSON.stringify(want)}`,
-      );
-      const ladder = p.map((r) => BANDS.indexOf(r.level));
-      must(ladder.every((v, i) => i === 0 || v >= ladder[i - 1]), `sitting ${n + 1} is in ladder order`);
-      must(p.length === section.serve!.count, `sitting ${n + 1} is ${section.serve!.count} recordings long`);
+      // The PUBLISHED shape does not move with the candidate or the sitting —
+      // on whichever axis the exam publishes it. TCF publishes a level
+      // profile; IELTS listening publishes four parts.
+      if (spec.byFamily) {
+        const order = (section.families ?? []).map((f) => f.id);
+        const profile = Object.fromEntries(
+          order.map((f) => [f, p.filter((r) => r.family === f).length]).filter(([, c]) => (c as number) > 0),
+        );
+        const want = Object.fromEntries(Object.entries(spec.byFamily).filter(([, c]) => (c ?? 0) > 0));
+        must(JSON.stringify(profile) === JSON.stringify(want),
+          `sitting ${n + 1} keeps the published part profile ${JSON.stringify(want)}`);
+        const parts = p.map((r) => order.indexOf(String(r.family)));
+        must(parts.every((v, i) => i === 0 || v >= parts[i - 1]), `sitting ${n + 1} plays the parts in order`);
+      } else {
+        const profile = Object.fromEntries(
+          BANDS.map((b) => [b, p.filter((r) => r.level === b).length]).filter(([, c]) => (c as number) > 0),
+        );
+        const want = Object.fromEntries(Object.entries(spec.byBand).filter(([, c]) => (c ?? 0) > 0));
+        must(JSON.stringify(profile) === JSON.stringify(want),
+          `sitting ${n + 1} keeps the published band profile ${JSON.stringify(want)}`);
+        const ladder = p.map((r) => BANDS.indexOf(r.level));
+        must(ladder.every((v, i) => i === 0 || v >= ladder[i - 1]), `sitting ${n + 1} is in ladder order`);
+      }
+      must(p.length === spec.count, `sitting ${n + 1} is ${spec.count} recordings long`);
       console.log(`      sitting ${n + 1}: ${itemsFor(section, p).length} questions · ${p.map((r) => r.id).join(' ')}`);
     }
 

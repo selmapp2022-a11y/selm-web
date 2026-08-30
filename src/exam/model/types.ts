@@ -972,6 +972,25 @@ export type ComprehensionSection = {
      * have no way to know.
      */
     byBand: Record<string, number>;
+    /**
+     * How many of each FAMILY the épreuve presents, when the paper is defined
+     * by part rather than by level.
+     *
+     * ── Why a second axis, and why bands cannot do it ────────────────────
+     * IELTS Listening is four parts and every candidate sits all four: an
+     * everyday conversation, a talk to a group, an academic discussion, a
+     * lecture. Two of those sit at C1 in our banding, so `byBand` expressing
+     * `{ B1:1, B2:1, C1:2 }` would be satisfied by drawing TWO discussions and
+     * no lecture — a paper missing Part 4 and holding Part 3 twice, which is
+     * not the exam at any level.
+     *
+     * The TCF's compréhension orale genuinely is defined by level, and it
+     * keeps `byBand`. This is not a replacement; it is the axis the other
+     * instrument publishes its paper on. When `byFamily` is present it
+     * governs, and the épreuve comes back in family order — Part 1 to Part 4
+     * — because that order is the exam's, not a consequence of difficulty.
+     */
+    byFamily?: Record<string, number>;
   };
   /**
    * The material. One entry per recording (listening) or passage (reading).
