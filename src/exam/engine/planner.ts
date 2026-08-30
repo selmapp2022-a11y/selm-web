@@ -259,6 +259,25 @@ export function candidateLevel(
   return { index: cefrIndexFor(exam, target, skill), basis: 'target' };
 }
 
+/**
+ * The lowest score on the exam's own scale that earns this benchmark level in
+ * this skill — band 7.0 for CLB 9 in IELTS reading, and so on.
+ *
+ * The awarding body publishes the conversion in one direction and a candidate
+ * needs it in the other: they are told they need CLB 9, and what they have to
+ * produce is a band. Reading the table backwards is not a new claim — it is
+ * the same row.
+ *
+ * Per skill, because IRCC converts each skill differently: 7.5 is CLB 8 in
+ * reading and CLB 10 in listening, so a single number for "what you need"
+ * would be wrong for three of the four.
+ */
+export function scoreNeededFor(exam: ExamDefinition, level: number, skill: SkillId): number | null {
+  const rows = exam.benchmark.bySkill?.[skill] ?? exam.benchmark.bands;
+  const hit = rows.find((b) => b.level === level);
+  return hit ? hit.from : null;
+}
+
 /** The CEFR tag for an index, for a screen that has to name the band. */
 export function cefrTag(index: number): string {
   return CEFR[Math.max(0, Math.min(CEFR.length - 1, index))];

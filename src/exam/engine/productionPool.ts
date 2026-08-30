@@ -56,8 +56,60 @@ export type ServedPrompt = {
  * count: a candidate who has written every Tâche 2 situation has not thereby
  * seen any of Tâche 1's.
  */
-export function servePrompt(task: TaskDefinition, attempts: readonly Attempt[]): ServedPrompt {
-  const list = promptsOf(task);
+/**
+ * A stable number for a destination, used to rotate the pool.
+ *
+ * ── Why a rotation, and why it is not a difference we invented ──────────
+ *
+ * The founder, a third time and about Speaking: *"all the practice in the
+ * three English destinations is the same."* It was. Serving the
+ * least-recently-used unseen situation varies what ONE candidate meets over
+ * time, and leaves three candidates who have done nothing all starting at
+ * situation one.
+ *
+ * The tempting fix is to band the situations — to call one of them harder and
+ * give it to CLB 9. That would be inventing a difference the exam does not
+ * make: IELTS Speaking Part 1 asks about your home whether you need band 5 or
+ * band 8, and what changes with the level is what a sufficient answer looks
+ * like, not which question is asked. §D's discipline applies to a product's
+ * own claims as much as to its content.
+ *
+ * What is honest is that **the order within a pool was already arbitrary**.
+ * Situation one is first because it was written first. Rotating the start by
+ * the destination claims nothing about difficulty, and it means three
+ * candidates on three destinations do not open the same screen — which is what
+ * was actually wrong.
+ *
+ * The rotation is deterministic, so a candidate who returns tomorrow does not
+ * find the bank reshuffled underneath them.
+ *
+ * ── And it is a POSITION, not a hash ────────────────────────────────────
+ * The first version hashed the destination id. Two of the three English
+ * destinations landed on the same offset — with four situations and three
+ * destinations, a hash colliding is ordinary luck — and Canadian citizenship
+ * and Australia opened on the identical question, which is the whole
+ * complaint, surviving the fix meant to end it.
+ *
+ * The offset is now the destination's POSITION among those sharing the exam,
+ * so three destinations take three different starts by construction rather
+ * than by hoping.
+ */
+export function seedFor(destinationsSharingThisExam: readonly string[], goalId: string | null | undefined): number {
+  const i = goalId ? destinationsSharingThisExam.indexOf(goalId) : -1;
+  return i < 0 ? 0 : i;
+}
+
+export function servePrompt(
+  task: TaskDefinition,
+  attempts: readonly Attempt[],
+  seed = 0,
+): ServedPrompt {
+  const all = promptsOf(task);
+  // Rotate, so the arbitrary first is a different arbitrary first per
+  // destination. Order is otherwise untouched: `serve` still takes the
+  // least-recently-served among unseen.
+  const off = all.length ? seed % all.length : 0;
+  const list = [...all.slice(off), ...all.slice(0, off)];
   const known = new Set(list.map((p) => p.id));
   const st: ServeState = newServeState();
   for (const a of attempts) {

@@ -10,6 +10,7 @@ import { CompletionCard } from '../components/CompletionCard';
 import { ErrorBox } from '../components/States';
 import { practiceTasksFor, pronunciationLinesFor, type PracticeSet, type PracticeTask } from '../lib/practiceTasks';
 import { PromptCount } from '../components/PromptCount';
+import { WhatYouNeed } from '../components/WhatYouNeed';
 import { getAttempts } from '../lib/attempts';
 import { difficultyForSkill } from '../lib/difficulty';
 import { ts } from '../i18n';
@@ -84,7 +85,7 @@ export default function SpeakingPage() {
             <AuxBtn active={aux === 'conversation'} onClick={() => setAux('conversation')} icon={MessageSquare}>Conversation</AuxBtn>
           </div>
 
-          {activeTask && <TaskMode task={activeTask} />}
+          {activeTask && <TaskMode task={activeTask} need={set && set !== 'loading' ? set.need : null} />}
           {aux === 'pronunciation' && <PronunciationMode level={level} />}
           {aux === 'conversation' && <ConversationMode level={level} />}
         </>
@@ -374,7 +375,7 @@ function ConversationMode({ level: _level }: { level: string }) {
   );
 }
 
-function TaskMode({ task }: { task: PracticeTask }) {
+function TaskMode({ task, need }: { task: PracticeTask; need: PracticeSet['need'] }) {
   const prompt = task.instruction + '\n\n' + task.prompt;
   const [result, setResult] = useState<SpeechAssessment | null>(null);
   const [loading, setLoading] = useState(false);
@@ -403,6 +404,7 @@ function TaskMode({ task }: { task: PracticeTask }) {
           <p className="text-base leading-relaxed text-ink-primary">{prompt}</p>
           <p className="mt-3 text-xs text-ink-secondary">Speak for 1–2 minutes.</p>
         </div>
+        <WhatYouNeed need={need} skill="speaking" />
         <PromptCount task={task} verb="recorded" />
         <AudioRecorder onComplete={onRecorded} maxSeconds={120} label="Tap to start your 2-minute response" />
       </div>

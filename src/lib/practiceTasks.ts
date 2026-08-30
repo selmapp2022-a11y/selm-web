@@ -19,7 +19,8 @@
  */
 import { loadPlan } from '../exam/model/plan';
 import type { Attempt } from './attempts';
-import { servePrompt, type ServedPrompt } from '../exam/engine/productionPool';
+import { seedFor, servePrompt, type ServedPrompt } from '../exam/engine/productionPool';
+import { scoreNeededFor } from '../exam/engine/planner';
 import type { LanguageCode, TaskDefinition } from '../exam/model/types';
 
 export type PracticeTask = {
@@ -69,6 +70,23 @@ export type PracticeSet = {
   examName: string;
   lang: LanguageCode;
   tasks: PracticeTask[];
+  /**
+   * What this candidate's destination actually demands of this skill, said in
+   * the exam's own units.
+   *
+   * ── Why this is on the screen ───────────────────────────────────────────
+   * The founder, about Speaking: *"the practice is the same in all three
+   * English destinations."* It was, and the deeper reason is that a Part 1
+   * question IS the same question whether you need band 5 or band 8 — the
+   * exam does not band its prompts, and pretending it does would be inventing
+   * a difference to make a screen look personalised.
+   *
+   * What genuinely differs is the DEMAND. CLB 9 needs band 7.0 in speaking;
+   * CLB 4 needs 4.0. Same question, and a sufficient answer to it is not
+   * remotely the same thing. That is the exam's own difference, it is
+   * checkable against the published chart, and it was nowhere on the page.
+   */
+  need: { system: string; level: number; score: number | null; onExamScale: boolean } | null;
 };
 
 function toPractice(t: TaskDefinition, lang: LanguageCode, served: ServedPrompt): PracticeTask {
@@ -118,13 +136,35 @@ export async function practiceTasksFor(
   const exam = defs.EXAMS.find((e) => e.id === plan.examId);
   if (!exam) return null;
   const lang = exam.language;
+  const goal = defs.goalById(plan.goalId);
+  // The destinations that sit this same exam, in declaration order. The
+  // rotation is a position among them, so three destinations take three
+  // different starts by construction — see `seedFor`.
+  const sharing = defs.GOALS.filter((g) => g.exams.includes(exam.id)).map((g) => g.id);
+  const seed = seedFor(sharing, plan.goalId);
   const tasks: PracticeTask[] = [];
   for (const s of exam.sections) {
     if (s.kind !== 'production' || s.skill !== skill) continue;
-    // Each task chooses its own situation from what this candidate has done.
-    for (const t of s.tasks) tasks.push(toPractice(t, lang, servePrompt(t, attempts)));
+    // Each task chooses its own situation from what this candidate has done,
+    // starting from a point that depends on the destination.
+    for (const t of s.tasks) tasks.push(toPractice(t, lang, servePrompt(t, attempts, seed)));
   }
-  return { examId: exam.id, examName: exam.name[lang], lang, tasks };
+  // WHAT THE DESTINATION DEMANDS, and a conversion that must not be made
+  // twice. Australia asks for IELTS band 6 — a level on the EXAM'S OWN SCALE —
+  // so the score it needs is 6, not the band that earns CLB 6. Reading it
+  // through the benchmark table produced 5.5, which is a real number for a
+  // different question. `GoalPage` already draws this distinction; it is drawn
+  // the same way here rather than differently.
+  const onExamScale = goal?.scaleId ? exam.scales.some((sc) => sc.id === goal.scaleId) : false;
+  const need = goal
+    ? {
+        system: goal.system,
+        level: goal.requiredLevel,
+        score: onExamScale ? goal.requiredLevel : scoreNeededFor(exam, goal.requiredLevel, skill),
+        onExamScale,
+      }
+    : null;
+  return { examId: exam.id, examName: exam.name[lang], lang, tasks, need };
 }
 
 /**

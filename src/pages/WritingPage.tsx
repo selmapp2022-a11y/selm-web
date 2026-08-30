@@ -5,6 +5,7 @@ import { checkGrammar, rewriteText, assessWriting, type GrammarCheck, type Writi
 import { CompletionCard } from '../components/CompletionCard';
 import { practiceTasksFor, type PracticeSet, type PracticeTask } from '../lib/practiceTasks';
 import { PromptCount } from '../components/PromptCount';
+import { WhatYouNeed } from '../components/WhatYouNeed';
 import { getAttempts } from '../lib/attempts';
 import { ts } from '../i18n';
 
@@ -70,7 +71,7 @@ export default function WritingPage() {
             <AuxBtn active={aux === 'rewrite'} onClick={() => setAux('rewrite')} icon={Sparkles}>Smart rewrite</AuxBtn>
           </div>
 
-          {activeTask && <TaskWriteMode task={activeTask} />}
+          {activeTask && <TaskWriteMode task={activeTask} need={set && set !== 'loading' ? set.need : null} />}
           {aux === 'live' && <LiveMode />}
           {aux === 'rewrite' && <RewriteMode />}
         </>
@@ -225,7 +226,7 @@ function RewriteMode() {
   );
 }
 
-function TaskWriteMode({ task }: { task: PracticeTask }) {
+function TaskWriteMode({ task, need }: { task: PracticeTask; need: PracticeSet['need'] }) {
   const [text, setText] = useState('');
   const [assessment, setAssessment] = useState<WritingAssessment | null>(null);
   const [loading, setLoading] = useState(false);
@@ -250,6 +251,7 @@ function TaskWriteMode({ task }: { task: PracticeTask }) {
             {task.timeIsOurs ? ' ' + ts('practice.ourSplit') : ''}
           </p>
         </div>
+        <WhatYouNeed need={need} skill="writing" />
         <PromptCount task={task} verb="written" />
         <div className="card p-6">
           <label className="label">Your draft</label>

@@ -16,7 +16,9 @@
 import { EXAMS } from '../definitions';
 import type { Attempt } from '../../lib/attempts';
 import type { ProductionSection, TaskDefinition } from '../model/types';
-import { promptsOf, servePrompt } from './productionPool';
+import { GOALS } from '../definitions';
+import { scoreNeededFor } from './planner';
+import { promptsOf, seedFor, servePrompt } from './productionPool';
 
 let failed = 0;
 const t = (name: string, got: unknown, want: unknown) => {
@@ -99,6 +101,47 @@ for (const { examId, task } of tasks) {
   if (gated && missing.length)
     console.log(`     ${task.id} gates on off_topic and ${missing.length} of its situations carry no keywords of their own — safe only while the sitting serves situation one`);
 }
+
+console.log('\n5. Destinations that share an exam do not open on the same situation\n');
+
+/**
+ * The founder's complaint, in its third and most specific form: *"all the
+ * practice in the three English destinations is the same."*
+ *
+ * Serving the least-recently-used unseen situation varies what ONE candidate
+ * meets over time and leaves three candidates who have done nothing all
+ * starting at situation one. The rotation is a position among the destinations
+ * sharing the exam, so this case fails if two of them collide — which is
+ * exactly what the first version, hashing the id, did.
+ */
+for (const exam of EXAMS) {
+  const sharing = GOALS.filter((g) => g.exams.includes(exam.id)).map((g) => g.id);
+  if (sharing.length < 2) continue;
+  for (const s of exam.sections) {
+    if (s.kind !== 'production') continue;
+    for (const task of (s as ProductionSection).tasks) {
+      const opens = sharing.map((gid) => servePrompt(task, [], seedFor(sharing, gid)).id);
+      const enough = promptsOf(task).length >= sharing.length;
+      t(`${exam.id} · ${task.id}: ${sharing.length} destinations open on ${new Set(opens).size} different situations`,
+        new Set(opens).size, enough ? sharing.length : promptsOf(task).length);
+    }
+  }
+}
+
+console.log('\n6. What the destination demands is read once, and not twice\n');
+// Australia asks for IELTS band 6, a level on the EXAM'S OWN SCALE, so the
+// score it needs is 6. Reading it through the benchmark table gives 5.5 --
+// a real number for a different question, and the kind of conversion-of-a-
+// conversion `cefrBands` was introduced to stop.
+for (const g of GOALS) {
+  const exam = EXAMS.find((e) => e.id === g.exams[0])!;
+  const onExamScale = g.scaleId ? exam.scales.some((sc) => sc.id === g.scaleId) : false;
+  const score = onExamScale ? g.requiredLevel : scoreNeededFor(exam, g.requiredLevel, 'speaking');
+  console.log(`     ${g.id.padEnd(14)} ${g.system} ${g.requiredLevel} -> speaking needs ${score ?? '—'}${onExamScale ? '   (its own scale, no conversion)' : ''}`);
+  t(`${g.id}: the demand is a real number`, typeof score === 'number' && score > 0, true);
+}
+t('a goal set on the exam\'s own scale is not converted',
+  (() => { const g = GOALS.find((x) => x.scaleId === 'band')!; return g.requiredLevel; })(), 6);
 
 console.log(failed === 0
   ? '\nEvery production task sets something new until it runs out, and says when it has.\n'
