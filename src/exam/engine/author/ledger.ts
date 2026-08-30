@@ -34,7 +34,11 @@ export type BatchRecord = {
   batch: string;
   examId: string;
   sectionId: string;
-  /** The commit the numbers below were taken from. */
+  /**
+   * The commit the numbers below were reported in. Filled in AFTER that commit
+   * exists — an entry cannot name the commit that carries it, and amending one
+   * to try moves the sha it was naming.
+   */
   sha: string;
   /** Candidates put through `ingest` on the first pass. */
   submitted: number;
@@ -180,7 +184,7 @@ export const LEDGER: BatchRecord[] = [
   },
   {
     batch: '2026-08-31-listening-part4',
-    examId: 'ielts-gt', sectionId: 'listening', sha: '50cf467',
+    examId: 'ielts-gt', sectionId: 'listening', sha: '4fefc88',
     submitted: 3, accepted: 3, unattributed: 0,
     reasons: {},
     items: { completion: 30 },
