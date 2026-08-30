@@ -24,6 +24,13 @@ export const FR: FrenchDict = {
   'nav.vocabulary': 'Vocabulaire',
   'nav.progress': 'Progression',
   'nav.settings': 'Paramètres',
+  'nav.today': "Aujourd'hui",
+  'nav.practice': 'Entraînement',
+  'nav.mockExam': "Examen blanc",
+  'nav.myExam': 'Mon examen',
+  'nav.signOut': 'Se déconnecter',
+  'nav.appearance': 'Apparence',
+  'nav.main': 'Navigation principale',
 
   'common.loading': 'Chargement…',
   'common.continue': 'Continuer',

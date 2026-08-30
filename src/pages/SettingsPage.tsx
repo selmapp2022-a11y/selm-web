@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertTriangle, Trash2, User as UserIcon, Mail, Shield, LogOut } from 'lucide-react';
+import { AlertTriangle, Trash2, User as UserIcon, Mail, Shield, LogOut, Sun } from 'lucide-react';
+import { ThemeToggle } from '../components/ThemeToggle';
 import { useAuthStore } from '../store/authStore';
 import { deleteAccount, tokenStore } from '../lib/api';
 import { Languages } from 'lucide-react';
@@ -118,6 +119,19 @@ export default function SettingsPage() {
             </button>
           ))}
         </div>
+      </section>
+
+      {/* Appearance — the theme switcher's new home as of 30 August. It used
+          to sit in the phone header, on every screen, beside a gear and a
+          sign-out. A theme is chosen roughly once; it does not earn a
+          permanent seat on the smallest screen in the product, and it belongs
+          beside the interface language, which is the same kind of choice. */}
+      <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+        <h2 className="mb-3 flex items-center gap-2 text-lg font-bold text-navy dark:text-white">
+          <Sun className="h-5 w-5 text-navy" />
+          {ts('nav.appearance')}
+        </h2>
+        <ThemeToggle />
       </section>
 
       {/* Privacy */}

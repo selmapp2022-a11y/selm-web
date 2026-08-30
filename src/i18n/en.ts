@@ -12,6 +12,17 @@ export const EN = {
   'nav.vocabulary': 'Vocabulary',
   'nav.progress': 'Progress',
   'nav.settings': 'Settings',
+  // The five destinations of the app's own navigation. They were hard-coded
+  // English inside `AppLayout` — the one place §5.2 was not being followed,
+  // and the most visible: a candidate reading the app in French had five
+  // English words on every screen.
+  'nav.today': 'Today',
+  'nav.practice': 'Practice',
+  'nav.mockExam': 'Mock exam',
+  'nav.myExam': 'My exam',
+  'nav.signOut': 'Sign out',
+  'nav.appearance': 'Appearance',
+  'nav.main': 'Main navigation',
 
   'common.loading': 'Loading…',
   'common.continue': 'Continue',
