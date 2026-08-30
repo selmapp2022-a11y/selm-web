@@ -188,6 +188,32 @@ export const IELTS_GT: ExamDefinition = {
             en: 'You recently took a training course that was paid for by your employer. Write a letter to your manager. In your letter: say what the course was and when you took it, explain what you learned that you can use in your job, and suggest one change you would make if the course is offered again.',
             fr: "Vous avez récemment suivi une formation payée par votre employeur. Écrivez une lettre à votre responsable.",
           },
+          prompts: [
+            {
+              id: 'gt-w-t1-p2',
+              freshness: 'current',
+              prompt: {
+                en: "You ordered a piece of furniture online and it arrived damaged. Write a letter to the company. In your letter: describe what you ordered and when it arrived, explain what is wrong with it, and say what you would like the company to do.",
+                fr: "Vous avez commandé un meuble en ligne et il est arrivé abîmé. Écrivez une lettre à l'entreprise.",
+              },
+            },
+            {
+              id: 'gt-w-t1-p3',
+              freshness: 'current',
+              prompt: {
+                en: "A neighbour has agreed to look after your flat while you are away for three weeks. Write a letter to your neighbour. In your letter: thank them and explain what needs doing, say where they will find what they need, and tell them how to reach you if something goes wrong.",
+                fr: "Un voisin a accepté de s'occuper de votre appartement pendant trois semaines. Écrivez-lui une lettre.",
+              },
+            },
+            {
+              id: 'gt-w-t1-p4',
+              freshness: 'current',
+              prompt: {
+                en: "You have been offered a place on a course that clashes with your working hours. Write a letter to your employer. In your letter: explain what the course is and why you want to do it, describe the clash, and propose a way of making up the hours you would miss.",
+                fr: "On vous propose une place dans une formation qui chevauche vos heures de travail. Écrivez une lettre à votre employeur.",
+              },
+            },
+          ],
           timeLimitSec: 20 * 60,
           wordGuidance: { en: 'At least 150 words', fr: 'Au moins 150 mots' },
           scaleId: 'band',
@@ -331,6 +357,32 @@ export const IELTS_GT: ExamDefinition = {
             en: 'Some people think that new arrivals to a country should adopt the customs and traditions of that country. Others think they should be free to keep their own way of life. Discuss both views and give your own opinion.',
             fr: "Certains pensent que les nouveaux arrivants dans un pays devraient adopter ses coutumes et traditions ; d'autres pensent qu'ils devraient rester libres de garder leur propre mode de vie. Discutez des deux points de vue et donnez votre opinion.",
           },
+          prompts: [
+            {
+              id: 'gt-w-t2-p2',
+              freshness: 'current',
+              prompt: {
+                en: "In many countries people are working later in life than they used to. Some see this as a benefit to society; others believe it prevents younger people from entering the workforce. Discuss both views and give your own opinion.",
+                fr: "Dans de nombreux pays, on travaille plus tard qu'avant. Discutez des deux points de vue et donnez le vôtre.",
+              },
+            },
+            {
+              id: 'gt-w-t2-p3',
+              freshness: 'current',
+              prompt: {
+                en: "Some people believe that public money should be spent on preserving old buildings. Others argue that it should go towards new housing instead. Discuss both views and give your own opinion.",
+                fr: "Faut-il dépenser l'argent public pour conserver les bâtiments anciens ou pour construire des logements ? Discutez des deux points de vue et donnez le vôtre.",
+              },
+            },
+            {
+              id: 'gt-w-t2-p4',
+              freshness: 'current',
+              prompt: {
+                en: "Some think the ability to work without supervision is the most important quality an employee can have. Others believe that working well with other people matters more. Discuss both views and give your own opinion.",
+                fr: "L'autonomie ou le travail en équipe : quelle qualité compte le plus chez un employé ? Discutez des deux points de vue et donnez le vôtre.",
+              },
+            },
+          ],
           timeLimitSec: 40 * 60,
           wordGuidance: { en: 'At least 250 words', fr: 'Au moins 250 mots' },
           scaleId: 'band',
@@ -487,6 +539,32 @@ export const IELTS_GT: ExamDefinition = {
             en: 'Let us talk about where you live. Where is your home, and what do you like about it? Would you like to live somewhere else in the future? Do you prefer mornings or evenings, and why?',
             fr: "Parlons de l'endroit où vous vivez. Où se trouve votre domicile et qu'aimez-vous à son sujet ? Aimeriez-vous vivre ailleurs à l'avenir ? Préférez-vous le matin ou le soir, et pourquoi ?",
           },
+          prompts: [
+            {
+              id: 'gt-s-p1-p2',
+              freshness: 'current',
+              prompt: {
+                en: "Let us talk about food. What do you usually eat during the week? Is there a dish you have learned to cook recently? Do you prefer eating at home or eating out, and why?",
+                fr: "Parlons de la nourriture : ce que vous mangez en semaine, un plat appris récemment, et si vous préférez manger chez vous ou au restaurant.",
+              },
+            },
+            {
+              id: 'gt-s-p1-p3',
+              freshness: 'current',
+              prompt: {
+                en: "Let us talk about getting around. How do you usually travel in your town? Has that changed in the last few years? Is there a journey you make often that you enjoy?",
+                fr: "Parlons des déplacements : comment vous circulez, ce qui a changé, et un trajet fréquent que vous aimez.",
+              },
+            },
+            {
+              id: 'gt-s-p1-p4',
+              freshness: 'current',
+              prompt: {
+                en: "Let us talk about your free time. What do you do when you have an afternoon with nothing planned? Have your interests changed since you were younger? Do you prefer doing things alone or with other people?",
+                fr: "Parlons du temps libre : un après-midi sans rien de prévu, l'évolution de vos centres d'intérêt, seul ou avec d'autres.",
+              },
+            },
+          ],
           timeLimitSec: 90,
           wordGuidance: { en: 'Answer each question in a sentence or two', fr: 'Répondez par une ou deux phrases' },
           scaleId: 'band',
@@ -582,6 +660,32 @@ export const IELTS_GT: ExamDefinition = {
             en: 'Describe a skill you learned that turned out to be more useful than you expected. You should say: what the skill is, how and when you learned it, why you did not expect it to be useful, and explain how you have used it since.',
             fr: "Décrivez une compétence que vous avez apprise et qui s'est révélée plus utile que prévu.",
           },
+          prompts: [
+            {
+              id: 'gt-s-p2-p2',
+              freshness: 'current',
+              prompt: {
+                en: "Describe a place you go to when you want to think. You should say: where it is, how often you go there, what you do while you are there, and explain why it suits you better than other places.",
+                fr: "Décrivez un endroit où vous allez pour réfléchir : où il est, à quelle fréquence, ce que vous y faites, et pourquoi il vous convient mieux qu'un autre.",
+              },
+            },
+            {
+              id: 'gt-s-p2-p3',
+              freshness: 'current',
+              prompt: {
+                en: "Describe an object you own that would be difficult to replace. You should say: what it is, how you came to have it, how you use it, and explain what makes replacing it difficult.",
+                fr: "Décrivez un objet difficile à remplacer : ce que c'est, comment vous l'avez eu, comment vous l'utilisez, et pourquoi le remplacer serait difficile.",
+              },
+            },
+            {
+              id: 'gt-s-p2-p4',
+              freshness: 'current',
+              prompt: {
+                en: "Describe a time you changed your mind about something. You should say: what you believed at first, what happened, how long the change took, and explain how you feel about it now.",
+                fr: "Décrivez une fois où vous avez changé d'avis : ce que vous pensiez, ce qui s'est passé, combien de temps, et ce que vous en pensez aujourd'hui.",
+              },
+            },
+          ],
           timeLimitSec: 120,
           wordGuidance: { en: 'Speak for one to two minutes', fr: 'Parlez une à deux minutes' },
           scaleId: 'band',
@@ -677,6 +781,32 @@ export const IELTS_GT: ExamDefinition = {
             en: 'Let us consider skills in general. Why do some skills grow more valuable over time while others fade? Should schools teach practical skills or focus on knowledge? How might the skills people need change over the next twenty years?',
             fr: "Considérons les compétences en général. Pourquoi certaines prennent-elles de la valeur avec le temps tandis que d'autres disparaissent ? L'école devrait-elle enseigner des compétences pratiques ou se concentrer sur les savoirs ? Comment les compétences nécessaires pourraient-elles évoluer dans les vingt prochaines années ?",
           },
+          prompts: [
+            {
+              id: 'gt-s-p3-p2',
+              freshness: 'current',
+              prompt: {
+                en: "Let us consider quiet places in general. Why do people find it harder to concentrate than they once did? Should employers provide quiet spaces at work? How might the places people go to think change as cities grow?",
+                fr: "Parlons des lieux calmes : la concentration, les espaces calmes au travail, et l'évolution de ces lieux dans des villes plus grandes.",
+              },
+            },
+            {
+              id: 'gt-s-p3-p3',
+              freshness: 'current',
+              prompt: {
+                en: "Let us consider ownership in general. Why do some people keep possessions for decades while others replace them quickly? Is repairing things a skill worth teaching? How might attitudes to owning things change over the next twenty years?",
+                fr: "Parlons de la possession : garder ou remplacer, l'utilité d'apprendre à réparer, et l'évolution du rapport aux objets.",
+              },
+            },
+            {
+              id: 'gt-s-p3-p4',
+              freshness: 'current',
+              prompt: {
+                en: "Let us consider how opinions change. Why do people find it difficult to admit they were wrong? Should schools teach students how to argue? What makes some groups better than others at changing their minds?",
+                fr: "Parlons du changement d'opinion : la difficulté d'admettre une erreur, l'enseignement de l'argumentation, et pourquoi certains groupes changent plus facilement d'avis.",
+              },
+            },
+          ],
           timeLimitSec: 120,
           wordGuidance: { en: 'Speak for one to two minutes', fr: 'Parlez une à deux minutes' },
           scaleId: 'band',

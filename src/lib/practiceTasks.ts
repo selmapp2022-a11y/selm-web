@@ -18,6 +18,8 @@
  * that arrives when a practice page does.
  */
 import { loadPlan } from '../exam/model/plan';
+import type { Attempt } from './attempts';
+import { servePrompt, type ServedPrompt } from '../exam/engine/productionPool';
 import type { LanguageCode, TaskDefinition } from '../exam/model/types';
 
 export type PracticeTask = {
@@ -28,6 +30,20 @@ export type PracticeTask = {
   instruction: string;
   /** The material, where the task supplies any. */
   prompt: string;
+  /**
+   * WHICH situation this is, and how many the task holds.
+   *
+   * A task used to be one situation, so an attempt recorded the task and the
+   * screen had nothing to count. It now serves the least-recently-used unseen
+   * situation, so the attempt records the SITUATION — a candidate who has
+   * written Tâche 1 three times has met three different letters, and the two
+   * facts are not the same.
+   */
+  promptId: string;
+  promptsTotal: number;
+  promptsUnseen: number;
+  /** True when every situation has been met and the pool came round again. */
+  promptsRecycled: boolean;
   /** "120 to 180 words" — the exam's band, stated because it is markable. */
   words: string | null;
   /** Seconds. Tâche times are ours where the body publishes only a total. */
@@ -55,12 +71,16 @@ export type PracticeSet = {
   tasks: PracticeTask[];
 };
 
-function toPractice(t: TaskDefinition, lang: LanguageCode): PracticeTask {
+function toPractice(t: TaskDefinition, lang: LanguageCode, served: ServedPrompt): PracticeTask {
   return {
     id: t.id,
     title: t.name[lang],
     instruction: t.instruction[lang],
-    prompt: t.prompt[lang],
+    prompt: served.prompt[lang],
+    promptId: served.id,
+    promptsTotal: served.total,
+    promptsUnseen: served.unseen,
+    promptsRecycled: served.recycled,
     words: t.wordGuidance ? t.wordGuidance[lang] : null,
     timeLimitSec: t.timeLimitSec,
     timeIsOurs: Boolean(t.timeLimitApportioned),
@@ -78,7 +98,20 @@ function toPractice(t: TaskDefinition, lang: LanguageCode): PracticeTask {
  * caller shows the choice rather than inventing a task. Amendment 1 §6: a
  * visible gap is a better failure than a plausible generic answer.
  */
-export async function practiceTasksFor(skill: 'writing' | 'speaking'): Promise<PracticeSet | null> {
+export async function practiceTasksFor(
+  skill: 'writing' | 'speaking',
+  /**
+   * The candidate's attempt log, passed in rather than read here.
+   *
+   * It was read here for about ten minutes, and two engine checks went red:
+   * `lib/attempts` imports the API client, which reads `import.meta.env`, so
+   * every check that touched this module needed a browser to run. A module
+   * that decides which situation to set should not drag an HTTP client behind
+   * it — and passing the log in also makes the choice reproducible, which is
+   * what let `productionPool.check.ts` be written at all.
+   */
+  attempts: readonly Attempt[] = [],
+): Promise<PracticeSet | null> {
   const plan = loadPlan();
   if (!plan?.examId) return null;
   const defs = await import('../exam/definitions');
@@ -88,7 +121,8 @@ export async function practiceTasksFor(skill: 'writing' | 'speaking'): Promise<P
   const tasks: PracticeTask[] = [];
   for (const s of exam.sections) {
     if (s.kind !== 'production' || s.skill !== skill) continue;
-    for (const t of s.tasks) tasks.push(toPractice(t, lang));
+    // Each task chooses its own situation from what this candidate has done.
+    for (const t of s.tasks) tasks.push(toPractice(t, lang, servePrompt(t, attempts)));
   }
   return { examId: exam.id, examName: exam.name[lang], lang, tasks };
 }

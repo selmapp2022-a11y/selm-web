@@ -2379,6 +2379,32 @@ export const TCF_CANADA: ExamDefinition = {
             en: 'You have just finished a training course paid for by your employer. Write a message to your colleagues describing the course and what you learned.',
             fr: "Vous venez de terminer une formation payée par votre employeur. Vous écrivez un message à vos collègues pour décrire cette formation et expliquer ce que vous avez appris.",
           },
+          prompts: [
+            {
+              id: 'tcf-ee-t1-p2',
+              freshness: 'current',
+              prompt: {
+                en: "You have found a home in a new neighbourhood. Write a message to a friend describing the area and what you like and miss about it.",
+                fr: "Vous avez trouvé un logement dans un nouveau quartier. Vous écrivez un message à un ami pour décrire le quartier, ce qui vous plaît et ce qui vous manque.",
+              },
+            },
+            {
+              id: 'tcf-ee-t1-p3',
+              freshness: 'current',
+              prompt: {
+                en: "Your team is organising a meal for a colleague who is leaving. Write a message to the others proposing a date, a place and a contribution, and asking who will come.",
+                fr: "Votre équipe organise un repas pour le départ d'un collègue. Vous écrivez un message aux autres pour proposer une date, un lieu et une participation, et pour demander qui viendra.",
+              },
+            },
+            {
+              id: 'tcf-ee-t1-p4',
+              freshness: 'current',
+              prompt: {
+                en: "You borrowed something from a neighbour and damaged it. Write a message telling them, explaining what happened and proposing a solution.",
+                fr: "Vous avez emprunté un objet à un voisin et vous l'avez abîmé. Vous écrivez un message pour le lui dire, expliquer ce qui s'est passé et proposer une solution.",
+              },
+            },
+          ],
           timeLimitSec: 20 * 60,
           timeLimitApportioned: true,
           wordGuidance: { en: '60 to 120 words', fr: 'De 60 à 120 mots' },
@@ -2526,6 +2552,32 @@ export const TCF_CANADA: ExamDefinition = {
             en: 'A magazine for newcomers is collecting accounts of a day that changed something for its readers. Write your account: what happened, in what order, and what it changed for you. Your reader does not know you and was not there.',
             fr: "Un magazine destiné aux personnes nouvellement arrivées réunit des récits d'une journée qui a changé quelque chose. Rédigez le vôtre : ce qui s'est passé, dans quel ordre, et ce que cela a changé pour vous. Votre lecteur ne vous connaît pas et n'était pas présent.",
           },
+          prompts: [
+            {
+              id: 'tcf-ee-t2-p2',
+              freshness: 'current',
+              prompt: {
+                en: "A site about work collects accounts of a first day in a new job. Write yours.",
+                fr: "Un site consacré au travail réunit des récits d'un premier jour dans un nouvel emploi. Rédigez le vôtre : ce que vous attendiez, ce qui s'est réellement passé, et ce que vous en avez retenu. Votre lecteur ne vous connaît pas.",
+              },
+            },
+            {
+              id: 'tcf-ee-t2-p3',
+              freshness: 'current',
+              prompt: {
+                en: "A neighbourhood magazine publishes accounts of a chance meeting that led somewhere unexpected. Write yours.",
+                fr: "Un magazine de quartier publie des récits d'une rencontre qui a mené à quelque chose d'inattendu. Rédigez le vôtre : les circonstances, ce qui a été dit, et la suite. Votre lecteur n'était pas présent.",
+              },
+            },
+            {
+              id: 'tcf-ee-t2-p4',
+              freshness: 'current',
+              prompt: {
+                en: "A review collects accounts of a decision taken too quickly. Write yours.",
+                fr: "Une revue réunit des récits d'une décision prise trop vite. Rédigez le vôtre : la situation, la décision, ce qui a suivi, et ce que vous feriez aujourd'hui. Votre lecteur ne vous connaît pas.",
+              },
+            },
+          ],
           timeLimitSec: 20 * 60,
           timeLimitApportioned: true,
           wordGuidance: { en: '120 to 150 words', fr: 'De 120 à 150 mots' },
@@ -2669,6 +2721,32 @@ export const TCF_CANADA: ExamDefinition = {
             en: 'Document 1 — a municipal notice announcing that the town centre will be closed to cars on Saturdays, to reduce pollution and make room for markets and cycling.\n\nDocument 2 — a letter from a shopkeepers\u2019 association arguing that the closure will cut takings, that deliveries have nowhere to stop, and that customers with reduced mobility will stay away.\n\nCompare the two positions and give your own reasoned opinion.',
             fr: "Document 1 — un avis municipal annonçant la fermeture du centre-ville aux voitures le samedi, afin de réduire la pollution et de laisser la place aux marchés et au vélo.\n\nDocument 2 — une lettre d'une association de commerçants soutenant que cette fermeture fera baisser le chiffre d'affaires, que les livraisons n'auront plus où s'arrêter, et que la clientèle à mobilité réduite ne viendra plus.\n\nComparez les deux positions et donnez votre avis argumenté.",
           },
+          prompts: [
+            {
+              id: 'tcf-ee-t3-p2',
+              freshness: 'current',
+              prompt: {
+                en: "Compare an employer's notice introducing two days of remote work with a letter from employees opposing it, and give your reasoned opinion.",
+                fr: "Document 1 — une note de direction annonçant que chacun travaillera désormais deux jours par semaine à distance, afin de réduire les frais de bureau.\n\nDocument 2 — une lettre d'un groupe d'employés soutenant que la formation des nouveaux et l'entraide informelle disparaissent quand la moitié de l'équipe est absente, et que les réunions ne les remplacent pas.\n\nComparez les deux positions et donnez votre avis argumenté.",
+              },
+            },
+            {
+              id: 'tcf-ee-t3-p3',
+              freshness: 'current',
+              prompt: {
+                en: "Compare a university notice ending lecture recordings with a student association's letter opposing it, and give your reasoned opinion.",
+                fr: "Document 1 — un avis universitaire annonçant que les cours ne seront plus enregistrés, afin d'encourager la présence en amphithéâtre.\n\nDocument 2 — une lettre d'une association étudiante soutenant que ce sont les enregistrements qui permettent à ceux qui travaillent de suivre les cours, et que la mesure frappe les seuls étudiants salariés.\n\nComparez les deux positions et donnez votre avis argumenté.",
+              },
+            },
+            {
+              id: 'tcf-ee-t3-p4',
+              freshness: 'current',
+              prompt: {
+                en: "Compare a municipal notice charging for waste by weight with a residents' association letter opposing it, and give your reasoned opinion.",
+                fr: "Document 1 — un avis municipal annonçant que les ordures ménagères seront facturées au poids, afin d'en réduire le volume.\n\nDocument 2 — une lettre d'une association de résidents soutenant que la mesure fera apparaître des dépôts dans la rue et pénalisera les familles nombreuses, qui produisent davantage sans gaspiller davantage.\n\nComparez les deux positions et donnez votre avis argumenté.",
+              },
+            },
+          ],
           timeLimitSec: 20 * 60,
           timeLimitApportioned: true,
           wordGuidance: { en: '120 to 180 words', fr: 'De 120 à 180 mots' },
@@ -2863,6 +2941,32 @@ export const TCF_CANADA: ExamDefinition = {
             en: 'Introduce yourself: who you are, what you do, and what brought you to learn French.',
             fr: "Présentez-vous : qui vous êtes, ce que vous faites, et ce qui vous a amené à apprendre le français.",
           },
+          prompts: [
+            {
+              id: 'tcf-eo-t1-p2',
+              freshness: 'current',
+              prompt: {
+                en: "Introduce yourself: your background, what you do now, and what you would like to be doing in five years.",
+                fr: "Présentez-vous : votre parcours, ce que vous faites aujourd'hui, et ce que vous aimeriez faire dans cinq ans.",
+              },
+            },
+            {
+              id: 'tcf-eo-t1-p3',
+              freshness: 'current',
+              prompt: {
+                en: "Introduce yourself: where you are from, where you live now, and what was hardest about the change.",
+                fr: "Présentez-vous : d'où vous venez, où vous vivez maintenant, et ce qui a été le plus difficile dans ce changement.",
+              },
+            },
+            {
+              id: 'tcf-eo-t1-p4',
+              freshness: 'current',
+              prompt: {
+                en: "Introduce yourself: your work or your studies, an ordinary day for you, and what you do when you are not working.",
+                fr: "Présentez-vous : votre travail ou vos études, une journée ordinaire pour vous, et ce que vous faites quand vous ne travaillez pas.",
+              },
+            },
+          ],
           timeLimitSec: 120,
           // "Entretien dirigé sans préparation" — Manuel du candidat TCF,
           // Version P, avril 2026, p. 19. Zero here is the exam's published
@@ -2990,6 +3094,32 @@ export const TCF_CANADA: ExamDefinition = {
             en: 'You have just moved into a flat and the heating does not work. Your examiner is the building manager. Find out what is wrong, when it will be repaired, and what you should do in the meantime. Ask the questions you need to ask.',
             fr: "Vous venez d'emménager dans un appartement et le chauffage ne fonctionne pas. Votre examinateur est le gestionnaire de l'immeuble. Renseignez-vous sur l'origine du problème, sur la date de la réparation, et sur ce que vous devez faire en attendant. Posez les questions nécessaires.",
           },
+          prompts: [
+            {
+              id: 'tcf-eo-t2-p2',
+              freshness: 'current',
+              prompt: {
+                en: "Find out what you need about an after-school activity for your child. The examiner runs the centre.",
+                fr: "Vous voulez inscrire votre enfant à une activité après l'école. Votre examinateur est le responsable du centre. Renseignez-vous sur les horaires, sur le coût et sur ce qu'il faut apporter. Posez les questions nécessaires.",
+              },
+            },
+            {
+              id: 'tcf-eo-t2-p3',
+              freshness: 'current',
+              prompt: {
+                en: "Find out why your telephone bill is much higher than usual. The examiner is the customer adviser.",
+                fr: "Vous avez reçu une facture de téléphone bien plus élevée que d'habitude. Votre examinateur est le conseiller du service client. Renseignez-vous sur l'origine de la différence, sur ce qui peut être annulé et sur le délai de remboursement. Posez les questions nécessaires.",
+              },
+            },
+            {
+              id: 'tcf-eo-t2-p4',
+              freshness: 'current',
+              prompt: {
+                en: "Find out what you need about an evening French course. The examiner works at the reception desk.",
+                fr: "Vous cherchez une formation de français le soir. Votre examinateur travaille à l'accueil du centre de formation. Renseignez-vous sur le niveau demandé, sur les dates et sur ce qui se passe si vous manquez des séances. Posez les questions nécessaires.",
+              },
+            },
+          ],
           timeLimitSec: 210,
           preparationSec: 120,
           wordGuidance: { en: 'About three and a half minutes', fr: 'Environ trois minutes trente' },
@@ -3073,6 +3203,32 @@ export const TCF_CANADA: ExamDefinition = {
             en: 'Some people say that a city should be built for those who live in it, others that it should be built for those who work in it. What do you think? Give your view, support it, and say what you would answer to someone who disagreed.',
             fr: "Certains disent qu'une ville doit être conçue pour ceux qui l'habitent, d'autres pour ceux qui y travaillent. Qu'en pensez-vous ? Donnez votre avis, appuyez-le, et dites ce que vous répondriez à quelqu'un qui ne serait pas d'accord.",
           },
+          prompts: [
+            {
+              id: 'tcf-eo-t3-p2',
+              freshness: 'current',
+              prompt: {
+                en: "Give and defend your view on whether an employer may ask where and when employees work.",
+                fr: "Certains pensent qu'un employeur peut demander où et quand ses employés travaillent ; d'autres estiment que cela ne le regarde pas tant que le travail est fait. Qu'en pensez-vous ? Donnez votre avis, appuyez-le, et dites ce que vous répondriez à quelqu'un qui ne serait pas d'accord.",
+              },
+            },
+            {
+              id: 'tcf-eo-t3-p3',
+              freshness: 'current',
+              prompt: {
+                en: "Give and defend your view on whether it is better to speak a language badly at once or wait until you master it.",
+                fr: "Certains disent qu'il vaut mieux parler une langue mal tout de suite ; d'autres qu'il faut attendre de la maîtriser un peu. Qu'en pensez-vous ? Donnez votre avis, appuyez-le, et dites ce que vous répondriez à quelqu'un qui ne serait pas d'accord.",
+              },
+            },
+            {
+              id: 'tcf-eo-t3-p4',
+              freshness: 'current',
+              prompt: {
+                en: "Give and defend your view on whether every public service should be available online.",
+                fr: "Certains estiment que tous les services publics devraient être accessibles en ligne ; d'autres qu'un guichet où l'on parle à quelqu'un doit toujours exister. Qu'en pensez-vous ? Donnez votre avis, appuyez-le, et dites ce que vous répondriez à quelqu'un qui ne serait pas d'accord.",
+              },
+            },
+          ],
           timeLimitSec: 270,
           preparationSec: 0,
           wordGuidance: { en: 'About four and a half minutes', fr: 'Environ quatre minutes trente' },

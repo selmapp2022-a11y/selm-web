@@ -4,7 +4,8 @@ import clsx from 'clsx';
 import { checkGrammar, rewriteText, assessWriting, type GrammarCheck, type WritingAssessment } from '../lib/writing';
 import { CompletionCard } from '../components/CompletionCard';
 import { practiceTasksFor, type PracticeSet, type PracticeTask } from '../lib/practiceTasks';
-import { SeenBefore } from '../components/SeenBefore';
+import { PromptCount } from '../components/PromptCount';
+import { getAttempts } from '../lib/attempts';
 import { ts } from '../i18n';
 
 
@@ -29,7 +30,7 @@ export default function WritingPage() {
   const [taskIdx, setTaskIdx] = useState(0);
   const [aux, setAux] = useState<null | 'live' | 'rewrite'>(null);
 
-  useEffect(() => { practiceTasksFor('writing').then(setSet); }, []);
+  useEffect(() => { practiceTasksFor('writing', getAttempts()).then(setSet); }, []);
 
   const tasks = set && set !== 'loading' ? set.tasks : [];
   const activeTask = !aux && tasks.length ? tasks[Math.min(taskIdx, tasks.length - 1)] : null;
@@ -249,7 +250,7 @@ function TaskWriteMode({ task }: { task: PracticeTask }) {
             {task.timeIsOurs ? ' ' + ts('practice.ourSplit') : ''}
           </p>
         </div>
-        <SeenBefore taskId={task.id} taskTitle={task.title} verb="written" />
+        <PromptCount task={task} verb="written" />
         <div className="card p-6">
           <label className="label">Your draft</label>
           <textarea value={text} onChange={(e) => setText(e.target.value)} rows={14} className="input" placeholder="Write your response here…" />
@@ -288,7 +289,7 @@ function TaskWriteMode({ task }: { task: PracticeTask }) {
             <CompletionCard
               skill="writing"
               topic={task.title}
-              itemId={task.id}
+              itemId={task.promptId}
               score={assessment.overall_score}
               onNext={() => { setText(''); setAssessment(null); }}
               nextLabel="Write again"

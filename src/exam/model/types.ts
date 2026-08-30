@@ -348,13 +348,69 @@ export type JudgeBinding =
       stability?: StabilityRecord;
     };
 
+/**
+ * One situation a production task can set.
+ *
+ * ── The defect this exists for ──────────────────────────────────────────
+ * The founder, twice: *"the practice is the same in all four skills."* The
+ * comprehension half was a selection defect and was fixed. The production half
+ * was not a selection defect — Writing and Speaking list every tâche by name
+ * and the candidate picks — and it was answered with that explanation instead
+ * of being fixed, which was the wrong answer to the right complaint.
+ *
+ * **The exam sets a new situation every sitting. We held one per task.** So a
+ * candidate who opened Task 1 twice wrote the same letter twice, and there was
+ * nothing to select among because there was nothing else there.
+ *
+ * A task now carries a LIST of situations. `prompt` remains the first of them
+ * so that everything reading a task — the gate's `off_topic` keywords, the
+ * prescription cells, the plan — keeps working unchanged, and `prompts` holds
+ * the rest.
+ */
+export type TaskPrompt = {
+  /** Unique across the exam. What an attempt records, so a repeat is visible. */
+  id: string;
+  prompt: Localised;
+  /** §D of TASK 4, as on `Recording`. */
+  freshness?: Freshness;
+  /**
+   * The content words a response to THIS situation is expected to engage with.
+   *
+   * ── The trap this field exists to keep shut ─────────────────────────────
+   * `TaskDefinition.topicKeywords` drives the gate's `off_topic` rule, which
+   * awards ZERO whatever the quality of the language. Those words were chosen
+   * for the task's first situation — for IELTS Task 1 they are *course,
+   * training, manager, employer, learned, job*. A candidate answering the
+   * damaged-furniture letter would engage none of them.
+   *
+   * **So a served situation and the keywords of a different one must never
+   * meet.** Today they cannot: the mock exam sets `task.prompt`, which is
+   * situation one, and practice does not run the gate. That is a fact about
+   * the current wiring rather than a property of the design, so it is asserted
+   * in `productionPool.check.ts` rather than trusted — and this field is where
+   * a situation's own keywords go on the day the sitting serves a variant.
+   */
+  topicKeywords?: readonly string[];
+};
+
 export type TaskDefinition = {
   id: string;
   skill: SkillId;
   /** Name as the official instrument names it: "Task 1", "Tâche 1". */
   name: Localised;
   instruction: Localised;
+  /**
+   * The first situation this task sets. Kept as a plain field rather than
+   * folded into `prompts` because a dozen callers read it, and a migration
+   * that renamed it would have touched the gate, the cells and the plan to
+   * add a feature none of them cares about.
+   */
   prompt: Localised;
+  /**
+   * The other situations, if any. Served least-recently-used among unseen,
+   * exactly as comprehension passages are — see `productionPool.ts`.
+   */
+  prompts?: readonly TaskPrompt[];
   /**
    * Seconds. Taken from the published specification wherever the instrument
    * publishes a per-task time. Where it publishes only a time for the whole
