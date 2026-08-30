@@ -132,12 +132,31 @@ const MEASURES: Array<{ id: string; pick: (p: Profile) => number; rising: boolea
  * fit. The precedent is `items.check.ts`, where a bar was once set at the
  * value the bank happened to sit on and had to be moved back.
  */
+/**
+ * Below this many words the four measures are noise, not measurement.
+ *
+ * The TCF A1 anchor was a consigne of eight words. Three of those eight are
+ * long, so its `longWordRate` came out at 0.375 — higher than the C2 anchor's
+ * 0.226 — and the ladder appeared to fall from A1 to C2 on that measure. The
+ * passage is not wrong; a French sign is eight words. **A rate computed on a
+ * denominator of eight is arithmetic about the denominator.**
+ *
+ * So a short passage is not vetoed and is not counted as having passed: it is
+ * `skipped`, and the caller records it as unmeasured, exactly as an anchor at
+ * a band with no neighbours is. The alternative — a floor low enough to
+ * "measure" a four-word sign — would have put noise into the instrument and
+ * called it a reading.
+ */
+export const MIN_MEASURABLE_WORDS = 30;
+
 export function runVeto(
   script: string,
   level: Band,
   anchors: Anchor[],
   locale?: string,
 ): LayerVerdict {
+  if (words(script, segmentationFor(locale)).length < MIN_MEASURABLE_WORDS)
+    return { pass: true, skipped: true, reasons: [], measured: { note: `under ${MIN_MEASURABLE_WORDS} words — too short to measure` } };
   const p = profile(script, locale);
   const reasons: string[] = [];
   const measured: Record<string, number | string> = {};

@@ -162,10 +162,21 @@ const LADDER: Anchor[] = [
   { id: 'c2', level: 'C2', script: 'One might conceivably commend the representative association for belatedly promulgating guidance concerning delivery scheduling, were it not that the guidance presupposes, throughout and without acknowledgement, an establishment sufficiently capacious to accommodate a complete day of inventory — which is to say, precisely the establishment that never encountered the predicament. The diminutive trader, for whom the question is authentically intractable, will discover therein a succession of recommendations presupposing the very resource whose unavailability constitutes the difficulty; and will conclude, not unreasonably, that the recommendations originated with commentators who have perused literature about shopkeeping rather than practised it.' },
 ];
 
-const flat = 'The shop is open. It sells bread. It sells milk. The shop is near the park. It shuts at six.';
+// Long enough to be measurable, and deliberately flat: short sentences, common
+// words, no subordination. Under thirty words it would be skipped instead, and
+// that is a different result with a different meaning — see below.
+const flat = 'The shop is open. It sells bread. It sells milk. It sells fruit. The shop is near the park. ' +
+  'It shuts at six. It is shut on Sunday. The man is nice. The shop has a cat. The cat sleeps on the bags.';
 const vFlat = runVeto(flat, 'C1', LADDER, gt.locale);
 t('a flat passage claiming C1 is vetoed', vFlat.pass, false);
 t('and the veto names the measures that put it outside', vFlat.reasons.length > 0, true);
+
+// A passage too short to measure is NOT a passage that passed. `skipped` says
+// which of the two happened, because a record that cannot tell "checked and
+// sound" from "never checked" is the record this codebase refuses everywhere.
+const tiny = runVeto('Staff only.', 'A1', LADDER, gt.locale);
+t('a passage under thirty words is skipped, not judged', tiny.skipped, true);
+t('and it is not reported as having been measured', tiny.reasons, []);
 
 // The ladder's own C1 rung, measured against B2 and C2 — the instrument
 // agreeing with itself, which is the least it must do.

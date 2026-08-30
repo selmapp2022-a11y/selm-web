@@ -146,18 +146,62 @@ const FORMATS: Record<string, Format> = {
     source: 'ielts.org — Listening: 4 parts, 40 questions, 10 per part, about 30 minutes.',
   },
   'tcf-canada:listening': {
-    // Thirty-nine short independent recordings in thirty-five minutes — about
-    // fifty seconds each including the question. Nothing in the épreuve is a
-    // four-hundred-word part, and a bank of those would not be this exam.
-    words: scaled([10, 20, 35, 50, 70, 90], [60, 90, 140, 200, 280, 350]),
+    // DERIVED FROM THE ÉPREUVE'S OWN CLOCK, not from the bank and not by eye.
+    //
+    // Thirty-nine questions in thirty-five minutes is 2,100 seconds over 39
+    // items — about 54 seconds each. Of that, the question read aloud, the
+    // pause for the answer and the gap between items take roughly 28, which
+    // leaves about 26 seconds of recording. French read speech runs 140 to 160
+    // words a minute, so 26 seconds is 60 to 70 words AT THE TOP OF THE
+    // LADDER, and much less at the bottom, where a document is one sentence.
+    //
+    // The first version of this row was guessed and put the B2 floor at 50 and
+    // the C1 floor at 70; the check then reported 24 of the 39 recordings as
+    // too short. Two of those were genuinely thin and the rest were the
+    // guess being wrong — 39 recordings running 8:44 in a 35-minute épreuve is
+    // close to what the clock allows, not far below it.
+    //
+    // The ceilings are per item and deliberately above the average: an exposé
+    // may run long when its question is quick. What no row may do is exceed
+    // the clock at every band at once, which is what a table built from a
+    // reading paper would have done.
+    words: scaled([4, 10, 20, 30, 40, 45], [25, 50, 90, 120, 150, 180]),
     questions: flat({ min: 1, max: 2 }),
     source: 'France Éducation international — TCF Canada, compréhension orale : 39 questions, 35 minutes.',
   },
   'tcf-canada:reading': {
     // Thirty-nine questions in sixty minutes over short independent documents:
     // notices and instructions at the bottom, argued texts at the top.
-    words: scaled([12, 20, 40, 60, 90, 110], [60, 100, 180, 280, 400, 500]),
-    questions: flat({ min: 1, max: 3 }),
+    //
+    // The A1 and A2 floors were 12 and 20 and came down to 5 and 15 after the
+    // check reported four A1 consignes as too short. They are six to nine
+    // words — « Défense de fumer », a lift sign, a ticket-machine instruction —
+    // and that is what the épreuve sets at the bottom of the ladder. **Length
+    // there is fixed by the genre, not by the band**: a notice is short
+    // because notices are short, and a floor that forced a twelve-word sign
+    // would have made the bank less like the exam rather than more.
+    //
+    // This is the opposite decision from the IELTS reading floors, which were
+    // RAISED against a bank that failed them. The difference is which one is
+    // the placeholder: the six IELTS passages were stubs standing in for a
+    // paper that runs to thousands of words; a four-word French sign is the
+    // real thing.
+    words: scaled([5, 15, 40, 60, 90, 110], [60, 100, 180, 280, 400, 500]),
+    // ONE QUESTION PER DOCUMENT, and that is the épreuve rather than a
+    // preference. The range was 1 to 3 for about an hour, four documents were
+    // authored against it carrying two questions each, and the inventory
+    // immediately reported the section as SERVING 42 QUESTIONS WHERE THE
+    // ÉPREUVE SETS 39.
+    //
+    // `tcf-canada.ts` already carries a comment about the same failure in an
+    // earlier form — *"growing the bank to 57 silently made the épreuve 57
+    // questions long"* — which was fixed by pinning `serve.count` to 39. A
+    // range here reopened it from the other end: the count of documents was
+    // right and the count of questions was not.
+    //
+    // All 57 documents of the reviewed French bank carry exactly one question.
+    // The range was mine and unsupported; this is the bank's own shape.
+    questions: flat({ min: 1, max: 1 }),
     source: 'France Éducation international — TCF Canada, compréhension écrite : 39 questions, 60 minutes.',
   },
 };

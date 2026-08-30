@@ -43,6 +43,16 @@ export type Freshness = 'timeless' | 'current' | 'dated';
 
 export type LayerVerdict = {
   pass: boolean;
+  /**
+   * True when the layer did not run rather than ran and passed.
+   *
+   * `pass: true, skipped: true` is not a pass and must not be reported as one.
+   * A statistical veto on a passage of eight words, or on a band whose
+   * neighbours are empty, has nothing to measure — and a record that cannot
+   * distinguish "checked and sound" from "never checked" is the record this
+   * codebase refuses everywhere else, from `stability.ts` to `calibration.ts`.
+   */
+  skipped?: boolean;
   /** Rule ids that fired, empty when it passed. */
   reasons: string[];
   /** Measurements worth keeping whether or not anything fired. */
