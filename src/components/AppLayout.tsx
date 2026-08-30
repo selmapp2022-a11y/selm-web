@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { Logo } from './Logo';
 import { ThemeToggle } from './ThemeToggle';
-import { PracticeLanguageBadge } from './PracticeLanguageBadge';
 import { StaleBuild } from './StaleBuild';
 import { useAuthStore } from '../store/authStore';
 import { syncAttemptsFromBackend } from '../lib/attempts';
@@ -48,7 +47,6 @@ export function AppLayout() {
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-surface-divider bg-white dark:border-slate-700 dark:bg-slate-900 md:block">
         <div className="flex h-full flex-col">
           <div className="px-6 pb-3 pt-6"><Logo /></div>
-          <div className="mb-2 px-4"><PracticeLanguageBadge /></div>
           <nav className="flex-1 space-y-1 px-3">
             {navItems.map((item) => (
               <NavLink
@@ -105,9 +103,13 @@ export function AppLayout() {
           The symbol carries the brand here; the wordmark is still in the
           sidebar where there is room for it. */}
       <header className="sticky top-0 z-20 flex items-center justify-between gap-2 border-b border-surface-divider bg-white/80 px-4 py-3 backdrop-blur dark:border-slate-700 dark:bg-slate-900/80 md:hidden">
+        {/* The exam/language pill that used to sit here is gone, both here and
+            in the sidebar. It linked to /goal — and so does "My exam" in the
+            navigation, which is on every screen and is the place a candidate
+            looks for it. Two controls, one destination, is a control that has
+            to be explained; the one in the navigation explains itself. */}
         <div className="flex min-w-0 items-center gap-2">
           <Logo variant="symbol" className="h-8 w-8 shrink-0 rounded-xl" />
-          <PracticeLanguageBadge compact />
         </div>
         <div className="flex shrink-0 items-center gap-2">
           <ThemeToggle />
