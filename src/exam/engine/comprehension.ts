@@ -24,11 +24,13 @@
  * rendering this must show the count, may show the profile, and must not
  * print a three-digit number.
  */
-import type { ComprehensionItem, ComprehensionSection, Localised, Recording } from '../model/types';
+import type { AccentTrack, ComprehensionItem, ComprehensionSection, Localised, Recording } from '../model/types';
+import { PRIMARY_TRACK } from '../model/types';
 import { isCompletionItem, isMatchingItem } from '../model/types';
 import { isCompletionCorrect } from './completion';
 import { newServeState, serve, type ServeState } from './pool';
 import { deliverable } from './practicePool';
+import { renditionFor } from '../model/rendition';
 
 export const BANDS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'] as const;
 export type Band = (typeof BANDS)[number];
@@ -194,6 +196,7 @@ export function governingLevel(levels: Array<number | null>): { level: number | 
 export function serveEpreuve(
   section: ComprehensionSection,
   st?: ServeState,
+  track: AccentTrack = PRIMARY_TRACK,
 ): Recording[] {
   const spec = section.serve;
   // Only what can actually be put in front of a candidate. A play-once
@@ -201,7 +204,7 @@ export function serveEpreuve(
   // nobody can sit, and putting one on a paper makes `SectionPage` refuse the
   // entire section — so the unrenderable scripts would take the renderable
   // ones off the air with them. See `deliverable`.
-  const bank = section.recordings.filter((r) => deliverable(section, r));
+  const bank = section.recordings.filter((r) => deliverable(section, r, track));
   if (!spec) return bank;
   const state = st ?? newServeState();
   const out: Recording[] = [];
@@ -215,12 +218,40 @@ export function serveEpreuve(
   // in, which is the order the parts are played.
   if (spec.byFamily) {
     const order = (section.families ?? []).map((f) => f.id);
+    // ── NO TWO PARTS OF ONE PAPER OPEN WITH THE SAME VOICE ──────────────
+    //
+    // `ielts-listening.check.ts` has asserted this since 29 August, when the
+    // bank held one paper and it was a property of four files. On 31 August
+    // the bank became four versions of every part and the assertion went red,
+    // correctly: Canadian is half the bank and the account holds two Canadian
+    // voices, so Rebecca opens seven of the sixteen recordings.
+    //
+    // The arithmetic says it cannot be fixed in the DATA. A paper draws one
+    // version per part and all 4x4x4x4 = 256 combinations are drawable, so the
+    // property requires the four parts' opener pools to be disjoint — sixteen
+    // distinct voices. The cast holds twelve besides the narrator, and a FIXED
+    // cast is itself the ruling: *"so that successive tests feel like one
+    // examination rather than a collection."*
+    //
+    // So it is fixed HERE, where it is actually a property: of a paper, not of
+    // a bank. Within a family the draw still obeys §4.3 — least-recently-served
+    // among unseen, never random — and this only removes candidates that would
+    // repeat a voice already on THIS paper, and only while at least one
+    // candidate survives. A part with no alternative is served anyway rather
+    // than left off: a missing part is worse than a familiar voice.
+    const spoken = new Set<string>();
+    const opener = (r: Recording) => renditionFor(r, track)?.voice.voiceId;
     for (const family of order) {
       const want = spec.byFamily[family] ?? 0;
-      const pool = bank.filter((r) => r.family === family);
+      const all = bank.filter((r) => r.family === family);
       for (let n = 0; n < want; n++) {
-        const { item } = serve(pool, state);
-        if (item) out.push(item);
+        const fresh = all.filter((r) => { const v = opener(r); return !v || !spoken.has(v); });
+        const { item } = serve(fresh.length ? fresh : all, state);
+        if (item) {
+          const v = opener(item);
+          if (v) spoken.add(v);
+          out.push(item);
+        }
       }
     }
     return out.sort(

@@ -531,6 +531,50 @@ export type SpeechVariety =
  * people moving to Canada; Irish and Scottish because they are the other
  * native varieties the exam draws on and the account can now speak them.
  */
+/**
+ * WHICH ACCENT A CANDIDATE HEARS, DECIDED BY WHERE THEY ARE GOING.
+ *
+ * The founder, 31 August 2026: Canadian for IELTS, British and Australian for
+ * the Australian route. Those are not two exams — `au-competent`, Express
+ * Entry and Canadian citizenship all sit **the same IELTS General Training
+ * paper**, and one audio file has one accent. So the same script is rendered
+ * twice and the audio is chosen by destination.
+ *
+ * ── Why this is on the RECORDING and not on the section ─────────────────────
+ * The alternative was to split the four versions of each part between the two
+ * routes — Australian candidates get the British and Australian versions,
+ * Canadian ones the rest. It costs no extra rendering, and it is wrong twice
+ * over: each route would be left with one or two versions of a part instead of
+ * four, which is below `MIN_ITEMS_PER_COORDINATE`, and Part 4 would have no
+ * British version at all to give anyone. Depth is per candidate, not per bank.
+ *
+ * ── And why the questions are NOT duplicated ────────────────────────────────
+ * A rendition is audio, not content. The script, the items, the keys and the
+ * band are one thing with one authoring history; what differs is who reads it
+ * aloud. Duplicating the recordings instead would double the bank the
+ * inventory counts and the gate has to judge, for no gain in what a candidate
+ * is asked.
+ */
+export type AccentTrack = 'canada' | 'australia';
+
+/**
+ * The track a section's own `audioPath` / `variety` / `voice` belong to.
+ *
+ * A single-track bank — the TCF, and IELTS before this ruling — carries its
+ * audio in those fields directly. Keeping them as the primary track rather
+ * than migrating 39 French recordings into a `renditions` map is deliberate:
+ * the migration would touch every provenance record in the project to express
+ * something French does not have.
+ */
+export const PRIMARY_TRACK: AccentTrack = 'canada';
+
+/** One rendering of one script: the audio, the accent, and who spoke it. */
+export type Rendition = {
+  audioPath: string;
+  variety: SpeechVariety;
+  voice: RenderedVoice;
+};
+
 export const ENGLISH_VARIETY_MIX: Array<{ variety: SpeechVariety; share: 'majority' | 'minority' | 'occasional' }> = [
   { variety: 'british', share: 'majority' },
   { variety: 'north_american', share: 'minority' },
@@ -671,6 +715,19 @@ export type Recording = {
    * exactly the state `variety: 'unknown'` describes.
    */
   voice?: RenderedVoice;
+  /**
+   * The same script, read in another accent, for a candidate going somewhere
+   * else.
+   *
+   * `audioPath` / `variety` / `voice` above are the PRIMARY track. This holds
+   * the others. Nothing reads either directly: `renditionFor(recording, track)`
+   * is the one accessor, so a surface cannot accidentally play the Canadian
+   * file to an Australian candidate by reaching for the field that is always
+   * there.
+   *
+   * Absent on every recording in a single-track bank, which is all of French.
+   */
+  renditions?: Partial<Record<AccentTrack, Rendition>>;
   /**
    * The exam's own name for this piece, where it publishes one — IELTS names
    * four Parts and a candidate hears them named. Absent where the exam does
@@ -1178,6 +1235,15 @@ export type Goal = {
    * round — this is that sentence, as data.
    */
   exams: string[];
+  /**
+   * Which accent track this destination hears. Defaults to `PRIMARY_TRACK`.
+   *
+   * This is on the GOAL rather than on the exam because it is a fact about
+   * where the candidate is going, not about the paper they sit: three
+   * destinations sit the same IELTS General Training paper and two of them
+   * are Canadian.
+   */
+  accentTrack?: AccentTrack;
 };
 
 export type Response =

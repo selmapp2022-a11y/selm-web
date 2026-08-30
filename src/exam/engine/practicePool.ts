@@ -52,7 +52,9 @@
  *    difference.
  */
 import type { Attempt } from '../../lib/attempts';
-import type { ComprehensionSection, Recording } from '../model/types';
+import { audioFor } from '../model/rendition';
+import type { AccentTrack, ComprehensionSection, Recording } from '../model/types';
+import { PRIMARY_TRACK } from '../model/types';
 import { newServeState, serve, type ServeResult, type ServeState } from './pool';
 
 const BANDS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
@@ -229,6 +231,18 @@ export function practicable(section: ComprehensionSection): Recording[] {
  * by refusing the WHOLE section — so twenty scripts with no audio would have
  * taken the four that do have it off the air.
  */
-export function deliverable(section: ComprehensionSection, r: Recording): boolean {
-  return section.delivery.audioPlaysOnce ? !!r.audioPath : true;
+/**
+ * ── And why it takes a TRACK as of 31 August ───────────────────────────
+ * `!!r.audioPath` was the whole test while every candidate heard the same
+ * file. The accent ruling made the audio depend on where the candidate is
+ * going, and `audioPath` is the PRIMARY track's field — always present once
+ * anything has been rendered. Left as it was, this predicate would have
+ * answered "yes, deliverable" for an Australian candidate about to be handed
+ * a Canadian recording, or nothing at all.
+ *
+ * The track defaults to the primary one, so every existing caller keeps the
+ * behaviour it had, and a caller that knows the candidate passes it.
+ */
+export function deliverable(section: ComprehensionSection, r: Recording, track: AccentTrack = PRIMARY_TRACK): boolean {
+  return section.delivery.audioPlaysOnce ? !!audioFor(r, track) : true;
 }

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { audioFor } from '../model/rendition';
 import { useNavigate } from 'react-router-dom';
 import { AlertTriangle } from 'lucide-react';
 import clsx from 'clsx';
@@ -130,7 +131,7 @@ function Section({ section }: { section: ComprehensionSection }) {
   // which is the one behaviour worse than refusing outright — the candidate
   // would never know that questions had been dropped.
   const missing = section.delivery.audioPlaysOnce
-    ? recordings.filter((r) => !r.audioPath).map((r) => r.id)
+    ? recordings.filter((r) => !audioFor(r)).map((r) => r.id)
     : [];
   const audioMissing = missing.length > 0;
 
@@ -286,7 +287,7 @@ function OneRecording({
         </span>
         <div className="mt-4">
           <PlayOnce
-            src={resolveAudio(rec.audioPath)}
+            src={resolveAudio(audioFor(rec))}
             played={played}
             // Recorded before the audio starts, and written straight into the
             // sitting, so a reload, a second click or a failed play does not

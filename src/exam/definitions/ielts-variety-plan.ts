@@ -91,10 +91,10 @@ export type IeltsVarietyAssignment = {
    * True when the audio that exists is audio this plan still allows.
    *
    * `rendered && !keep` is the one state that costs money: a file that plays
-   * and is no longer permitted. It is `gt-l-p4`, spoken Irish, and it is
-   * re-rendered rather than left — a bank described as Canadian-majority with
-   * an Irish recording in it is the substitution defect with our own name on
-   * it, and it would play perfectly.
+   * and is no longer permitted. It was `gt-l-p4`, spoken Irish. Every row is
+   * `keep: true` as of 31 August, which is the state to defend — the field
+   * exists so that the NEXT accent ruling names its casualties in data
+   * instead of in a person's memory.
    */
   keep: boolean;
 };
@@ -102,32 +102,33 @@ export type IeltsVarietyAssignment = {
 export const IELTS_VARIETY_PLAN: IeltsVarietyAssignment[] = [
   // ── Part 1 · B1 · two speakers ────────────────────────────────────────
   { id: 'gt-l-p1',    part: 'Part 1', level: 'B1', speakers: 2, variety: 'australian',     rendered: true,  keep: true },
-  { id: 'gt-l-p1-v2', part: 'Part 1', level: 'B1', speakers: 2, variety: 'canadian',       rendered: false, keep: false },
-  { id: 'gt-l-p1-v3', part: 'Part 1', level: 'B1', speakers: 2, variety: 'canadian',       rendered: false, keep: false },
-  { id: 'gt-l-p1-v4', part: 'Part 1', level: 'B1', speakers: 2, variety: 'north_american', rendered: false, keep: false },
+  { id: 'gt-l-p1-v2', part: 'Part 1', level: 'B1', speakers: 2, variety: 'canadian',       rendered: true,  keep: true },
+  { id: 'gt-l-p1-v3', part: 'Part 1', level: 'B1', speakers: 2, variety: 'canadian',       rendered: true,  keep: true },
+  { id: 'gt-l-p1-v4', part: 'Part 1', level: 'B1', speakers: 2, variety: 'north_american', rendered: true,  keep: true },
 
   // ── Part 2 · B2 · one speaker ─────────────────────────────────────────
   { id: 'gt-l-p2',    part: 'Part 2', level: 'B2', speakers: 1, variety: 'british',        rendered: true,  keep: true },
-  { id: 'gt-l-p2-v2', part: 'Part 2', level: 'B2', speakers: 1, variety: 'canadian',       rendered: false, keep: false },
-  { id: 'gt-l-p2-v3', part: 'Part 2', level: 'B2', speakers: 1, variety: 'canadian',       rendered: false, keep: false },
-  { id: 'gt-l-p2-v4', part: 'Part 2', level: 'B2', speakers: 1, variety: 'new_zealand',    rendered: false, keep: false },
+  { id: 'gt-l-p2-v2', part: 'Part 2', level: 'B2', speakers: 1, variety: 'canadian',       rendered: true,  keep: true },
+  { id: 'gt-l-p2-v3', part: 'Part 2', level: 'B2', speakers: 1, variety: 'canadian',       rendered: true,  keep: true },
+  { id: 'gt-l-p2-v4', part: 'Part 2', level: 'B2', speakers: 1, variety: 'new_zealand',    rendered: true,  keep: true },
 
   // ── Part 3 · C1 · two speakers ────────────────────────────────────────
   { id: 'gt-l-p3',    part: 'Part 3', level: 'C1', speakers: 2, variety: 'canadian',       rendered: true,  keep: true },
-  { id: 'gt-l-p3-v2', part: 'Part 3', level: 'C1', speakers: 2, variety: 'canadian',       rendered: false, keep: false },
-  { id: 'gt-l-p3-v3', part: 'Part 3', level: 'C1', speakers: 2, variety: 'british',        rendered: false, keep: false },
-  { id: 'gt-l-p3-v4', part: 'Part 3', level: 'C1', speakers: 2, variety: 'australian',     rendered: false, keep: false },
+  { id: 'gt-l-p3-v2', part: 'Part 3', level: 'C1', speakers: 2, variety: 'canadian',       rendered: true,  keep: true },
+  { id: 'gt-l-p3-v3', part: 'Part 3', level: 'C1', speakers: 2, variety: 'british',        rendered: true,  keep: true },
+  { id: 'gt-l-p3-v4', part: 'Part 3', level: 'C1', speakers: 2, variety: 'australian',     rendered: true,  keep: true },
 
   // ── Part 4 · C1 · one speaker ─────────────────────────────────────────
-  // `gt-l-p4` was rendered IRISH and is the one already-rendered file this
-  // ruling costs. Irish is out of the bank, so the audio that exists is audio
-  // the plan no longer allows — and leaving it while calling the bank
-  // Canadian-majority would be the substitution defect with our own name on
-  // it. `keep: false` on a rendered row is what says "re-render this one".
-  { id: 'gt-l-p4',    part: 'Part 4', level: 'C1', speakers: 1, variety: 'canadian',       rendered: true,  keep: false },
-  { id: 'gt-l-p4-v2', part: 'Part 4', level: 'C1', speakers: 1, variety: 'canadian',       rendered: false, keep: false },
-  { id: 'gt-l-p4-v3', part: 'Part 4', level: 'C1', speakers: 1, variety: 'north_american', rendered: false, keep: false },
-  { id: 'gt-l-p4-v4', part: 'Part 4', level: 'C1', speakers: 1, variety: 'new_zealand',    rendered: false, keep: false },
+  // `gt-l-p4` was rendered IRISH, and re-rendering it is the one cost this
+  // ruling carried into already-paid-for work. Irish is out of the bank, so
+  // the audio that existed was audio the plan no longer allowed — and leaving
+  // it while calling the bank Canadian-majority would have been the
+  // substitution defect with our own name on it. It is now Canadian and the
+  // whole bank is `keep: true`; the row is kept as the record of why.
+  { id: 'gt-l-p4',    part: 'Part 4', level: 'C1', speakers: 1, variety: 'canadian',       rendered: true,  keep: true },
+  { id: 'gt-l-p4-v2', part: 'Part 4', level: 'C1', speakers: 1, variety: 'canadian',       rendered: true,  keep: true },
+  { id: 'gt-l-p4-v3', part: 'Part 4', level: 'C1', speakers: 1, variety: 'north_american', rendered: true,  keep: true },
+  { id: 'gt-l-p4-v4', part: 'Part 4', level: 'C1', speakers: 1, variety: 'new_zealand',    rendered: true,  keep: true },
 ];
 
 /** The four accents ielts.org names. A floor, not the whole list. */

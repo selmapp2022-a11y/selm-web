@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { audioFor } from '../exam/model/rendition';
 import { Link } from 'react-router-dom';
 import { CheckCircle2, XCircle, Headphones, BookOpen, RefreshCcw } from 'lucide-react';
 import clsx from 'clsx';
@@ -409,7 +410,7 @@ function Runner({
       <div className="card p-6">
         {isAudio ? (
           <>
-            <audio controls src={resolveAudio(rec.audioPath)} className="w-full" />
+            <audio controls src={resolveAudio(audioFor(rec))} className="w-full" />
             <p className="mt-2 text-xs text-ink-secondary">
               You can replay this here. In the real exam you will hear it once.
             </p>

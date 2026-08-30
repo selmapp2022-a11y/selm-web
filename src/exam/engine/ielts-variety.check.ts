@@ -108,11 +108,16 @@ console.log('\n3b. Nothing is planned in a variety the ruling removed\n');
 // Irish recording in it is the substitution defect with our own name on it.
 for (const v of SINGLE_VOICE_VARIETIES)
   t(`${v} is not planned anywhere`, IELTS_VARIETY_PLAN.filter((p) => p.variety === v).map((p) => p.id), []);
+// `rendered && !keep` is audio that plays in a variety the plan forbids. It
+// was `gt-l-p4`, spoken Irish; it has been re-rendered Canadian and the set is
+// now empty, which is the state to defend. The assertion is kept pointing at
+// the empty set rather than deleted: the next accent ruling will make it
+// non-empty, and a check that was removed once it went green is a check that
+// only ever guarded the past.
 const stale = IELTS_VARIETY_PLAN.filter((p) => p.rendered && !p.keep);
-t('the rendered files that no longer match the plan are named, not left',
-  stale.map((p) => p.id), ['gt-l-p4']);
-t('and every other rendered file is kept',
-  IELTS_VARIETY_PLAN.filter((p) => p.rendered && p.keep).length, 3);
+t('no rendered file is left in a variety the plan forbids', stale.map((p) => p.id), []);
+t('and every recording in the bank has been rendered',
+  IELTS_VARIETY_PLAN.filter((p) => p.rendered && p.keep).length, IELTS_VARIETY_PLAN.length);
 
 console.log('\n4. The account’s limits are in the DATA, not met at render time\n');
 

@@ -22,6 +22,7 @@ import { IELTS_LISTENING } from '../definitions/ielts-listening';
 import { isChoiceItem, isCompletionItem, isMatchingItem } from '../model/types';
 import { normalise } from './completion';
 import { scoreComprehension, serveEpreuve, itemsFor, type ItemAnswer } from './comprehension';
+import { newServeState } from './pool';
 
 const S = IELTS_LISTENING;
 let bad = 0;
@@ -184,8 +185,46 @@ ok(RENDERED.every((r) => (r.voice?.voiceIds?.length ?? 0) === (r.speakers ?? 1) 
 const NARRATOR_ID = RENDERED[0]?.voice?.voiceIds?.slice(-1)[0];
 ok(!!NARRATOR_ID && RENDERED.every((r) => r.voice?.voiceIds?.slice(-1)[0] === NARRATOR_ID),
    'the same narrator speaks every rendered part', NARRATOR_ID ?? '');
-ok(new Set(RENDERED.map((r) => r.voice?.voiceId)).size === RENDERED.length,
-   'no two rendered parts open with the same voice');
+// ── NO TWO PARTS OF ONE PAPER OPEN WITH THE SAME VOICE ────────────────────
+//
+// This was asserted over the BANK — `new Set(RENDERED.map(voiceId)).size ===
+// RENDERED.length` — and it was right while the bank held one paper. It is the
+// third time this file has confused the two, and this time the arithmetic says
+// the bank version is not merely wrong but IMPOSSIBLE: a paper draws one
+// version per part, all 256 combinations are drawable, so the bank property
+// needs the four parts' opener pools disjoint — sixteen distinct voices
+// against a cast of twelve, and the fixed cast is itself the ruling.
+//
+// It is a property of a PAPER, so it is asserted over papers, and over enough
+// successive sittings that a draw which only works the first time cannot pass.
+// `serveEpreuve` is what makes it hold: within a family it still serves
+// least-recently-served among unseen, and only skips a candidate whose opener
+// is already on this paper.
+{
+  const st = newServeState();
+  let clean = 0;
+  const sittings = 12;
+  for (let n = 0; n < sittings; n++) {
+    const paper = serveEpreuve(S, st);
+    const openers = paper.map((r) => r.voice?.voiceId).filter(Boolean);
+    if (new Set(openers).size === openers.length) clean += 1;
+    else ok(false, `sitting ${n + 1} opened two parts with the same voice`,
+            paper.map((r) => `${r.id}:${r.voice?.vendorName?.split(' ')[0]}`).join(' '));
+  }
+  ok(clean === sittings, 'no paper opens two parts with the same voice', `${clean} of ${sittings} sittings`);
+}
+// And the bank-level fact that IS true and worth stating: the openers are not
+// one voice. Seven of sixteen are Rebecca, because Canadian is half the bank
+// and the account holds two Canadian voices — that is the ruling's cost, and
+// it is a number rather than a surprise.
+{
+  const byOpener: Record<string, number> = {};
+  for (const r of RENDERED) byOpener[r.voice?.vendorName?.split(' -')[0] ?? '?'] =
+    (byOpener[r.voice?.vendorName?.split(' -')[0] ?? '?'] ?? 0) + 1;
+  const biggest = Math.max(...Object.values(byOpener));
+  ok(biggest * 2 <= RENDERED.length, 'no single voice opens more than half the bank',
+     Object.entries(byOpener).map(([k, v]) => `${k} ${v}`).join(' · '));
+}
 
 /**
  * §8 SCORES ONE PAPER, not the bank.
@@ -263,8 +302,8 @@ if (!fs.existsSync(PLAN_PATH)) {
   // allows. It must be named, because the renderer's default is to skip
   // anything already rendered and it would skip exactly the file that has to
   // be redone.
-  ok(plan.filter((x) => x.rendered && !x.keep).map((x) => x.id).join(',') === 'gt-l-p4',
-     'and on which rendered file the accent ruling made stale',
+  ok(plan.filter((x) => x.rendered && !x.keep).length === 0,
+     'and that no row is rendered in a variety the plan forbids',
      plan.filter((x) => x.rendered && !x.keep).map((x) => x.id).join(', ') || 'none');
   let agree = 0;
   for (const r of S.recordings) {
