@@ -21,7 +21,7 @@
 import { IELTS_LISTENING } from '../definitions/ielts-listening';
 import { isChoiceItem, isCompletionItem, isMatchingItem } from '../model/types';
 import { normalise } from './completion';
-import { scoreComprehension, type ItemAnswer } from './comprehension';
+import { scoreComprehension, serveEpreuve, itemsFor, type ItemAnswer } from './comprehension';
 
 const S = IELTS_LISTENING;
 let bad = 0;
@@ -32,25 +32,61 @@ const ok = (cond: boolean, label: string, detail = '') => {
 
 const completion = S.items.filter(isCompletionItem);
 const matching = S.items.filter(isMatchingItem);
-const choice = S.items.filter(isChoiceItem);
+//  is measured on the paper (px) and on nothing else — the bank-wide
+// count told us less than the per-paper one and read as a published fact.
 
-console.log('\n1. The shape of the paper\n');
-ok(S.recordings.length === 4, 'four parts', `${S.recordings.length}`);
-ok(S.items.length === 40, 'forty questions', `${S.items.length}`);
-ok(new Set(S.items.map((i) => i.id)).size === 40, 'question ids unique');
-ok(new Set(S.recordings.map((r) => r.id)).size === 4, 'recording ids unique');
+/**
+ * THE PAPER IS NOT THE BANK, and until 31 August this file could not tell them
+ * apart.
+ *
+ * `four parts` and `forty questions` were asserted on `S.recordings` and
+ * `S.items` — the whole bank. That was correct while the bank held exactly one
+ * of each part, and it was about to become wrong for a good reason: the bank
+ * is being grown to four versions of every part, and a check reading the bank
+ * would have reported a forty-question exam as a hundred-and-sixty-question
+ * failure while the exam itself had not changed at all.
+ *
+ * So the published facts are asserted against what ONE SITTING presents, and
+ * the bank is checked separately for the properties every recording must have
+ * whether or not it is on today's paper.
+ */
+const PAPER = serveEpreuve(S);
+const paperItems = itemsFor(S, PAPER);
+const pc = paperItems.filter(isCompletionItem);
+const pm = paperItems.filter(isMatchingItem);
+const px = paperItems.filter(isChoiceItem);
+
+console.log('\n1. The shape of the PAPER — what one sitting presents\n');
+ok(PAPER.length === 4, 'four parts', `${PAPER.length}`);
+ok(paperItems.length === 40, 'forty questions', `${paperItems.length}`);
+ok(new Set(PAPER.map((r) => r.family)).size === 4, 'one of each part, never the same part twice',
+   PAPER.map((r) => `${r.family}:${r.id}`).join(' '));
 
 console.log('');
-ok(completion.length > S.items.length / 2,
+ok(pc.length > paperItems.length / 2,
    'completion is the MAJORITY, as the real paper is',
-   `${completion.length}/40 typed`);
-ok(matching.length > 0, 'matching and labelling are present', `${matching.length}`);
-ok(choice.length < completion.length,
+   `${pc.length}/${paperItems.length} typed`);
+ok(pm.length > 0, 'matching and labelling are present', `${pm.length}`);
+ok(px.length < pc.length,
    'multiple choice is a minority of the paper',
-   `${choice.length} choice vs ${completion.length} completion`);
-ok(completion.length + matching.length + choice.length === 40, 'every question has a kind');
+   `${px.length} choice vs ${pc.length} completion`);
+ok(pc.length + pm.length + px.length === paperItems.length, 'every question has a kind');
 ok(S.matchingGroups?.some((g) => !!g.figureSvg) === true,
    'a labelling task with a figure exists — map labelling is a real IELTS task');
+
+console.log('\n1b. The shape of the BANK — every version, on or off today\'s paper\n');
+ok(new Set(S.items.map((i) => i.id)).size === S.items.length, 'question ids unique',
+   `${S.items.length} questions`);
+ok(new Set(S.recordings.map((r) => r.id)).size === S.recordings.length, 'recording ids unique',
+   `${S.recordings.length} recordings`);
+ok(completion.length > S.items.length / 2,
+   'completion stays the majority across the whole bank',
+   `${completion.length}/${S.items.length}`);
+{
+  const byFamily = new Map<string, number>();
+  for (const r of S.recordings) byFamily.set(String(r.family), (byFamily.get(String(r.family)) ?? 0) + 1);
+  console.log(`       versions per part: ${[...byFamily].map(([f, n]) => `${f} ${n}`).join(', ')}`);
+}
 
 console.log('\n2. Every question names material that exists, and every part is used\n');
 const recIds = new Set(S.recordings.map((r) => r.id));
@@ -107,16 +143,34 @@ for (const i of completion) {
      heard ? '' : `none of ${JSON.stringify(i.answer.accept)} appears in ${i.recordingId}`);
 }
 
-console.log('\n6. Accents: more than the four ielts.org names as a floor\n');
-const varieties = new Set(S.recordings.map((r) => r.variety));
-ok(varieties.size >= 4, 'at least four different accents across the four parts',
-   [...varieties].join(', '));
-ok(S.recordings.every((r) => !!r.variety && r.variety !== 'unknown'),
-   'every part declares the variety it is meant to be spoken in');
+/**
+ * §6 AND §7 ARE ABOUT RENDERED AUDIO, so they are asserted over the recordings
+ * that HAVE audio, not over every script in the bank.
+ *
+ * The ruling of 29 August: *"`variety` is set per recording as it is produced
+ * — declared at render time, never inferred afterwards."* An unrendered script
+ * therefore has no variety and no voice, and that is the correct state rather
+ * than a gap. Requiring one in advance would mean writing down which accent a
+ * recording was going to be spoken in before anybody had chosen it, which is
+ * exactly the `unknown` finding the ruling exists to prevent.
+ */
+const RENDERED = S.recordings.filter((r) => !!r.audioPath);
+const UNRENDERED = S.recordings.filter((r) => !r.audioPath);
 
-console.log('\n7. Every part says which voices actually spoke it\n');
-ok(S.recordings.every((r) => !!r.voice), 'every part records the voice that produced it');
-ok(S.recordings.every((r) => r.voice?.requestedVariety === r.variety),
+console.log('\n6. Accents: more than the four ielts.org names as a floor\n');
+console.log(`       ${RENDERED.length} rendered, ${UNRENDERED.length} written and waiting for the variety gate`);
+const varieties = new Set(RENDERED.map((r) => r.variety));
+ok(varieties.size >= 4, 'at least four different accents across the rendered parts',
+   [...varieties].join(', '));
+ok(RENDERED.every((r) => !!r.variety && r.variety !== 'unknown'),
+   'every rendered part declares the variety it is spoken in');
+ok(UNRENDERED.every((r) => !r.variety && !r.voice),
+   'and an unrendered script claims neither a variety nor a voice',
+   `${UNRENDERED.length} checked`);
+
+console.log('\n7. Every rendered part says which voices actually spoke it\n');
+ok(RENDERED.every((r) => !!r.voice), 'every rendered part records the voice that produced it');
+ok(RENDERED.every((r) => r.voice?.requestedVariety === r.variety),
    'no part was rendered in a variety other than the one asked for');
 // A monologue is one speaker plus the narrator; a dialogue is two plus the
 // narrator. The first manifest listed a voice for Part 2 and Part 4 that never
@@ -124,14 +178,14 @@ ok(S.recordings.every((r) => r.voice?.requestedVariety === r.variety),
 // part had one. A provenance record naming a voice that did not speak is the
 // same defect as one omitting a voice that did, and nothing caught it but
 // reading the file. This is what catches it now.
-ok(S.recordings.every((r) => (r.voice?.voiceIds?.length ?? 0) === (r.speakers ?? 1) + 1),
+ok(RENDERED.every((r) => (r.voice?.voiceIds?.length ?? 0) === (r.speakers ?? 1) + 1),
    'the voices listed are exactly the speakers plus the narrator',
-   S.recordings.map((r) => `${r.id}:${r.voice?.voiceIds?.length}`).join(' '));
-const NARRATOR_ID = S.recordings[0]?.voice?.voiceIds?.slice(-1)[0];
-ok(!!NARRATOR_ID && S.recordings.every((r) => r.voice?.voiceIds?.slice(-1)[0] === NARRATOR_ID),
-   'the same narrator speaks every part', NARRATOR_ID ?? '');
-ok(new Set(S.recordings.map((r) => r.voice?.voiceId)).size === S.recordings.length,
-   'no two parts open with the same voice');
+   RENDERED.map((r) => `${r.id}:${r.voice?.voiceIds?.length}`).join(' '));
+const NARRATOR_ID = RENDERED[0]?.voice?.voiceIds?.slice(-1)[0];
+ok(!!NARRATOR_ID && RENDERED.every((r) => r.voice?.voiceIds?.slice(-1)[0] === NARRATOR_ID),
+   'the same narrator speaks every rendered part', NARRATOR_ID ?? '');
+ok(new Set(RENDERED.map((r) => r.voice?.voiceId)).size === RENDERED.length,
+   'no two rendered parts open with the same voice');
 
 console.log('\n8. Scoring, end to end\n');
 const answerAll = (f: (n: number) => 'right' | 'wrong' | 'near'): ItemAnswer[] =>
