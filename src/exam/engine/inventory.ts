@@ -141,7 +141,38 @@ export function inventory(sizeOf: (audioPath: string) => number = () => 0): Skil
         row.sets = c.sets.questions ?? null;
         row.setsUnit = 'questions';
         row.setsSource = c.sets.source;
-        row.serves = c.serve?.count ?? c.items.length;
+        // QUESTIONS, not recordings, and the difference stopped being
+        // invisible on 2026-08-29. `serve.count` is how many RECORDINGS a
+        // sitting presents; when every recording carried exactly one question
+        // the two numbers were the same, and the row was right by accident.
+        // The first Task 4 batch put four to six questions behind each IELTS
+        // reading passage, and the row went on reporting 6 against an `exists`
+        // of 28 — a sitting that presents 28 questions described as presenting
+        // 6, next to a `gap` computed from it.
+        //
+        // Counted the same way `exists` is, which is the rule this file has
+        // already had to learn once: *"Both are questions now."*
+        if (c.serve) {
+          const perBand = new Map<string, number[]>();
+          for (const r of c.recordings) {
+            const n = c.items.filter((i) => i.recordingId === r.id).length;
+            const list = perBand.get(r.level) ?? [];
+            list.push(n);
+            perBand.set(r.level, list);
+          }
+          let served = 0;
+          for (const [band, want] of Object.entries(c.serve.byBand ?? {})) {
+            // The most questions that band could present, taken largest-first:
+            // the serve rule picks least-recently-served among unseen, so any
+            // subset is possible and the row should not understate what a
+            // sitting can carry.
+            const counts = (perBand.get(band) ?? []).sort((x, y) => y - x);
+            served += counts.slice(0, want as number).reduce((a, b) => a + b, 0);
+          }
+          row.serves = served;
+        } else {
+          row.serves = c.items.length;
+        }
         row.existsItems = c.items.length;
         row.existsRecordings = c.recordings.length;
         for (const r of c.recordings) {

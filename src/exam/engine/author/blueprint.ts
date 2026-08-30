@@ -74,7 +74,10 @@ export type Blueprint = {
  * ones, and C1–C2 the long passage. FEI publishes less again for the TCF, and
  * the same reasoning applies to it.
  */
-const WORDS: Record<Band, { min: number; max: number }> = {
+type Range = { min: number; max: number };
+type Format = { words: Record<Band, Range>; questions: Record<Band, Range>; source: string };
+
+const IELTS_READING_WORDS: Record<Band, Range> = {
   A1: { min: 25, max: 120 },
   A2: { min: 40, max: 180 },
   B1: { min: 90, max: 320 },
@@ -96,7 +99,7 @@ const WORDS: Record<Band, { min: number; max: number }> = {
  * carry fourteen questions that are not padding, and padding is what a bank
  * fills with when a number has to be reached.
  */
-const QUESTIONS: Record<Band, { min: number; max: number }> = {
+const IELTS_READING_QUESTIONS: Record<Band, Range> = {
   A1: { min: 2, max: 4 },
   A2: { min: 2, max: 5 },
   B1: { min: 3, max: 6 },
@@ -104,6 +107,71 @@ const QUESTIONS: Record<Band, { min: number; max: number }> = {
   C1: { min: 4, max: 9 },
   C2: { min: 4, max: 8 },
 };
+
+const flat = (r: Range): Record<Band, Range> =>
+  ({ A1: r, A2: r, B1: r, B2: r, C1: r, C2: r });
+
+const scaled = (mins: number[], maxs: number[]): Record<Band, Range> =>
+  Object.fromEntries(BANDS.map((b, i) => [b, { min: mins[i], max: maxs[i] }])) as Record<Band, Range>;
+
+/**
+ * ONE FORMAT PER EXAM AND SKILL, because they are not one format.
+ *
+ * The first version of this file had a single table and applied it to
+ * everything, and the check found it within the hour by running the gate over
+ * the banks that already exist. IELTS listening came back with every part
+ * "too long" and "too many questions" — a Part IS four hundred to nine hundred
+ * words and DOES carry exactly ten questions, and the numbers it was being
+ * measured against were the ones for a General Training reading passage.
+ *
+ * That is not a near miss. A gate calibrated for one skill and applied to
+ * another rejects correct material and, worse, would have accepted a TCF
+ * listening recording ten times longer than the épreuve sets.
+ *
+ * So each row below is a fact about a published format, with the source
+ * beside it. The CEFR split within a row remains ours, as it is everywhere
+ * else in this product: the awarding bodies band by section or by nothing.
+ */
+const FORMATS: Record<string, Format> = {
+  'ielts-gt:reading': {
+    words: IELTS_READING_WORDS,
+    questions: IELTS_READING_QUESTIONS,
+    source: 'ielts.org — GT Reading: three sections rising in difficulty, 40 questions in 60 minutes.',
+  },
+  'ielts-gt:listening': {
+    // Four parts, TEN questions each, about thirty minutes of recording. The
+    // question count is not a range: it is the paper.
+    words: scaled([300, 320, 350, 400, 450, 500], [700, 750, 800, 850, 900, 1000]),
+    questions: flat({ min: 10, max: 10 }),
+    source: 'ielts.org — Listening: 4 parts, 40 questions, 10 per part, about 30 minutes.',
+  },
+  'tcf-canada:listening': {
+    // Thirty-nine short independent recordings in thirty-five minutes — about
+    // fifty seconds each including the question. Nothing in the épreuve is a
+    // four-hundred-word part, and a bank of those would not be this exam.
+    words: scaled([10, 20, 35, 50, 70, 90], [60, 90, 140, 200, 280, 350]),
+    questions: flat({ min: 1, max: 2 }),
+    source: 'France Éducation international — TCF Canada, compréhension orale : 39 questions, 35 minutes.',
+  },
+  'tcf-canada:reading': {
+    // Thirty-nine questions in sixty minutes over short independent documents:
+    // notices and instructions at the bottom, argued texts at the top.
+    words: scaled([12, 20, 40, 60, 90, 110], [60, 100, 180, 280, 400, 500]),
+    questions: flat({ min: 1, max: 3 }),
+    source: 'France Éducation international — TCF Canada, compréhension écrite : 39 questions, 60 minutes.',
+  },
+};
+
+/** The format for a section, or the IELTS reading one as the documented default. */
+export function formatFor(examId: string, skill: string): Format {
+  return (
+    FORMATS[`${examId}:${skill}`] ?? {
+      words: IELTS_READING_WORDS,
+      questions: IELTS_READING_QUESTIONS,
+      source: 'no published format declared for this exam and skill — IELTS GT Reading used as a stand-in',
+    }
+  );
+}
 
 /** The kinds a section already uses, so authoring cannot invent a format. */
 export function kindsOf(section: ComprehensionSection): Array<'choice' | 'completion' | 'matching'> {
@@ -126,6 +194,7 @@ export function blueprintsFor(exam: ExamDefinition, section: ComprehensionSectio
   const coordinates = fams.length * BANDS.length;
   const want = Math.max(1, Math.round(cap / Math.max(1, coordinates)));
   const kinds = kindsOf(section);
+  const format = formatFor(exam.id, section.skill);
   const out: Blueprint[] = [];
   for (const f of fams) {
     for (const level of BANDS) {
@@ -139,8 +208,8 @@ export function blueprintsFor(exam: ExamDefinition, section: ComprehensionSectio
         family: f.id,
         familyDescribes: f.describes[exam.language] ?? f.describes.en,
         level,
-        words: WORDS[level],
-        questions: QUESTIONS[level],
+        words: format.words[level],
+        questions: format.questions[level],
         kinds,
         have,
         want,

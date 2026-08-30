@@ -506,7 +506,23 @@ export const FRENCH_VARIETY_MIX: Array<{ variety: SpeechVariety; share: 'majorit
   { variety: 'swiss', share: 'occasional' },
 ];
 
+/**
+ * PART D of TASK 4. Recorded per passage so the annual refresh can find aged
+ * framing without re-reading the bank.
+ *
+ *  - `timeless` — would have read the same in 2015 and will in 2035. The task
+ *    document calls this the stock content of the market and is right that a
+ *    bank made only of it is what the founder rejected.
+ *  - `current`  — could have been written this year: remote work, delivery,
+ *    climate adaptation, the housing argument. What the bank should mostly be.
+ *  - `dated`    — needs a particular year to make sense. The authoring gate
+ *    refuses these; the value exists so a refresh can name one that slipped in.
+ */
+export type Freshness = 'timeless' | 'current' | 'dated';
+
 export type Recording = {
+  /** §D. Absent on material authored before the field existed. */
+  freshness?: Freshness;
   id: string;
   /**
    * The CEFR band the RECORDING is written to. **Ours, not the exam's.** TCF

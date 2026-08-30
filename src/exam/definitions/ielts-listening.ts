@@ -545,7 +545,12 @@ export const IELTS_LISTENING: ComprehensionSection = {
       recordingId: 'gt-l-p3',
       level: 'C1',
       stem: 'What did Doctor Ellis say about their research question?',
-      options: ['That it was the wrong question for the module.', 'That it was too broad for the time they have.', 'That it had already been answered by other studies.', 'That it was too narrow to sustain six sections.'],
+      // The key was 'That it was too broad for the time they have', eight
+      // words of which are said aloud in that order. A candidate who matched
+      // the sound of the phrase scored without understanding Priya's
+      // correction, which is the entire point of the item. Reworded to carry
+      // the same meaning in different words; the distractors are untouched.
+      options: ['That it was the wrong question for the module.', 'That its scope was larger than their timetable allowed.', 'That it had already been answered by other studies.', 'That it was too narrow to sustain six sections.'],
       answer: 1,
       rationale: 'Sam paraphrases her as saying it was "too broad", and Priya corrects the paraphrase. The corrected version is the answer, and the uncorrected one is option A\u2019s neighbour.',
     },
@@ -554,7 +559,11 @@ export const IELTS_LISTENING: ComprehensionSection = {
       recordingId: 'gt-l-p3',
       level: 'C1',
       stem: 'What do they decide to do about the research question?',
-      options: ['Keep it as it is and state what they could not cover.', 'Narrow it, and add a section on what a wider study would have asked.', 'Narrow it and say nothing about the limits.', 'Ask Doctor Ellis to decide for them.'],
+      // Same defect, same fix: 'a section on what a wider study would have
+      // asked' is spoken almost verbatim. The item tests that the candidate
+      // hears the two students COMBINE their positions, not that they can
+      // recognise a phrase.
+      options: ['Keep it as it is and state what they could not cover.', 'Reduce its scope, and record the questions a larger study would ask.', 'Narrow it and say nothing about the limits.', 'Ask Doctor Ellis to decide for them.'],
       answer: 1,
       rationale: 'Each student argues for a different one of the first two options before they combine them. A candidate who answers from either argument alone gets it wrong.',
     },

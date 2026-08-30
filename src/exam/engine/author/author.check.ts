@@ -238,33 +238,49 @@ const report = summarise(6, [ok, bad, noJudge]);
 t('the batch report counts before and after', [report.before, report.after], [6, 7]);
 t('and keeps the rejection reasons', Object.keys(report.byReason).length > 0, true);
 
-console.log('\n5. In the reviewed bank the gate finds thinness, and nothing else\n');
-for (const r of reading.recordings) {
-  const items = reading.items.filter((i) => i.recordingId === r.id);
-  const b = blueprintsFor(gt, reading).find((x) => x.family === r.family && x.level === r.level)!;
-  // Measured against the section WITHOUT itself; a passage is always a
-  // duplicate of itself, and the question is whether it would be accepted if
-  // it were arriving now.
-  const without = { ...reading, recordings: reading.recordings.filter((x) => x.id !== r.id) } as ComprehensionSection;
-  const v = runGate({
-    candidate: {
-      id: r.id, examId: gt.id, skill: 'reading', family: r.family!, level: r.level as Candidate['level'],
-      script: r.script ?? '', items, freshness: 'current',
-      provenance: { author: 'selm', authoredAt: '2026-08-28', promptVersion: 'bank-v0', source: 'ielts.org published GT Reading specification' },
-    },
-    blueprint: b, section: without, locale: gt.locale,
-  });
-  // Thinness is the subject of this build: one question where the exam asks
-  // several, and a passage of forty words where it sets hundreds. Those two
-  // reasons are expected. ANY OTHER reason would mean the gate disagrees with
-  // material a person has already read, and one of the two would be wrong.
-  const THIN = /^(items\.too-few|passage\.too-short)/;
-  const hygiene = v.reasons.filter((x) => !THIN.test(x));
-  t(`${r.id} (${r.level}) raises no hygiene defect`, hygiene, []);
-  t(`${r.id} (${r.level}) is short of the exam, and the gate says so`,
-    v.reasons.some((x) => x.startsWith('passage.too-short')), true);
-}
+console.log('\n5. Across every bank the gate finds thinness, and nothing else\n');
 
+/**
+ * This section began as *"the gate must not reject the bank it will judge
+ * successors by"*, went red on all six IELTS reading passages, and was the
+ * reason the word floors were rewritten from the published format instead of
+ * from what happened to be in the file.
+ *
+ * Then the first batch replaced those six, and the assertion that they were
+ * short of the exam went red the other way. Both states were correct in turn,
+ * which is why the check now says the thing that stays true: **a hygiene
+ * defect anywhere in any bank is a failure; thinness is counted and printed,
+ * because it is the work remaining rather than a fault.**
+ */
+const THIN = /^(items\.too-few|passage\.too-short)/;
+for (const exam of EXAMS) {
+  for (const sec of exam.sections) {
+    if (sec.kind !== 'comprehension') continue;
+    const section = sec as ComprehensionSection;
+    const bps = blueprintsFor(exam, section);
+    let thin = 0;
+    const hygiene: string[] = [];
+    for (const r of section.recordings) {
+      const items = section.items.filter((i) => i.recordingId === r.id);
+      const b = bps.find((x) => x.family === r.family && x.level === r.level);
+      if (!b) { hygiene.push(`${r.id}: no blueprint — family or band is not one the planner can emit`); continue; }
+      const without = { ...section, recordings: section.recordings.filter((x) => x.id !== r.id) } as ComprehensionSection;
+      const v = runGate({
+        candidate: {
+          id: r.id, examId: exam.id, skill: section.skill as 'reading', family: r.family!, level: r.level as Candidate['level'],
+          script: r.script ?? '', items, freshness: r.freshness ?? 'timeless',
+          provenance: { author: 'selm', authoredAt: '2026-08-29', promptVersion: 'bank', source: 'published exam format' },
+        },
+        blueprint: b, section: without, locale: exam.locale,
+      });
+      const bad = v.reasons.filter((x) => !THIN.test(x));
+      if (bad.length) hygiene.push(`${r.id}: ${bad.join(', ')}`);
+      if (v.reasons.some((x) => THIN.test(x))) thin += 1;
+    }
+    t(`${exam.id} · ${section.skill}: no hygiene defect in ${section.recordings.length} passages`, hygiene, []);
+    console.log(`       ${thin} of ${section.recordings.length} are thinner than the format asks for`);
+  }
+}
 console.log('\n6. Thinnest first is an order, not a slogan\n');
 const plan = thinnestFirst(blueprintsFor(gt, reading));
 t('the first coordinate is empty', plan[0].have, 0);

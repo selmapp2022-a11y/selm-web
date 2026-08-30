@@ -30,7 +30,7 @@ import type { ComprehensionSection } from '../../model/types';
 import { isChoiceItem, isCompletionItem, isMatchingItem } from '../../model/types';
 import { longestCommonRun, segmentationFor, tokenSet, words } from '../text';
 import type { Blueprint } from './blueprint';
-import type { Candidate, LayerVerdict } from './types';
+import { BANDS, type Band, type Candidate, type LayerVerdict } from './types';
 
 /**
  * §D's forbidden furniture, as words rather than as a judgement.
@@ -40,7 +40,37 @@ import type { Candidate, LayerVerdict } from './types';
  * obvious case cheaply, and `freshness: 'dated'` catches the author admitting
  * it. The two-year test in §D remains a reading, done by a person.
  */
-const NEWS = /\b(president|prime minister|chancellor|election|referendum|coup|war|invasion|ceasefire|pandemic|lockdown|earthquake|hurricane|wildfire|shooting|scandal|impeach\w*|sanction(s|ed)?|tariff war|general strike)\b/i;
+const NEWS_EN = /\b(president|prime minister|chancellor|election|referendum|coup d'état|invasion|ceasefire|pandemic|lockdown|earthquake|hurricane|wildfire|shooting|scandal|impeach\w*|sanctions|general strike)\b/i;
+
+/**
+ * And the French list, because the English one matched French.
+ *
+ * `coup` was in the English list and fired on three TCF reading passages —
+ * `tout à coup`, `un coup de fil`, `du coup`. Three perfectly ordinary French
+ * sentences flagged as news, by a rule that had never been shown a French
+ * text.
+ *
+ * A word list is a language-specific instrument and pretending otherwise is
+ * how a gate quietly rejects a whole bank. The English `coup` now has to
+ * appear as `coup d'état` to fire at all.
+ */
+const NEWS_FR = /\b(président|première ministre|premier ministre|élections?|référendum|coup d'État|invasion|cessez-le-feu|pandémie|confinement|séisme|tremblement de terre|ouragan|incendie de forêt|fusillade|scandale|destitution|sanctions|grève générale)\b/i;
+
+/**
+ * `war` and `guerre` were in these lists and came out again.
+ *
+ * A TCF reading passage about how cities restore their old buildings mentions
+ * `les logements ouvriers ajoutés après la guerre` — post-war workers'
+ * housing. That is history, and §D forbids NEWS: *"a framing that could only
+ * have been written this month"*. A passage that would read identically in
+ * 2015 and 2035 is the opposite of what the rule is aimed at, and a word list
+ * that cannot tell `after the war` from a war is not enforcing the rule, it is
+ * enforcing the word.
+ *
+ * What is left fires on events rather than on subjects: an invasion, a
+ * ceasefire, a coup d'état, an election, a named office.
+ */
+const newsFor = (locale?: string) => (locale?.toLowerCase().startsWith('fr') ? NEWS_FR : NEWS_EN);
 
 /** Two options that are near-restatements of each other. */
 function jaccard(a: Set<string>, b: Set<string>): number {
@@ -70,7 +100,7 @@ export function runGate({ candidate: c, blueprint: b, section, locale }: GateInp
   if (c.level !== b.level) reasons.push(`passage.wrong-band(${c.level}≠${b.level})`);
   if (c.family !== b.family) reasons.push(`passage.wrong-family(${c.family}≠${b.family})`);
   if (c.freshness === 'dated') reasons.push('passage.dated');
-  const news = NEWS.exec(c.script);
+  const news = newsFor(locale).exec(c.script);
   if (news) reasons.push(`passage.news(${news[0].toLowerCase()})`);
 
   // Against every passage already in the section, and against nothing else:
@@ -90,10 +120,24 @@ export function runGate({ candidate: c, blueprint: b, section, locale }: GateInp
   for (const it of c.items) {
     const at = it.id;
     if (it.recordingId !== c.id) reasons.push(`${at}:item.wrong-passage`);
-    if (it.level !== c.level) reasons.push(`${at}:item.wrong-band`);
+    // An item's band is what the QUESTION is written to; the passage's band is
+    // the passage's. In a forty-question listening part the two legitimately
+    // differ — the last questions of a part are harder than the first — so
+    // equality was the wrong test and fired on seven correct items. What is
+    // not legitimate is a gap of two bands, which means one of the two labels
+    // is wrong.
+    if (Math.abs(BANDS.indexOf(it.level as Band) - BANDS.indexOf(c.level)) > 1)
+      reasons.push(`${at}:item.band-far-from-passage(${it.level} vs ${c.level})`);
     const stem = it.stem.trim();
     if (!stem) reasons.push(`${at}:item.no-stem`);
-    else if (!stem.endsWith('?') && !stem.endsWith(':')) reasons.push(`${at}:item.stem-not-a-question`);
+    // A QUESTION MARK IS A MULTIPLE-CHOICE RULE, not an item rule. It was
+    // applied to everything at first and fired on eleven IELTS listening
+    // items whose stems are the labels of a form or a map — "Building where
+    // the tour starts", "Cost per person" — which is exactly what a note
+    // completion looks like on the paper. Requiring those to end in a
+    // question mark would have made the bank less like the exam.
+    else if (isChoiceItem(it) && !stem.endsWith('?') && !stem.endsWith(':'))
+      reasons.push(`${at}:item.stem-not-a-question`);
     if (!it.rationale || it.rationale.trim().length < 40) reasons.push(`${at}:item.no-rationale`);
     if (!b.kinds.includes((it.kind ?? 'choice') as 'choice')) reasons.push(`${at}:item.kind-not-in-section`);
 
@@ -130,8 +174,26 @@ export function runGate({ candidate: c, blueprint: b, section, locale }: GateInp
       }
       // The answer has to be IN the material. A completion whose answer is
       // not there is unanswerable however well it reads.
-      const hay = c.script.toLowerCase();
-      if (!it.answer.accept.some((a) => hay.includes(a.trim().toLowerCase())))
+      //
+      // Compared on letters and digits only. The first version compared raw
+      // strings and reported four IELTS listening items as unanswerable when
+      // the answer was audible and merely punctuated differently — a postcode
+      // written `SW1A 2AA` against a script saying `S W 1 A, 2 A A`, a time
+      // written `9.30` against `9:30`. `ielts-listening.check.ts` already
+      // asserts audibility with a normalising comparison, and two checks that
+      // disagree about the same fact are worse than one.
+      //
+      // NOT APPLIED TO AUDIO SECTIONS, and the reason is the four IELTS
+      // listening items that were reported unanswerable when they are not: a
+      // telephone number is SPOKEN as words and ANSWERED in digits, so it is
+      // correctly absent from the script as a string and correctly present to
+      // anyone listening. `ielts-listening.check.ts` already asserts that
+      // every answer is audible, with a comparison built for spoken material.
+      // Two checks that disagree about the same fact are worse than one, and
+      // the one built for the job wins.
+      const flatten = (x: string) => x.toLowerCase().replace(/[^a-z0-9à-ÿ]/gi, '');
+      const hay = flatten(c.script);
+      if (!section.delivery.audioPlaysOnce && !it.answer.accept.some((a) => hay.includes(flatten(a))))
         reasons.push(`${at}:completion.answer-not-in-passage`);
     } else if (isMatchingItem(it)) {
       const g = section.matchingGroups?.find((x) => x.id === it.groupId);

@@ -946,9 +946,14 @@ export const TCF_CANADA: ExamDefinition = {
           recordingId: "tcf-co-05-r",
           level: "A2",
           stem: "Quel est le problème de l'appartement ?",
-          options: ["Il est trop petit", "Il n'y a pas d'ascenseur", "Il est trop cher", "Il est au rez-de-chaussée"],
+          // The key was « Il n'y a pas d'ascenseur », seven words repeated from
+          // the recording in that order. A candidate who matched the sound of
+          // the clause answered without following the « mais », which is what
+          // the item exists to test. Now the key states the CONSEQUENCE, so it
+          // has to be inferred from the third floor and the missing lift.
+          options: ["Il est trop petit", "Il faut monter les escaliers", "Il est trop cher", "Il est au rez-de-chaussée"],
           answer: 1,
-          rationale: "Tests the restrictive mais in a short housing exchange; the distractors are typical apartment complaints that are never stated, and rez-de-chaussée contradicts troisième étage.",
+          rationale: "Tests the restrictive mais in a short housing exchange, and now also the inference from troisième étage plus pas d'ascenseur; the distractors are typical apartment complaints that are never stated, and rez-de-chaussée contradicts troisième étage.",
         },
         {
           id: "tcf-co-06",
@@ -1045,9 +1050,12 @@ export const TCF_CANADA: ExamDefinition = {
           recordingId: "tcf-co-16-r",
           level: "B1",
           stem: "Que se passera-t-il si personne n'est présent à la livraison ?",
-          options: ["Le colis sera immédiatement renvoyé à l'expéditeur", "Le colis sera livré le lendemain", "Le colis restera au centre de tri", "Le colis sera déposé au bureau de poste"],
+          // The key repeated « déposé au bureau de poste » verbatim. Reworded
+          // so the candidate has to follow the si-clause rather than recognise
+          // the phrase that follows it.
+          options: ["Le colis sera immédiatement renvoyé à l'expéditeur", "Le colis sera livré le lendemain", "Le colis restera au centre de tri", "Il faudra aller le chercher dans le quartier"],
           answer: 3,
-          rationale: "Tests a si-clause consequence; centre de tri and livré demain are in the script but describe the normal route, not the failed-delivery case.",
+          rationale: "Tests a si-clause consequence, and now the inference that a parcel left at the local post office has to be collected; centre de tri and livré demain are in the script but describe the normal route, not the failed-delivery case.",
         },
         {
           id: "tcf-co-17",
@@ -1835,7 +1843,11 @@ export const TCF_CANADA: ExamDefinition = {
           recordingId: "tcf-ce-18-r",
           level: "B1",
           stem: "Que peut-on déduire au sujet de la déviation ?",
-          options: ["Elle est réservée aux riverains", "Elle fait perdre plus de sept minutes aux heures de pointe", "Elle est interdite aux véhicules de livraison", "Elle raccourcit le trajet de sept minutes"],
+          // The key ran to eleven words against a longest distractor of seven.
+          // A candidate who has learned that the long option is the answer
+          // scores here without reading the notice, which is the tell
+          // items.check.ts exists to count and the gate now refuses per item.
+          options: ["Elle est réservée aux riverains", "Elle coûte plus de sept minutes le matin", "Elle est interdite aux véhicules de livraison", "Elle raccourcit le trajet de sept minutes"],
           answer: 1,
           rationale: "Tests the inference carried by \"davantage le matin\"; the last option reverses the direction of the figure and the other two misapply the separate rules given for residents and deliveries.",
         },
