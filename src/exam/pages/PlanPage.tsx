@@ -59,7 +59,7 @@ export default function PlanPage() {
               ? 'Built from your real marks — a better start than any placement test, because it came from a real exam.'
               : "Construit à partir de vos vraies notes — un meilleur départ qu'un test de niveau, car il vient d'un examen réel."
             : ui === 'en'
-              ? 'Built in exam order. Enter a past result any time and this reorders around your real marks.'
+              ? 'Built in exam order. A past score report reorders it around your real marks.'
               : "Construit dans l'ordre de l'examen. Saisissez un résultat passé à tout moment et ceci se réorganise autour de vos vraies notes."}
         </p>
       </header>

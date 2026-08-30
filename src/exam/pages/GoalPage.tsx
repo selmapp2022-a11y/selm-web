@@ -244,23 +244,34 @@ export default function GoalPage() {
 
       <section className="card p-6">
         <span className="chip">{ui === 'en' ? 'Already sat this exam?' : 'Déjà passé cet examen ?'}</span>
+        {/* Copy rule 1 — no sentence twice on one screen — applies inside a
+            card as well as across one. The heading names the thing; the
+            button is the only place the CTA's words appear. */}
         <h2 className="mt-3 font-display text-xl font-bold text-navy">
-          {ui === 'en' ? 'Enter a past result' : 'Saisir un résultat passé'}
+          {ui === 'en' ? 'Your past results' : 'Vos résultats passés'}
         </h2>
         <p className="mt-1 text-sm text-ink-secondary">
           {ui === 'en'
             ? 'Your real marks build a better plan than any test we could give you. This page holds your exam, destination and date; your scores go in here.'
             : "Vos vraies notes bâtissent un meilleur plan que tout test. Cette page contient votre examen, votre destination et votre date ; vos notes se saisissent ici."}
         </p>
+        {/* D3 — the heading above says "Enter a past result" and this button
+            said "Enter my scores". Two labels, one action, one card: a
+            candidate reading them as two things is reading them correctly,
+            because that is how they were written. The button now carries the
+            same words as the heading, and this is the only place in the app
+            they appear. */}
         <button onClick={() => nav('/attestation')} className="btn-primary mt-4">
-          {ui === 'en' ? 'Enter my scores' : 'Saisir mes notes'}
+          {ui === 'en' ? 'Enter a past result' : 'Saisir un résultat passé'}
           <ChevronRight className="h-4 w-4" />
         </button>
-        <p className="mt-3 text-xs text-ink-secondary">
-          {ui === 'en'
-            ? 'To practise, or to sit a full mock exam, use Practice and Mock exam in the navigation.'
-            : "Pour vous entraîner ou passer un examen blanc complet, utilisez Practice et Mock exam dans la navigation."}
-        </p>
+        {/* Deleted 31 August: "To practise, or to sit a full mock exam, use
+            Practice and Mock exam in the navigation."
+
+            A page that has to explain the navigation in prose is the
+            navigation reporting its own failure. Both are one tap away in the
+            tab bar on every screen, and a sentence pointing at them says only
+            that we did not trust the tab bar. */}
       </section>
     </div>
   );

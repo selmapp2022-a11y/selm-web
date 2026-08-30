@@ -236,6 +236,16 @@ export default function DashboardPage() {
 
         <StandingRows exam={exam} record={latest} target={target} />
         <StandingNote exam={exam} />
+        {/* D2 — THE SENTENCE THAT WAS ON THIS SCREEN TWICE.
+            `gate.reason` ("no predicted score is published … it requires 150
+            official score reports") was printed under "Are you ready to book?"
+            AND again under "What is not built for your exam". Same words, one
+            scroll apart, which reads as two different facts until you notice
+            it is one. The IA ruling of 30 August: keep it once, under "Where
+            you stand", because that is the block it qualifies. */}
+        {!gate.publishNumeric && (
+          <p className="text-xs leading-relaxed text-ink-secondary">{t(gate.reason, 'en')}</p>
+        )}
       </section>
 
       {/* Still block 3: the decision, stated against the evidence rather than
@@ -254,7 +264,6 @@ export default function DashboardPage() {
                   ? `${exam.benchmark.system} ${governing.level}`
                   : 'Not yet answerable'}
               </p>
-              <p className="mt-2 text-xs leading-relaxed text-ink-secondary">{t(gate.reason, 'en')}</p>
               {!governing.complete && (
                 <p className="mt-2 text-xs leading-relaxed text-ink-secondary">
                   {goal.destination.requirement === 'overall'
@@ -311,10 +320,12 @@ export default function DashboardPage() {
       <section className="space-y-3">
         <SectionHeading icon={ScrollText}>What is not built for your exam</SectionHeading>
         <NotBuiltNote exam={exam} />
+        {/* The second printing of `gate.reason` stood here. It is now stated
+            once, under "Where you stand". What was useful in this paragraph
+            was the advice rather than the repetition, so the advice stays and
+            the restatement goes. */}
         {gate.publishNumeric ? null : (
           <p className="rounded-xl bg-surface-muted px-4 py-3 text-xs leading-relaxed text-ink-secondary">
-            No predicted score is published for {t(exam.name, 'en')} yet, in any skill.{' '}
-            {t(gate.reason, 'en')}{' '}
             <strong>What to do meanwhile:</strong> practise the tasks the exam actually sets, sit
             the mock exam to see the band your answers hold, and enter any past score report you
             have — that is the one number here that comes from the awarding body rather than from
@@ -324,7 +335,9 @@ export default function DashboardPage() {
         <div className="flex flex-wrap gap-2">
           <Link to="/practice" className="btn-secondary">Practice</Link>
           <Link to="/exam" className="btn-secondary">Mock exam</Link>
-          <a href={EXAM_HOME} className="btn-secondary">Enter a past result</a>
+          {/* D3 — "Enter a past result" appeared four times in the app: here,
+              on Progress, and twice on the exam page. It now appears exactly
+              once, on the page that owns past results. */}
         </div>
       </section>
 

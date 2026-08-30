@@ -116,7 +116,7 @@ export function ComprehensionPractice({ skill }: { skill: 'reading' | 'listening
         level.basis === 'attestation'
           ? `Served around ${cefrTag(level.index)} — the level your last ${state0Name(examName)} result puts you at.`
           : goal
-            ? `Served around ${cefrTag(level.index)} — the level ${goal.system} ${goal.requiredLevel} asks for. Enter a past result and this follows your marks instead.`
+            ? `Served around ${cefrTag(level.index)} — the level ${goal.system} ${goal.requiredLevel} asks for. A past score report makes this follow your marks instead.`
             : `Served around ${cefrTag(level.index)}.`;
       if (alive) setState({ kind: 'ready', examName, section, recordings: usable, lang, level, levelNote });
     };

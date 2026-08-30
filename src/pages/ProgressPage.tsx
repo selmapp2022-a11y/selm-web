@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { LineChart, ListChecks, Compass, MapPinned, CalendarPlus, FileText } from 'lucide-react';
 import { SectionHeading } from '../components/SectionHeading';
 import { lookFor } from '../lib/skillLook';
-import { StandingRows, StandingNote, NotBuiltNote } from '../components/Standing';
 import { ATTEMPTS_EVENT, attemptsBySkill, getAttempts, type SkillKey } from '../lib/attempts';
 import { loadHistory, type SittingRecord } from '../exam/model/history';
 import { PLAN_EVENT, loadPlan, daysUntil } from '../exam/model/plan';
@@ -133,7 +132,6 @@ export default function ProgressPage() {
   const touched = new Set(attempts.map((a) => a.topic).filter(Boolean) as string[]);
   const untouched = built.slots.filter((s) => !touched.has(s.coordinate.label));
 
-  const latest = mine.length ? mine[mine.length - 1] : null;
 
   return (
     <div className="space-y-8">
@@ -199,14 +197,29 @@ export default function ProgressPage() {
         )}
       </section>
 
-      {/* 3 ── where you stand: the same rows as Today, from the same component */}
+      {/* D1 — "WHERE YOU STAND" IS ON TODAY, AND ONLY ON TODAY.
+          The four rows and their explanation were rendered here identically,
+          from the same component, so a candidate met the same block twice in
+          two taps and had no way to know which was the current one — they
+          were both current, which is worse.
+
+          The IA audit proposed deleting it from Today and keeping it here.
+          The ruling of 30 August reversed that, and the reason is about when
+          it is read rather than where it belongs: Today is opened several
+          times a day, and the governing level with the distance to target is
+          exactly what a candidate opens the app to see. So the block stays
+          where it is looked at, and this page links to it. */}
       <section className="space-y-3">
         <SectionHeading icon={Compass} meta={`Target: ${target} in every skill`}>
           Where you stand
         </SectionHeading>
-        <StandingRows exam={exam} record={latest} target={target} />
-        <StandingNote exam={exam} />
-        <NotBuiltNote exam={exam} />
+        <Link to="/" className="card flex items-center gap-3 p-4 hover:shadow-cardHover">
+          <span className="flex-1 text-sm text-ink-secondary">
+            Your four skills and the level each one holds are on{' '}
+            <strong className="text-navy dark:text-white">Today</strong>.
+          </span>
+          <span className="btn-secondary shrink-0">Open</span>
+        </Link>
       </section>
 
       {/* 4 ── the gap */}
@@ -282,7 +295,9 @@ function RealResults({ exam, goal, rows }: { exam: ExamDefinition; goal: Goal; r
           A line needs points. Enter a past {t(exam.name, 'en')} score report and this shows your
           {' '}{goal.system} level per skill against the {goal.system} {goal.requiredLevel} you need.
         </p>
-        <Link to="/goal" className="btn-secondary mt-3 inline-block">Enter a past result</Link>
+        {/* D3 — the CTA that appeared four times. It is on the exam page
+            now, and only there. This card says what is missing; the place to
+            fix it is one tap away in the navigation. */}
         </div>
       </div>
     );
