@@ -1,0 +1,443 @@
+[
+ {
+  "id": "gt-l-p2-v2",
+  "family": "briefing",
+  "level": "B2",
+  "freshness": "current",
+  "part": {
+   "en": "Part 2",
+   "fr": "Partie 2"
+  },
+  "speakers": 1,
+  "script": "Now turn to Part two. You will hear a librarian briefing a group of new volunteers. First, you have some time to look at questions eleven to twenty.\nGood morning, and thank you for coming in early. I want to walk you through the building before it opens, because most of what goes wrong on a first shift is somebody sending a reader to the wrong floor with complete confidence.\nWe are on four levels and they are not numbered the way you would expect. The ground floor is what we call the Street floor, because it has the door on it. Below that is the Lower floor, which is not a basement and does have windows. Above the Street floor are the First and the Second.\nSo. Newspapers and the current magazines are on the Lower floor, at the back, past the lift. People assume they are near the door because they are quick to read, and they are not.\nThe children's library has the whole of the First floor. It has its own toilets and its own entrance from the car park, which matters on a wet Tuesday when a class arrives.\nLocal history is on the Second floor, and it is the only collection that does not lend. Everything there is consulted at the desk and stays in the room. If somebody asks to borrow a parish register, the answer is no, and the reason is that there is one of it.\nThe photocopier is on the Street floor beside the returns machine, and the study rooms are on the Second, along the corridor from local history. Do not send anyone to the First floor for a study room; the rooms up there are for staff and one of them is where we eat lunch.\nNow, some practical things, and I would rather over-explain than have you guess.\nFines. We do not charge them any more, on children's books or adult books. What we do charge for is a lost item, and the charge is the replacement cost, not a fixed fee. If a reader tells you they have been fined, they are remembering an old system.\nSecond: the self-service machines take a card but they will not renew an item that somebody else has reserved. The machine says so in very small type, so the reader will come to you convinced it is broken. It is not.\nThird, and this is the one I want you to remember: you may not look up what a reader has borrowed and tell somebody else, including their husband, their wife, or a police officer without a warrant. If you are asked, the answer is that you cannot, and you may send them to me. Nobody will be cross with you for saying no.\nFourth, the volunteer shift is three hours, and we ask you to take fifteen minutes of it as a break, in the staff room and not at the desk. People skip it and then get short with somebody at the end.\nAnd finally, what we actually need. It is not shelving, honestly, although there is always shelving. It is somebody willing to walk a reader to the shelf rather than pointing. That one habit changes what people think of this building more than anything else we do.\nThat is the end of Part two.",
+  "matchingGroup": {
+   "id": "gt-l-p2-v2-floor",
+   "instruction": "Which floor is each part of the library on? Write the correct letter, A–D, next to questions eleven to fifteen.",
+   "options": [
+    {
+     "id": "A",
+     "label": "Lower floor"
+    },
+    {
+     "id": "B",
+     "label": "Street floor"
+    },
+    {
+     "id": "C",
+     "label": "First floor"
+    },
+    {
+     "id": "D",
+     "label": "Second floor"
+    }
+   ],
+   "reusable": true
+  },
+  "items": [
+   {
+    "id": "gt-l-p2-v2-01",
+    "kind": "matching",
+    "groupId": "gt-l-p2-v2-floor",
+    "stem": "Newspapers and current magazines",
+    "answer": "A",
+    "rationale": "The speaker corrects the expectation aloud — people assume they are near the door and they are not — so the item tests the correction rather than the guess."
+   },
+   {
+    "id": "gt-l-p2-v2-02",
+    "kind": "matching",
+    "groupId": "gt-l-p2-v2-floor",
+    "stem": "Children's library",
+    "answer": "C",
+    "rationale": "It has the whole of that floor, with its own entrance from the car park, which is the detail that fixes it rather than the name of the collection."
+   },
+   {
+    "id": "gt-l-p2-v2-03",
+    "kind": "matching",
+    "groupId": "gt-l-p2-v2-floor",
+    "stem": "Local history",
+    "answer": "D",
+    "rationale": "Named with the fact that it does not lend, which is what a candidate remembers instead of the floor if they are listening for rules."
+   },
+   {
+    "id": "gt-l-p2-v2-04",
+    "kind": "matching",
+    "groupId": "gt-l-p2-v2-floor",
+    "stem": "Photocopier",
+    "answer": "B",
+    "rationale": "Placed beside the returns machine on the floor with the door on it, so the answer depends on having held the unusual floor naming from the opening."
+   },
+   {
+    "id": "gt-l-p2-v2-05",
+    "kind": "matching",
+    "groupId": "gt-l-p2-v2-floor",
+    "stem": "Study rooms for readers",
+    "answer": "D",
+    "rationale": "The speaker rules out the First floor in the next sentence because the rooms there are for staff, so two floors are named for one question."
+   },
+   {
+    "id": "gt-l-p2-v2-06",
+    "kind": "completion",
+    "stem": "Charges — what the library charges for:",
+    "prompt": "Charged for a lost item: the ___ cost",
+    "answer": {
+     "accept": [
+      "replacement"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "Fines are abolished in the same breath, and the charge is explicitly not a fixed fee, so the item turns on which of two systems is current."
+   },
+   {
+    "id": "gt-l-p2-v2-07",
+    "kind": "completion",
+    "stem": "Self-service machines — what they will not do:",
+    "prompt": "Will not renew an item that is ___",
+    "answer": {
+     "accept": [
+      "reserved"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "Explained with why the reader will believe the machine is broken, which is the reason a volunteer needs and the detail the item asks for."
+   },
+   {
+    "id": "gt-l-p2-v2-08",
+    "kind": "completion",
+    "stem": "Borrowing records — what may not be disclosed:",
+    "prompt": "Never say what a reader has ___",
+    "answer": {
+     "accept": [
+      "borrowed"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "Stated as the rule the speaker most wants remembered, with the exceptions named and refused, including a police officer without a warrant."
+   },
+   {
+    "id": "gt-l-p2-v2-09",
+    "kind": "completion",
+    "stem": "Volunteer shift — length of the break:",
+    "prompt": "Break: ___ minutes, in the staff room",
+    "answer": {
+     "accept": [
+      "fifteen",
+      "15"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "Three hours is said immediately before it, so two durations sit in one sentence and only one answers the question asked."
+   },
+   {
+    "id": "gt-l-p2-v2-10",
+    "kind": "completion",
+    "stem": "What the library most needs from volunteers:",
+    "prompt": "Walk a reader to the ___ rather than pointing",
+    "answer": {
+     "accept": [
+      "shelf"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "The closing line, after shelving has been named and set aside, so a candidate listening for the obvious answer writes shelving instead."
+   }
+  ]
+ },
+ {
+  "id": "gt-l-p2-v3",
+  "family": "briefing",
+  "level": "B2",
+  "freshness": "current",
+  "part": {
+   "en": "Part 2",
+   "fr": "Partie 2"
+  },
+  "speakers": 1,
+  "script": "Now turn to Part two. You will hear a warden welcoming new residents to a hall of residence. First, you have some time to look at questions eleven to twenty.\nWelcome, all of you. I am going to speak for about ten minutes and then you can go and unpack. Most of this is on the sheet in your room, but people do not read the sheet, so here it is out loud.\nThe site is five blocks around a courtyard. They are named after rivers. That sounded charming to somebody in nineteen-sixty. It is now simply five names you have to learn: Avon, Brent, Colne, Derwent and Erne.\nThe laundry is in Brent, on the ground floor. It is the only one. Please do not carry a basket around all five blocks looking for another. The bicycle store is in Erne, at the far end from the gate. It opens with the same card as your room.\nThe post arrives at the porters' desk in Avon. That is the block with the arch. Sorting is into pigeonholes by surname and not by block. Parcels are held there too. The kitchen for anyone in a studio without one is in Colne. It is shared with the common room. Consequently it is noisy in the evening and deserted in the morning.\nQuiet hours run from eleven at night to seven in the morning, every night, including Saturday. I will be honest that Friday is enforced less strictly than Tuesday, but do not rely on that.\nOn kitchens: each floor has one and each floor cleans it. We do not have a cleaner for kitchens, and the reason is not money. It is that a cleaner meant nobody ever spoke to anybody about the state of it, and the kitchens were worse.\nMaintenance goes through the portal, not to me, and not to the porters. A message to me has to be typed into the portal by somebody. That somebody is me at eleven at night. If it is a leak or a smell of gas, then find a person immediately and do not use the portal at all.\nGuests may stay two nights in any week. You must sign them in at the porters' desk. The reason is fire, not suspicion. If the building empties at three in the morning we count heads against a list.\nThe deposit is two hundred pounds. It comes back in full unless something is broken. Ordinary marks on a wall are not something broken. A hole in a door is.\nOne last thing. The first fortnight is the loudest and the least representative. If you decide in week one that you have made a mistake, wait until week three before you decide it again.\nThat is the end of Part two.",
+  "matchingGroup": {
+   "id": "gt-l-p2-v3-block",
+   "instruction": "Which block is each facility in? Write the correct letter, A–E, next to questions eleven to fifteen.",
+   "options": [
+    {
+     "id": "A",
+     "label": "Avon"
+    },
+    {
+     "id": "B",
+     "label": "Brent"
+    },
+    {
+     "id": "C",
+     "label": "Colne"
+    },
+    {
+     "id": "D",
+     "label": "Derwent"
+    },
+    {
+     "id": "E",
+     "label": "Erne"
+    }
+   ],
+   "reusable": true
+  },
+  "items": [
+   {
+    "id": "gt-l-p2-v3-01",
+    "kind": "matching",
+    "groupId": "gt-l-p2-v3-block",
+    "stem": "Laundry",
+    "answer": "B",
+    "rationale": "Named as the only one on the site, which is the detail that stops a candidate assuming there is one in every block."
+   },
+   {
+    "id": "gt-l-p2-v3-02",
+    "kind": "matching",
+    "groupId": "gt-l-p2-v3-block",
+    "stem": "Bicycle store",
+    "answer": "E",
+    "rationale": "Placed at the far end from the gate, so the position is given as a relation rather than as a name and has to be held."
+   },
+   {
+    "id": "gt-l-p2-v3-03",
+    "kind": "matching",
+    "groupId": "gt-l-p2-v3-block",
+    "stem": "Porters' desk and post",
+    "answer": "A",
+    "rationale": "Identified by the arch rather than by the name, and the sorting is by surname rather than by block, which is the trap for a candidate matching on their own address."
+   },
+   {
+    "id": "gt-l-p2-v3-04",
+    "kind": "matching",
+    "groupId": "gt-l-p2-v3-block",
+    "stem": "Shared kitchen for studio rooms",
+    "answer": "C",
+    "rationale": "Given with the reason it is noisy at night, which is the kind of aside that carries the answer while a candidate is listening for a rule."
+   },
+   {
+    "id": "gt-l-p2-v3-05",
+    "kind": "matching",
+    "groupId": "gt-l-p2-v3-block",
+    "stem": "Common room",
+    "answer": "C",
+    "rationale": "Shared with the kitchen, so the same letter serves two questions — which is why this bank is reusable and says so."
+   },
+   {
+    "id": "gt-l-p2-v3-06",
+    "kind": "completion",
+    "stem": "Quiet hours — the time they begin:",
+    "prompt": "Quiet from ___ at night",
+    "answer": {
+     "accept": [
+      "eleven",
+      "11"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "Seven in the morning is given in the same sentence as the end, so two times are stated and only one is the beginning."
+   },
+   {
+    "id": "gt-l-p2-v3-07",
+    "kind": "completion",
+    "stem": "Kitchens — why there is no cleaner:",
+    "prompt": "Because with a cleaner the kitchens were ___",
+    "answer": {
+     "accept": [
+      "worse"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "The speaker rules out cost explicitly and gives the real reason, so the item tests the reason rather than the arrangement."
+   },
+   {
+    "id": "gt-l-p2-v3-08",
+    "kind": "completion",
+    "stem": "Maintenance — where a request must go:",
+    "prompt": "Report through the ___",
+    "answer": {
+     "accept": [
+      "portal"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "The warden and the porters are both named and both refused, and an exception for a leak or gas follows immediately."
+   },
+   {
+    "id": "gt-l-p2-v3-09",
+    "kind": "completion",
+    "stem": "Guests — why they must be signed in:",
+    "prompt": "The reason is ___, not suspicion",
+    "answer": {
+     "accept": [
+      "fire"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "The speaker names the reason people assume and refuses it in the same clause, which is what the question turns on."
+   },
+   {
+    "id": "gt-l-p2-v3-10",
+    "kind": "completion",
+    "stem": "Deposit — amount in pounds:",
+    "prompt": "Deposit: £___",
+    "answer": {
+     "accept": [
+      "two hundred and fifty",
+      "250"
+     ],
+     "maxWords": 4
+    },
+    "rationale": "Returned in full unless something is broken, and the speaker then draws the line between marks on a wall and a hole in a door."
+   }
+  ]
+ },
+ {
+  "id": "gt-l-p2-v4",
+  "family": "briefing",
+  "level": "B2",
+  "freshness": "current",
+  "part": {
+   "en": "Part 2",
+   "fr": "Partie 2"
+  },
+  "speakers": 1,
+  "script": "Now turn to Part two. You will hear a ranger briefing new guides at a wildlife reserve. First, you have some time to look at questions eleven to twenty.\nGood morning. You have all walked the reserve once as visitors. Today I want you to learn it as guides. That is a different thing. A guide has to know where not to take people.\nThe reserve divides into five zones and we use the same five names on every map and every radio call. The Reedbed is the wet ground at the eastern end. The Scrape is the shallow water with the islands in it. The Carr is the wet woodland. The Heath is the dry open ground on the ridge. And the Meadow is the field by the car park, which most visitors think is the whole reserve.\nThe main hide, the one with the ramp, looks over the Scrape. That is where you take anyone who cannot walk far. It is also where the birds are. Nobody is being handed the consolation option.\nThe pond dipping platform is in the Meadow, deliberately, because it is loud and children fall in. The nesting terns are on the Scrape as well. They sit on the far islands. That is why the telescope in the hide matters.\nThe boardwalk runs through the Carr. It is closed from the first of the month for repairs. If a visitor asks, do not say it is closed because of nesting; that is next spring and this is carpentry.\nAdders are on the Heath. They are there every year and they are not aggressive. The reason we mention them is not danger but dogs. Dogs stay on the lead on the ridge.\nNow, three things about guiding rather than about the reserve.\nFirst, do not promise a species. Say to a family that they will see a kingfisher and you have made the next ninety minutes a disappointment. Say what has been seen this week. That information is on the board by the door, updated every morning.\nSecond, the reserve is quiet in the middle of the day and there is nothing wrong with saying so. A guide who fills a silent hour with continuous talking has taught people that nothing was happening. A guide who says the birds are resting has taught them something true.\nThird, and this is the one guides get wrong for years: your group will look where you look. Point with your whole arm at nothing and twenty people will examine that nothing for a minute. They will trust you slightly less afterwards.\nAnd if you are asked a question you cannot answer, say so and write it on the board. Somebody who works here will know, and the visitor will remember the answer arriving more than they would have remembered you having it.\nThat is the end of Part two.",
+  "matchingGroup": {
+   "id": "gt-l-p2-v4-zone",
+   "instruction": "Which zone of the reserve is each thing in? Write the correct letter, A–E, next to questions eleven to fifteen.",
+   "options": [
+    {
+     "id": "A",
+     "label": "the Reedbed"
+    },
+    {
+     "id": "B",
+     "label": "the Scrape"
+    },
+    {
+     "id": "C",
+     "label": "the Carr"
+    },
+    {
+     "id": "D",
+     "label": "the Heath"
+    },
+    {
+     "id": "E",
+     "label": "the Meadow"
+    }
+   ],
+   "reusable": true
+  },
+  "items": [
+   {
+    "id": "gt-l-p2-v4-01",
+    "kind": "matching",
+    "groupId": "gt-l-p2-v4-zone",
+    "stem": "The main hide with the ramp",
+    "answer": "B",
+    "rationale": "The ranger adds that the birds are there anyway, which is the detail that stops a candidate hearing it as the accessible-but-inferior option."
+   },
+   {
+    "id": "gt-l-p2-v4-02",
+    "kind": "matching",
+    "groupId": "gt-l-p2-v4-zone",
+    "stem": "Pond dipping platform",
+    "answer": "E",
+    "rationale": "Placed there deliberately because it is loud, so the reason and the location arrive in one clause."
+   },
+   {
+    "id": "gt-l-p2-v4-03",
+    "kind": "matching",
+    "groupId": "gt-l-p2-v4-zone",
+    "stem": "Nesting terns",
+    "answer": "B",
+    "rationale": "The same zone as the hide, on the far islands, which is why the telescope matters — and why this bank is reusable."
+   },
+   {
+    "id": "gt-l-p2-v4-04",
+    "kind": "matching",
+    "groupId": "gt-l-p2-v4-zone",
+    "stem": "The boardwalk",
+    "answer": "C",
+    "rationale": "Named with its closure and with an explicit warning not to give nesting as the reason, so two facts about it compete for attention."
+   },
+   {
+    "id": "gt-l-p2-v4-05",
+    "kind": "matching",
+    "groupId": "gt-l-p2-v4-zone",
+    "stem": "Adders",
+    "answer": "D",
+    "rationale": "Given with the reason they are mentioned at all, which is dogs rather than danger, and the lead rule follows from it."
+   },
+   {
+    "id": "gt-l-p2-v4-06",
+    "kind": "completion",
+    "stem": "Boardwalk — the reason for the closure:",
+    "prompt": "Closed for ___",
+    "answer": {
+     "accept": [
+      "repairs",
+      "carpentry"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "The wrong reason is named and refused in the following sentence, so a candidate who hears only the refusal writes nesting."
+   },
+   {
+    "id": "gt-l-p2-v4-07",
+    "kind": "completion",
+    "stem": "Dogs — where they must be on the lead:",
+    "prompt": "On the lead on the ___",
+    "answer": {
+     "accept": [
+      "ridge",
+      "Heath",
+      "heath"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "The ridge is how the Heath was described when the zones were listed, so the answer requires holding a synonym from earlier in the talk."
+   },
+   {
+    "id": "gt-l-p2-v4-08",
+    "kind": "completion",
+    "stem": "Guiding — what a guide must not promise:",
+    "prompt": "Never promise a ___",
+    "answer": {
+     "accept": [
+      "species",
+      "bird"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "Followed by the consequence — the next ninety minutes become a failure — which is the part a candidate remembers instead of the noun."
+   },
+   {
+    "id": "gt-l-p2-v4-09",
+    "kind": "completion",
+    "stem": "Guiding — where this week's sightings are listed:",
+    "prompt": "On the ___ by the door, updated each morning",
+    "answer": {
+     "accept": [
+      "board"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "Offered as the honest alternative to promising a species, so it arrives as a solution rather than as a fact to be noted."
+   },
+   {
+    "id": "gt-l-p2-v4-10",
+    "kind": "completion",
+    "stem": "Guiding — the mistake guides make for years:",
+    "prompt": "A group will look where you ___",
+    "answer": {
+     "accept": [
+      "look"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "Stated as the third and last point about guiding, with the cost of it spelled out — twenty people looking at nothing and trusting you less."
+   }
+  ]
+ }
+]
