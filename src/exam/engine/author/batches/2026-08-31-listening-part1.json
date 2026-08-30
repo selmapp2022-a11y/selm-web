@@ -1,0 +1,449 @@
+[
+ {
+  "id": "gt-l-p1-v2",
+  "family": "transactional",
+  "level": "B1",
+  "freshness": "current",
+  "part": {
+   "en": "Part 1",
+   "fr": "Partie 1"
+  },
+  "speakers": 2,
+  "script": "Now turn to Part one. You will hear a woman telephoning a van hire company. First, you have some time to look at questions one to ten.\n— Bridgeway Van Hire, good afternoon.\n— Hello. I'd like to book a van for a house move, if that's possible.\n— Certainly. Can I take your name?\n— It's Kowalski. K, O, W, A, L, S, K, I.\n— Kowalski. And a mobile number?\n— It's oh-seven-nine-one, four-double-six, two-oh-three.\n— Let me read that back. Oh-seven-nine-one, four-double-six, two-oh-three.\n— That's right.\n— Now, we have three sizes. The small van is really a car with a large boot. The medium is what most people take for a flat. And the long wheelbase is for a house of three bedrooms or more.\n— We're moving out of a two-bedroom flat, but there's a piano.\n— Then take the long wheelbase. The medium takes a piano only if you take nothing else that day, and people always have more than they think.\n— The long wheelbase, then.\n— The daily rate for that one is eighty-nine pounds. There's a deposit as well, which is two hundred, and you get that back when the van comes home undamaged.\n— And what about fuel?\n— Bring it back full. If you don't, we fill it and charge a handling fee of twenty pounds on top of the fuel itself.\n— Understood. What day did you want?\n— Saturday the fourteenth.\n— Saturday is our busiest day, so pick-up would be at eight in the morning rather than nine. Is that all right?\n— Eight is fine.\n— Good. Now, the driver has to be over twenty-three for the long wheelbase, and we'll need a licence at the counter. A photograph of it is not enough, I'm afraid — people ask.\n— I'll bring the licence itself.\n— One more thing. We include a trolley and four blankets with every van, at no charge. Ropes we don't lend, because they go missing, but you can buy a set here for six pounds.\n— I'll take a set of ropes.\n— Right. And how did you hear about us?\n— A leaflet, actually. It came through the door.\n— A leaflet. That's useful to know — we weren't sure anybody read them.\nThat is the end of Part one.",
+  "items": [
+   {
+    "id": "gt-l-p1-v2-01",
+    "kind": "completion",
+    "stem": "Van hire booking — surname:",
+    "prompt": "Surname: ___",
+    "answer": {
+     "accept": [
+      "Kowalski"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "Spelt out letter by letter, which is the point of the item: a candidate who writes it from the sound alone produces Kovalski or Kowalsky."
+   },
+   {
+    "id": "gt-l-p1-v2-02",
+    "kind": "completion",
+    "stem": "Van hire booking — size of van:",
+    "prompt": "Size booked: ___ wheelbase",
+    "answer": {
+     "accept": [
+      "long"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "The clerk recommends the long wheelbase and gives the reason; the medium is named first and then ruled out, which is the distractor."
+   },
+   {
+    "id": "gt-l-p1-v2-03",
+    "kind": "completion",
+    "stem": "Van hire booking — reason the medium is not suitable:",
+    "prompt": "The customer is moving a ___",
+    "answer": {
+     "accept": [
+      "piano"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "The flat is two bedrooms, which would fit the medium; it is the piano that decides the size, and that is the detail the item turns on."
+   },
+   {
+    "id": "gt-l-p1-v2-04",
+    "kind": "completion",
+    "stem": "Van hire booking — daily rate in pounds:",
+    "prompt": "Daily rate: £___",
+    "answer": {
+     "accept": [
+      "eighty-nine",
+      "89"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "Eighty-nine is the rate; two hundred is the deposit and twenty is the fuel fee, so three numbers are said close together and only one answers this."
+   },
+   {
+    "id": "gt-l-p1-v2-05",
+    "kind": "completion",
+    "stem": "Van hire booking — deposit in pounds:",
+    "prompt": "Deposit: £___",
+    "answer": {
+     "accept": [
+      "two hundred",
+      "200"
+     ],
+     "maxWords": 2
+    },
+    "rationale": "Returned when the van comes back undamaged, which is stated in the same breath and is what separates it from the daily rate."
+   },
+   {
+    "id": "gt-l-p1-v2-06",
+    "kind": "completion",
+    "stem": "Van hire booking — charge if fuel is not replaced:",
+    "prompt": "Handling fee: £___ plus the fuel",
+    "answer": {
+     "accept": [
+      "twenty",
+      "20"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "The fee sits on top of the cost of the fuel itself, so a candidate who hears only one number has not heard the arrangement."
+   },
+   {
+    "id": "gt-l-p1-v2-07",
+    "kind": "completion",
+    "stem": "Van hire booking — pick-up time on Saturday:",
+    "prompt": "Pick-up: ___ o'clock",
+    "answer": {
+     "accept": [
+      "eight"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "Nine is said first as the ordinary time and immediately corrected to eight because Saturday is busy; the item tests hearing the correction."
+   },
+   {
+    "id": "gt-l-p1-v2-08",
+    "kind": "completion",
+    "stem": "Van hire booking — minimum driver age:",
+    "prompt": "Driver must be over ___",
+    "answer": {
+     "accept": [
+      "twenty-three",
+      "23"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "The age applies to the long wheelbase specifically, which is the van being booked, so the number cannot be taken from anywhere else."
+   },
+   {
+    "id": "gt-l-p1-v2-09",
+    "kind": "completion",
+    "stem": "Van hire booking — document required at the counter:",
+    "prompt": "Bring the ___ itself, not a photograph",
+    "answer": {
+     "accept": [
+      "licence",
+      "license"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "The clerk rules out a photograph in the same sentence, so the item tests the qualification rather than the noun on its own."
+   },
+   {
+    "id": "gt-l-p1-v2-10",
+    "kind": "completion",
+    "stem": "Van hire booking — how the customer heard of the company:",
+    "prompt": "Heard about the company from a ___",
+    "answer": {
+     "accept": [
+      "leaflet"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "Said once, near the end, after the practical detail is finished and attention has usually dropped — which is where the real paper puts it too."
+   }
+  ]
+ },
+ {
+  "id": "gt-l-p1-v3",
+  "family": "transactional",
+  "level": "B1",
+  "freshness": "current",
+  "part": {
+   "en": "Part 1",
+   "fr": "Partie 1"
+  },
+  "speakers": 2,
+  "script": "Now turn to Part one. You will hear a man enrolling his daughter in swimming lessons. First, you have some time to look at questions one to ten.\n— Meadowbank Pool, how can I help?\n— Hello. I'd like to put my daughter down for lessons.\n— Of course. What's her name?\n— Aoife. That's A, O, I, F, E.\n— Aoife. And her age?\n— She's seven. Eight in November.\n— Seven now is what I need. Can she swim at all?\n— A bit. She can get across the small pool but she won't put her face in.\n— Then she wants Stage Two, not Stage One. Stage One is for children who have never been in water. Stage Three assumes a full width on the front, which she isn't doing yet.\n— Stage Two, then.\n— Stage Two runs Tuesdays at five and Saturdays at nine. The Tuesday group is nearly full — there are two places left — and the Saturday group has just started, so it's quieter.\n— Saturday would suit us better anyway.\n— Saturday it is. Now, the term is ten weeks and it costs sixty pounds, which works out at six a lesson. We ask for the whole term up front, but if that's difficult you can pay half now and half at week five.\n— I'll pay the whole thing now.\n— Lovely. A few practical things. She'll need a swimming cap — that's the only thing we insist on, and it's because of the filters, not the hair. Goggles are up to you. We sell caps at reception for three pounds.\n— I'll get one on the day.\n— Please arrive fifteen minutes early for the first lesson only, so we can do the badge check by the door. After that, five minutes is plenty.\n— Fifteen the first time. Right.\n— And if she misses a week, tell us before the lesson and we'll add a week at the end. If you tell us afterwards, we can't — the register's already gone in.\n— Understood.\n— Last thing: parents watch from the balcony, not the poolside. It sounds strict, but children look up at the glass instead of the teacher, and the lesson goes backwards.\nThat is the end of Part one.",
+  "items": [
+   {
+    "id": "gt-l-p1-v3-01",
+    "kind": "completion",
+    "stem": "Swimming enrolment — child's first name:",
+    "prompt": "First name: ___",
+    "answer": {
+     "accept": [
+      "Aoife"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "Spelt out because the sound gives no reliable spelling in English; a candidate who does not use the spelling writes Eefa or Eva."
+   },
+   {
+    "id": "gt-l-p1-v3-02",
+    "kind": "completion",
+    "stem": "Swimming enrolment — child's age now:",
+    "prompt": "Age: ___",
+    "answer": {
+     "accept": [
+      "seven",
+      "7"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "Eight is said in the next breath as the age she will be in November, so the item tests which of two numbers the form is asking for."
+   },
+   {
+    "id": "gt-l-p1-v3-03",
+    "kind": "completion",
+    "stem": "Swimming enrolment — stage placed in:",
+    "prompt": "Stage ___",
+    "answer": {
+     "accept": [
+      "Two",
+      "2"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "Stages One and Three are both named and both ruled out with a reason, which is what makes the correct one findable rather than guessable."
+   },
+   {
+    "id": "gt-l-p1-v3-04",
+    "kind": "completion",
+    "stem": "Swimming enrolment — day of the lesson:",
+    "prompt": "Day: ___",
+    "answer": {
+     "accept": [
+      "Saturday"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "Tuesday is offered first and has places, and the father chooses Saturday for his own reasons, so the answer is the choice and not the availability."
+   },
+   {
+    "id": "gt-l-p1-v3-05",
+    "kind": "completion",
+    "stem": "Swimming enrolment — length of the term:",
+    "prompt": "Term length: ___ weeks",
+    "answer": {
+     "accept": [
+      "ten",
+      "10"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "Ten weeks sits beside sixty pounds and six pounds a lesson, so three related numbers are spoken together and only one is the term."
+   },
+   {
+    "id": "gt-l-p1-v3-06",
+    "kind": "completion",
+    "stem": "Swimming enrolment — cost of the term in pounds:",
+    "prompt": "Term cost: £___",
+    "answer": {
+     "accept": [
+      "sixty",
+      "60"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "The per-lesson figure of six is derived aloud from it, and a candidate who writes six has heard the arithmetic rather than the price."
+   },
+   {
+    "id": "gt-l-p1-v3-07",
+    "kind": "completion",
+    "stem": "Swimming enrolment — item the pool insists on:",
+    "prompt": "Compulsory: a swimming ___",
+    "answer": {
+     "accept": [
+      "cap"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "Goggles are named immediately afterwards as optional, so the item turns on which of two pieces of kit is required."
+   },
+   {
+    "id": "gt-l-p1-v3-08",
+    "kind": "completion",
+    "stem": "Swimming enrolment — reason a cap is required:",
+    "prompt": "Because of the ___",
+    "answer": {
+     "accept": [
+      "filters"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "The speaker states the reason and rules out the obvious one in the same sentence — it is the filters, not the hair."
+   },
+   {
+    "id": "gt-l-p1-v3-09",
+    "kind": "completion",
+    "stem": "Swimming enrolment — how early to arrive on the first day:",
+    "prompt": "Arrive ___ minutes early, first lesson only",
+    "answer": {
+     "accept": [
+      "fifteen",
+      "15"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "Five minutes is given for every lesson after the first, so two numbers apply to the same question at different times."
+   },
+   {
+    "id": "gt-l-p1-v3-10",
+    "kind": "completion",
+    "stem": "Swimming enrolment — where parents watch from:",
+    "prompt": "Parents watch from the ___",
+    "answer": {
+     "accept": [
+      "balcony"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "The poolside is named in the same sentence as the place parents may not stand, so the item tests hearing which of the two is permitted."
+   }
+  ]
+ },
+ {
+  "id": "gt-l-p1-v4",
+  "family": "transactional",
+  "level": "B1",
+  "freshness": "current",
+  "part": {
+   "en": "Part 1",
+   "fr": "Partie 1"
+  },
+  "speakers": 2,
+  "script": "Now turn to Part one. You will hear a man reporting a lost bag at a bus station. First, you have some time to look at questions one to ten.\n— Lost property. How can I help?\n— I left a bag on a bus this morning and I've been sent up here.\n— Right. Let's take the details. Your name first.\n— Ademola. A, D, E, M, O, L, A.\n— Ademola. Which service was it?\n— The four-two-one, from the hospital into town.\n— And roughly what time?\n— It was the ten past eight. I meant to catch the twenty to, but I missed it.\n— Ten past eight. Now, describe the bag for me.\n— It's a rucksack. Dark green, with a broken zip on the front pocket — that's the thing that would tell you it's mine.\n— A broken zip. Anything inside that identifies it?\n— A library book, and a jacket. And a water bottle, but that's just a bottle.\n— The book is more useful, because it has a ticket in it with a name. Was there anything valuable? I have to ask.\n— No money and no cards. That's all in my pocket.\n— That's good news for you and it makes it more likely you'll see it again, honestly. Now, drivers hand things in at the end of a shift, not straight away, so this morning's bus won't reach us until about six this evening.\n— So there's no point coming back before six.\n— None at all. And it may not be this evening — if the driver finished at another depot it comes across the following day.\n— How long do you keep things?\n— A month for an ordinary item. We'll ring you the moment it comes in, so let me take a number.\n— It's oh-seven-double-three, eight-one-five, nine-four-two.\n— Oh-seven-double-three, eight-one-five, nine-four-two. And there's no charge for collection, in case you're wondering. People often assume there is.\n— I did assume there was, actually.\n— Most people do. Bring something with your name on it when you come — a letter, a card, anything printed. And if you can, come before eight, because after that there is one member of staff on the whole station and the queue at the desk gets long.\n— Before eight. I'll try.\n— One last thing, and it is worth knowing. If the bag turns up at a different depot they will not send it here; they ring the number on the form instead. So do answer a call you do not recognise this week.\nThat is the end of Part one.",
+  "items": [
+   {
+    "id": "gt-l-p1-v4-01",
+    "kind": "completion",
+    "stem": "Lost property report — surname:",
+    "prompt": "Name: ___",
+    "answer": {
+     "accept": [
+      "Ademola"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "Spelt out letter by letter, which is the only way a candidate reaches the correct spelling from the sound of it."
+   },
+   {
+    "id": "gt-l-p1-v4-02",
+    "kind": "completion",
+    "stem": "Lost property report — bus service number:",
+    "prompt": "Service: ___",
+    "answer": {
+     "accept": [
+      "421",
+      "four-two-one"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "Given as three separate digits, which is how a service number is said aloud, and the item tests hearing them as one number."
+   },
+   {
+    "id": "gt-l-p1-v4-03",
+    "kind": "completion",
+    "stem": "Lost property report — type of bag:",
+    "prompt": "Item lost: a ___",
+    "answer": {
+     "accept": [
+      "rucksack"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "Named once and then described at length, so a candidate listening for the description can miss the noun the form asks for."
+   },
+   {
+    "id": "gt-l-p1-v4-04",
+    "kind": "completion",
+    "stem": "Lost property report — colour:",
+    "prompt": "Colour: dark ___",
+    "answer": {
+     "accept": [
+      "green"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "The colour comes with a qualifier and the form supplies the qualifier, so only the colour word itself belongs in the gap."
+   },
+   {
+    "id": "gt-l-p1-v4-05",
+    "kind": "completion",
+    "stem": "Lost property report — distinguishing feature:",
+    "prompt": "Identifying mark: a broken ___",
+    "answer": {
+     "accept": [
+      "zip",
+      "zipper"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "The owner names it as the thing that proves the bag is his, which is what the clerk is asking for rather than a general description."
+   },
+   {
+    "id": "gt-l-p1-v4-06",
+    "kind": "completion",
+    "stem": "Lost property report — most useful item inside:",
+    "prompt": "Contents that identify it: a library ___",
+    "answer": {
+     "accept": [
+      "book"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "Three things are listed and the clerk says why one of them is the useful one, so the item tests the reason rather than the list."
+   },
+   {
+    "id": "gt-l-p1-v4-07",
+    "kind": "completion",
+    "stem": "Lost property report — earliest time to return:",
+    "prompt": "Come back after ___ this evening",
+    "answer": {
+     "accept": [
+      "six",
+      "6"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "Explained by drivers handing items in at the end of a shift, so the time is the consequence of a rule rather than an opening hour."
+   },
+   {
+    "id": "gt-l-p1-v4-08",
+    "kind": "completion",
+    "stem": "Lost property report — how long items are kept:",
+    "prompt": "Kept for one ___",
+    "answer": {
+     "accept": [
+      "month"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "Stated for an ordinary item, which is the qualification that makes the answer a rule rather than a promise about this bag."
+   },
+   {
+    "id": "gt-l-p1-v4-09",
+    "kind": "completion",
+    "stem": "Lost property report — charge for collection:",
+    "prompt": "Cost of collection: ___",
+    "answer": {
+     "accept": [
+      "no charge",
+      "nothing",
+      "free"
+     ],
+     "maxWords": 2
+    },
+    "rationale": "Volunteered at the end because people assume otherwise, and the speaker says so, which is what marks it as the answer and not an aside."
+   },
+   {
+    "id": "gt-l-p1-v4-10",
+    "kind": "completion",
+    "stem": "Lost property report — what to bring when collecting:",
+    "prompt": "Bring something with your ___ on it",
+    "answer": {
+     "accept": [
+      "name"
+     ],
+     "maxWords": 1
+    },
+    "rationale": "The last line of the recording, after the practical business is settled and attention has usually dropped."
+   }
+  ]
+ }
+]

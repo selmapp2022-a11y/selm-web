@@ -68,8 +68,16 @@ function checkSection(exam: ExamDefinition, sec: ComprehensionSection) {
 
   if (anchors.length) {
     console.log('\n2. Every non-anchor passage clears the statistical veto\n');
-    t('the anchor ladder covers every band',
-      [...new Set(anchors.map((a) => a.level))].sort(), ['A1', 'A2', 'B1', 'B2', 'C1', 'C2']);
+    // EVERY BAND THE SECTION ACTUALLY REACHES, not every band that exists.
+    // A rung is needed where there is something to measure; demanding one at
+    // A1 for a bank whose easiest recording is B1 asks for an anchor with
+    // nothing under it. IELTS listening spans B1 to C1 and is honest about
+    // it; the reading bank spans all six and this line still requires all
+    // six of it. The bands the section holds are printed either way, so a
+    // bank that grows into a new band without an anchor is visible.
+    const spanned = [...new Set(sec.recordings.map((r) => String(r.level)))].sort();
+    t('the anchor ladder covers every band the bank reaches',
+      [...new Set(anchors.map((a) => a.level))].sort(), spanned);
     let outside = 0;
     let skipped = 0;
     const measured = sec.recordings.filter((x) => x.role !== 'anchor');

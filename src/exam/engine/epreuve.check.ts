@@ -14,6 +14,7 @@
 import { EXAMS, GOALS } from '../definitions';
 import { itemsFor } from './comprehension';
 import { paperFor, situationFor, clearEpreuveMemory, EPREUVE_KEY } from '../model/epreuve';
+import { deliverable } from './practicePool';
 import type { ComprehensionSection } from '../model/types';
 
 const mem = new Map<string, string>();
@@ -63,9 +64,16 @@ for (const exam of EXAMS) {
     // version of this line asked for that and called the TCF bank frozen when
     // it plainly is not: 61 documents against an épreuve of 39 moves twenty-two
     // of them, without any single band holding twice what it is asked for.
+    // Counted over what can actually be SERVED, not over what has been
+    // written. IELTS listening holds four versions of Part 1 tonight and can
+    // still only present one, because three of them are scripts waiting on
+    // the variety gate. A spare that cannot be played does not move a paper,
+    // and a check that counted it would report a variety the candidate will
+    // not meet. See `deliverable`.
+    const bank = section.recordings.filter((r) => deliverable(section, r));
     const coordinates = spec.byFamily
-      ? Object.entries(spec.byFamily).map(([f, want]) => ({ k: f, have: section.recordings.filter((r) => r.family === f).length, want }))
-      : Object.entries(spec.byBand).filter(([, n]) => n).map(([b, want]) => ({ k: b, have: section.recordings.filter((r) => r.level === b).length, want }));
+      ? Object.entries(spec.byFamily).map(([f, want]) => ({ k: f, have: bank.filter((r) => r.family === f).length, want }))
+      : Object.entries(spec.byBand).filter(([, n]) => n).map(([b, want]) => ({ k: b, have: bank.filter((r) => r.level === b).length, want }));
     const canMove = coordinates.some((c) => c.have > c.want);
     if (canMove) {
       must(ids[0] !== ids[1], 'sitting 2 is not sitting 1');

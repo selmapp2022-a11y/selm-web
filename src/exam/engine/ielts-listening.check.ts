@@ -187,9 +187,18 @@ ok(!!NARRATOR_ID && RENDERED.every((r) => r.voice?.voiceIds?.slice(-1)[0] === NA
 ok(new Set(RENDERED.map((r) => r.voice?.voiceId)).size === RENDERED.length,
    'no two rendered parts open with the same voice');
 
-console.log('\n8. Scoring, end to end\n');
+/**
+ * §8 SCORES ONE PAPER, not the bank.
+ *
+ * `everything right → forty` was computed over every item in the section, so
+ * the first alternate version of Part 1 turned it into `70/40`. Forty is a
+ * fact about a sitting; the bank's total is a fact about how much has been
+ * written, and they were the same number for exactly as long as the bank held
+ * one paper.
+ */
+console.log('\n8. Scoring, end to end — over ONE PAPER\n');
 const answerAll = (f: (n: number) => 'right' | 'wrong' | 'near'): ItemAnswer[] =>
-  S.items.map((i, n) => {
+  paperItems.map((i, n) => {
     const how = f(n);
     if (isCompletionItem(i)) {
       const a = i.answer.accept[0];
@@ -204,18 +213,18 @@ const answerAll = (f: (n: number) => 'right' | 'wrong' | 'near'): ItemAnswer[] =
   });
 
 const perfect = scoreComprehension(S, answerAll(() => 'right'));
-ok(perfect.correct === 40, 'everything right → forty', `${perfect.correct}/40`);
+ok(perfect.correct === paperItems.length, 'everything right → forty', `${perfect.correct}/${paperItems.length}`);
 const nothing = scoreComprehension(S, answerAll(() => 'wrong'));
 ok(nothing.correct === 0, 'everything wrong → zero', `${nothing.correct}`);
 
 // THE ONE THAT MATTERS. Every typed answer doubled on its last letter — the
 // shape of a real misspelling. A generous marker would score most of these.
-const near = scoreComprehension(S, answerAll((n) => (S.items[n] && isCompletionItem(S.items[n]) ? 'near' : 'wrong')));
+const near = scoreComprehension(S, answerAll((n) => (paperItems[n] && isCompletionItem(paperItems[n]) ? 'near' : 'wrong')));
 ok(near.correct === 0,
    'every typed answer misspelt by one letter → ZERO. Spelling is marked.',
-   `${near.correct} of ${completion.length} typed answers were let through`);
+   `${near.correct} of ${pc.length} typed answers were let through`);
 
-const blanks = scoreComprehension(S, S.items.map((i) => ({ itemId: i.id, chose: isCompletionItem(i) ? '   ' : null })));
+const blanks = scoreComprehension(S, paperItems.map((i) => ({ itemId: i.id, chose: isCompletionItem(i) ? '   ' : null })));
 ok(blanks.answered === 0, 'whitespace typed into every box is not "answered"', `${blanks.answered}`);
 
 console.log('\n9. The plan the backend renders from cannot drift from this file\n');
@@ -234,9 +243,15 @@ if (!fs.existsSync(PLAN_PATH)) {
   ok(false, 'the backend plan is missing', PLAN_PATH);
 } else try {
   const plan = JSON.parse(fs.readFileSync(PLAN_PATH, 'utf-8')) as Array<{ id: string; variety: string; speakers: number; body: string[]; narratorIntro: string; narratorOutro: string }>;
-  ok(plan.length === S.recordings.length, 'the plan has one row per part', `${plan.length}`);
+  // The plan is the RENDER manifest, so it holds a row for every recording
+  // that has audio and nothing for one that does not. A script waiting on the
+  // variety gate has nothing to render and correctly has no row; when it is
+  // rendered it gains one, and this line starts requiring it.
+  ok(plan.length === RENDERED.length, 'the plan has one row per rendered part', `${plan.length} rows, ${RENDERED.length} rendered`);
+  ok(UNRENDERED.every((r) => !plan.some((x) => x.id === r.id)),
+     'and no row for a script that has not been rendered', `${UNRENDERED.length} unrendered`);
   let agree = 0;
-  for (const r of S.recordings) {
+  for (const r of RENDERED) {
     const row = plan.find((x) => x.id === r.id);
     if (!row) { ok(false, `${r.id}: missing from the plan`); continue; }
     const rebuilt = [row.narratorIntro, ...row.body, row.narratorOutro].join('\n');
@@ -244,7 +259,7 @@ if (!fs.existsSync(PLAN_PATH)) {
       && row.variety === r.variety && row.speakers === (r.speakers ?? 1);
     if (same) agree++; else ok(false, `${r.id}: the plan and this file disagree`);
   }
-  ok(agree === S.recordings.length, 'every part in the plan matches this file word for word', `${agree}/${S.recordings.length}`);
+  ok(agree === RENDERED.length, 'every rendered part matches this file word for word', `${agree}/${RENDERED.length}`);
 } catch (e) {
   ok(false, 'the backend plan could not be read', String(e).slice(0, 120));
 }

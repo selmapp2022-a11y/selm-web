@@ -43,21 +43,33 @@ import type { ComprehensionItem, ComprehensionSection } from '../../model/types'
 import { PROMPT_VERSION } from './instructions';
 
 const AUTHOR = 'claude-opus-5 (SELM executing session)';
-const SOURCE = 'ielts.org — General Training Reading: three sections rising in difficulty, 40 questions in 60 minutes.';
+const SOURCE_BY_SKILL: Record<string, string> = {
+  reading: 'ielts.org — General Training Reading: three sections rising in difficulty, 40 questions in 60 minutes.',
+  listening: 'ielts.org — Listening: 4 parts, 40 questions, 10 per part, about 30 minutes.',
+};
 
 type Raw = {
   id: string; family: string; level: Band; freshness: 'timeless' | 'current' | 'dated';
   script: string;
-  items: Array<{ stem: string; options: string[]; correct: number; rationale: string }>;
+  items: Array<{
+    id?: string; kind?: string; stem: string; rationale: string;
+    options?: string[]; correct?: number;
+    // completion / matching carry their own shape and pass through untouched
+    prompt?: string; answer?: unknown; groupId?: string;
+  }>;
 };
 
 const file = process.argv[2];
-if (!file) throw new Error('usage: depth.run.ts <batch.json> [--emit out.ts]');
+if (!file) throw new Error('usage: depth.run.ts <batch.json> [--emit out.ts] [--section listening]');
 const emitAt = process.argv.includes('--emit') ? process.argv[process.argv.indexOf('--emit') + 1] : null;
+// Reading was the only skill this ran for until 31 August. Listening is the
+// same pipeline over a different section, and the only thing that changes is
+// which section the blueprint and the anchors come from.
+const skill = (process.argv.includes('--section') ? process.argv[process.argv.indexOf('--section') + 1] : 'reading') as 'reading' | 'listening';
 
 const exam = EXAMS.find((e) => e.id === 'ielts-gt')!;
 const section = exam.sections.find(
-  (s): s is ComprehensionSection => s.kind === 'comprehension' && s.skill === 'reading',
+  (s): s is ComprehensionSection => s.kind === 'comprehension' && s.skill === skill,
 )!;
 const blueprints = blueprintsFor(exam, section);
 const anchors = section.recordings
@@ -78,27 +90,25 @@ const before = section.items.length;
 let n = 0;
 const results = raws.map((raw) => {
   const items: ComprehensionItem[] = raw.items.map((q, qi) => {
+    const id = q.id ?? `${raw.id.replace(/-r$/, '')}-q${qi + 1}`;
+    const base = { id, recordingId: raw.id, level: raw.level, stem: q.stem, rationale: q.rationale };
+    // A completion or matching item is already an item: it has no options to
+    // rotate and no position to spread. Only a multiple-choice key needs the
+    // rotation, and applying it to the others would corrupt them.
+    if (q.kind && q.kind !== 'choice') return { ...base, ...q } as unknown as ComprehensionItem;
     // Rotate so the key is not always the option written first. Cyclic, so the
     // distractors keep the order they were composed in.
     const target = n++ % 4;
-    const shift = ((q.correct - target) % 4 + 4) % 4;
-    const options = [...q.options.slice(shift), ...q.options.slice(0, shift)];
-    return {
-      id: `${raw.id.replace(/-r$/, '')}-q${qi + 1}`,
-      recordingId: raw.id,
-      level: raw.level,
-      stem: q.stem,
-      options,
-      answer: target,
-      rationale: q.rationale,
-    } as ComprehensionItem;
+    const shift = ((q.correct! - target) % 4 + 4) % 4;
+    const options = [...q.options!.slice(shift), ...q.options!.slice(0, shift)];
+    return { ...base, options, answer: target } as ComprehensionItem;
   });
 
   const blueprint = blueprints.find((b) => b.family === raw.family && b.level === raw.level)!;
   const candidate: Candidate = {
-    id: raw.id, examId: exam.id, skill: 'reading', family: raw.family, level: raw.level,
+    id: raw.id, examId: exam.id, skill, family: raw.family, level: raw.level,
     script: raw.script, items, freshness: raw.freshness,
-    provenance: { author: AUTHOR, authoredAt: new Date().toISOString(), promptVersion: PROMPT_VERSION, source: SOURCE },
+    provenance: { author: AUTHOR, authoredAt: new Date().toISOString(), promptVersion: PROMPT_VERSION, source: SOURCE_BY_SKILL[skill] },
   };
   const easier = nearest(raw.level, -1);
   const harder = nearest(raw.level, 1);
@@ -135,13 +145,22 @@ if (emitAt) {
   const q = (s: string) => JSON.stringify(s);
   const recs = ok.map(({ result }) => {
     const a = (result as { accepted: Candidate }).accepted;
-    return `        {\n          id: ${q(a.id)},\n          level: '${a.level}',\n          family: '${a.family}',\n          freshness: '${a.freshness}',\n          script: ${q(a.script)},\n        },`;
+    const extra = (raws.find((x) => x.id === a.id) as unknown as Record<string, unknown>) ?? {};
+    const carry = ['part', 'speakers']
+      .filter((k) => extra[k] !== undefined)
+      .map((k) => `          ${k}: ${JSON.stringify(extra[k])},`)
+      .join('\n');
+    return `        {\n          id: ${q(a.id)},\n${carry ? carry + '\n' : ''}          level: '${a.level}',\n          family: '${a.family}',\n          freshness: '${a.freshness}',\n          script: ${q(a.script)},\n        },`;
   });
   const items = ok.flatMap(({ result }) => {
     const a = (result as { accepted: Candidate }).accepted;
-    return a.items.map((i) =>
-      `        {\n          id: ${q(i.id)},\n          recordingId: ${q(i.recordingId)},\n          level: '${i.level}',\n          stem: ${q(i.stem)},\n          options: [\n${(i.options as string[]).map((o) => `            ${q(o)},`).join('\n')}\n          ],\n          answer: ${(i as { answer: number }).answer},\n          rationale: ${q((i as { rationale?: string }).rationale ?? '')},\n        },`,
-    );
+    return a.items.map((i) => {
+      const o = i as unknown as Record<string, unknown>;
+      const lines = Object.entries(o)
+        .filter(([, v]) => v !== undefined)
+        .map(([k, v]) => `          ${k}: ${typeof v === 'string' ? q(v) : JSON.stringify(v)},`);
+      return `        {\n${lines.join('\n')}\n        },`;
+    });
   });
   writeFileSync(emitAt, `// RECORDINGS\n${recs.join('\n')}\n// ITEMS\n${items.join('\n')}\n`);
   console.log(`\nemitted ${recs.length} recordings and ${items.length} items to ${emitAt}`);
