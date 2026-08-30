@@ -154,8 +154,40 @@ export function servePractice(
 ): PracticeServe {
   const order = orderFor(recordings, here);
   const unseen = order.filter((r) => !st.seen.has(r.id)).length;
+
+  // ── THE SECOND TIME ROUND IS ALSO AT THE CANDIDATE'S LEVEL ────────────
+  //
+  // `serve` recycles by clearing `seen` and taking the least-recently-served
+  // of EVERYTHING. That is right for a pool with no ordering, and wrong here:
+  // the item served longest ago is the one furthest from the candidate's band
+  // — it was served first, back when the bank was fresh and the far ends were
+  // still being drawn. So a candidate at B2 who exhausted the bank was handed
+  // A1 notices on their second pass, having been served correctly on the
+  // first. The ordering was applied to the draw and not to the recycle, which
+  // is the same class of defect as the épreuve serving without state: a rule
+  // that holds in one path and not in the other.
+  //
+  // On recycle the draw is confined to the NEAREST BAND — the first tier of
+  // `orderFor` — and only then falls to least-recently-served within it.
+  // With no known level there is no nearest band, so the ladder recycles
+  // whole, which is what it already did.
+  if (unseen === 0 && order.length > 0 && here !== null) {
+    st.seen.clear();
+    const tier = nearestTier(order, here);
+    const { item } = serve(tier, st);
+    return { item, recycled: true, unseen: 0, total: order.length, here };
+  }
+
   const result = serve(order, st);
   return { ...result, unseen, total: order.length, here };
+}
+
+/** The recordings at the smallest distance from `here` — one band, usually. */
+function nearestTier(order: readonly Recording[], here: number): Recording[] {
+  const distance = (r: Recording) => Math.abs(BANDS.indexOf(r.level) - here);
+  let best = Infinity;
+  for (const r of order) best = Math.min(best, distance(r));
+  return order.filter((r) => distance(r) === best);
 }
 
 /**

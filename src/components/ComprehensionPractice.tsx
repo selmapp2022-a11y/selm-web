@@ -108,7 +108,7 @@ export function ComprehensionPractice({ skill }: { skill: 'reading' | 'listening
       const att = loadAttestations()
         .filter((x) => x.examId === exam.id)
         .sort((x, y) => (x.sat < y.sat ? 1 : -1))[0] ?? null;
-      const level = candidateLevel(exam, att, goal?.requiredLevel ?? 0, skill);
+      const level = candidateLevel(exam, att, goal?.requiredLevel ?? 0, skill, goal?.scaleId);
       // Said out loud, with its source. "At your level" was on this page as a
       // subtitle for weeks while every candidate got A1; a claim that cannot
       // be checked from the screen is the kind this product does not make.
@@ -316,6 +316,12 @@ function Runner({
             The score above is how you did on these questions today. It is not a predicted band.
           </p>
         )}
+        {/* The level line is dropped everywhere else on this page the moment
+            the bank runs out, and it is exactly here that it answers a
+            question: a second pass is not the whole bank again in bank order
+            — it starts at the candidate's own band, which is the one part of
+            "go through them again" worth knowing before agreeing to it. */}
+        <p className="mt-2 text-xs leading-relaxed text-ink-secondary">{levelNote}</p>
         <div className="mt-4 flex flex-wrap gap-3">
           <button
             onClick={() => { setReplaying(true); setChosen({}); setMarked(false); setTally({ correct: 0, total: 0 }); }}

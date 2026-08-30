@@ -145,7 +145,7 @@ export default function DashboardPage() {
   // IA §4 item 2 — the next thing, from the plan. The planner orders slots
   // worst-first; the first one with content behind it is where to go now.
   const attestation = loadAttestations().filter((a) => a.examId === exam.id).sort((a, b) => (a.sat < b.sat ? 1 : -1))[0] ?? null;
-  const builtPlan = buildPlan({ exam, attestation, target: goal.requiredLevel, daysLeft: left });
+  const builtPlan = buildPlan({ exam, attestation, target: goal.requiredLevel, targetScaleId: goal.scaleId, daysLeft: left });
   const nextSlot = builtPlan.slots.find((sl) => sl.items > 0) ?? builtPlan.slots[0] ?? null;
   const nextSkill = nextSlot?.coordinate.skill ?? null;
 

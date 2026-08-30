@@ -105,7 +105,41 @@ const CEFR = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
  * `bySkill` is read before `bands`, the same precedence the rest of the model
  * uses.
  */
-export function cefrIndexFor(exam: ExamDefinition, level: number, skill?: SkillId): number {
+export function cefrIndexFor(
+  exam: ExamDefinition,
+  level: number,
+  skill?: SkillId,
+  /**
+   * The scale the LEVEL is expressed on, when the destination sets it on the
+   * exam's own scale rather than on a benchmark.
+   *
+   * ── The conversion that must not be made twice ────────────────────────
+   * Australia asks for **IELTS band 6** — a score, on the exam's own scale.
+   * Every other destination here asks for a benchmark level: CLB 9, NCLC 7.
+   * Without this parameter the 6 was read as CLB 6, sent through the
+   * benchmark table, and came back as band 5.5 — a real number, for a
+   * question nobody asked.
+   *
+   * `GoalPage` and `lib/practiceTasks` both already draw this distinction
+   * (`onExamScale`). This function did not, and was right only by
+   * coincidence: CLB 6 and band 6 happened to land on the same CEFR row.
+   * A coincidence is not a conversion, and the next scale added would have
+   * ended it silently.
+   */
+  targetScaleId?: string,
+): number {
+  const own = targetScaleId ? exam.scales.find((sc) => sc.id === targetScaleId) : undefined;
+  if (own) {
+    // A score on the exam's own scale needs no benchmark at all: the scale
+    // carries CEFR itself. Ordered high-to-low on `from`, so the first row
+    // this score reaches is the highest CEFR it earns.
+    const hit = own.cefrBands?.find((b) => level >= b.from);
+    const i = hit ? CEFR.indexOf(hit.cefr) : -1;
+    if (i >= 0) return i;
+    // A scale with no published CEFR is a real gap, not a number to invent.
+    return 2;
+  }
+
   const rows = (skill && exam.benchmark.bySkill?.[skill]) || exam.benchmark.bands;
   const band = rows.find((b) => b.level === level);
 
@@ -189,8 +223,15 @@ export type PlannerInput = {
   exam: ExamDefinition;
   /** The most recent attestation for this exam, if any. */
   attestation: Attestation | null;
-  /** Required benchmark level, from the candidate's goal. */
+  /** Required level, from the candidate's goal. */
   target: number;
+  /**
+   * The scale `target` is on, when the goal sets it on the exam's own rather
+   * than on a benchmark — `Goal.scaleId`. Australia's "IELTS band 6" is a
+   * score; CLB 9 and NCLC 7 are benchmark levels, and reading one as the
+   * other converts a number that was already in the right units.
+   */
+  targetScaleId?: string;
   /** Days until the sitting, or null when no date is set. */
   daysLeft: number | null;
   /** How many slots the plan should hold. §4.1: roughly 30 over six weeks. */
@@ -253,10 +294,12 @@ export function candidateLevel(
   attestation: Attestation | null,
   target: number,
   skill: SkillId,
+  /** The scale `target` is on, when the destination sets it on the exam's own. */
+  targetScaleId?: string,
 ): CandidateLevel {
   const measured = attestationLevel(exam, attestation, skill);
   if (measured !== null) return { index: measured, basis: 'attestation' };
-  return { index: cefrIndexFor(exam, target, skill), basis: 'target' };
+  return { index: cefrIndexFor(exam, target, skill, targetScaleId), basis: 'target' };
 }
 
 /**
@@ -336,7 +379,7 @@ export function buildPlan(input: PlannerInput): Plan {
   // `attestationLevel` alone, which is null before a first score — so the
   // plan ordered by the raw ladder and put A1 in front of a candidate who
   // needs CLB 9. See `candidateLevel`.
-  const perSkill = coordinatesFor(exam, (skill) => candidateLevel(exam, attestation, target, skill).index);
+  const perSkill = coordinatesFor(exam, (skill) => candidateLevel(exam, attestation, target, skill, input.targetScaleId).index);
   {
     // Comprehension coordinates are ordered by DISTANCE FROM THE CANDIDATE,
     // not by the ladder — see `coordinatesFor`, which now owns that ordering.

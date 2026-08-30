@@ -12,8 +12,9 @@
  *             | Zero is a bug, not a gap
  */
 import { TCF_CANADA } from '../definitions/tcf-canada';
-import { buildPlan, shortfall, MIN_ITEMS_PER_COORDINATE } from './planner';
+import { buildPlan, shortfall, cefrIndexFor, cefrTag, MIN_ITEMS_PER_COORDINATE } from './planner';
 import type { Attestation } from '../model/attestation';
+import { EXAMS as EXAMS_ALL, GOALS as GOALS_ALL } from '../definitions';
 
 const pad = (s: string, n: number) => (s + ' '.repeat(n)).slice(0, n);
 
@@ -69,3 +70,34 @@ if (short.length > 16) console.log(`  … and ${short.length - 16} more`);
 const filled = full.slots.filter((s) => s.items >= MIN_ITEMS_PER_COORDINATE);
 console.log(`\n  coordinates that ARE ready: ${filled.length}`);
 for (const s of filled) console.log(`    ${pad(s.coordinate.label, 26)} ${s.items} items` + (s.prescription ? `  · ${s.prescription}` : ''));
+
+// ════════════════════════════════════════════════════════════════════════
+// A GOAL SET ON THE EXAM'S OWN SCALE IS NOT CONVERTED
+//
+// Australia asks for IELTS band 6 — a score. Every other destination asks
+// for a benchmark level. `cefrIndexFor` read the 6 as CLB 6 and sent it
+// through the benchmark table, which is a real conversion of a number that
+// was already in the right units. It was right by coincidence in three
+// skills and wrong in reading, and a coincidence is not a conversion.
+{
+  console.log(`\n${'='.repeat(78)}\nEXAM-SCALE GOALS`);
+  const gt = EXAMS_ALL.find((e) => e.id === 'ielts-gt')!;
+  const au = GOALS_ALL.find((g) => g.id === 'au-competent')!;
+  const ee = GOALS_ALL.find((g) => g.id === 'ee-english')!;
+  let bad = 0;
+  const say = (ok: boolean, what: string) => { console.log(`  ${ok ? 'ok  ' : 'FAIL'}  ${what}`); if (!ok) bad += 1; };
+
+  // Band 6 in reading is B2 on the IELTS scale's own CEFR row. Read as CLB 6
+  // it came back B1 — one band low, for every reading coordinate.
+  say(cefrTag(cefrIndexFor(gt, au.requiredLevel, 'reading', au.scaleId)) === 'B2',
+    `au-competent reading is ${cefrTag(cefrIndexFor(gt, au.requiredLevel, 'reading', au.scaleId))} on the exam's own scale`);
+  say(cefrTag(cefrIndexFor(gt, au.requiredLevel, 'reading')) === 'B1',
+    'and reading it as a benchmark level gives B1 — the defect, kept visible');
+
+  // A benchmark goal has no scaleId, and must be unaffected.
+  for (const skill of ['reading', 'listening', 'writing', 'speaking'] as const)
+    say(cefrIndexFor(gt, ee.requiredLevel, skill, ee.scaleId) === cefrIndexFor(gt, ee.requiredLevel, skill),
+      `ee-english ${skill} is unchanged`);
+
+  if (bad) throw new Error(`${bad} exam-scale case(s) failed`);
+}

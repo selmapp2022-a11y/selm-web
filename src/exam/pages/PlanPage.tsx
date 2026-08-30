@@ -33,7 +33,7 @@ export default function PlanPage() {
       .sort((a, b) => (a.sat < b.sat ? 1 : -1));
     const attestation = atts[0] ?? null;
     const daysLeft = daysUntil(loadPlan()?.examDate ?? null);
-    return buildPlan({ exam, attestation, target: goal.requiredLevel, daysLeft });
+    return buildPlan({ exam, attestation, target: goal.requiredLevel, targetScaleId: goal.scaleId, daysLeft });
   }, [exam, goal]);
 
   const holes = shortfall(plan);

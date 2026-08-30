@@ -24,6 +24,8 @@ import { GOALS } from '../definitions';
 import type { Attempt } from '../../lib/attempts';
 import type { ComprehensionSection, Recording } from '../model/types';
 import { EXAMS } from '../definitions';
+import { newServeState } from './pool';
+const CEFR = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
 
 let failed = 0;
 const t = (name: string, got: unknown, want: unknown) => {
@@ -182,6 +184,35 @@ t('a tie resolves downward', orderFor(TIE, 3 /* B2 */)[0].id, 'below');
 // inventory does not depend on whose screen it was taken from.
 t('here === null is still the ladder', orderFor(BANK, null).map((r) => r.id),
   ['r-a1', 'r-a2', 'r-b1', 'r-c1']);
+
+
+// ── THE RECYCLE IS AT THE CANDIDATE'S LEVEL TOO ──────────────────────────
+// The ordering was applied to the draw and not to the recycle. A candidate at
+// B2 who exhausted the bank was handed A1 on their second pass — served
+// correctly the first time and wrongly the second, which is the harder failure
+// to notice because the screen looks the same.
+{
+  console.log('\nRECYCLE\n');
+  const gt = EXAMS.find((e) => e.id === 'ielts-gt')!;
+  const sec = gt.sections.find((x) => x.kind === 'comprehension' && x.skill === 'reading') as any;
+  const bank = sec.recordings as Recording[];
+  const here = CEFR.indexOf('B2');
+
+  const st = newServeState();
+  const drawn: string[] = [];
+  for (let n = 0; n < bank.length; n++) drawn.push(servePractice(bank, st, here).item!.id);
+  t('every recording is drawn once before any repeats', new Set(drawn).size, bank.length);
+
+  const first = servePractice(bank, st, here);
+  const level = bank.find((r) => r.id === first.item!.id)!.level;
+  t('the recycle is flagged', first.recycled, true);
+  t('and the first recycled recording is at the candidate\'s band', level, 'B2');
+
+  // With no known level there is no nearest band, and the ladder recycles whole.
+  const st2 = newServeState();
+  for (let n = 0; n < bank.length; n++) servePractice(bank, st2, null);
+  t('here === null still recycles, and says so', servePractice(bank, st2, null).recycled, true);
+}
 
 console.log(failed === 0
   ? '\nAll practice-pool cases pass — including the four that fail if the memory lives in the page.\n'
