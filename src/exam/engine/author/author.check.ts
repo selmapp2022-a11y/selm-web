@@ -277,7 +277,11 @@ if (asAnchor.ok) {
 }
 
 const report = summarise(6, [ok, bad, noJudge]);
-t('the batch report counts before and after', [report.before, report.after], [6, 7]);
+// The unit is QUESTIONS, and the one accepted candidate carries four of them.
+// This case wanted 7 for a year, because `after` was adding passages to a
+// count of questions: the batch runner printed "questions in the bank: 130 ->
+// 133" after thirty were written, and that figure reached a report.
+t('the batch report counts before and after, in questions', [report.before, report.after], [6, 10]);
 t('and keeps the rejection reasons', Object.keys(report.byReason).length > 0, true);
 
 console.log('\n5. Across every bank the gate finds thinness, and nothing else\n');

@@ -146,6 +146,40 @@ console.log(`accepted ${report.accepted} · rejected ${Array.isArray(report.reje
 if (report.reasons && Object.keys(report.reasons).length)
   console.log('reasons:', JSON.stringify(report.reasons));
 
+/**
+ * A PASTE-READY LEDGER ENTRY.
+ *
+ * The reject rate per batch is the number the founder plans capacity from, and
+ * until 31 August it survived only in commit messages — when he asked for it
+ * broken down by item format it had to be mined back out of `git log`, and one
+ * batch's breakdown could not be recovered at all.
+ *
+ * This is not written to `ledger.ts` automatically, and that is deliberate:
+ * the runner cannot tell a FIRST PASS from a repair, and every refused
+ * candidate in this project was repaired and resubmitted until it passed. A
+ * runner that overwrote its own ledger would end holding a file saying nothing
+ * was ever refused. Only the author knows which run was the first one, so the
+ * block is printed and a person puts it there, once.
+ */
+const items: Record<string, number> = {};
+for (const raw of raws)
+  for (const q of raw.items) {
+    const f = q.options ? 'choice' : q.group ? 'matching' : 'completion';
+    items[f] = (items[f] ?? 0) + 1;
+  }
+console.log('\n── ledger entry, IF this was the first pass (ledger.ts) ──\n');
+console.log(JSON.stringify({
+  batch: file.split('/').pop()!.replace(/\.json$/, ''),
+  examId: exam.id,
+  sectionId: section.id,
+  sha: 'HEAD',
+  submitted: raws.length,
+  accepted: report.accepted,
+  unattributed: 0,
+  reasons: report.byReason,
+  items,
+}, null, 2));
+
 if (emitAt) {
   const ok = results.filter((r) => r.result.ok);
   const q = (s: string) => JSON.stringify(s);

@@ -162,7 +162,11 @@ export function summarise(before: number, results: IngestResult[]): BatchReport 
     }
   return {
     before,
-    after: before + accepted.length,
+    // Questions, not passages. `accepted.length` counts recordings, and a
+    // recording carries ten questions: the line read "questions in the bank"
+    // and moved by three when thirty had been written. Counting the thing the
+    // label names is not a cosmetic fix — the number went into reports.
+    after: before + accepted.reduce((n, a) => n + a.accepted.items.length, 0),
     accepted: accepted.length,
     rejected,
     byReason,
