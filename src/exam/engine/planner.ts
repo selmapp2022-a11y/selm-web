@@ -24,6 +24,7 @@
  * definition, the attestation and the catalogue.
  */
 import type { ExamDefinition, SkillId, TaskDefinition } from '../model/types';
+import { deliverable } from './practicePool';
 import type { Attestation } from '../model/attestation';
 import { entriesFor } from '../definitions/prescriptions';
 
@@ -183,6 +184,10 @@ function familiesOf(exam: ExamDefinition, skill: SkillId): Array<{ family: strin
     const counts = new Map<string, number>();
     for (const r of s.recordings) {
       if (!r.family) continue;
+      // A coordinate the product cannot play is not a coordinate the plan can
+      // schedule. See `deliverable` — the same predicate practice and the
+      // mock exam use, so a plan slot always has something behind it.
+      if (!deliverable(s, r)) continue;
       const k = `${r.family}|${r.level}`;
       counts.set(k, (counts.get(k) ?? 0) + 1);
     }

@@ -199,8 +199,36 @@ function nearestTier(order: readonly Recording[], here: number): Recording[] {
  */
 export function practicable(section: ComprehensionSection): Recording[] {
   const withItems = new Set(section.items.map((i) => i.recordingId));
-  const usable = section.delivery.audioPlaysOnce
-    ? section.recordings.filter((r) => !!r.audioPath)
-    : section.recordings;
-  return usable.filter((r) => withItems.has(r.id));
+  return section.recordings.filter((r) => deliverable(section, r) && withItems.has(r.id));
+}
+
+/**
+ * CAN THIS RECORDING BE PUT IN FRONT OF A CANDIDATE TODAY?
+ *
+ * One predicate, used by practice, by the mock exam and by the inventory,
+ * because three answers to this question is how a number comes to say
+ * something the product cannot do.
+ *
+ * A play-once section is an AUDIO section. A recording there with no rendered
+ * audio is a written script: real work, and not something anybody can sit.
+ * Showing the script instead would turn a listening test into a reading test,
+ * which is the one behaviour worse than showing nothing.
+ *
+ * ── Why this exists as of 31 August ────────────────────────────────────
+ * The listening banks are about to be written while the audio waits on the
+ * variety gate, so for the first time the product will hold comprehension
+ * material it cannot serve. The founder's condition when he approved that:
+ *
+ *   *"An item with no audioPath must not be served to a user. Make sure
+ *   `servable` does not count them — otherwise the number goes up and there
+ *   is nothing behind it."*
+ *
+ * He is right, and the risk is wider than the number. Without this predicate
+ * the planner would schedule coordinates that cannot play, and `serveEpreuve`
+ * would put an unrenderable recording on a paper, which `SectionPage` answers
+ * by refusing the WHOLE section — so twenty scripts with no audio would have
+ * taken the four that do have it off the air.
+ */
+export function deliverable(section: ComprehensionSection, r: Recording): boolean {
+  return section.delivery.audioPlaysOnce ? !!r.audioPath : true;
 }

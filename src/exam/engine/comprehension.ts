@@ -28,6 +28,7 @@ import type { ComprehensionItem, ComprehensionSection, Localised, Recording } fr
 import { isCompletionItem, isMatchingItem } from '../model/types';
 import { isCompletionCorrect } from './completion';
 import { newServeState, serve, type ServeState } from './pool';
+import { deliverable } from './practicePool';
 
 export const BANDS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'] as const;
 export type Band = (typeof BANDS)[number];
@@ -195,19 +196,25 @@ export function serveEpreuve(
   st?: ServeState,
 ): Recording[] {
   const spec = section.serve;
-  if (!spec) return section.recordings;
+  // Only what can actually be put in front of a candidate. A play-once
+  // section holding a script with no rendered audio holds real work that
+  // nobody can sit, and putting one on a paper makes `SectionPage` refuse the
+  // entire section — so the unrenderable scripts would take the renderable
+  // ones off the air with them. See `deliverable`.
+  const bank = section.recordings.filter((r) => deliverable(section, r));
+  if (!spec) return bank;
   const state = st ?? newServeState();
   const out: Recording[] = [];
   for (const band of BANDS) {
     const want = spec.byBand[band] ?? 0;
-    const pool = section.recordings.filter((r) => r.level === band);
+    const pool = bank.filter((r) => r.level === band);
     for (let n = 0; n < want; n++) {
       const { item } = serve(pool, state);
       if (item) out.push(item);
     }
   }
   // Ladder order, and stable within a band on the bank's own order.
-  const at = new Map(section.recordings.map((r, n) => [r.id, n]));
+  const at = new Map(bank.map((r, n) => [r.id, n]));
   return out.sort(
     (a, b) =>
       BANDS.indexOf(a.level as Band) - BANDS.indexOf(b.level as Band) ||

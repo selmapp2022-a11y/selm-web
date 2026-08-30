@@ -37,6 +37,7 @@
 import { EXAMS } from '../definitions';
 import { CATALOGUE } from '../definitions/prescriptions';
 import { coordinatesFor, MIN_ITEMS_PER_COORDINATE } from './planner';
+import { deliverable } from './practicePool';
 import { isChoiceItem, isCompletionItem, isMatchingItem } from '../model/types';
 import type { ComprehensionSection, ExamDefinition, ProductionSection, SkillId } from '../model/types';
 
@@ -194,6 +195,14 @@ export function inventory(sizeOf: (audioPath: string) => number = () => 0): Skil
         const perCoord = new Map<string, { recordings: number; questions: number }>();
         for (const r of c.recordings) {
           if (!r.family) continue;
+          // A written script with no rendered audio EXISTS and is not
+          // REACHABLE. The founder's condition on writing the listening banks
+          // before the voices are approved: *"an item with no audioPath must
+          // not be served, and `servable` must not count them — otherwise the
+          // number goes up and there is nothing behind it."* One predicate,
+          // shared with practice and with the mock exam, so the three cannot
+          // disagree about what can be put in front of a candidate.
+          if (!deliverable(c, r)) continue;
           const k = `${r.family} · ${r.level}`;
           const e = perCoord.get(k) ?? { recordings: 0, questions: 0 };
           e.recordings += 1;
