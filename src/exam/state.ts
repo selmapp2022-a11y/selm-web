@@ -63,6 +63,21 @@ export type Sitting = {
    * at the questions. "Heard once" means once. It does not mean zero.
    */
   playedRecordings: string[];
+  /**
+   * The PAPER this sitting is running, by section id, in the order served.
+   *
+   * Recorded because `serveEpreuve` now draws from a memory that advances
+   * (`model/epreuve.ts`), and a draw that advances must happen ONCE per
+   * sitting. Without this, a candidate who reloaded forty minutes into a
+   * section — the exact case `playedRecordings` exists for — would be handed
+   * a different set of documents inside the same clock, with the answers they
+   * had already given attached to questions that were no longer on the paper.
+   *
+   * A sitting stored before this field existed reads back with an empty
+   * record and draws its paper on the next render, which is what it was doing
+   * every render before.
+   */
+  papers: Record<string, string[]>;
 };
 
 const SITTING_KEY = 'selm_exam_sitting_v1';
@@ -76,6 +91,7 @@ const loadSitting = (): Sitting | null => {
     // Treating it as unplayable, or crashing on it, would end a mock that was
     // already in progress when the app updated underneath the candidate.
     if (!Array.isArray(v.playedRecordings)) v.playedRecordings = [];
+    if (!v.papers || typeof v.papers !== 'object') v.papers = {};
     return v;
   } catch {
     return null;
@@ -115,6 +131,8 @@ type ExamState = {
   answerItem: (sectionId: string, itemId: string, chose: number | string | null) => void;
   /** Record that a recording has been played. Irreversible within a sitting. */
   markPlayed: (recordingId: string) => void;
+  /** Fix the paper this sitting will run for one section. Written once. */
+  setPaper: (sectionId: string, recordingIds: string[]) => void;
   submitSection: (sectionId: string) => void;
   endSitting: () => void;
 };
@@ -243,10 +261,21 @@ export const useExam = create<ExamState>((set) => ({
       answers: {},
       submitted: [],
       playedRecordings: [],
+      papers: {},
     };
     saveSitting(sitting);
     set({ exam, sitting });
   },
+  setPaper: (sectionId, recordingIds) =>
+    set((st) => {
+      if (!st.sitting) return st;
+      // Written once. A second write would mean the paper had been re-drawn
+      // mid-sitting, which is the failure this field prevents.
+      if (st.sitting.papers[sectionId]?.length) return st;
+      const sitting = { ...st.sitting, papers: { ...st.sitting.papers, [sectionId]: recordingIds } };
+      saveSitting(sitting);
+      return { sitting };
+    }),
   markPlayed: (recordingId) =>
     set((st) => {
       if (!st.sitting) return st;

@@ -5,7 +5,9 @@ import clsx from 'clsx';
 import { useExam } from '../state';
 import { t } from '../model/format';
 import { resolveAudio } from '../engine/audio';
-import { serveEpreuve, itemsOf, itemsFor } from '../engine/comprehension';
+import { itemsOf, itemsFor } from '../engine/comprehension';
+import { paperFor } from '../model/epreuve';
+import { useExam as useExamStore } from '../state';
 import { SectionClock, ProgressBar } from '../components/SectionClock';
 import { PlayOnce } from '../components/PlayOnce';
 import { isCompletionItem, isMatchingItem } from '../model/types';
@@ -49,7 +51,7 @@ export default function SectionPage() {
 }
 
 function Section({ section }: { section: ComprehensionSection }) {
-  const { ui, sitting, answerItem, submitSection } = useExam();
+  const { ui, sitting, answerItem, submitSection, setPaper } = useExam();
   const nav = useNavigate();
   const [cursor, setCursor] = useState(0);
   const [now, setNow] = useState(Date.now());
@@ -66,7 +68,38 @@ function Section({ section }: { section: ComprehensionSection }) {
   // profile. They were the same number until the bank outgrew the exam.
   // The ÉPREUVE, not the bank — and RECORDINGS, not questions. A recording's
   // questions travel with it, because half a recording cannot be served.
-  const recordings = useMemo(() => serveEpreuve(section), [section]);
+  //
+  // ── AND IT IS DRAWN ONCE, FROM A MEMORY THAT OUTLIVES THE SITTING ─────
+  //
+  // This line read `serveEpreuve(section)` until 30 August. `serveEpreuve`
+  // obeys §4.3 — least-recently-served among unseen — but with no state
+  // passed in it built a fresh one on every call, and a state that has seen
+  // nothing resolves to the bank's own order. Every sitting therefore
+  // presented the same eight documents out of sixty-one, for ever.
+  //
+  // Two rules now hold at once, and they pull in opposite directions:
+  //
+  //   - ACROSS sittings the paper must MOVE, so the draw reads and writes
+  //     `model/epreuve.ts`, which persists what has been asked;
+  //   - WITHIN a sitting the paper must NOT move, because a candidate who
+  //     reloads mid-section must get their own exam back — so the drawn ids
+  //     are recorded on the sitting and a stored paper is restored verbatim,
+  //     never re-drawn.
+  //
+  // The draw is therefore an effect, not a render. Rendering it would let
+  // React's development double-invoke advance the memory twice, silently
+  // skipping a whole paper's worth of documents. The effect reads the store
+  // imperatively for the same reason: it must see a paper written by its own
+  // first pass.
+  const [paper, setPaperState] = useState<Recording[] | null>(null);
+  useEffect(() => {
+    const stored = useExamStore.getState().sitting?.papers?.[section.id];
+    const { paper: rs, drew } = paperFor(section, stored);
+    if (drew) setPaper(section.id, rs.map((r) => r.id));
+    setPaperState(rs);
+  }, [section, setPaper]);
+
+  const recordings = useMemo(() => paper ?? [], [paper]);
   const items = useMemo(() => itemsFor(section, recordings), [section, recordings]);
   const answers = sitting?.answers[section.id] ?? {};
   const answeredCount = items.filter((i) => typeof answers[i.id] === 'number').length;
@@ -100,6 +133,17 @@ function Section({ section }: { section: ComprehensionSection }) {
     ? recordings.filter((r) => !r.audioPath).map((r) => r.id)
     : [];
   const audioMissing = missing.length > 0;
+
+  // One paint before the effect settles the paper. Rendering the header with
+  // "0 questions" for that frame would be a lie about the exam's length, and
+  // on a slow device a visible one.
+  if (paper === null) {
+    return (
+      <div className="card p-6 text-sm text-ink-secondary">
+        {ui === 'en' ? 'Preparing your paper…' : 'Préparation de votre épreuve…'}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
