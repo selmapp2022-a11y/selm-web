@@ -143,7 +143,20 @@ export function AppLayout() {
           `env(safe-area-inset-top)` because this ships inside Capacitor as
           well as a browser, and there the status bar overlays the web view. */}
       <header
-        className="sticky top-0 z-20 flex items-center justify-between gap-2 border-b border-surface-divider bg-white/80 px-4 py-3 backdrop-blur dark:border-slate-700 dark:bg-slate-900/80 md:hidden"
+        // OPAQUE. It was `bg-white/80 … backdrop-blur`, and the founder sent a
+        // photograph of the page heading legible THROUGH the header, with the
+        // logo sitting on top of the word "Today".
+        //
+        // A translucent bar only works because the blur behind it destroys the
+        // detail of whatever is passing underneath. Take the blur away and 80%
+        // opacity is a window. And the blur does go away: this screenshot is an
+        // iPhone with Lockdown Mode on — the badge is visible at the foot of it
+        // — and Lockdown Mode disables `backdrop-filter`. Low-power mode and
+        // several older engines drop it too.
+        //
+        // So the chrome does not depend on a filter the platform may decline to
+        // run. Nothing scrolls through it now, on any device, in any mode.
+        className="sticky top-0 z-20 flex items-center justify-between gap-2 border-b border-surface-divider bg-white px-4 py-3 dark:border-slate-700 dark:bg-slate-900 md:hidden"
         style={{ paddingTop: 'calc(0.75rem + env(safe-area-inset-top))' }}
       >
         <Logo variant="symbol" className="h-8 w-8 shrink-0 rounded-xl" />
@@ -175,7 +188,9 @@ export function AppLayout() {
           - **`env(safe-area-inset-bottom)`.** Inside Capacitor on a
             gesture-bar iPhone the labels sat under the home indicator. */}
       <nav
-        className="fixed bottom-0 left-0 right-0 z-30 flex border-t border-surface-divider bg-white/95 backdrop-blur dark:border-slate-700 dark:bg-slate-900/95 md:hidden"
+        // Opaque, for the reason given on the header above: "Where you stand"
+        // and the target line were both readable through this bar.
+        className="fixed bottom-0 left-0 right-0 z-30 flex border-t border-surface-divider bg-white dark:border-slate-700 dark:bg-slate-900 md:hidden"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
         aria-label={ts('nav.main', ui)}
       >
