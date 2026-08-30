@@ -12,13 +12,19 @@ export const EN = {
   'nav.vocabulary': 'Vocabulary',
   'nav.progress': 'Progress',
   'nav.settings': 'Settings',
-  // The five destinations of the app's own navigation. They were hard-coded
+  // The FOUR destinations of the app's own navigation. They were hard-coded
   // English inside `AppLayout` — the one place §5.2 was not being followed,
   // and the most visible: a candidate reading the app in French had five
   // English words on every screen.
+  //
+  // Five became four on 31 August. `My exam` and `Progress` both fold into
+  // `You`; their keys stay because both words are still used as headings on
+  // the pages themselves, and `nav.settings` stays because the gear that
+  // opens `/me` still needs a label for assistive technology.
   'nav.today': 'Today',
   'nav.practice': 'Practice',
   'nav.mockExam': 'Mock exam',
+  'nav.you': 'You',
   'nav.myExam': 'My exam',
   'nav.signOut': 'Sign out',
   'nav.appearance': 'Appearance',

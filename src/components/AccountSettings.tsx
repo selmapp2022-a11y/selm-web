@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AlertTriangle, Trash2, User as UserIcon, Mail, Shield, LogOut, Sun } from 'lucide-react';
-import { ThemeToggle } from '../components/ThemeToggle';
+import { ThemeToggle } from './ThemeToggle';
 import { useAuthStore } from '../store/authStore';
 import { deleteAccount, tokenStore } from '../lib/api';
 import { Languages } from 'lucide-react';
@@ -22,7 +22,19 @@ import { setUiLang, ts, useUiLangValue } from '../i18n';
 // the Privacy Policy, and the standard Sign out control so App Review
 // can find the deletion flow without hunting.
 
-export default function SettingsPage() {
+/**
+ * THE ACCOUNT SECTION OF `/me`.
+ *
+ * This was `SettingsPage` at `/settings`, reached from a gear in the phone
+ * header and a link in the desktop sidebar. The IA ruling folds it into `You`
+ * — D4 (*theme switcher in sidebar AND settings*) and D5 (*sign out in sidebar
+ * AND settings*) are duplications only because this had a second home.
+ *
+ * Two things are deliberately unchanged, both App Store requirements:
+ * Delete account (5.1.1(v)) sits mid-page, above Sign out, so the phone tab
+ * bar can never cover it; and the Privacy Policy link stays.
+ */
+export function AccountSettings() {
   const uiLangNow = useUiLangValue();
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
@@ -57,10 +69,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="mx-auto max-w-2xl px-4 pt-6 pb-40">
-      <h1 className="mb-6 font-display text-2xl font-bold text-navy dark:text-white">
-        Settings
-      </h1>
+    <div>
 
       {/* Account details */}
       <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">

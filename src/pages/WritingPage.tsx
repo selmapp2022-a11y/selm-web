@@ -51,7 +51,7 @@ export default function WritingPage() {
         <div className="card p-6">
           <h3 className="font-display text-lg font-bold text-navy">{ts('practice.chooseExamFirst')}</h3>
           <p className="mt-1 text-sm text-ink-secondary">{ts('practice.writingNeedsExam')}</p>
-          <a href="/goal" className="btn-primary mt-4 inline-flex">{ts('common.chooseExam')}</a>
+          <a href="/me" className="btn-primary mt-4 inline-flex">{ts('common.chooseExam')}</a>
         </div>
       )}
 

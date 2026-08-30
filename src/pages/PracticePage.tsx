@@ -13,10 +13,10 @@ import { lookFor } from '../lib/skillLook';
  * so it is a card here rather than a sibling in the nav.
  */
 const SKILLS = [
-  { to: '/speaking',  skill: 'speaking',  label: 'Speaking',  icon: Mic,        blurb: 'Record the exam’s speaking tasks and get scored feedback.' },
-  { to: '/listening', skill: 'listening', label: 'Listening', icon: Headphones, blurb: 'The exam’s own listening questions, one at a time.' },
-  { to: '/reading',   skill: 'reading',   label: 'Reading',   icon: BookOpen,   blurb: 'The exam’s own reading passages and questions.' },
-  { to: '/writing',   skill: 'writing',   label: 'Writing',   icon: PenLine,    blurb: 'Write each exam task and get scored feedback.' },
+  { to: '/practice/speaking',  skill: 'speaking',  label: 'Speaking',  icon: Mic,        blurb: 'Record the exam’s speaking tasks and get scored feedback.' },
+  { to: '/practice/listening', skill: 'listening', label: 'Listening', icon: Headphones, blurb: 'The exam’s own listening questions, one at a time.' },
+  { to: '/practice/reading',   skill: 'reading',   label: 'Reading',   icon: BookOpen,   blurb: 'The exam’s own reading passages and questions.' },
+  { to: '/practice/writing',   skill: 'writing',   label: 'Writing',   icon: PenLine,    blurb: 'Write each exam task and get scored feedback.' },
 ] as const;
 
 export default function PracticePage() {
@@ -55,7 +55,7 @@ export default function PracticePage() {
       </div>
 
       {/* Vocabulary is a support surface, not a fifth skill — IA §5. */}
-      <Link to="/vocabulary" className="card flex items-center gap-4 p-5 hover:shadow-cardHover">
+      <Link to="/practice/vocabulary" className="card flex items-center gap-4 p-5 hover:shadow-cardHover">
         <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-surface-muted text-navy">
           <Brain className="h-5 w-5" />
         </div>

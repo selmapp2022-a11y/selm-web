@@ -27,6 +27,7 @@ export const FR: FrenchDict = {
   'nav.today': "Aujourd'hui",
   'nav.practice': 'Entraînement',
   'nav.mockExam': "Examen blanc",
+  'nav.you': 'Vous',
   'nav.myExam': 'Mon examen',
   'nav.signOut': 'Se déconnecter',
   'nav.appearance': 'Apparence',

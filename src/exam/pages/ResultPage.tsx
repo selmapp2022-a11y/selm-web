@@ -34,7 +34,7 @@ export default function ResultPage() {
   const { result, goal, ui } = useExam();
   const nav = useNavigate();
   if (!result) {
-    nav('/goal');
+    nav('/me');
     return null;
   }
   const { exam, task, signal, gate, judges, judgeAggregate, examScaleAggregate, benchmarkLevel, release, zeroedBy, overtimeSec } = result;
@@ -295,7 +295,7 @@ export default function ResultPage() {
         </div>
       </section>
 
-      <button onClick={() => nav('/goal')} className="btn-secondary w-full">
+      <button onClick={() => nav('/me')} className="btn-secondary w-full">
         {ui === 'en' ? 'Run the same task under the other exam' : "Refaire la même tâche sous l'autre examen"}
       </button>
     </div>

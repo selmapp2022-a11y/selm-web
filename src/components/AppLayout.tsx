@@ -1,47 +1,55 @@
 import { useEffect } from 'react';
-import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { Outlet, NavLink } from 'react-router-dom';
 import { Logo } from './Logo';
-import { ThemeToggle } from './ThemeToggle';
 import { StaleBuild } from './StaleBuild';
 import { useAuthStore } from '../store/authStore';
 import { syncAttemptsFromBackend } from '../lib/attempts';
 import { claimCandidateRecord } from '../lib/localRecord';
 import { syncDocumentLang, ts, useUiLangValue } from '../i18n';
-import { Home, Dumbbell, ClipboardCheck, TrendingUp, Target, LogOut, Settings } from 'lucide-react';
+import { Home, Dumbbell, ClipboardCheck, CircleUser } from 'lucide-react';
 import type { Key } from '../i18n';
 import clsx from 'clsx';
 
 /**
- * The five destinations, declared once and rendered twice — the sidebar on a
+ * The FOUR destinations, declared once and rendered twice — the sidebar on a
  * desktop, the tab bar on a phone. One list, so the two can never drift.
  *
- * Each label is the word its page uses as a heading, checked on 29 August 2026
- * after the founder observed that the app read as assembled rather than
- * designed. `Progress` is in the list because the page behind it is no longer
- * the scoreboard it was: see `ProgressPage`.
+ * ── Five became four on 31 August ───────────────────────────────────────────
+ * IA ruling §2.1: *"Four tabs is still right. Drop `My exam` into `You` …
+ * Keep Mock exam."*
+ *
+ *     Today · Practice · Mock exam · You
+ *
+ * `My exam` and `Progress` both fold into `You`, which holds the numbers
+ * alongside the goal they are measured against. Five tabs on a 390px screen
+ * is 78 points each; four is 97, and the two that went were the two a
+ * candidate opens least often.
+ *
+ * **Mock exam stays, and the ruling is explicit about why.** The audit
+ * proposed moving it under Practice. *"Practice teaches. The mock exam
+ * measures … it is the only surface that answers 'are you ready to book?' —
+ * the question the candidate came with. Burying it demotes the thing they
+ * came for."*
  *
  * The labels are KEYS as of 30 August. They were hard-coded English, which
  * made this the one place §5.2 was not being followed and the most visible
- * one: a candidate reading the app in French met five English words on every
+ * one: a candidate reading the app in French met English words on every
  * screen, in the only component that is on every screen.
  */
 const navItems: Array<{ to: string; label: Key; icon: typeof Home; end?: boolean }> = [
   { to: '/', label: 'nav.today', icon: Home, end: true },
   { to: '/practice', label: 'nav.practice', icon: Dumbbell },
   { to: '/exam', label: 'nav.mockExam', icon: ClipboardCheck },
-  { to: '/progress', label: 'nav.progress', icon: TrendingUp },
-  { to: '/goal', label: 'nav.myExam', icon: Target },
+  { to: '/me', label: 'nav.you', icon: CircleUser },
 ];
 
 export function AppLayout() {
-  const { user, logout } = useAuthStore();
+  const { user } = useAuthStore();
   // `index.html` hard-codes `lang="en"`. Keep the document on the language the
   // candidate chose, so assistive technology announces it correctly and the
   // browser's own date fields follow the app rather than the operating system.
   const ui = useUiLangValue();
   useEffect(() => { syncDocumentLang(ui); }, [ui]);
-  const navigate = useNavigate();
-  const handleLogout = () => { logout(); navigate('/login'); };
 
   // Bind this device's local record to whoever is signed in — discarding it
   // first if it belonged to someone else — and only then pull from the
@@ -84,8 +92,22 @@ export function AppLayout() {
               </NavLink>
             ))}
           </nav>
+          {/* ── D4 AND D5: THE SIDEBAR STOPPED OWNING THE ACCOUNT ──────
+              This block held a theme switcher, a Settings link and a Sign
+              out button. All three now live on `/me`, which is a tab.
+
+              They were not duplicated by accident. There were two places
+              that could plausibly own "appearance" and "sign out" — the
+              chrome and the account page — and both took it. Deleting one
+              copy without merging the routes would have left the same
+              question open for the next control.
+
+              Sign out in particular has no business one stray tap away on
+              every screen of an exam app: a candidate mid-practice does not
+              want to discover it by accident. It is now behind the `You`
+              tab, beside the account it signs out of. */}
           <div className="border-t border-surface-divider p-4">
-            <div className="mb-3 px-2">
+            <div className="px-2">
               <div className="text-sm font-semibold text-navy">{user?.full_name || user?.username || 'Learner'}</div>
               <div className="truncate text-xs text-ink-secondary">{user?.email}</div>
               {/* The backend's `current_level` badge was removed here on
@@ -94,23 +116,6 @@ export function AppLayout() {
                   practice difficulty; it is simply not a score, so it is no
                   longer displayed as one beside the candidate's name. */}
             </div>
-            <div className="mb-2 px-2"><ThemeToggle /></div>
-            {/* Settings entry — required so users (and Apple's App Review)
-                can reach the Delete Account flow. Apple 5.1.1(v) rejected
-                Build 38 because the sidebar had no visible way to open
-                Settings. */}
-            <NavLink
-              to="/settings"
-              className={({ isActive }) => clsx(
-                'flex w-full items-center gap-2 rounded-xl px-4 py-2 text-sm hover:bg-surface-muted',
-                isActive ? 'text-navy font-semibold' : 'text-ink-secondary'
-              )}
-            >
-              <Settings className="h-4 w-4" /> {ts('nav.settings', ui)}
-            </NavLink>
-            <button onClick={handleLogout} className="mt-1 flex w-full items-center gap-2 rounded-xl px-4 py-2 text-sm text-ink-secondary hover:bg-surface-muted">
-              <LogOut className="h-4 w-4" /> {ts('nav.signOut', ui)}
-            </button>
           </div>
         </div>
       </aside>
@@ -133,8 +138,8 @@ export function AppLayout() {
           30 August because "My exam" in the navigation already led there.
           The theme switcher and sign-out went with it — not because they are
           unimportant but because they belong to the account, not to the
-          screen the candidate is on, and both are in Settings, one tap
-          behind the gear that is already required to be here.
+          screen the candidate is on, and both are on `/me`, one tap behind
+          the gear that is already required to be here.
 
           Sign-out in particular has no business one stray tap away on every
           screen of an exam app. A candidate mid-practice does not want to
@@ -160,20 +165,22 @@ export function AppLayout() {
         style={{ paddingTop: 'calc(0.75rem + env(safe-area-inset-top))' }}
       >
         <Logo variant="symbol" className="h-8 w-8 shrink-0 rounded-xl" />
-        {/* Gear → Settings → Delete Account. Required so iPhone users (and
+        {/* Gear → `/me` → Delete Account. Required so iPhone users (and
             Apple's reviewers) can reach account deletion without an obscure
-            gesture; 5.1.1(v) rejected Build 38 for exactly this. */}
+            gesture; 5.1.1(v) rejected Build 38 for exactly this. It points at
+            `/me` since 31 August — `/settings` still resolves, but the gear
+            should name where it actually goes. */}
         <NavLink
-          to="/settings"
+          to="/me"
           className="-mr-2 flex h-11 w-11 items-center justify-center rounded-full text-ink-secondary transition hover:bg-surface-muted hover:text-navy"
           aria-label={ts('nav.settings', ui)}
         >
-          <Settings className="h-5 w-5" />
+          <CircleUser className="h-5 w-5" />
         </NavLink>
       </header>
 
       {/* ── THE PHONE TAB BAR ───────────────────────────────────────────
-          Same five destinations as the sidebar, from the same list.
+          Same four destinations as the sidebar, from the same list.
 
           Three things changed on 30 August, all of them because this is the
           component a phone user touches most and it was the least considered:

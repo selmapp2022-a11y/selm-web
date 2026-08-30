@@ -138,7 +138,7 @@ export function ComprehensionPractice({ skill }: { skill: 'reading' | 'listening
           Choose your exam first. Everything you practise here — the language, the text types, the
           questions — comes from it.
         </p>
-        <Link to="/goal" className="btn-primary mt-4 inline-block">Choose my exam</Link>
+        <Link to="/me" className="btn-primary mt-4 inline-block">Choose my exam</Link>
       </div>
     );
   }

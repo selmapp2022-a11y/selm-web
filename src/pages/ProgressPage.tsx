@@ -35,7 +35,7 @@ const SKILL_LABEL: Record<SkillKey, string> = {
 };
 
 const PRACTICE: Record<SkillId, string> = {
-  listening: '/listening', reading: '/reading', writing: '/writing', speaking: '/speaking',
+  listening: '/practice/listening', reading: '/practice/reading', writing: '/practice/writing', speaking: '/practice/speaking',
 };
 
 type Catalogue = { EXAMS: ExamDefinition[]; GOALS: Goal[] };
@@ -112,7 +112,7 @@ export default function ProgressPage() {
             Until then there is nothing here to measure against — and a page that filled the space
             anyway is exactly what this one replaced.
           </p>
-          <Link to="/goal" className="btn-primary mt-4 inline-block">Choose my exam</Link>
+          <Link to="/me" className="btn-primary mt-4 inline-block">Choose my exam</Link>
         </div>
       </div>
     );

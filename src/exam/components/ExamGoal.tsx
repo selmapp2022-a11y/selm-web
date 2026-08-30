@@ -6,11 +6,20 @@ import { useExam } from '../state';
 import { GOALS } from '../definitions';
 import { t } from '../model/format';
 import { daysUntil, loadPlan, savePlan } from '../model/plan';
-import { useDocumentTitle } from '../../lib/useDocumentTitle';
 import { fmtDate, localeTag } from '../../i18n';
 
-export default function GoalPage() {
-  useDocumentTitle('My exam');
+/**
+ * THE EXAM SECTION OF `/me`.
+ *
+ * This was `GoalPage`, a top-level destination at `/goal` with a tab of its
+ * own. The IA ruling of 30 August folds it into `You`: *"Drop `My exam` into
+ * `You` … `Progress` folds into `You`, which holds the numbers alongside the
+ * goal they are measured against."* The page's own `<h1>` went with the route
+ * — a section inside a page does not get to be a page heading — and everything
+ * below it is unchanged, including the two notes explaining why it says what
+ * it says.
+ */
+export function ExamGoal() {
   const { exam, goal, setGoal, ui } = useExam();
   const nav = useNavigate();
 
@@ -90,10 +99,7 @@ export default function GoalPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="font-display text-3xl font-bold text-navy">
-          {ui === 'en' ? 'My exam' : 'Mon examen'}
-        </h1>
-        <p className="mt-1 font-display text-lg font-semibold text-navy">
+        <p className="font-display text-lg font-semibold text-navy">
           {ui === 'en' ? 'Where are you going, and what do you need?' : 'Où allez-vous, et que vous faut-il ?'}
         </p>
         <p className="mt-1 text-ink-secondary">

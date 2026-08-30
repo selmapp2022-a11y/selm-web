@@ -61,7 +61,7 @@ export default function MockExamPage() {
         </div>
       )}
 
-      <Link to="/history" className="inline-flex items-center gap-2 text-sm font-medium text-teal hover:underline">
+      <Link to="/progress" className="inline-flex items-center gap-2 text-sm font-medium text-teal hover:underline">
         <History className="h-4 w-4" />
         {ui === 'en' ? 'Your past sittings' : 'Vos sessions passées'}
       </Link>

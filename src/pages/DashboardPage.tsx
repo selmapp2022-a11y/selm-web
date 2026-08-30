@@ -56,14 +56,14 @@ import type {
  */
 
 /** The engine is a second Vite entry point on the same origin, not a route. */
-const EXAM_HOME = '/goal';
+const EXAM_HOME = '/me';
 
 /** Where a skill's own practice lives inside the application. */
 const PRACTICE: Record<SkillId, string> = {
-  listening: '/listening',
-  reading: '/reading',
-  writing: '/writing',
-  speaking: '/speaking',
+  listening: '/practice/listening',
+  reading: '/practice/reading',
+  writing: '/practice/writing',
+  speaking: '/practice/speaking',
 };
 
 type Catalogue = { EXAMS: ExamDefinition[]; GOALS: Goal[] };
@@ -222,8 +222,11 @@ export default function DashboardPage() {
           </div>
         ) : (
           <div className="mt-3 flex flex-wrap items-center gap-4">
+            {/* D6 — a "Go to Practice" button sat here, and Practice is a tab
+                on this same screen. The sentence tells the candidate what to
+                do; the tab bar is how they do it. A button that duplicates a
+                tab teaches that the tab is not to be trusted. */}
             <p className="min-w-[180px] flex-1 text-sm text-ink-secondary">Pick a skill and begin.</p>
-            <Link to="/practice" className="btn-primary shrink-0">Go to Practice<ChevronRight className="h-4 w-4" /></Link>
           </div>
         )}
       </section>
@@ -332,13 +335,14 @@ export default function DashboardPage() {
             us.
           </p>
         )}
-        <div className="flex flex-wrap gap-2">
-          <Link to="/practice" className="btn-secondary">Practice</Link>
-          <Link to="/exam" className="btn-secondary">Mock exam</Link>
-          {/* D3 — "Enter a past result" appeared four times in the app: here,
-              on Progress, and twice on the exam page. It now appears exactly
-              once, on the page that owns past results. */}
-        </div>
+        {/* D6 — two buttons stood here, "Practice" and "Mock exam", and both
+            are tabs in the bar at the foot of this same screen. The paragraph
+            above names both actions in prose, which is what it is for; the
+            buttons only said them again in a different shape.
+
+            D3 removed a third — "Enter a past result" appeared four times in
+            the app: here, on Progress, and twice on the exam page. It now
+            appears exactly once, on the page that owns past results. */}
       </section>
 
       {/* Upgrade to SELM Pro. This is the primary in-app entry point to the

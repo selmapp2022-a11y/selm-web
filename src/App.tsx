@@ -14,7 +14,7 @@ import WritingPage from './pages/WritingPage';
 import VocabularyPage from './pages/VocabularyPage';
 import ProgressPage from './pages/ProgressPage';
 import PaywallPage from './pages/PaywallPage';
-import SettingsPage from './pages/SettingsPage';
+import MePage from './pages/MePage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import TermsPage from './pages/TermsPage';
 import ConsentPage, { hasPrivacyConsent } from './pages/ConsentPage';
@@ -26,12 +26,10 @@ import MockExamPage from './exam/pages/MockExamPage';
 // live behind ExamGate in a HashRouter; here they are ordinary protected
 // routes, so ProtectedRoute (account) and the consent gate before login cover
 // what ExamGate did.
-import GoalPage from './exam/pages/GoalPage';
 import TaskPage from './exam/pages/TaskPage';
 import ResultPage from './exam/pages/ResultPage';
 import SectionPage from './exam/pages/SectionPage';
 import SittingResultPage from './exam/pages/SittingResultPage';
-import HistoryPage from './exam/pages/HistoryPage';
 import AttestationPage from './exam/pages/AttestationPage';
 import PlanPage from './exam/pages/PlanPage';
 
@@ -103,12 +101,28 @@ export default function App() {
           <Route path="/onboarding/profile" element={<Navigate to="/" replace />} />
           <Route path="/onboarding/assessment" element={<Navigate to="/" replace />} />
           <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/speaking" element={<SpeakingPage />} />
-          <Route path="/listening" element={<ListeningPage />} />
-          <Route path="/reading" element={<ReadingPage />} />
-          <Route path="/writing" element={<WritingPage />} />
+
+          {/* ── THE SKILL PAGES LIVE UNDER PRACTICE ──────────────────────
+              IA ruling §1.3: `/listening` etc. become `/practice/listening`
+              etc., old paths 301.
+
+              The path was lying about the hierarchy. A skill page is not a
+              destination — it is what Practice opens, and the tab bar shows
+              Practice as current while the URL claims a sibling of it. The
+              old paths still resolve, because a candidate's bookmark and a
+              link in an old email are not ours to break. */}
           <Route path="/practice" element={<PracticePage />} />
-          <Route path="/vocabulary" element={<VocabularyPage />} />
+          <Route path="/practice/speaking" element={<SpeakingPage />} />
+          <Route path="/practice/listening" element={<ListeningPage />} />
+          <Route path="/practice/reading" element={<ReadingPage />} />
+          <Route path="/practice/writing" element={<WritingPage />} />
+          <Route path="/practice/vocabulary" element={<VocabularyPage />} />
+          <Route path="/speaking" element={<Navigate to="/practice/speaking" replace />} />
+          <Route path="/listening" element={<Navigate to="/practice/listening" replace />} />
+          <Route path="/reading" element={<Navigate to="/practice/reading" replace />} />
+          <Route path="/writing" element={<Navigate to="/practice/writing" replace />} />
+          <Route path="/vocabulary" element={<Navigate to="/practice/vocabulary" replace />} />
+
           <Route path="/progress" element={<ProgressPage />} />
           {/* Paywall — reachable from the crown icon in the header and
               from the Upgrade card on the Dashboard. `/upgrade` and
@@ -116,16 +130,24 @@ export default function App() {
               App Review at either without breaking their notes. */}
           <Route path="/upgrade" element={<PaywallPage />} />
           <Route path="/paywall" element={<PaywallPage />} />
-          {/* Settings — exposes the Delete Account flow required by
-              App Store Guideline 5.1.1(v). Reachable from the sidebar
-              entry with the same name. */}
-          <Route path="/settings" element={<SettingsPage />} />
-          <Route path="/account" element={<SettingsPage />} />
+          {/* ── /me — YOU ───────────────────────────────────────────────
+              Three routes merged into one (IA ruling §1.3). `/me` holds the
+              exam and destination, past results, the account, appearance and
+              sign out — which is why the theme switcher and the sign-out
+              could come out of the sidebar (D4, D5): they had two homes only
+              because there were two places that could own them.
 
-          {/* Exam engine, now in-app (SELM-IA.md §1). Provisional paths for
-              this step; §2 renames the navigation. `/exam.html` redirects
+              The Delete Account flow required by App Store Guideline
+              5.1.1(v) is inside it, one tap from the `You` tab and one from
+              the gear in the phone header. `/settings` was the path App
+              Review was given; it still resolves. */}
+          <Route path="/me" element={<MePage />} />
+          <Route path="/settings" element={<Navigate to="/me" replace />} />
+          <Route path="/account" element={<Navigate to="/me" replace />} />
+          <Route path="/goal" element={<Navigate to="/me" replace />} />
+
+          {/* Exam engine, now in-app (SELM-IA.md §1). `/exam.html` redirects
               here so old links and bookmarks keep working. */}
-          <Route path="/goal" element={<GoalPage />} />
           <Route path="/attestation" element={<AttestationPage />} />
           <Route path="/plan" element={<PlanPage />} />
           <Route path="/task" element={<TaskPage />} />
@@ -133,7 +155,13 @@ export default function App() {
           <Route path="/exam" element={<MockExamPage />} />
           <Route path="/section" element={<SectionPage />} />
           <Route path="/sitting-result" element={<SittingResultPage />} />
-          <Route path="/history" element={<HistoryPage />} />
+          {/* D8 — past sittings were split across `/history` and
+              `/progress`, and `/history` → `/exam` → `/history` was a
+              circular dead end with no third exit. `/progress` already draws
+              every sitting AND every practice attempt against the target, so
+              the second page was the poorer half of a duplication rather
+              than a second view of it. */}
+          <Route path="/history" element={<Navigate to="/progress" replace />} />
         </Route>
       </Route>
 

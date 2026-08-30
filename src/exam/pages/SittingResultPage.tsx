@@ -179,13 +179,13 @@ export default function SittingResultPage() {
       </section>
 
       <div className="flex flex-col gap-2 sm:flex-row">
-        <button onClick={() => nav('/history')} className="btn-secondary flex-1">
+        <button onClick={() => nav('/progress')} className="btn-secondary flex-1">
           {ui === 'en' ? 'See your history' : 'Voir votre historique'}
         </button>
         <button
           onClick={() => {
             endSitting();
-            nav('/goal');
+            nav('/me');
           }}
           className="btn-primary flex-1"
         >
