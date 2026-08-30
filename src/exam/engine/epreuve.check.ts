@@ -11,9 +11,9 @@
  * What is checked here is the whole of the claim, including the parts that
  * must NOT change: the published band profile, the length, and the ladder.
  */
-import { EXAMS } from '../definitions';
+import { EXAMS, GOALS } from '../definitions';
 import { itemsFor } from './comprehension';
-import { paperFor, clearEpreuveMemory, EPREUVE_KEY } from '../model/epreuve';
+import { paperFor, situationFor, clearEpreuveMemory, EPREUVE_KEY } from '../model/epreuve';
 import type { ComprehensionSection } from '../model/types';
 
 const mem = new Map<string, string>();
@@ -91,6 +91,42 @@ for (const exam of EXAMS) {
     let short = 0;
     for (let n = 0; n < 20; n++) if (sit(section).length !== section.serve.count) short += 1;
     must(short === 0, 'twenty further sittings are all full length');
+  }
+}
+
+// ── THE EXPRESSION HALF ──────────────────────────────────────────────────
+// `TaskPage` rendered `task.prompt` — situation one, every sitting, every
+// destination. Same defect, same fix, and the same two rules that pull apart.
+for (const exam of EXAMS) {
+  const sharing = GOALS.filter((g) => g.exams.includes(exam.id)).map((g) => g.id);
+  for (const section of exam.sections) {
+    if (section.kind !== 'production') continue;
+    for (const task of section.tasks) {
+      clearEpreuveMemory();
+      console.log(`\n${exam.id} · ${task.id}`);
+      const goal = sharing[0];
+      const seen: string[] = [];
+      for (let n = 0; n < 3; n++) seen.push(situationFor(task, undefined, sharing, goal).situation.id);
+      must(new Set(seen).size === 3, `three sittings, three situations (${seen.join(' → ')})`);
+
+      const before = mem.get(EPREUVE_KEY);
+      const back = situationFor(task, seen[2], sharing, goal);
+      must(!back.drew && back.situation.id === seen[2], 'a reload returns the same situation');
+      must(mem.get(EPREUVE_KEY) === before, 'a reload does not advance the memory');
+
+      // And the served situation carries ITS OWN keywords, which is what
+      // stops `off_topic` zeroing a correct answer to situation three.
+      const gated = (task.gate ?? []).some((g) => g.id === 'off_topic');
+      if (gated) must(Boolean(back.situation.topicKeywords?.length) || back.situation.id.endsWith('-p1'),
+        'the served situation carries keywords of its own');
+
+      // Three destinations, three different opening situations.
+      if (sharing.length > 1) {
+        clearEpreuveMemory();
+        const firsts = sharing.map((g) => situationFor(task, undefined, sharing, g).situation.id);
+        must(new Set(firsts).size === sharing.length, `${sharing.length} destinations open on ${sharing.length} situations`);
+      }
+    }
   }
 }
 

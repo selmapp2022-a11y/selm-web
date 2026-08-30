@@ -51,11 +51,27 @@ export function scaleFor(exam: ExamDefinition, id: string): Scale {
 export async function scoreResponse(
   exam: ExamDefinition,
   task: TaskDefinition,
-  response: Response
+  response: Response,
+  /**
+   * WHICH situation was actually set.
+   *
+   * `task.prompt` is situation one. Until 30 August it was also the only one
+   * a sitting could set, so reading it here was right. Now the sitting serves
+   * from the whole pool, and three things downstream read the prompt: the
+   * gate's `prompt_copy` and `lifted_run` rules, the `off_topic` keywords,
+   * and the judge. All three would have been looking at a question the
+   * candidate was never asked — the gate would have found no copying where
+   * there was some, and `off_topic` would have zeroed a correct answer.
+   *
+   * Optional, and defaulting to situation one, so every caller that scores a
+   * single-situation task is unchanged.
+   */
+  situation?: { prompt: Localised; topicKeywords?: readonly string[] },
 ): Promise<ScoreResult> {
   const lang = exam.language;
   const scale = scaleFor(exam, task.scaleId);
-  const promptText = task.prompt[lang];
+  const promptText = (situation?.prompt ?? task.prompt)[lang];
+  const keywords = situation?.topicKeywords ?? task.topicKeywords;
   const release = releaseGate(exam);
   const overtimeSec = Math.max(0, response.elapsedSec - task.timeLimitSec);
 
@@ -70,7 +86,7 @@ export async function scoreResponse(
   // under-count and a third of correct-length answers wrongly zeroed
   // without it.
   const seg = segmentationFor(exam.locale);
-  const gate = runGate(task, signal.transcript, promptText, seg);
+  const gate = runGate(task, signal.transcript, promptText, seg, keywords);
 
   // Layer 2 — the diagnostic tier, and it runs BEFORE the zero check on
   // purpose.

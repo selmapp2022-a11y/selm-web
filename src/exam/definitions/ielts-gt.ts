@@ -191,6 +191,7 @@ export const IELTS_GT: ExamDefinition = {
           prompts: [
             {
               id: 'gt-w-t1-p2',
+              topicKeywords: ['furniture', 'ordered', 'damaged', 'delivery', 'refund', 'replacement', 'company', 'broken'],
               freshness: 'current',
               prompt: {
                 en: "You ordered a piece of furniture online and it arrived damaged. Write a letter to the company. In your letter: describe what you ordered and when it arrived, explain what is wrong with it, and say what you would like the company to do.",
@@ -199,6 +200,7 @@ export const IELTS_GT: ExamDefinition = {
             },
             {
               id: 'gt-w-t1-p3',
+              topicKeywords: ['neighbour', 'flat', 'keys', 'plants', 'post', 'away', 'weeks', 'contact'],
               freshness: 'current',
               prompt: {
                 en: "A neighbour has agreed to look after your flat while you are away for three weeks. Write a letter to your neighbour. In your letter: thank them and explain what needs doing, say where they will find what they need, and tell them how to reach you if something goes wrong.",
@@ -207,6 +209,7 @@ export const IELTS_GT: ExamDefinition = {
             },
             {
               id: 'gt-w-t1-p4',
+              topicKeywords: ['clash', 'hours', 'timetable', 'schedule', 'miss', 'overtime', 'permission', 'evening'],
               freshness: 'current',
               prompt: {
                 en: "You have been offered a place on a course that clashes with your working hours. Write a letter to your employer. In your letter: explain what the course is and why you want to do it, describe the clash, and propose a way of making up the hours you would miss.",
@@ -360,6 +363,7 @@ export const IELTS_GT: ExamDefinition = {
           prompts: [
             {
               id: 'gt-w-t2-p2',
+              topicKeywords: ['older', 'retirement', 'workforce', 'younger', 'pension', 'age', 'experience', 'jobs'],
               freshness: 'current',
               prompt: {
                 en: "In many countries people are working later in life than they used to. Some see this as a benefit to society; others believe it prevents younger people from entering the workforce. Discuss both views and give your own opinion.",
@@ -368,6 +372,7 @@ export const IELTS_GT: ExamDefinition = {
             },
             {
               id: 'gt-w-t2-p3',
+              topicKeywords: ['buildings', 'heritage', 'housing', 'preserving', 'historic', 'homes', 'restore', 'money'],
               freshness: 'current',
               prompt: {
                 en: "Some people believe that public money should be spent on preserving old buildings. Others argue that it should go towards new housing instead. Discuss both views and give your own opinion.",
@@ -376,6 +381,7 @@ export const IELTS_GT: ExamDefinition = {
             },
             {
               id: 'gt-w-t2-p4',
+              topicKeywords: ['supervision', 'independently', 'teamwork', 'colleagues', 'employee', 'alone', 'together', 'quality'],
               freshness: 'current',
               prompt: {
                 en: "Some think the ability to work without supervision is the most important quality an employee can have. Others believe that working well with other people matters more. Discuss both views and give your own opinion.",
@@ -542,6 +548,7 @@ export const IELTS_GT: ExamDefinition = {
           prompts: [
             {
               id: 'gt-s-p1-p2',
+              topicKeywords: ['eat', 'cook', 'dish', 'meal', 'restaurant', 'food', 'week', 'recipe'],
               freshness: 'current',
               prompt: {
                 en: "Let us talk about food. What do you usually eat during the week? Is there a dish you have learned to cook recently? Do you prefer eating at home or eating out, and why?",
@@ -550,6 +557,7 @@ export const IELTS_GT: ExamDefinition = {
             },
             {
               id: 'gt-s-p1-p3',
+              topicKeywords: ['travel', 'bus', 'train', 'walk', 'car', 'journey', 'town', 'commute'],
               freshness: 'current',
               prompt: {
                 en: "Let us talk about getting around. How do you usually travel in your town? Has that changed in the last few years? Is there a journey you make often that you enjoy?",
@@ -558,6 +566,7 @@ export const IELTS_GT: ExamDefinition = {
             },
             {
               id: 'gt-s-p1-p4',
+              topicKeywords: ['free', 'afternoon', 'hobby', 'interests', 'friends', 'alone', 'younger', 'relax'],
               freshness: 'current',
               prompt: {
                 en: "Let us talk about your free time. What do you do when you have an afternoon with nothing planned? Have your interests changed since you were younger? Do you prefer doing things alone or with other people?",
@@ -663,6 +672,7 @@ export const IELTS_GT: ExamDefinition = {
           prompts: [
             {
               id: 'gt-s-p2-p2',
+              topicKeywords: ['place', 'quiet', 'think', 'park', 'calm', 'suits', 'often', 'go'],
               freshness: 'current',
               prompt: {
                 en: "Describe a place you go to when you want to think. You should say: where it is, how often you go there, what you do while you are there, and explain why it suits you better than other places.",
@@ -671,6 +681,7 @@ export const IELTS_GT: ExamDefinition = {
             },
             {
               id: 'gt-s-p2-p3',
+              topicKeywords: ['object', 'replace', 'own', 'difficult', 'gave', 'value', 'keep', 'use'],
               freshness: 'current',
               prompt: {
                 en: "Describe an object you own that would be difficult to replace. You should say: what it is, how you came to have it, how you use it, and explain what makes replacing it difficult.",
@@ -679,6 +690,7 @@ export const IELTS_GT: ExamDefinition = {
             },
             {
               id: 'gt-s-p2-p4',
+              topicKeywords: ['believed', 'changed', 'mind', 'happened', 'wrong', 'opinion', 'realised', 'now'],
               freshness: 'current',
               prompt: {
                 en: "Describe a time you changed your mind about something. You should say: what you believed at first, what happened, how long the change took, and explain how you feel about it now.",
@@ -784,6 +796,7 @@ export const IELTS_GT: ExamDefinition = {
           prompts: [
             {
               id: 'gt-s-p3-p2',
+              topicKeywords: ['concentrate', 'quiet', 'spaces', 'employers', 'cities', 'noise', 'distraction', 'work'],
               freshness: 'current',
               prompt: {
                 en: "Let us consider quiet places in general. Why do people find it harder to concentrate than they once did? Should employers provide quiet spaces at work? How might the places people go to think change as cities grow?",
@@ -792,6 +805,7 @@ export const IELTS_GT: ExamDefinition = {
             },
             {
               id: 'gt-s-p3-p3',
+              topicKeywords: ['possessions', 'own', 'replace', 'repairing', 'things', 'decades', 'attitudes', 'buy'],
               freshness: 'current',
               prompt: {
                 en: "Let us consider ownership in general. Why do some people keep possessions for decades while others replace them quickly? Is repairing things a skill worth teaching? How might attitudes to owning things change over the next twenty years?",
@@ -800,6 +814,7 @@ export const IELTS_GT: ExamDefinition = {
             },
             {
               id: 'gt-s-p3-p4',
+              topicKeywords: ['admit', 'wrong', 'argue', 'opinions', 'minds', 'debate', 'evidence', 'groups'],
               freshness: 'current',
               prompt: {
                 en: "Let us consider how opinions change. Why do people find it difficult to admit they were wrong? Should schools teach students how to argue? What makes some groups better than others at changing their minds?",

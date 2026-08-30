@@ -2382,6 +2382,7 @@ export const TCF_CANADA: ExamDefinition = {
           prompts: [
             {
               id: 'tcf-ee-t1-p2',
+              topicKeywords: ['logement', 'quartier', 'voisins', 'commerces', 'transport', 'plaît', 'manque', 'déménagé'],
               freshness: 'current',
               prompt: {
                 en: "You have found a home in a new neighbourhood. Write a message to a friend describing the area and what you like and miss about it.",
@@ -2390,6 +2391,7 @@ export const TCF_CANADA: ExamDefinition = {
             },
             {
               id: 'tcf-ee-t1-p3',
+              topicKeywords: ['repas', 'départ', 'collègue', 'date', 'lieu', 'restaurant', 'participation', 'viendra'],
               freshness: 'current',
               prompt: {
                 en: "Your team is organising a meal for a colleague who is leaving. Write a message to the others proposing a date, a place and a contribution, and asking who will come.",
@@ -2398,6 +2400,7 @@ export const TCF_CANADA: ExamDefinition = {
             },
             {
               id: 'tcf-ee-t1-p4',
+              topicKeywords: ['voisin', 'objet', 'abîmé', 'emprunté', 'désolé', 'réparer', 'remplacer', 'excuses'],
               freshness: 'current',
               prompt: {
                 en: "You borrowed something from a neighbour and damaged it. Write a message telling them, explaining what happened and proposing a solution.",
@@ -2555,6 +2558,7 @@ export const TCF_CANADA: ExamDefinition = {
           prompts: [
             {
               id: 'tcf-ee-t2-p2',
+              topicKeywords: ['emploi', 'collègues', 'bureau', 'attendais', 'premier', 'patron', 'retenu', 'métier'],
               freshness: 'current',
               prompt: {
                 en: "A site about work collects accounts of a first day in a new job. Write yours.",
@@ -2563,6 +2567,7 @@ export const TCF_CANADA: ExamDefinition = {
             },
             {
               id: 'tcf-ee-t2-p3',
+              topicKeywords: ['rencontre', 'inattendu', 'circonstances', 'suite', 'personne', 'hasard', 'dit', 'ensuite'],
               freshness: 'current',
               prompt: {
                 en: "A neighbourhood magazine publishes accounts of a chance meeting that led somewhere unexpected. Write yours.",
@@ -2571,6 +2576,7 @@ export const TCF_CANADA: ExamDefinition = {
             },
             {
               id: 'tcf-ee-t2-p4',
+              topicKeywords: ['décision', 'vite', 'regrette', 'situation', 'suivi', 'choix', 'trop', 'aujourd'],
               freshness: 'current',
               prompt: {
                 en: "A review collects accounts of a decision taken too quickly. Write yours.",
@@ -2724,6 +2730,7 @@ export const TCF_CANADA: ExamDefinition = {
           prompts: [
             {
               id: 'tcf-ee-t3-p2',
+              topicKeywords: ['télétravail', 'direction', 'bureau', 'employés', 'formation', 'réunions', 'distance', 'frais'],
               freshness: 'current',
               prompt: {
                 en: "Compare an employer's notice introducing two days of remote work with a letter from employees opposing it, and give your reasoned opinion.",
@@ -2732,6 +2739,7 @@ export const TCF_CANADA: ExamDefinition = {
             },
             {
               id: 'tcf-ee-t3-p3',
+              topicKeywords: ['enregistrements', 'étudiants', 'amphithéâtre', 'présence', 'salariés', 'université', 'suivre', 'cours'],
               freshness: 'current',
               prompt: {
                 en: "Compare a university notice ending lecture recordings with a student association's letter opposing it, and give your reasoned opinion.",
@@ -2740,6 +2748,7 @@ export const TCF_CANADA: ExamDefinition = {
             },
             {
               id: 'tcf-ee-t3-p4',
+              topicKeywords: ['ordures', 'poids', 'déchets', 'dépôts', 'familles', 'facturées', 'volume', 'résidents'],
               freshness: 'current',
               prompt: {
                 en: "Compare a municipal notice charging for waste by weight with a residents' association letter opposing it, and give your reasoned opinion.",
@@ -2944,6 +2953,7 @@ export const TCF_CANADA: ExamDefinition = {
           prompts: [
             {
               id: 'tcf-eo-t1-p2',
+              topicKeywords: ['parcours', 'aujourd', 'cinq', 'aimerais', 'projet', 'avenir', 'étudié', 'ans'],
               freshness: 'current',
               prompt: {
                 en: "Introduce yourself: your background, what you do now, and what you would like to be doing in five years.",
@@ -2952,6 +2962,7 @@ export const TCF_CANADA: ExamDefinition = {
             },
             {
               id: 'tcf-eo-t1-p3',
+              topicKeywords: ['viens', 'vis', 'maintenant', 'difficile', 'changement', 'installé', 'langue', 'pays'],
               freshness: 'current',
               prompt: {
                 en: "Introduce yourself: where you are from, where you live now, and what was hardest about the change.",
@@ -2960,6 +2971,7 @@ export const TCF_CANADA: ExamDefinition = {
             },
             {
               id: 'tcf-eo-t1-p4',
+              topicKeywords: ['journée', 'ordinaire', 'matin', 'soir', 'loisirs', 'habitude', 'semaine', 'travail'],
               freshness: 'current',
               prompt: {
                 en: "Introduce yourself: your work or your studies, an ordinary day for you, and what you do when you are not working.",
@@ -3097,6 +3109,7 @@ export const TCF_CANADA: ExamDefinition = {
           prompts: [
             {
               id: 'tcf-eo-t2-p2',
+              topicKeywords: ['enfant', 'activité', 'école', 'horaires', 'coût', 'apporter', 'inscrire', 'centre'],
               freshness: 'current',
               prompt: {
                 en: "Find out what you need about an after-school activity for your child. The examiner runs the centre.",
@@ -3105,6 +3118,7 @@ export const TCF_CANADA: ExamDefinition = {
             },
             {
               id: 'tcf-eo-t2-p3',
+              topicKeywords: ['facture', 'téléphone', 'élevée', 'remboursement', 'annulé', 'conseiller', 'délai', 'différence'],
               freshness: 'current',
               prompt: {
                 en: "Find out why your telephone bill is much higher than usual. The examiner is the customer adviser.",
@@ -3113,6 +3127,7 @@ export const TCF_CANADA: ExamDefinition = {
             },
             {
               id: 'tcf-eo-t2-p4',
+              topicKeywords: ['formation', 'français', 'soir', 'niveau', 'dates', 'séances', 'manque', 'inscription'],
               freshness: 'current',
               prompt: {
                 en: "Find out what you need about an evening French course. The examiner works at the reception desk.",
@@ -3206,6 +3221,7 @@ export const TCF_CANADA: ExamDefinition = {
           prompts: [
             {
               id: 'tcf-eo-t3-p2',
+              topicKeywords: ['employeur', 'employés', 'horaires', 'confiance', 'privée', 'résultat', 'contrôle', 'vie'],
               freshness: 'current',
               prompt: {
                 en: "Give and defend your view on whether an employer may ask where and when employees work.",
@@ -3214,6 +3230,7 @@ export const TCF_CANADA: ExamDefinition = {
             },
             {
               id: 'tcf-eo-t3-p3',
+              topicKeywords: ['langue', 'parler', 'erreurs', 'maîtriser', 'apprendre', 'confiance', 'pratique', 'attendre'],
               freshness: 'current',
               prompt: {
                 en: "Give and defend your view on whether it is better to speak a language badly at once or wait until you master it.",
@@ -3222,6 +3239,7 @@ export const TCF_CANADA: ExamDefinition = {
             },
             {
               id: 'tcf-eo-t3-p4',
+              topicKeywords: ['services', 'publics', 'ligne', 'guichet', 'internet', 'accès', 'numérique', 'personnes'],
               freshness: 'current',
               prompt: {
                 en: "Give and defend your view on whether every public service should be available online.",

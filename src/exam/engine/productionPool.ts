@@ -47,6 +47,16 @@ export type ServedPrompt = {
   unseen: number;
   /** True when every situation has been met and the pool came round again. */
   recycled: boolean;
+  /**
+   * THIS situation's own keywords, where it declares them.
+   *
+   * Carried because the `off_topic` gate awards ZERO whatever the quality of
+   * the language, and the task's keywords are situation one's. A served
+   * situation and the keywords of a different one must never meet — the
+   * hazard written into `TaskPrompt.topicKeywords`, now that the sitting does
+   * serve a variant.
+   */
+  topicKeywords?: readonly string[];
 };
 
 /**
@@ -104,12 +114,7 @@ export function servePrompt(
   attempts: readonly Attempt[],
   seed = 0,
 ): ServedPrompt {
-  const all = promptsOf(task);
-  // Rotate, so the arbitrary first is a different arbitrary first per
-  // destination. Order is otherwise untouched: `serve` still takes the
-  // least-recently-served among unseen.
-  const off = all.length ? seed % all.length : 0;
-  const list = [...all.slice(off), ...all.slice(0, off)];
+  const list = rotated(task, seed);
   const known = new Set(list.map((p) => p.id));
   const st: ServeState = newServeState();
   for (const a of attempts) {
@@ -119,8 +124,43 @@ export function servePrompt(
     if (a.ts > prev) st.lastServed.set(a.itemId, a.ts);
   }
   st.draw = Date.now();
+  return draw(list, st);
+}
+
+/**
+ * The same serve, from a `ServeState` the caller keeps.
+ *
+ * PRACTICE remembers through the attempt log, above: a candidate who wrote a
+ * situation has met it, and the log is where that fact already lives. THE
+ * MOCK EXAM has no such log — a `SittingRecord` holds counts, not which
+ * situation was set — so it keeps its own state, in `model/epreuve.ts`, for
+ * the same reason and with the same separation as the comprehension paper.
+ */
+export function servePromptWith(task: TaskDefinition, st: ServeState, seed = 0): ServedPrompt {
+  return draw(rotated(task, seed), st);
+}
+
+/**
+ * Rotate, so the arbitrary first is a different arbitrary first per
+ * destination. Order is otherwise untouched: `serve` still takes the
+ * least-recently-served among unseen.
+ */
+function rotated(task: TaskDefinition, seed: number): TaskPrompt[] {
+  const all = promptsOf(task);
+  const off = all.length ? seed % all.length : 0;
+  return [...all.slice(off), ...all.slice(0, off)];
+}
+
+function draw(list: TaskPrompt[], st: ServeState): ServedPrompt {
   const unseen = list.filter((p) => !st.seen.has(p.id)).length;
   const { item, recycled } = serve(list, st);
   const chosen = item ?? list[0];
-  return { id: chosen.id, prompt: chosen.prompt, total: list.length, unseen, recycled };
+  return {
+    id: chosen.id,
+    prompt: chosen.prompt,
+    total: list.length,
+    unseen,
+    recycled,
+    topicKeywords: chosen.topicKeywords,
+  };
 }

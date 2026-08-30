@@ -46,6 +46,16 @@ export function runGate(
    * answers, which is measured in `text.ts`.
    */
   seg: Segmentation = DEFAULT_SEGMENTATION,
+  /**
+   * The content words THIS response is expected to engage with.
+   *
+   * Defaults to the task's, which are situation one's. Once the sitting began
+   * serving a variant, running situation three's answer against situation
+   * one's keywords would award ZERO to a correct response — `off_topic` does
+   * not care how well it is written. So the served situation's own keywords
+   * are passed in, and the default is what every caller had before.
+   */
+  keywords: readonly string[] = task.topicKeywords,
 ): GateResult {
   const scaffold = (task.suppliedScaffold ?? []).join(' ');
   const m = {
@@ -53,7 +63,7 @@ export function runGate(
     promptOverlap: overlapRatio(text, promptText, seg),
     scaffoldRatio: scaffold ? overlapRatio(text, scaffold, seg) : 0,
     longestLiftedRun: longestCommonRun(text, promptText, seg),
-    topicHits: keywordHits(text, task.topicKeywords, seg),
+    topicHits: keywordHits(text, [...keywords], seg),
     sourceHits: [] as GateResult['measurements']['sourceHits'],
   };
 

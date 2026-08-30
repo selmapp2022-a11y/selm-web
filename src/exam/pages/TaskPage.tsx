@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AlertTriangle } from 'lucide-react';
-import { useExam, allTasks, sectionOf } from '../state';
+import { useExam, useExam as useExamStore, allTasks, sectionOf } from '../state';
+import { GOALS } from '../definitions';
+import { situationFor } from '../model/epreuve';
 import { AudioRecorder } from '../../components/AudioRecorder';
 import { SectionClock } from '../components/SectionClock';
 import { t } from '../model/format';
@@ -15,7 +17,7 @@ import type { Response } from '../model/types';
  * same component runs the IELTS letter and the TCF message without a branch.
  */
 export default function TaskPage() {
-  const { exam, ui, setResult, taskId, sitting, submitSection } = useExam();
+  const { exam, ui, goal, setResult, taskId, sitting, submitSection, setPaper } = useExam();
   const nav = useNavigate();
 
   // Inside a sitting this page runs the production section's tasks in order.
@@ -34,6 +36,31 @@ export default function TaskPage() {
     if (sittingSection) return sittingSection.tasks[Math.min(inSectionAt, sittingSection.tasks.length - 1)];
     return allTasks(exam).find((t) => t.id === taskId) ?? allTasks(exam)[0];
   }, [exam, taskId, sittingSection, inSectionAt]);
+
+  /**
+   * WHICH SITUATION this task sets today.
+   *
+   * This page rendered `task.prompt` until 30 August — situation one, always.
+   * The tasks have held four situations each since Task 4, so a candidate who
+   * sat the mock four times wrote the same letter four times, and three
+   * candidates on three destinations wrote it on the same day. Practice had
+   * already been fixed; the mock exam had not, and the mock is the half that
+   * is supposed to feel like the real thing.
+   *
+   * Drawn once and recorded on the sitting, for the reason the comprehension
+   * paper is: a candidate who reloads must get their own question back, not a
+   * different essay inside the same clock with half an answer already typed.
+   * Outside a sitting there is nothing to record, and the draw simply advances
+   * the same durable memory.
+   */
+  const sharing = useMemo(() => GOALS.filter((g) => g.exams.includes(exam.id)).map((g) => g.id), [exam.id]);
+  const [situation, setSituation] = useState<ReturnType<typeof situationFor>['situation'] | null>(null);
+  useEffect(() => {
+    const stored = useExamStore.getState().sitting?.papers?.[task.id]?.[0];
+    const { situation: sit, drew } = situationFor(task, stored, sharing, goal?.id);
+    if (drew && useExamStore.getState().sitting) setPaper(task.id, [sit.id]);
+    setSituation(sit);
+  }, [task, sharing, goal?.id, setPaper]);
 
   const [text, setText] = useState('');
   const [elapsed, setElapsed] = useState(0);
@@ -58,7 +85,7 @@ export default function TaskPage() {
 
   async function run(response: Response) {
     setBusy(true);
-    const result = await scoreResponse(exam, task, response);
+    const result = await scoreResponse(exam, task, response, situation ?? undefined);
     setResult(response, result);
     setBusy(false);
     if (sittingSection) {
@@ -129,7 +156,7 @@ export default function TaskPage() {
       </header>
 
       <div className="card p-6">
-        <p className="leading-relaxed text-ink-primary">{t(task.prompt, ui)}</p>
+        <p className="leading-relaxed text-ink-primary">{t(situation?.prompt ?? task.prompt, ui)}</p>
         {task.wordGuidance && (
           <p className="mt-3 text-xs font-medium text-ink-secondary">{t(task.wordGuidance, ui)}</p>
         )}

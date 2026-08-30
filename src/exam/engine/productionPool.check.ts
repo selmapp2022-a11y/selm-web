@@ -87,19 +87,35 @@ for (const { examId, task } of tasks) {
 }
 
 console.log('\n4. A served situation can never meet another situation\'s keywords\n');
-// `off_topic` awards zero on `task.topicKeywords`, which were written for
-// situation one. Today the mock exam sets `task.prompt` and practice does not
-// gate, so the two cannot meet. Both halves of that are asserted, because both
-// are wiring rather than design.
+// `off_topic` awards ZERO whatever the quality of the language, on keywords
+// written for situation one. That was safe only while the sitting served
+// situation one, and on 30 August it stopped doing so. So it is no longer
+// enough to note the risk: every situation of a gated task must carry its own
+// keywords, and no two situations of one task may be satisfiable by the same
+// answer.
 for (const { examId, task } of tasks) {
   t(`${examId} · ${task.id}: the declared prompt is situation one`,
     promptsOf(task)[0].prompt.en ?? promptsOf(task)[0].prompt.fr,
     task.prompt.en ?? task.prompt.fr);
-  const gated = (task.gate ?? []).some((g) => g.id === 'off_topic');
+  const rule = (task.gate ?? []).find((g) => g.id === 'off_topic');
+  if (!rule) continue;
+  const need = rule.id === 'off_topic' ? rule.minKeywordHits : 2;
   const variants = promptsOf(task).slice(1);
-  const missing = variants.filter((p) => !p.topicKeywords?.length).map((p) => p.id);
-  if (gated && missing.length)
-    console.log(`     ${task.id} gates on off_topic and ${missing.length} of its situations carry no keywords of their own — safe only while the sitting serves situation one`);
+  t(`${examId} · ${task.id}: every situation carries its own keywords`,
+    variants.filter((p) => !p.topicKeywords?.length).map((p) => p.id).join(',') || 'none missing',
+    'none missing');
+
+  // Situation one's set is the task's, by the documented fallback.
+  const sets = promptsOf(task).map((p) => ({ id: p.id, kw: new Set((p.topicKeywords ?? task.topicKeywords).map((w) => w.toLocaleLowerCase())) }));
+  for (let i = 0; i < sets.length; i++)
+    for (let j = i + 1; j < sets.length; j++) {
+      const shared = [...sets[i].kw].filter((w) => sets[j].kw.has(w));
+      // `minKeywordHits` of shared words means an answer to one situation can
+      // clear the other's gate — the sets would not be telling them apart.
+      t(`${examId} · ${sets[i].id} vs ${sets[j].id}: fewer than ${need} shared keywords`,
+        shared.length < need ? 'ok' : `shares ${shared.join(', ')}`,
+        'ok');
+    }
 }
 
 console.log('\n5. Destinations that share an exam do not open on the same situation\n');

@@ -41,7 +41,8 @@
  */
 import { newServeState, type ServeState } from '../engine/pool';
 import { serveEpreuve } from '../engine/comprehension';
-import type { ComprehensionSection, Recording } from './types';
+import { promptsOf, servePromptWith, seedFor, type ServedPrompt } from '../engine/productionPool';
+import type { ComprehensionSection, Recording, TaskDefinition } from './types';
 
 export const EPREUVE_KEY = 'selm_exam_epreuve_memory_v1';
 
@@ -121,4 +122,49 @@ export function paperFor(
   const paper = serveEpreuve(section, st);
   saveEpreuveState(section.id, st);
   return { paper, drew: true };
+}
+
+/**
+ * The SITUATION one sitting sets for a production task — restored if this
+ * sitting already has one, drawn from the durable memory if it does not.
+ *
+ * The comprehension half of this file fixed the same defect for documents.
+ * This is the expression half: `TaskPage` rendered `task.prompt`, situation
+ * one, so a candidate who sat the mock four times wrote the same letter four
+ * times, and three candidates on three destinations wrote it on the same day.
+ *
+ * The destination rotation is the one `productionPool.seedFor` already
+ * defines, and it claims nothing about difficulty — a tâche is the same tâche
+ * at every level, and what changes with the level is what a sufficient answer
+ * looks like, not which situation is asked.
+ */
+export function situationFor(
+  task: TaskDefinition,
+  stored: string | undefined,
+  destinationsSharingThisExam: readonly string[],
+  goalId: string | null | undefined,
+): { situation: ServedPrompt; drew: boolean } {
+  if (stored) {
+    const found = promptsOf(task).find((p) => p.id === stored);
+    if (found) {
+      const all = promptsOf(task);
+      return {
+        situation: {
+          id: found.id,
+          prompt: found.prompt,
+          total: all.length,
+          unseen: 0,
+          recycled: false,
+          topicKeywords: found.topicKeywords,
+        },
+        drew: false,
+      };
+    }
+    // A stored situation the task no longer holds — the bank was edited under
+    // a sitting. Draw rather than fall back to situation one silently.
+  }
+  const st = loadEpreuveState(`task:${task.id}`);
+  const situation = servePromptWith(task, st, seedFor(destinationsSharingThisExam, goalId));
+  saveEpreuveState(`task:${task.id}`, st);
+  return { situation, drew: true };
 }
