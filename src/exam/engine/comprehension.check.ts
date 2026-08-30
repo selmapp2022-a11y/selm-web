@@ -93,6 +93,14 @@ for (const s of sections) {
   // z = 3.3, and twelve of the eighteen items written on 2026-08-28 were the
   // cause — at B1 and B2 the RIGHT answer is the nuanced one, and nuance
   // takes words, so a candidate reading no French could score by length.
+  //
+  // A VACUITY GUARD, added 31 August after a case in `author.check.ts` was
+  // found printing `ok` while asserting nothing. A z-score on a handful of
+  // items is not evidence of anything: with four items the standard deviation
+  // is large enough that no realistic bias reaches z = 2, so a thin section
+  // passes this line by being thin. The floor is stated rather than assumed.
+  const ENOUGH = 20;
+  ok(s.items.length >= ENOUGH, `${s.id}: enough items for the z-scores to mean anything`, `${s.items.length} (need ${ENOUGH})`);
   const expected = s.items.length * 0.25;
   const sd = Math.sqrt(s.items.length * 0.25 * 0.75);
   const z = (longest - expected) / sd;

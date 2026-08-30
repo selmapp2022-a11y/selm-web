@@ -78,6 +78,13 @@ function checkSection(exam: ExamDefinition, sec: ComprehensionSection) {
       if (v.skipped) { skipped += 1; continue; }
       if (!v.pass) { outside += 1; console.log(`     outside: ${r.id} ${r.level} — ${v.reasons.join('; ')}`); }
     }
+    // A VACUITY GUARD, added 31 August. `outside === 0` is satisfied by there
+    // being nothing to measure, and a bank with every passage marked as an
+    // anchor — or every passage too short — would print this line green while
+    // asserting nothing at all. The same shape as the case in
+    // `author.check.ts` that went green when the bank grew: an assertion
+    // satisfied by absence. So the count is asserted before the result is.
+    t('there is something to measure at all', measured.length - skipped > 0, true);
     t(`all ${measured.length - skipped} measurable non-anchor passages sit inside the ladder`, outside, 0);
     if (skipped) console.log(`     ${skipped} were too short to measure and are recorded as unmeasured, not as passed`);
 

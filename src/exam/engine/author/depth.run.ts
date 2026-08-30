@@ -37,10 +37,12 @@ import { blueprintsFor } from './blueprint';
 import { ingest, summarise } from './ingest';
 import type { AnchorVerdict, Band, Candidate } from './types';
 import { BANDS } from './types';
-import type { ComprehensionItem, ComprehensionSection, Recording } from '../../model/types';
+import type { ComprehensionItem, ComprehensionSection } from '../../model/types';
+// The version lives with the instructions, so an item's provenance names the
+// rules it was actually written under.
+import { PROMPT_VERSION } from './instructions';
 
 const AUTHOR = 'claude-opus-5 (SELM executing session)';
-const PROMPT_VERSION = 'reading-depth-2026-08-30';
 const SOURCE = 'ielts.org — General Training Reading: three sections rising in difficulty, 40 questions in 60 minutes.';
 
 type Raw = {
