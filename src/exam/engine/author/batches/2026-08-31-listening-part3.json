@@ -1,0 +1,397 @@
+[
+ {
+  "id": "gt-l-p3-v2",
+  "family": "discussion",
+  "level": "C1",
+  "freshness": "current",
+  "part": {
+   "en": "Part 3",
+   "fr": "Partie 3"
+  },
+  "speakers": 2,
+  "script": "Now turn to Part three. You will hear two students, Rachel and Tomás, deciding what to do about an experiment that did not work. First, you have some time to look at questions twenty-one to thirty.\n— So. Run four is wrong and we both know it.\n— I don't know that it's wrong. I know it doesn't match the other three.\n— Which is what wrong means, Tomás.\n— No, it is what anomalous means, and the difference matters here: wrong would mean that we made a mistake somewhere, and I have been through the log twice without finding one.\n— The temperature drifted.\n— It drifted by half a degree, which is comfortably inside the tolerance we wrote down before we started, so if half a degree is enough to move the result that far then the interesting finding is the half degree rather than the run.\n— Or the probe was failing.\n— That I'll grant you. The probe is nine years old and the calibration certificate expired in March.\n— So we have two candidate explanations and no way to choose between them.\n— We have one way. Repeat run four with the new probe.\n— Which costs us a fortnight we don't have.\n— Then here is the honest question. What do we write if we don't repeat it?\n— We write that we observed an anomaly, we set out both explanations as fairly as we can, and we say plainly that we were not able to distinguish between them with the runs we had.\n— And Doctor Ellis will ask why we didn't repeat it.\n— And we answer that a repeat would have cost two weeks which we judged were better spent on the other four runs, which is a defensible position even though it is not a comfortable one to defend.\n— I'd rather be uncomfortable and honest than comfortable and quiet. But I still want the repeat.\n— Say why.\n— Because if the probe is genuinely failing then runs one to three are suspect as well, and we have already written three-quarters of a report resting on them.\n— That is a much better argument than the one you started with.\n— I know. I got there while you were talking.\n— All right. We repeat run four, and we do it with the borrowed probe from the second lab rather than waiting for ours to be calibrated.\n— Can we borrow it?\n— Marta says yes if we book it for a morning, because the second lab uses it in the afternoons and she is not willing to move that for us.\n— A morning is enough for one run, provided we set the bath up the night before and leave it running so the temperature has settled by the time we get there.\n— Then that's the plan. And whichever way it comes out, the anomaly goes in the report. If the repeat matches the others we say the first attempt was instrument error and we caught it. If it doesn't, we've found something.\n— And if the repeat is different from both?\n— Then we have a very short discussion with Doctor Ellis and a much longer chapter.\nThat is the end of Part three.",
+  "matchingGroup": {
+   "id": "gt-l-p3-v2-who",
+   "instruction": "Who makes each point about the experiment? Write the correct letter, A, B or C, next to questions twenty-one to twenty-six.",
+   "options": [
+    {
+     "id": "A",
+     "label": "Rachel"
+    },
+    {
+     "id": "B",
+     "label": "Tomás"
+    },
+    {
+     "id": "C",
+     "label": "both, once they agree"
+    }
+   ],
+   "reusable": true
+  },
+  "items": [
+   {
+    "id": "gt-l-p3-v2-01",
+    "kind": "matching",
+    "groupId": "gt-l-p3-v2-who",
+    "stem": "Run four is simply wrong",
+    "answer": "A",
+    "rationale": "She states it flatly and he refuses the word, drawing the distinction between wrong and anomalous that the whole exchange rests on."
+   },
+   {
+    "id": "gt-l-p3-v2-02",
+    "kind": "matching",
+    "groupId": "gt-l-p3-v2-who",
+    "stem": "A half-degree drift would itself be the finding",
+    "answer": "B",
+    "rationale": "He points out the drift is inside the tolerance they agreed in advance, so the effect rather than the error becomes the interesting result."
+   },
+   {
+    "id": "gt-l-p3-v2-03",
+    "kind": "matching",
+    "groupId": "gt-l-p3-v2-who",
+    "stem": "The probe may be at fault",
+    "answer": "A",
+    "rationale": "She raises it and he concedes at once with the age of the probe and the expired certificate, which is agreement rather than authorship."
+   },
+   {
+    "id": "gt-l-p3-v2-04",
+    "kind": "matching",
+    "groupId": "gt-l-p3-v2-who",
+    "stem": "A failing probe would make the earlier runs suspect",
+    "answer": "A",
+    "rationale": "This is her second argument, and he says explicitly that it is much better than the one she began with."
+   },
+   {
+    "id": "gt-l-p3-v2-05",
+    "kind": "matching",
+    "groupId": "gt-l-p3-v2-who",
+    "stem": "Not repeating it is defensible but uncomfortable",
+    "answer": "B",
+    "rationale": "He supplies both the answer they would give the tutor and the judgement that it is defensible without being comfortable."
+   },
+   {
+    "id": "gt-l-p3-v2-06",
+    "kind": "matching",
+    "groupId": "gt-l-p3-v2-who",
+    "stem": "The anomaly goes in the report either way",
+    "answer": "C",
+    "rationale": "Reached at the end, after the plan is settled, and stated as a shared conclusion rather than proposed by one of them."
+   },
+   {
+    "id": "gt-l-p3-v2-07",
+    "kind": "choice",
+    "stem": "Why does Tomás object to calling run four wrong?",
+    "options": [
+     "He checked the log twice",
+     "Wrong would imply an error",
+     "The tolerance was never agreed"
+    ],
+    "correct": 1,
+    "rationale": "He separates the two words: anomalous means it does not match, and wrong would mean they made a mistake he cannot find."
+   },
+   {
+    "id": "gt-l-p3-v2-08",
+    "kind": "choice",
+    "stem": "What finally persuades him to repeat the run?",
+    "options": [
+     "The cost of two weeks",
+     "The risk to the earlier runs",
+     "The expired certificate"
+    ],
+    "correct": 1,
+    "rationale": "He calls her second argument much better than her first, and it is the one about runs one to three being suspect."
+   },
+   {
+    "id": "gt-l-p3-v2-09",
+    "kind": "choice",
+    "stem": "How will they get a working probe?",
+    "options": [
+     "Borrow one for a morning",
+     "Wait for theirs to be calibrated",
+     "Hire one for the fortnight"
+    ],
+    "correct": 0,
+    "rationale": "Marta allows a morning and not a whole day, and a morning is stated to be enough for one run, so the alternative is explicitly set aside."
+   },
+   {
+    "id": "gt-l-p3-v2-10",
+    "kind": "choice",
+    "stem": "What will they report if the repeat matches the other runs?",
+    "options": [
+     "That the instrument was at fault",
+     "That the anomaly was real",
+     "That the tolerance was too wide"
+    ],
+    "correct": 0,
+    "rationale": "He sets out both outcomes in advance, and the matching case is the one they will describe as an error they caught."
+   }
+  ]
+ },
+ {
+  "id": "gt-l-p3-v3",
+  "family": "discussion",
+  "level": "C1",
+  "freshness": "current",
+  "part": {
+   "en": "Part 3",
+   "fr": "Partie 3"
+  },
+  "speakers": 2,
+  "script": "Now turn to Part three. You will hear a student, Nadia, discussing a draft dissertation chapter with her supervisor. First, you have some time to look at questions twenty-one to thirty.\n— Come in, Nadia. I've read the chapter twice, which is more than I usually manage, and I want to start with what is working.\n— That would be a change.\n— The literature section is genuinely good, because you have organised it by argument rather than by decade, which almost nobody manages at this stage, and the effect of doing it that way is that a reader can see immediately what is actually contested and what is merely repeated.\n— That took the longest.\n— It shows, and it was worth it. The methods section is where I want to spend our time.\n— I thought it might be.\n— You describe what you did very clearly. What you do not do is say why you did it that way rather than another way. At the moment a reader has to take the design on trust.\n— I assumed that was obvious from the research question.\n— It is obvious to you because you have lived with it for eight months, whereas an examiner who reads the whole thing in a single afternoon has no way of telling an unstated reason from an absent one, so an unjustified choice reads as a choice you did not know you were making.\n— So I need a paragraph on why interviews rather than a survey.\n— A paragraph, and one on why twelve interviews rather than thirty. Not an apology. A reason.\n— Right.\n— Now, the sample. You have twelve participants and eleven of them are from the same organisation.\n— I know. I could not get access anywhere else in the time.\n— That is a perfectly good answer and it belongs in the text rather than in this room. What worries me is not the eleven from one organisation, which is defensible if you say why, but that the chapter as it stands reads as though you selected them deliberately.\n— Whereas actually they were who would speak to me.\n— Exactly. Write that. A limitation you have named is a limitation you have controlled; a limitation the examiner finds is something else entirely.\n— And the analysis?\n— Thin, but not wrong. You have coded the transcripts carefully and then reported the codes back to me, which is a description rather than an analysis, and what is missing is the step where you say what the pattern actually means. I would rather read three claims you are prepared to defend under questioning than nine you are merely reporting because you found them.\n— Three feels like very few.\n— Three defended claims is a chapter. Nine undefended ones is a list.\n— When do you need the revision?\n— The submission is the twentieth, and I would like the revision by the thirteenth, although I will be honest with you that the date is mine rather than the faculty's, because a week is what I need to read something properly instead of quickly.\n— The thirteenth is tight but possible.\n— If it is not possible, tell me on Monday rather than on the twelfth. I can do a great deal on Monday and almost nothing on the twelfth.\nThat is the end of Part three.",
+  "matchingGroup": {
+   "id": "gt-l-p3-v3-verdict",
+   "instruction": "What does the supervisor say about each part of the chapter? Write the correct letter, A, B or C, next to questions twenty-one to twenty-five.",
+   "options": [
+    {
+     "id": "A",
+     "label": "it is already strong"
+    },
+    {
+     "id": "B",
+     "label": "it needs a reason added"
+    },
+    {
+     "id": "C",
+     "label": "it needs to go further than reporting"
+    }
+   ],
+   "reusable": true
+  },
+  "items": [
+   {
+    "id": "gt-l-p3-v3-01",
+    "kind": "matching",
+    "groupId": "gt-l-p3-v3-verdict",
+    "stem": "The literature section",
+    "answer": "A",
+    "rationale": "Praised for being organised by argument rather than by decade, which the supervisor says almost nobody manages at this stage."
+   },
+   {
+    "id": "gt-l-p3-v3-02",
+    "kind": "matching",
+    "groupId": "gt-l-p3-v3-verdict",
+    "stem": "The description of the method",
+    "answer": "B",
+    "rationale": "Clear about what was done and silent about why, so the design has to be taken on trust — the missing element is justification, not clarity."
+   },
+   {
+    "id": "gt-l-p3-v3-03",
+    "kind": "matching",
+    "groupId": "gt-l-p3-v3-verdict",
+    "stem": "The number of interviews",
+    "answer": "B",
+    "rationale": "Twelve rather than thirty needs a reason and explicitly not an apology, which is the distinction the supervisor draws."
+   },
+   {
+    "id": "gt-l-p3-v3-04",
+    "kind": "matching",
+    "groupId": "gt-l-p3-v3-verdict",
+    "stem": "The account of who the participants were",
+    "answer": "B",
+    "rationale": "The problem is not the eleven from one organisation but that the chapter implies she chose them, so what is missing is again the reason."
+   },
+   {
+    "id": "gt-l-p3-v3-05",
+    "kind": "matching",
+    "groupId": "gt-l-p3-v3-verdict",
+    "stem": "The analysis of the transcripts",
+    "answer": "C",
+    "rationale": "Coded carefully and then reported, with the interpretive step absent — thin but not wrong, which rules out both other verdicts."
+   },
+   {
+    "id": "gt-l-p3-v3-06",
+    "kind": "choice",
+    "stem": "Why does the supervisor say the design looks unjustified?",
+    "options": [
+     "The research question is unclear",
+     "It is obvious to her alone",
+     "The method was chosen too late"
+    ],
+    "correct": 1,
+    "rationale": "She has lived with it for eight months; an examiner reads it in an afternoon and cannot distinguish an unstated reason from an absent one."
+   },
+   {
+    "id": "gt-l-p3-v3-07",
+    "kind": "choice",
+    "stem": "What does he say about a limitation?",
+    "options": [
+     "It should be left for the examiner to raise",
+     "Naming it is what puts it under control",
+     "It should be removed from the chapter"
+    ],
+    "correct": 1,
+    "rationale": "A limitation named is controlled and one the examiner finds is something else, which is the contrast the whole exchange turns on."
+   },
+   {
+    "id": "gt-l-p3-v3-08",
+    "kind": "choice",
+    "stem": "How many claims does he want the analysis to defend?",
+    "options": [
+     "Three",
+     "Nine",
+     "As many as the codes support"
+    ],
+    "correct": 0,
+    "rationale": "Nine is the number she currently reports; three defended claims are called a chapter and nine undefended ones a list."
+   },
+   {
+    "id": "gt-l-p3-v3-09",
+    "kind": "choice",
+    "stem": "Why does he ask for the revision by the thirteenth?",
+    "options": [
+     "The faculty requires it",
+     "So that he has a week",
+     "So that she can rest before submission"
+    ],
+    "correct": 1,
+    "rationale": "He states the reason and volunteers that it is his own rather than the faculty's, which is what rules out the first option."
+   },
+   {
+    "id": "gt-l-p3-v3-10",
+    "kind": "choice",
+    "stem": "What does he ask her to do if the date is impossible?",
+    "options": [
+     "Tell him on Monday",
+     "Tell him on the twelfth",
+     "Submit what she has"
+    ],
+    "correct": 0,
+    "rationale": "He can do a great deal on Monday and almost nothing on the twelfth, so the request is about his own capacity rather than politeness."
+   }
+  ]
+ },
+ {
+  "id": "gt-l-p3-v4",
+  "family": "discussion",
+  "level": "C1",
+  "freshness": "current",
+  "part": {
+   "en": "Part 3",
+   "fr": "Partie 3"
+  },
+  "speakers": 2,
+  "script": "Now turn to Part three. You will hear two students, Callum and Ines, reviewing a group presentation they have just given. First, you have some time to look at questions twenty-one to thirty.\n— Well. That was not a disaster.\n— It was not a disaster, and what I would like to do while it is still fresh is work out why it so nearly was, because in a fortnight we will remember only that it went acceptably.\n— Go on, then. Start with the opening.\n— The opening was the strongest thing we did and it was also the part we rehearsed least, which bothers me rather more than anything that actually went wrong.\n— It bothers me too. I think it worked because we were nervous and therefore brief.\n— Possibly. The slides, though.\n— The slides were too full, and since I wrote them I will own that entirely: fourteen lines on a single slide is not a slide at all but a handout with a projector pointed at it.\n— I'd say the problem was not the number of lines. It was that you read them.\n— That's fair. Once the words are up there I cannot stop myself.\n— Then next time we put four words on a slide and you have to say the rest.\n— Agreed, although I will hate it.\n— The data section is the one I am least sure about. I thought it went well.\n— It went well for the two of us, but watch the room in the recording, because the moment the third graph appeared six people in the front half looked down at their phones.\n— Because the graph was unreadable at the back.\n— Partly, although I think the larger reason is that it was the third graph inside ninety seconds and not one of them arrived with a sentence attached saying what a reader was supposed to take from it.\n— So fewer graphs, and a sentence each.\n— One graph, with thirty seconds spent on it, because I would rather they walked out remembering one thing properly than four things approximately.\n— What about the questions at the end? I thought that was the weak part.\n— That is where I disagree with you, because I think the questions were the best evidence we have that anybody was listening at all: we answered four of them and three were about the method rather than the conclusion.\n— Which we had not practised at all.\n— And still answered. That is worth noticing rather than worrying about.\n— The timing, though. We ran to nineteen minutes on a fifteen-minute slot.\n— Which was my fault rather than yours, since I was the one who added the case study on the morning without taking anything out to make room for it.\n— It was a good case study.\n— It was a good case study in the wrong presentation, which is a different thing, and the rule we should take from it is that if something is added on the morning then something else has to come out on the morning.\n— That's the rule, then. And the marks come back when?\n— Two weeks, apparently. Although Doctor Reyes said last year's took four.\n— Then I am not going to think about them until the fourth week.\n— Sensible. One last thing while we are being honest with each other. I nearly did not come this morning.\n— I know. You said so in the corridor.\n— I am glad that I did, because half of what we have just worked out I would have forgotten entirely by Thursday, and the other half I would have remembered wrongly and then told you about with complete confidence.\n— That is the most accurate thing you have said today.\nThat is the end of Part three.",
+  "matchingGroup": {
+   "id": "gt-l-p3-v4-view",
+   "instruction": "Who holds each view about the presentation? Write the correct letter, A, B or C, next to questions twenty-one to twenty-five.",
+   "options": [
+    {
+     "id": "A",
+     "label": "Callum"
+    },
+    {
+     "id": "B",
+     "label": "Ines"
+    },
+    {
+     "id": "C",
+     "label": "both of them"
+    }
+   ],
+   "reusable": true
+  },
+  "items": [
+   {
+    "id": "gt-l-p3-v4-01",
+    "kind": "matching",
+    "groupId": "gt-l-p3-v4-view",
+    "stem": "The opening was the strongest part",
+    "answer": "B",
+    "rationale": "She raises it and says it bothers her that the least rehearsed part worked best; he agrees only afterwards and offers an explanation."
+   },
+   {
+    "id": "gt-l-p3-v4-02",
+    "kind": "matching",
+    "groupId": "gt-l-p3-v4-view",
+    "stem": "The trouble with the slides was reading them aloud",
+    "answer": "B",
+    "rationale": "He blames the number of lines and she corrects him — the problem was not the count but that he read them, which he then concedes."
+   },
+   {
+    "id": "gt-l-p3-v4-03",
+    "kind": "matching",
+    "groupId": "gt-l-p3-v4-view",
+    "stem": "The data section went well",
+    "answer": "A",
+    "rationale": "He thought so and she disagrees using the recording, so the view belongs to one of them and is then argued against."
+   },
+   {
+    "id": "gt-l-p3-v4-04",
+    "kind": "matching",
+    "groupId": "gt-l-p3-v4-view",
+    "stem": "The questions at the end were the weakest part",
+    "answer": "A",
+    "rationale": "He calls it the weak part and she explicitly disagrees, treating the questions as evidence the audience was listening."
+   },
+   {
+    "id": "gt-l-p3-v4-05",
+    "kind": "matching",
+    "groupId": "gt-l-p3-v4-view",
+    "stem": "Something added late must displace something else",
+    "answer": "C",
+    "rationale": "He proposes it about his own case study and she names it as the rule, so the agreement is reached rather than stated by one of them."
+   },
+   {
+    "id": "gt-l-p3-v4-06",
+    "kind": "choice",
+    "stem": "What do they agree to do about slides next time?",
+    "options": [
+     "Say the rest from four words",
+     "Print a handout instead",
+     "Remove the slides entirely"
+    ],
+    "correct": 0,
+    "rationale": "The rule is proposed with the discomfort attached — he agrees and adds that he will hate it, which is what marks it as accepted."
+   },
+   {
+    "id": "gt-l-p3-v4-07",
+    "kind": "choice",
+    "stem": "What evidence does Ines give about the data section?",
+    "options": [
+     "The tutor's comment",
+     "The audience in the recording",
+     "Their own marks"
+    ],
+    "correct": 1,
+    "rationale": "Six people looked at their phones when the third graph appeared, which she offers as evidence against his impression."
+   },
+   {
+    "id": "gt-l-p3-v4-08",
+    "kind": "choice",
+    "stem": "What do they decide about graphs?",
+    "options": [
+     "One graph with thirty seconds on it",
+     "Three graphs with a sentence each",
+     "Larger versions of the same three"
+    ],
+    "correct": 0,
+    "rationale": "He suggests fewer with a sentence each and she goes further, preferring one thing remembered — the final position is hers."
+   },
+   {
+    "id": "gt-l-p3-v4-09",
+    "kind": "choice",
+    "stem": "Why did the presentation overrun?",
+    "options": [
+     "The questions took too long",
+     "A case study was added that morning",
+     "The graphs were reloaded"
+    ],
+    "correct": 1,
+    "rationale": "She names it as her own fault and calls it a good case study in the wrong presentation, which is why the answer is not a criticism of it."
+   },
+   {
+    "id": "gt-l-p3-v4-10",
+    "kind": "choice",
+    "stem": "When do they expect the marks?",
+    "options": [
+     "In two weeks, though last year took four",
+     "In four weeks, as last year",
+     "At the end of term"
+    ],
+    "correct": 0,
+    "rationale": "Two weeks is what they are told and the four is a remembered precedent, so the answer has to hold both without choosing the precedent."
+   }
+  ]
+ }
+]

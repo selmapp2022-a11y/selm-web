@@ -193,10 +193,28 @@ function checkSection(exam: ExamDefinition, sec: ComprehensionSection) {
     const max = Math.max(...lens);
     if (lens[it.answer] === max && lens.filter((l) => l === max).length === 1) longest += 1;
   }
-  const sd = Math.sqrt(choices.length * 0.25 * 0.75);
-  const z = choices.length ? (Math.max(...pos) - choices.length / 4) / sd : 0;
-  console.log(`     key position A/B/C/D: ${pos.join(' / ')}   (even would be ${(choices.length / 4).toFixed(1)} each)`);
-  console.log(`     worst position is ${z.toFixed(2)} sd from chance; the longest option is the key ${longest} of ${choices.length}`);
+  // EXPECTED PER POSITION, NOT ONE QUARTER EACH.
+  //
+  // A three-option question can never key D. IELTS Part 3 asks three-option
+  // questions and Part 2 asks four-option ones, so a bank holding both has a
+  // genuinely uneven expectation — D is reachable by only some of the items —
+  // and a flat quarter would report a skew that is arithmetic rather than
+  // authoring. Found on 31 August, when fourteen three-option items entered
+  // the listening bank and the flat model called the result 3.4 sigma.
+  //
+  // Each item contributes 1/n to each of its own n positions, which is the
+  // expectation under a candidate guessing at random within each question.
+  const expected = [0, 0, 0, 0];
+  for (const it of choices) for (let k = 0; k < it.options.length; k++) expected[k] += 1 / it.options.length;
+  let z = 0;
+  for (let k = 0; k < 4; k++) {
+    const e = expected[k];
+    if (e <= 0) continue;
+    const sd = Math.sqrt(e * (1 - e / Math.max(1, choices.length)));
+    z = Math.max(z, (pos[k] - e) / (sd || 1));
+  }
+  console.log(`     key position A/B/C/D: ${pos.join(' / ')}   (expected ${expected.map((e) => e.toFixed(1)).join(' / ')})`);
+  console.log(`     worst position is ${z.toFixed(2)} sd from its own expectation; the longest option is the key ${longest} of ${choices.length}`);
   // A TWENTY-ITEM FLOOR ON THE POSITION TEST, and it is not a let-off.
   //
   // IELTS listening holds seven multiple-choice items among its forty

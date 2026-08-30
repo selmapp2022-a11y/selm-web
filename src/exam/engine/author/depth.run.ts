@@ -98,8 +98,14 @@ const results = raws.map((raw) => {
     if (q.kind && q.kind !== 'choice') return { ...base, ...q } as unknown as ComprehensionItem;
     // Rotate so the key is not always the option written first. Cyclic, so the
     // distractors keep the order they were composed in.
-    const target = n++ % 4;
-    const shift = ((q.correct! - target) % 4 + 4) % 4;
+    //
+    // Modulo the OPTION COUNT, not modulo four. IELTS Part 3 asks three-option
+    // questions, and a target of 3 in a list of three is out of range — the
+    // gate would have caught it as `options.answer-out-of-range`, which is a
+    // true report of a bug in this runner rather than in the item.
+    const k = q.options!.length;
+    const target = n++ % k;
+    const shift = ((q.correct! - target) % k + k) % k;
     const options = [...q.options!.slice(shift), ...q.options!.slice(0, shift)];
     return { ...base, options, answer: target } as ComprehensionItem;
   });
