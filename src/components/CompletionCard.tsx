@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, LineChart, CheckCircle2 } from 'lucide-react';
 import { type SkillKey, recordAttempt } from '../lib/attempts';
+import { ts, useUiLangValue } from '../i18n';
 
 type Props = {
   skill: SkillKey;
@@ -35,7 +36,9 @@ type Props = {
  * as readily as on 10 out of 10. A product whose entire claim is that it will
  * not tell a candidate something it cannot defend should not open with that.
  */
-export function CompletionCard({ skill, topic, itemId, score, total, onNext, nextLabel = 'Continue with another', extra }: Props) {
+export function CompletionCard({ skill, topic, itemId, score, total, onNext, nextLabel, extra }: Props) {
+  const ui = useUiLangValue();
+  nextLabel = nextLabel ?? ts('common.continueWithAnother', ui);
   // Record exactly once, even under React's double-invoked effects in dev.
   const written = useRef(false);
   useEffect(() => {
@@ -85,7 +88,7 @@ export function CompletionCard({ skill, topic, itemId, score, total, onNext, nex
           {nextLabel} <ArrowRight className="h-4 w-4" />
         </button>
         <Link to="/progress" className="btn-secondary flex-1 justify-center">
-          <LineChart className="h-4 w-4" /> Progress
+          <LineChart className="h-4 w-4" /> {ts('nav.progress', ui)}
         </Link>
       </div>
     </div>

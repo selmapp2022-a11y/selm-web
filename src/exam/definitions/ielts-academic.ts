@@ -147,7 +147,11 @@ export const IELTS_ACADEMIC: ExamDefinition = {
             },
             {
               id: 'ac-w-t2-p3',
-              topicKeywords: ['research', 'published', 'public', 'access', 'journals', 'paid', 'knowledge', 'funding'],
+              // 'research' and 'funding' were here and are situation one's;
+              // two shared keywords is what `productionPool.check` refuses, and
+              // the `off_topic` gate awards ZERO on a miss, so a situation's
+              // words have to be the ones only ITS answer will use.
+              topicKeywords: ['taxpayers', 'journals', 'publish', 'open', 'readers', 'subscription', 'access', 'paid'],
               freshness: 'current',
               prompt: {
                 en: 'Research paid for by taxpayers is often published in journals that charge readers to see it. To what extent do you agree that all publicly funded research should be free to read?',

@@ -127,7 +127,7 @@ export default function OnboardingPage() {
               Today's name. The question that used to be the heading is still
               the first thing read — it just is not pretending to be the page's
               name, which is what made the app read as assembled. */}
-          <h1 className="font-display text-3xl font-bold text-navy">Today</h1>
+          <h1 className="font-display text-3xl font-bold text-navy">{t('nav.today')}</h1>
           <p className="mt-1 font-display text-xl font-bold text-navy">{t('onboarding.title')}</p>
           <p className="mt-1 text-ink-secondary">{t('onboarding.subtitle')}</p>
         </header>

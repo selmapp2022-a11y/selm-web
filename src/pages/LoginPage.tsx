@@ -7,9 +7,11 @@ import { goNext, safeNext } from '../lib/nextPath';
 import { Logo } from '../components/Logo';
 import { Eye, EyeOff } from 'lucide-react';
 import { Capacitor } from '@capacitor/core';
+import { ts, useUiLangValue } from '../i18n';
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const ui = useUiLangValue();
   const { setUser } = useAuthStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -91,12 +93,12 @@ export default function LoginPage() {
           <Logo />
         </div>
         <div className="card p-8">
-          <h1 className="text-2xl font-display font-bold text-navy mb-1">Welcome back</h1>
-          <p className="text-ink-secondary mb-6">Sign in to continue your English journey.</p>
+          <h1 className="text-2xl font-display font-bold text-navy mb-1">{ts('auth.welcomeBack', ui)}</h1>
+          <p className="text-ink-secondary mb-6">{ts('auth.signInBlurb', ui)}</p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="label" htmlFor="email">Email</label>
+              <label className="label" htmlFor="email">{ts('auth.email', ui)}</label>
               <input
                 id="email"
                 type="email"
@@ -104,13 +106,13 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="input"
-                placeholder="you@example.com"
+                placeholder={ts('auth.emailPlaceholder', ui)}
                 autoComplete="email"
               />
             </div>
 
             <div>
-              <label className="label" htmlFor="password">Password</label>
+              <label className="label" htmlFor="password">{ts('auth.password', ui)}</label>
               <div className="relative">
                 <input
                   id="password"
@@ -134,7 +136,7 @@ export default function LoginPage() {
                   to="/forgot-password"
                   className="text-sm font-semibold text-navy hover:underline"
                 >
-                  Forgot password?
+                  {ts('auth.forgot', ui)}
                 </Link>
               </div>
             </div>
@@ -152,7 +154,7 @@ export default function LoginPage() {
                       to="/forgot-password"
                       className="font-semibold text-red-800 underline hover:text-red-900"
                     >
-                      Reset your password →
+                      {ts('auth.resetLink', ui)}
                     </Link>
                   </div>
                 )}
@@ -160,7 +162,7 @@ export default function LoginPage() {
             )}
 
             <button type="submit" disabled={loading} className="btn-primary w-full">
-              {loading ? 'Signing in…' : 'Sign in'}
+              {ts(loading ? 'auth.signingIn' : 'auth.signIn', ui)}
             </button>
           </form>
 
@@ -185,7 +187,7 @@ export default function LoginPage() {
             {/* Divider — separates traditional login from third-party providers. */}
             <div className="my-5 flex items-center gap-3 text-xs uppercase tracking-wider text-ink-secondary">
               <div className="h-px flex-1 bg-slate-200" />
-              <span>or</span>
+              <span>{ts('auth.or', ui)}</span>
               <div className="h-px flex-1 bg-slate-200" />
             </div>
 
@@ -206,15 +208,15 @@ export default function LoginPage() {
               >
                 <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
               </svg>
-              {appleLoading ? 'Signing in…' : 'Sign in with Apple'}
+              {ts(appleLoading ? 'auth.signingIn' : 'auth.signInApple', ui)}
             </button>
             </>
           )}
 
           <p className="mt-6 text-center text-sm text-ink-secondary">
-            New to SELM?{' '}
+            {ts('auth.newToSelm', ui)}{' '}
             <Link to={`/register${window.location.search}`} className="font-semibold text-navy hover:underline">
-              Create an account
+              {ts('auth.createAccount', ui)}
             </Link>
           </p>
         </div>

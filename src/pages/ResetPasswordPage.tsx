@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { auth } from '../lib/api';
 import { Logo } from '../components/Logo';
+import { ts, useUiLangValue } from '../i18n';
 import { Eye, EyeOff } from 'lucide-react';
 
 export default function ResetPasswordPage() {
+  const ui = useUiLangValue();
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const token = params.get('token') || '';
@@ -67,21 +69,19 @@ export default function ResetPasswordPage() {
           <Logo />
         </div>
         <div className="card p-8">
-          <h1 className="text-2xl font-display font-bold text-navy mb-1">Choose a new password</h1>
-          <p className="text-ink-secondary mb-6">
-            Pick something at least 8 characters long. You'll use this to sign in next time.
-          </p>
+          <h1 className="text-2xl font-display font-bold text-navy mb-1">{ts('auth.newPasswordTitle', ui)}</h1>
+          <p className="text-ink-secondary mb-6">{ts('auth.newPasswordBlurb', ui)}</p>
 
           {success ? (
             <div className="space-y-4">
               <div className="rounded-xl border border-teal-200 bg-teal-50 px-4 py-3 text-sm text-teal-800">
-                Password updated. Redirecting you to sign in…
+                {ts('auth.passwordUpdated', ui)}
               </div>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="label" htmlFor="password">New password</label>
+                <label className="label" htmlFor="password">{ts('auth.newPassword', ui)}</label>
                 <div className="relative">
                   <input
                     id="password"
@@ -90,7 +90,7 @@ export default function ResetPasswordPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="input pr-12"
-                    placeholder="At least 8 characters"
+                    placeholder={ts('auth.password8', ui)}
                     autoComplete="new-password"
                     autoFocus
                   />
@@ -105,7 +105,7 @@ export default function ResetPasswordPage() {
               </div>
 
               <div>
-                <label className="label" htmlFor="confirm">Confirm new password</label>
+                <label className="label" htmlFor="confirm">{ts('auth.confirmNewPassword', ui)}</label>
                 <input
                   id="confirm"
                   type={showPw ? 'text' : 'password'}
@@ -113,7 +113,7 @@ export default function ResetPasswordPage() {
                   value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}
                   className="input"
-                  placeholder="Re-enter the password"
+                  placeholder={ts('auth.reenterPassword', ui)}
                   autoComplete="new-password"
                 />
               </div>
@@ -127,7 +127,7 @@ export default function ResetPasswordPage() {
                         to="/forgot-password"
                         className="font-semibold text-red-800 underline hover:text-red-900"
                       >
-                        Request a new reset link →
+                        {ts('auth.requestNewLink', ui)}
                       </Link>
                     </div>
                   )}
@@ -139,14 +139,14 @@ export default function ResetPasswordPage() {
                 disabled={loading || !password || !confirm}
                 className="btn-primary w-full"
               >
-                {loading ? 'Updating…' : 'Set new password'}
+                {ts(loading ? 'auth.updating' : 'auth.setNewPassword', ui)}
               </button>
             </form>
           )}
 
           <p className="mt-6 text-center text-sm text-ink-secondary">
             <Link to="/login" className="font-semibold text-navy hover:underline">
-              Back to sign in
+              {ts('auth.backToSignIn', ui)}
             </Link>
           </p>
         </div>

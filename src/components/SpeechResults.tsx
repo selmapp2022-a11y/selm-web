@@ -2,8 +2,10 @@ import type { SpeechAssessment } from '../lib/speaking';
 import { scoreColor } from '../lib/speaking';
 import { loadPlan } from '../exam/model/plan';
 import clsx from 'clsx';
+import { ts, tf, useUiLangValue } from '../i18n';
 
 export function SpeechResults({ result }: { result: SpeechAssessment }) {
+  const ui = useUiLangValue();
   const overall = scoreColor(result.overall_score);
   // The four labels below (Fluency & Coherence, Lexical Resource, Grammar &
   // Accuracy, Pronunciation) and the heading are IELTS's own criteria. They
@@ -18,33 +20,33 @@ export function SpeechResults({ result }: { result: SpeechAssessment }) {
       <div className={clsx('card p-6 border-l-4', overall.border)}>
         <div className="flex items-center justify-between">
           <div>
-            <div className="text-xs font-medium uppercase tracking-wider text-ink-secondary">Overall</div>
+            <div className="text-xs font-medium uppercase tracking-wider text-ink-secondary">{ts('sr.overall', ui)}</div>
             <div className={clsx('font-display text-5xl font-bold', overall.text)}>
               {result.overall_score}<span className="text-2xl text-ink-secondary">/100</span>
             </div>
             {result.ielts?.overall_band != null && (
               <div className="mt-1 text-sm text-ink-secondary">
-                IELTS band <strong className="text-navy">{result.ielts.overall_band}</strong>
-                {result.ielts.cefr_level && <> · CEFR <strong className="text-navy">{result.ielts.cefr_level}</strong></>}
+                {ts('sr.ieltsBand', ui)} <strong className="text-navy">{result.ielts.overall_band}</strong>
+                {result.ielts.cefr_level && <> · {ts('sr.cefr', ui)} <strong className="text-navy">{result.ielts.cefr_level}</strong></>}
               </div>
             )}
           </div>
           <div className="text-right text-sm">
             {result.fluency_score != null && (
-              <div className="mb-1">Fluency: <strong className="text-navy">{result.fluency_score}</strong></div>
+              <div className="mb-1">{ts('sr.fluency', ui)} <strong className="text-navy">{result.fluency_score}</strong></div>
             )}
             {result.pace_score != null && (
-              <div className="mb-1">Pace: <strong className="text-navy">{result.pace_score} wpm</strong></div>
+              <div className="mb-1">{ts('sr.pace', ui)} <strong className="text-navy">{tf('sr.wpm', { n: result.pace_score }, ui)}</strong></div>
             )}
             {result.pause_count != null && (
-              <div>Pauses: <strong className="text-navy">{result.pause_count}</strong></div>
+              <div>{ts('sr.pauses', ui)} <strong className="text-navy">{result.pause_count}</strong></div>
             )}
           </div>
         </div>
 
         {result.filler_words && result.filler_words.length > 0 && (
           <div className="mt-4 text-sm">
-            <span className="text-ink-secondary">Filler words detected: </span>
+            <span className="text-ink-secondary">{ts('sr.fillers', ui)} </span>
             {result.filler_words.map((w) => (
               <span key={w} className="chip mr-1.5 bg-amber-100 text-amber-700">{w}</span>
             ))}
@@ -53,7 +55,7 @@ export function SpeechResults({ result }: { result: SpeechAssessment }) {
 
         {result.feedback && (
           <div className="mt-4 rounded-xl bg-surface-muted p-4 text-sm text-ink-primary">
-            <strong className="text-navy">Coach: </strong>{result.feedback}
+            <strong className="text-navy">{ts('sr.coach', ui)} </strong>{result.feedback}
           </div>
         )}
       </div>
@@ -61,13 +63,13 @@ export function SpeechResults({ result }: { result: SpeechAssessment }) {
       {/* IELTS bands grid — only on free-form / mode=ielts */}
       {isIelts && result.ielts?.bands && (
         <div className="card p-6">
-          <h4 className="mb-4 font-display text-lg font-bold text-navy">IELTS band breakdown</h4>
+          <h4 className="mb-4 font-display text-lg font-bold text-navy">{ts('sr.bandBreakdown', ui)}</h4>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {[
-              ['Fluency & Coherence', result.ielts.bands.fluencyCoherence],
-              ['Lexical Resource', result.ielts.bands.lexicalResource],
-              ['Grammar & Accuracy', result.ielts.bands.grammarAccuracy],
-              ['Pronunciation', result.ielts.bands.pronunciation],
+              [ts('sr.fluencyCoherence', ui), result.ielts.bands.fluencyCoherence],
+              [ts('sr.lexicalResource', ui), result.ielts.bands.lexicalResource],
+              [ts('sr.grammarAccuracy', ui), result.ielts.bands.grammarAccuracy],
+              [ts('speaking.pronunciation', ui), result.ielts.bands.pronunciation],
             ].map(([label, b]) => {
               const band: any = b;
               const v = band?.band;
@@ -83,10 +85,10 @@ export function SpeechResults({ result }: { result: SpeechAssessment }) {
           {(result.ielts.toefl_score_estimate != null || result.ielts.pte_score_estimate != null) && (
             <div className="mt-4 flex flex-wrap gap-3 text-sm text-ink-secondary">
               {result.ielts.toefl_score_estimate != null && (
-                <span className="chip bg-surface-muted">TOEFL est. <strong className="ml-1 text-navy">{result.ielts.toefl_score_estimate}</strong></span>
+                <span className="chip bg-surface-muted">{ts('sr.toeflEst', ui)} <strong className="ml-1 text-navy">{result.ielts.toefl_score_estimate}</strong></span>
               )}
               {result.ielts.pte_score_estimate != null && (
-                <span className="chip bg-surface-muted">PTE est. <strong className="ml-1 text-navy">{result.ielts.pte_score_estimate}</strong></span>
+                <span className="chip bg-surface-muted">{ts('sr.pteEst', ui)} <strong className="ml-1 text-navy">{result.ielts.pte_score_estimate}</strong></span>
               )}
             </div>
           )}
@@ -97,8 +99,8 @@ export function SpeechResults({ result }: { result: SpeechAssessment }) {
       {result.transcript && result.transcript.trim().length > 0 && (
         <div className="card p-6">
           <div className="mb-3 flex items-center justify-between">
-            <h4 className="font-display text-lg font-bold text-navy">What you said</h4>
-            <span className="text-xs text-ink-secondary">Transcript</span>
+            <h4 className="font-display text-lg font-bold text-navy">{ts('sr.whatYouSaid', ui)}</h4>
+            <span className="text-xs text-ink-secondary">{ts('sr.transcript', ui)}</span>
           </div>
           <p className="rounded-xl bg-surface-muted p-4 text-base leading-relaxed text-ink-primary">
             {result.transcript}
@@ -109,7 +111,7 @@ export function SpeechResults({ result }: { result: SpeechAssessment }) {
       {/* Tips */}
       {result.tips && result.tips.length > 0 && (
         <div className="card p-6">
-          <h4 className="mb-3 font-display text-lg font-bold text-navy">Coach tips</h4>
+          <h4 className="mb-3 font-display text-lg font-bold text-navy">{ts('sr.coachTips', ui)}</h4>
           <ul className="space-y-2 text-sm text-ink-primary">
             {result.tips.map((t, i) => (
               <li key={i} className="rounded-xl border-l-4 border-teal bg-teal/5 p-3">{t}</li>
@@ -121,7 +123,7 @@ export function SpeechResults({ result }: { result: SpeechAssessment }) {
       {/* Grammar issues — original → suggestion */}
       {result.grammar_items && result.grammar_items.length > 0 && (
         <div className="card p-6">
-          <h4 className="mb-3 font-display text-lg font-bold text-navy">Grammar fixes</h4>
+          <h4 className="mb-3 font-display text-lg font-bold text-navy">{ts('sr.grammarFixes', ui)}</h4>
           <div className="space-y-3">
             {result.grammar_items.map((g, i) => (
               <div key={i} className="rounded-xl border-l-4 border-amber-400 bg-amber-50 p-3 text-sm">
@@ -141,8 +143,8 @@ export function SpeechResults({ result }: { result: SpeechAssessment }) {
       {/* Vocabulary upgrades */}
       {result.vocabulary_suggestions && result.vocabulary_suggestions.length > 0 && (
         <div className="card p-6">
-          <h4 className="mb-3 font-display text-lg font-bold text-navy">Stronger words to use</h4>
-          <p className="mb-3 text-xs text-ink-secondary">Replace these basic words with these higher-level alternatives next time.</p>
+          <h4 className="mb-3 font-display text-lg font-bold text-navy">{ts('sr.strongerWords', ui)}</h4>
+          <p className="mb-3 text-xs text-ink-secondary">{ts('sr.strongerWordsHelp', ui)}</p>
           <div className="space-y-2">
             {result.vocabulary_suggestions.map((v, i) => (
               <div key={i} className="flex flex-wrap items-center gap-2 rounded-xl bg-surface-muted p-3 text-sm">
@@ -160,17 +162,17 @@ export function SpeechResults({ result }: { result: SpeechAssessment }) {
       {/* Pronunciation top errors with phoneme detail */}
       {result.pronunciation_top_errors && result.pronunciation_top_errors.length > 0 && (
         <div className="card p-6">
-          <h4 className="mb-3 font-display text-lg font-bold text-navy">Sounds to practise</h4>
+          <h4 className="mb-3 font-display text-lg font-bold text-navy">{ts('sr.soundsToPractise', ui)}</h4>
           <div className="space-y-3">
             {result.pronunciation_top_errors.map((p, i) => (
               <div key={i} className="rounded-xl bg-surface-muted p-3 text-sm">
                 <div className="mb-1">
                   <span className="font-mono text-base text-navy">/{p.phoneme}/</span>
-                  {p.count != null && <span className="ml-2 text-xs text-ink-secondary">slipped {p.count}×</span>}
+                  {p.count != null && <span className="ml-2 text-xs text-ink-secondary">{tf('sr.slipped', { n: p.count }, ui)}</span>}
                 </div>
                 {p.examples && p.examples.length > 0 && (
                   <div className="mt-1 text-xs text-ink-secondary">
-                    Examples: {p.examples.map((e) => e.text).filter(Boolean).slice(0, 5).join(', ')}
+                    {ts('sr.examples', ui)} {p.examples.map((e) => e.text).filter(Boolean).slice(0, 5).join(', ')}
                   </div>
                 )}
               </div>
@@ -182,7 +184,7 @@ export function SpeechResults({ result }: { result: SpeechAssessment }) {
       {/* Word-by-word (mostly for Pronunciation tab where reference matched) */}
       {result.word_scores.length > 0 && (
         <div className="card p-6">
-          <h4 className="mb-4 font-display text-lg font-bold text-navy">Word-by-word</h4>
+          <h4 className="mb-4 font-display text-lg font-bold text-navy">{ts('sr.wordByWord', ui)}</h4>
           <div className="flex flex-wrap gap-2">
             {result.word_scores.map((w, i) => {
               const c = scoreColor(w.quality_score);
@@ -208,7 +210,7 @@ export function SpeechResults({ result }: { result: SpeechAssessment }) {
               );
             })}
           </div>
-          <p className="mt-3 text-xs text-ink-secondary">Hover any word to see phoneme-level scores.</p>
+          <p className="mt-3 text-xs text-ink-secondary">{ts('sr.hoverHelp', ui)}</p>
         </div>
       )}
     </div>

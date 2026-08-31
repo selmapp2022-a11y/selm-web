@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { BackToPractice } from '../components/BackToPractice';
 import { ComprehensionPractice } from '../components/ComprehensionPractice';
 import { examNameForPractice } from '../lib/practiceTasks';
+import { ts, tf, useUiLangValue } from '../i18n';
 
 /**
  * Listening — the exam's own listening section, and nothing else.
@@ -46,6 +47,7 @@ import { examNameForPractice } from '../lib/practiceTasks';
  * way until the listening bank is rendered.
  */
 export default function ListeningPage() {
+  const ui = useUiLangValue();
   const [examName, setExamName] = useState<string | null>(null);
   useEffect(() => { examNameForPractice().then(setExamName); }, []);
 
@@ -53,9 +55,9 @@ export default function ListeningPage() {
     <div className="space-y-6">
       <BackToPractice />
       <div>
-        <h1 className="font-display text-3xl font-bold text-navy dark:text-white">Listening</h1>
+        <h1 className="font-display text-3xl font-bold text-navy dark:text-white">{ts('nav.listening', ui)}</h1>
         <p className="mt-1 text-ink-secondary">
-          {examName ? `${examName} — listen and answer, at your level.` : 'Listen and answer, at your level.'}
+          {examName ? tf('practice.listenAnswerNamed', { exam: examName }, ui) : ts('practice.listenAnswer', ui)}
         </p>
       </div>
 

@@ -12,18 +12,40 @@
  *   length is the obvious divergence — **but derive the parameters rather than
  *   assuming which ones differ.**"*
  *
- * ── THE ASSUMPTION WAS WRONG, AND THAT IS THE POINT OF DERIVING ────────────
- * Turn length was the obvious candidate and is NOT the systematic divergence.
- * Measured across the whole bank, band by band, the one measure that separates
- * the two registers at EVERY band, in the same direction, by a similar factor,
- * is LEXICAL VARIETY. Speech carries a narrower lexicon than prose written to
- * the same band — and Guiraud's index is already length-normalised, so this is
- * a register fact and not an artefact of listening scripts being shorter.
+ * ── THE ASSUMPTION WAS WRONG, AND SO WAS THE FIRST CORRECTION ──────────────
+ * On 31 August, on a bank of about 90 measurable passages, the measure that
+ * separated the two registers at every band was LEXICAL VARIETY, and sentence
+ * length looked systematic and then reversed at C2. Both of those were
+ * asserted here.
  *
- * Sentence length does diverge at B1, B2 and C1 — and then REVERSES at C2,
- * where a C2 discussion runs longer sentences than a C2 passage. An envelope
- * built on the assumption would have been wrong at the top of the ladder,
- * which is exactly where the C2 material is hardest to write.
+ * **On 31 August, later the same day, the bank had roughly tripled and both
+ * assertions were false.** With 168 reading passages and 99 listening scripts
+ * measurable:
+ *
+ *   sentence length   59% 63% 63% 77% 86%   below parity at EVERY band
+ *   clause rate       95% 83% 68% 77% 92%   below parity at every band
+ *   long-word rate    99% 77% 95% 79% 102%  mixed
+ *   lexical variety  154% 72% 71% 69% 75%   ABOVE parity at A2
+ *
+ * The C2 reversal in sentence length was a sample of a dozen scripts. The A2
+ * variety figure is four listening scripts of transactional dialogue — names,
+ * times, places — and Guiraud's index reads a short script full of concrete
+ * nouns as varied. Neither number was wrong when it was taken. Both were the
+ * size of the sample, printed as if they were a fact about the language.
+ *
+ * ── SO WHAT IS ASSERTED HERE CHANGED ───────────────────────────────────────
+ * This file's own note already said it: *"The measured divergence is PRINTED
+ * rather than asserted. It is a property of two banks that are both still
+ * growing; asserting today's ratio would be asserting the size of the
+ * sample."* And then the file asserted today's ratio anyway, twice, and went
+ * red the moment the bank grew.
+ *
+ * What is asserted now is the thing that does not move with the sample: that
+ * the two registers separate at all, on at least one measure, at every band
+ * they share — and that the widest such measure is wide enough to matter. WHICH
+ * measure it is, is derived and printed, never named in an assertion. If that
+ * separation ever disappears, this check goes red and it should: it would mean
+ * the reason listening has its own anchors had gone with it.
  *
  * ── WHAT ACTUALLY FIXES IT ─────────────────────────────────────────────────
  * Not a correction factor. A correction factor is a second thing to keep true.
@@ -103,16 +125,31 @@ for (const b of BANDS) {
 }
 console.log('\n     (listening as a percentage of reading, at the same band)\n');
 
-// The claim being made in the note at the top of this file, asserted so the
-// note cannot quietly become false: lexical variety is the measure that
-// separates the registers at every band IN THE SAME DIRECTION, and sentence
-// length is the one that looks like it does and then reverses.
-const allBelow = (m: typeof MEASURES[number]) => diverge[m].every((r) => r < 1);
-const someAbove = (m: typeof MEASURES[number]) => diverge[m].some((r) => r >= 1);
-t('lexical variety is lower in speech at EVERY band the two share', allBelow('lexicalVariety'), true,
-  diverge.lexicalVariety.map((r) => `${(r * 100).toFixed(0)}%`).join(' '));
-t('and sentence length is not the systematic one — it reverses', someAbove('meanSentenceWords'), true,
-  diverge.meanSentenceWords.map((r) => `${(r * 100).toFixed(0)}%`).join(' '));
+// What is asserted is the separation, not which measure carries it. Naming the
+// measure is naming the sample — see the note at the top of this file.
+const pct = (m: typeof MEASURES[number]) => diverge[m].map((r) => `${(r * 100).toFixed(0)}%`).join(' ');
+const systematic = MEASURES.filter((m) =>
+  diverge[m].length > 0 && (diverge[m].every((r) => r < 1) || diverge[m].every((r) => r > 1)));
+
+t('the registers separate on at least one measure at EVERY band they share',
+  systematic.length > 0, true, systematic.length ? systematic.join(', ') : 'none');
+
+// The widest of them, by mean distance from parity. Printed, so the note above
+// can be checked against the bank on any day, and so a reader can see which
+// measure is currently doing the work.
+const spread = (m: typeof MEASURES[number]) =>
+  Math.abs(1 - diverge[m].reduce((a, b) => a + b, 0) / diverge[m].length);
+const leader = [...systematic].sort((a, b) => spread(b) - spread(a))[0];
+console.log(`     the widest systematic measure today is ${leader ?? '(none)'}`);
+for (const m of MEASURES) console.log(`       ${m.padEnd(18)} ${pct(m)}${systematic.includes(m) ? '   systematic' : ''}`);
+console.log('');
+
+// And it has to be wide enough to be a register difference rather than noise.
+// Ten percent at every shared band: below that, a listening envelope built
+// from listening anchors is a distinction without a difference.
+t('and the widest one is 10% or more from parity at every shared band',
+  leader ? diverge[leader].every((r) => Math.abs(1 - r) >= 0.10) : false, true,
+  leader ? pct(leader) : '');
 
 console.log('\n3. So a listening bank is judged by listening anchors, and the effect is visible\n');
 

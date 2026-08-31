@@ -8,7 +8,7 @@ import { practiceTasksFor, type PracticeSet, type PracticeTask } from '../lib/pr
 import { PromptCount } from '../components/PromptCount';
 import { WhatYouNeed } from '../components/WhatYouNeed';
 import { getAttempts } from '../lib/attempts';
-import { ts } from '../i18n';
+import { ts, tf, useUiLangValue } from '../i18n';
 
 
 // The four templates that used to live here — professional email, cover
@@ -24,6 +24,7 @@ import { ts } from '../i18n';
 // definition the candidate chose. See `lib/practiceTasks.ts`.
 
 export default function WritingPage() {
+  const ui = useUiLangValue();
   // Like Speaking: the main tabs are the EXAM's own writing tasks, from the
   // definition the candidate chose (TCF tâche 1·2·3, IELTS Task 1·2). The old
   // generic modes — live grammar coach and smart rewrite — belonged to no
@@ -41,9 +42,9 @@ export default function WritingPage() {
     <div className="space-y-6">
       <BackToPractice />
       <div>
-        <h1 className="font-display text-3xl font-bold text-navy">Writing</h1>
+        <h1 className="font-display text-3xl font-bold text-navy">{ts('nav.writing', ui)}</h1>
         <p className="mt-1 text-ink-secondary">
-          {set && set !== 'loading' ? `${set.examName} — write each task and get scored feedback.` : 'Write each exam task and get scored feedback.'}
+          {set && set !== 'loading' ? tf('writing.eachTaskNamed', { exam: set.examName }, ui) : ts('writing.eachTask', ui)}
         </p>
       </div>
 
@@ -68,9 +69,9 @@ export default function WritingPage() {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs text-ink-secondary">Extra practice:</span>
-            <AuxBtn active={aux === 'live'} onClick={() => setAux('live')} icon={PenLine}>Live grammar</AuxBtn>
-            <AuxBtn active={aux === 'rewrite'} onClick={() => setAux('rewrite')} icon={Sparkles}>Smart rewrite</AuxBtn>
+            <span className="text-xs text-ink-secondary">{ts('speaking.extraPractice', ui)}</span>
+            <AuxBtn active={aux === 'live'} onClick={() => setAux('live')} icon={PenLine}>{ts('writing.liveGrammar', ui)}</AuxBtn>
+            <AuxBtn active={aux === 'rewrite'} onClick={() => setAux('rewrite')} icon={Sparkles}>{ts('writing.smartRewrite', ui)}</AuxBtn>
           </div>
 
           {activeTask && <TaskWriteMode task={activeTask} need={set && set !== 'loading' ? set.need : null} />}
@@ -106,6 +107,7 @@ function ModeBtn({ active, onClick, icon: Icon, children }: any) {
 }
 
 function LiveMode() {
+  const ui = useUiLangValue();
   const [text, setText] = useState('');
   const [check, setCheck] = useState<GrammarCheck | null>(null);
   const [checking, setChecking] = useState(false);
@@ -124,15 +126,15 @@ function LiveMode() {
     <div className="grid gap-6 lg:grid-cols-[1fr,360px]">
       <div className="card p-6">
         <div className="mb-3 flex items-center justify-between">
-          <label className="label !mb-0">Write here — checks happen as you pause</label>
-          <span className="text-xs text-ink-secondary">{text.split(/\s+/).filter(Boolean).length} words {checking && '· checking…'}</span>
+          <label className="label !mb-0">{ts('writing.writeHere', ui)}</label>
+          <span className="text-xs text-ink-secondary">{tf('writing.words', { n: text.split(/\s+/).filter(Boolean).length }, ui)} {checking && ts('writing.checking', ui)}</span>
         </div>
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
           rows={16}
           className="input font-body text-base leading-relaxed"
-          placeholder="Start writing… AI will quietly review your grammar, vocabulary, and style."
+          placeholder={ts('writing.startWriting', ui)}
         />
       </div>
 
@@ -140,21 +142,21 @@ function LiveMode() {
         {!check && (
           <div className="card p-6 text-center text-ink-secondary">
             <PenLine className="mx-auto mb-2 h-10 w-10 opacity-40" />
-            <p className="text-sm">Suggestions appear here as you write.</p>
+            <p className="text-sm">{ts('writing.suggestionsHere', ui)}</p>
           </div>
         )}
         {check && check.errors.length === 0 && (
           <div className="card p-6 text-center">
             <div className="mb-2 text-4xl">✨</div>
-            <p className="font-medium text-teal">No issues found. Nice writing!</p>
+            <p className="font-medium text-teal">{ts('writing.noIssues', ui)}</p>
           </div>
         )}
         {check && check.errors.length > 0 && (
           <div className="card p-5">
-            <h4 className="mb-3 font-display font-bold text-navy">{check.errors.length} suggestion{check.errors.length > 1 ? 's' : ''}</h4>
+            <h4 className="mb-3 font-display font-bold text-navy">{tf(check.errors.length > 1 ? 'writing.suggestions' : 'writing.suggestion', { n: check.errors.length }, ui)}</h4>
             {check.corrected_text && (
               <div className="mb-4 rounded-xl border-l-4 border-teal bg-teal/5 p-3 text-sm">
-                <div className="mb-1 text-xs font-bold uppercase text-teal">Corrected</div>
+                <div className="mb-1 text-xs font-bold uppercase text-teal">{ts('writing.corrected', ui)}</div>
                 <p>{check.corrected_text}</p>
               </div>
             )}
@@ -177,35 +179,36 @@ function LiveMode() {
 }
 
 function RewriteMode() {
+  const ui = useUiLangValue();
   const [text, setText] = useState('');
   const [style, setStyle] = useState<'formal' | 'simple' | 'natural' | 'academic' | 'friendly'>('natural');
   const [output, setOutput] = useState('');
   const [loading, setLoading] = useState(false);
 
   const STYLES: Array<{ key: typeof style; label: string; desc: string }> = [
-    { key: 'formal', label: 'Formal', desc: 'Business / official' },
-    { key: 'simple', label: 'Simple', desc: 'Easier vocabulary' },
-    { key: 'natural', label: 'Natural', desc: 'Conversational' },
-    { key: 'academic', label: 'Academic', desc: 'Scholarly tone' },
-    { key: 'friendly', label: 'Friendly', desc: 'Warm and casual' },
+    { key: 'formal', label: ts('writing.styleFormal', ui), desc: ts('writing.styleFormalDesc', ui) },
+    { key: 'simple', label: ts('writing.styleSimple', ui), desc: ts('writing.styleSimpleDesc', ui) },
+    { key: 'natural', label: ts('writing.styleNatural', ui), desc: ts('writing.styleNaturalDesc', ui) },
+    { key: 'academic', label: ts('writing.styleAcademic', ui), desc: ts('writing.styleAcademicDesc', ui) },
+    { key: 'friendly', label: ts('writing.styleFriendly', ui), desc: ts('writing.styleFriendlyDesc', ui) },
   ];
 
   const submit = async () => {
     if (!text.trim()) return;
     setLoading(true); setOutput('');
     try { setOutput(await rewriteText(text, style)); }
-    catch { setOutput('(Could not rewrite — try again.)'); }
+    catch { setOutput(ts('writing.rewriteFailed', ui)); }
     finally { setLoading(false); }
   };
 
   return (
     <div className="space-y-4">
       <div className="card p-6">
-        <label className="label">Original text</label>
-        <textarea value={text} onChange={(e) => setText(e.target.value)} rows={6} className="input" placeholder="Paste a sentence or paragraph to rewrite…" />
+        <label className="label">{ts('writing.originalText', ui)}</label>
+        <textarea value={text} onChange={(e) => setText(e.target.value)} rows={6} className="input" placeholder={ts('writing.pasteToRewrite', ui)} />
       </div>
       <div className="card p-6">
-        <div className="mb-3 text-sm font-medium text-ink-secondary">Choose style</div>
+        <div className="mb-3 text-sm font-medium text-ink-secondary">{ts('writing.chooseStyle', ui)}</div>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
           {STYLES.map((s) => (
             <button key={s.key} onClick={() => setStyle(s.key)} className={clsx('rounded-xl border-2 p-3 text-left transition', style === s.key ? 'border-teal bg-teal/5' : 'border-surface-divider hover:border-navy/40')}>
@@ -215,12 +218,12 @@ function RewriteMode() {
           ))}
         </div>
         <button onClick={submit} disabled={loading || !text.trim()} className="btn-primary mt-4 w-full">
-          {loading ? 'Rewriting…' : `Rewrite as ${style}`}
+          {loading ? ts('writing.rewriting', ui) : tf('writing.rewriteAs', { style }, ui)}
         </button>
       </div>
       {output && (
         <div className="card border-l-4 border-teal p-6">
-          <div className="mb-2 text-xs font-bold uppercase text-teal">Rewritten ({style})</div>
+          <div className="mb-2 text-xs font-bold uppercase text-teal">{tf('writing.rewritten', { style }, ui)}</div>
           <p className="whitespace-pre-wrap text-ink-primary">{output}</p>
         </div>
       )}
@@ -229,6 +232,7 @@ function RewriteMode() {
 }
 
 function TaskWriteMode({ task, need }: { task: PracticeTask; need: PracticeSet['need'] }) {
+  const ui = useUiLangValue();
   const [text, setText] = useState('');
   const [assessment, setAssessment] = useState<WritingAssessment | null>(null);
   const [loading, setLoading] = useState(false);
@@ -256,11 +260,11 @@ function TaskWriteMode({ task, need }: { task: PracticeTask; need: PracticeSet['
         <WhatYouNeed need={need} skill="writing" />
         <PromptCount task={task} verb="written" />
         <div className="card p-6">
-          <label className="label">Your draft</label>
-          <textarea value={text} onChange={(e) => setText(e.target.value)} rows={14} className="input" placeholder="Write your response here…" />
-          <div className="mt-2 text-xs text-ink-secondary">{text.split(/\s+/).filter(Boolean).length} words</div>
+          <label className="label">{ts('writing.yourDraft', ui)}</label>
+          <textarea value={text} onChange={(e) => setText(e.target.value)} rows={14} className="input" placeholder={ts('writing.writeResponse', ui)} />
+          <div className="mt-2 text-xs text-ink-secondary">{tf('writing.words', { n: text.split(/\s+/).filter(Boolean).length }, ui)}</div>
           <button onClick={submit} disabled={loading || text.split(/\s+/).filter(Boolean).length < 30} className="btn-primary mt-4 w-full">
-            {loading ? 'Scoring…' : 'Get AI feedback'}
+            {ts(loading ? 'writing.scoring' : 'writing.getFeedback', ui)}
           </button>
         </div>
         {assessment && (
@@ -268,24 +272,24 @@ function TaskWriteMode({ task, need }: { task: PracticeTask; need: PracticeSet['
             <div className="card p-6">
               <div className="mb-4 text-center">
                 <div className="font-display text-5xl font-bold text-teal">{assessment.overall_score}</div>
-                <div className="text-xs uppercase tracking-wider text-ink-secondary">Overall score</div>
+                <div className="text-xs uppercase tracking-wider text-ink-secondary">{ts('writing.overallScore', ui)}</div>
               </div>
               <div className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
-                {assessment.grammar_score != null && <SubScore label="Grammar" v={assessment.grammar_score} />}
-                {assessment.vocabulary_score != null && <SubScore label="Vocab" v={assessment.vocabulary_score} />}
-                {assessment.coherence_score != null && <SubScore label="Coherence" v={assessment.coherence_score} />}
-                {assessment.task_response_score != null && <SubScore label="Task" v={assessment.task_response_score} />}
+                {assessment.grammar_score != null && <SubScore label={ts('writing.grammar', ui)} v={assessment.grammar_score} />}
+                {assessment.vocabulary_score != null && <SubScore label={ts('writing.vocab', ui)} v={assessment.vocabulary_score} />}
+                {assessment.coherence_score != null && <SubScore label={ts('writing.coherence', ui)} v={assessment.coherence_score} />}
+                {assessment.task_response_score != null && <SubScore label={ts('writing.task', ui)} v={assessment.task_response_score} />}
               </div>
               {assessment.feedback && <div className="mt-4 rounded-xl bg-surface-muted p-4 text-sm">{assessment.feedback}</div>}
               {assessment.strengths && assessment.strengths.length > 0 && (
                 <div className="mt-4">
-                  <h5 className="mb-2 text-xs font-bold uppercase text-teal">Strengths</h5>
+                  <h5 className="mb-2 text-xs font-bold uppercase text-teal">{ts('writing.strengths', ui)}</h5>
                   <ul className="space-y-1 text-sm">{assessment.strengths.map((s, i) => <li key={i}>• {s}</li>)}</ul>
                 </div>
               )}
               {assessment.weaknesses && assessment.weaknesses.length > 0 && (
                 <div className="mt-4">
-                  <h5 className="mb-2 text-xs font-bold uppercase text-amber-700">To improve</h5>
+                  <h5 className="mb-2 text-xs font-bold uppercase text-amber-700">{ts('writing.toImprove', ui)}</h5>
                   <ul className="space-y-1 text-sm">{assessment.weaknesses.map((s, i) => <li key={i}>• {s}</li>)}</ul>
                 </div>
               )}
@@ -296,7 +300,7 @@ function TaskWriteMode({ task, need }: { task: PracticeTask; need: PracticeSet['
               itemId={task.promptId}
               score={assessment.overall_score}
               onNext={() => { setText(''); setAssessment(null); }}
-              nextLabel="Write again"
+              nextLabel={ts('writing.writeAgain', ui)}
             />
           </>
         )}

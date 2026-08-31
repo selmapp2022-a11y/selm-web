@@ -10,10 +10,10 @@ import { CompletionCard } from '../components/CompletionCard';
 import { ErrorBox } from '../components/States';
 import { practiceTasksFor, pronunciationLinesFor, type PracticeSet, type PracticeTask } from '../lib/practiceTasks';
 import { PromptCount } from '../components/PromptCount';
+import { ts, tf, useUiLangValue } from '../i18n';
 import { WhatYouNeed } from '../components/WhatYouNeed';
 import { getAttempts } from '../lib/attempts';
 import { difficultyForSkill } from '../lib/difficulty';
-import { ts } from '../i18n';
 
 
 // The five pronunciation sentences and the three IELTS cue cards that used
@@ -30,6 +30,7 @@ import { ts } from '../i18n';
 // read-aloud lines are a stopgap rather than the finished answer.
 
 export default function SpeakingPage() {
+  const ui = useUiLangValue();
   const level = difficultyForSkill('speaking');
   // The tabs are the EXAM's tasks, built from the exam definition — TCF Canada
   // shows tâche 1·2·3, IELTS shows Part 1·2·3 — never a fixed "IELTS Speaking"
@@ -51,11 +52,11 @@ export default function SpeakingPage() {
     <div className="space-y-6">
       <BackToPractice />
       <div>
-        <h1 className="font-display text-3xl font-bold text-navy">Speaking</h1>
+        <h1 className="font-display text-3xl font-bold text-navy">{ts('nav.speaking', ui)}</h1>
         <p className="mt-1 text-ink-secondary">
           {set && set !== 'loading'
-            ? `${set.examName} — record each task and get scored feedback.`
-            : 'Record each exam task and get scored feedback.'}
+            ? tf('speaking.recordNamed', { exam: set.examName }, ui)
+            : ts('speaking.record', ui)}
         </p>
       </div>
 
@@ -82,8 +83,8 @@ export default function SpeakingPage() {
 
           {/* AUXILIARY — kept, but not the exam. */}
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs text-ink-secondary">Extra practice:</span>
-            <AuxBtn active={aux === 'pronunciation'} onClick={() => setAux('pronunciation')} icon={Volume2}>Pronunciation</AuxBtn>
+            <span className="text-xs text-ink-secondary">{ts('speaking.extraPractice', ui)}</span>
+            <AuxBtn active={aux === 'pronunciation'} onClick={() => setAux('pronunciation')} icon={Volume2}>{ts('speaking.pronunciation', ui)}</AuxBtn>
           </div>
 
           {activeTask && <TaskMode task={activeTask} need={set && set !== 'loading' ? set.need : null} />}
@@ -164,6 +165,7 @@ function PlayButton({ text, speaker }: { text: string; speaker?: string }) {
 }
 
 function PronunciationMode({ level }: { level: string }) {
+  const ui = useUiLangValue();
   const [lines, setLines] = useState<string[] | null>(null);
   const [prompt, setPrompt] = useState<{ level: string; text: string } | null>(null);
   const [result, setResult] = useState<SpeechAssessment | null>(null);
@@ -218,19 +220,19 @@ function PronunciationMode({ level }: { level: string }) {
       <div className="space-y-4">
         <div className="card p-6">
           <div className="mb-3 flex items-center justify-between">
-            <span className="chip">Level {prompt.level}</span>
+            <span className="chip">{tf('speaking.level', { level: prompt.level }, ui)}</span>
             <div className="flex gap-2">
               <PlayButton text={prompt.text} />
-              <button onClick={newPrompt} className="btn-ghost text-sm"><RefreshCcw className="h-4 w-4" /> New</button>
+              <button onClick={newPrompt} className="btn-ghost text-sm"><RefreshCcw className="h-4 w-4" /> {ts('speaking.new', ui)}</button>
             </div>
           </div>
           <p className="font-display text-xl leading-relaxed text-navy">"{prompt.text}"</p>
         </div>
-        <AudioRecorder onComplete={onRecorded} maxSeconds={45} label="Read the sentence aloud" />
+        <AudioRecorder onComplete={onRecorded} maxSeconds={45} label={ts('speaking.readAloud', ui)} />
       </div>
 
       <div className="space-y-4">
-        {loading && <Loading text="Analyzing pronunciation…" />}
+        {loading && <Loading text={ts('speaking.analysing', ui)} />}
         {err && <ErrorBox msg={err} />}
         {result && <SpeechResults result={result} />}
         {result && (
@@ -239,13 +241,13 @@ function PronunciationMode({ level }: { level: string }) {
             topic={`Pronunciation · ${prompt.level}`}
             score={Math.round(result.overall_score)}
             onNext={newPrompt}
-            nextLabel="Try a new sentence"
+            nextLabel={ts('speaking.newSentence', ui)}
           />
         )}
         {!loading && !err && !result && (
           <div className="card p-8 text-center text-ink-secondary">
             <Mic className="mx-auto mb-2 h-10 w-10 opacity-40" />
-            <p className="text-sm">Record yourself to see word-by-word and phoneme scores.</p>
+            <p className="text-sm">{ts('speaking.recordToSee', ui)}</p>
           </div>
         )}
       </div>
@@ -273,6 +275,7 @@ function PronunciationMode({ level }: { level: string }) {
 // present. See `lib/practiceTasks.ts` for why its lines are still a stopgap.
 
 function TaskMode({ task, need }: { task: PracticeTask; need: PracticeSet['need'] }) {
+  const ui = useUiLangValue();
   const prompt = task.instruction + '\n\n' + task.prompt;
   const [result, setResult] = useState<SpeechAssessment | null>(null);
   const [loading, setLoading] = useState(false);
@@ -309,10 +312,10 @@ function TaskMode({ task, need }: { task: PracticeTask; need: PracticeSet['need'
               The founder found it by testing: *"the microphone was not
               working and it was cut off."* */}
           <p className="mt-3 text-xs text-ink-secondary">
-            Speak for up to {Math.floor(task.timeLimitSec / 60)}
-            {task.timeLimitSec % 60 ? `:${String(task.timeLimitSec % 60).padStart(2, '0')}` : ''}{' '}
-            minute{task.timeLimitSec >= 120 ? 's' : ''}
-            {task.timeIsOurs ? ' — our apportionment of the section time' : ' — the exam’s own limit'}.
+            {tf('speaking.speakUpTo', {
+              time: `${Math.floor(task.timeLimitSec / 60)}${task.timeLimitSec % 60 ? `:${String(task.timeLimitSec % 60).padStart(2, '0')}` : ''}`,
+            }, ui)}
+            {ts(task.timeIsOurs ? 'speaking.timeOurs' : 'speaking.timeExam', ui)}
           </p>
         </div>
         <WhatYouNeed need={need} skill="speaking" />
@@ -320,11 +323,11 @@ function TaskMode({ task, need }: { task: PracticeTask; need: PracticeSet['need'
         <AudioRecorder
           onComplete={onRecorded}
           maxSeconds={task.timeLimitSec}
-          label={`Tap to start — up to ${Math.round(task.timeLimitSec / 60 * 10) / 10} minutes`}
+          label={tf('speaking.tapToStart', { minutes: Math.round(task.timeLimitSec / 60 * 10) / 10 }, ui)}
         />
       </div>
       <div className="space-y-4">
-        {loading && <Loading text="Scoring your response…" />}
+        {loading && <Loading text={ts('speaking.scoring', ui)} />}
         {err && <ErrorBox msg={err} />}
         {result && <SpeechResults result={result} />}
         {result && (
@@ -334,13 +337,13 @@ function TaskMode({ task, need }: { task: PracticeTask; need: PracticeSet['need'
             itemId={task.promptId}
             score={Math.round(result.overall_score)}
             onNext={() => { setResult(null); setErr(null); }}
-            nextLabel="Record again"
+            nextLabel={ts('speaking.recordAgain', ui)}
           />
         )}
         {!loading && !err && !result && (
           <div className="card p-8 text-center text-ink-secondary">
             <Trophy className="mx-auto mb-2 h-10 w-10 opacity-40" />
-            <p className="text-sm">Your score and feedback will appear here.</p>
+            <p className="text-sm">{ts('speaking.resultHere', ui)}</p>
           </div>
         )}
       </div>

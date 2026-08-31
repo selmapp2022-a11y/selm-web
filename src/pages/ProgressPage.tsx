@@ -12,7 +12,8 @@ import { releaseGate } from '../exam/engine/aggregate';
 import { governingLevel } from '../exam/engine/comprehension';
 import { StandingNote, NotBuiltNote } from '../components/Standing';
 import { useDocumentTitle } from '../lib/useDocumentTitle';
-import { fmtDate, fmtMonth, useUiLangValue } from '../i18n';
+import { fmtDate, fmtMonth, ts, tf, useUiLangValue, type Key } from '../i18n';
+import { Rich } from '../i18n/Rich';
 import { t } from '../exam/model/format';
 import type { ExamDefinition, Goal, SkillId } from '../exam/model/types';
 import type { Attestation } from '../exam/model/attestation';
@@ -33,8 +34,9 @@ import type { Attestation } from '../exam/model/attestation';
  * This page answers the same question Today answers, over time instead of now.
  */
 
-const SKILL_LABEL: Record<SkillKey, string> = {
-  listening: 'Listening', reading: 'Reading', speaking: 'Speaking', writing: 'Writing', vocabulary: 'Vocabulary',
+// Keys, not words — resolved with the reader's interface language at render.
+const SKILL_LABEL: Record<SkillKey, Key> = {
+  listening: 'nav.listening', reading: 'nav.reading', speaking: 'nav.speaking', writing: 'nav.writing', vocabulary: 'nav.vocabulary',
 };
 
 const PRACTICE: Record<SkillId, string> = {
@@ -44,7 +46,8 @@ const PRACTICE: Record<SkillId, string> = {
 type Catalogue = { EXAMS: ExamDefinition[]; GOALS: Goal[] };
 
 export default function ProgressPage() {
-  useDocumentTitle('Progress');
+  const ui = useUiLangValue();
+  useDocumentTitle(ts('nav.progress', ui));
   // Re-render when the candidate switches interface language, so the dates
   // below follow the language they chose rather than the one they last saw.
   useUiLangValue();
@@ -98,10 +101,8 @@ export default function ProgressPage() {
 
   const header = (
     <div>
-      <h1 className="font-display text-3xl font-bold text-navy">Progress</h1>
-      <p className="mt-1 text-ink-secondary">
-        What you have done, and whether the line is moving.
-      </p>
+      <h1 className="font-display text-3xl font-bold text-navy">{ts('nav.progress', ui)}</h1>
+      <p className="mt-1 text-ink-secondary">{ts('progress.blurb', ui)}</p>
     </div>
   );
 
@@ -110,12 +111,8 @@ export default function ProgressPage() {
       <div className="space-y-6">
         {header}
         <div className="card p-6">
-          <p className="text-sm text-ink-primary">
-            Choose your exam and destination, and this page can show what your practice is for.
-            Until then there is nothing here to measure against — and a page that filled the space
-            anyway is exactly what this one replaced.
-          </p>
-          <Link to="/me" className="btn-primary mt-4 inline-block">Choose my exam</Link>
+          <p className="text-sm text-ink-primary">{ts('progress.noPlan', ui)}</p>
+          <Link to="/me" className="btn-primary mt-4 inline-block">{ts('cp.chooseMyExam', ui)}</Link>
         </div>
       </div>
     );
@@ -155,23 +152,21 @@ export default function ProgressPage() {
 
           Today keeps the verdict as one line and links here for the rest. */}
       <section className="space-y-3">
-        <SectionHeading icon={Flag} meta={`Target: ${target} in every skill`}>
-          Are you ready to book?
+        <SectionHeading icon={Flag} meta={tf('today.targetMeta', { target }, ui)}>
+          {ts('today.readyToBook', ui)}
         </SectionHeading>
         <div className="card p-6">
           <p className="font-display text-2xl font-bold text-navy dark:text-white">
             {gate.publishNumeric && governing.complete
               ? `${exam.benchmark.system} ${governing.level}`
-              : 'Not yet answerable'}
+              : ts('progress.notYetAnswerable', ui)}
           </p>
           {!gate.publishNumeric && (
-            <p className="mt-2 text-xs leading-relaxed text-ink-secondary">{t(gate.reason, 'en')}</p>
+            <p className="mt-2 text-xs leading-relaxed text-ink-secondary">{t(gate.reason, ui)}</p>
           )}
           {!governing.complete && (
             <p className="mt-2 text-xs leading-relaxed text-ink-secondary">
-              {goal.destination.requirement === 'overall'
-                ? 'This destination reads an aggregate, so a weak skill can be carried — but an aggregate still needs every skill to have a number, and not all of them do.'
-                : 'The lowest of your four skills is the one that counts, not the average — a candidate at 8, 8, 8 and 5 is at 5. No overall level is shown while any skill is unknown, because taking the lowest of the ones that do have a number would show you a better result than you hold.'}
+              {ts(goal.destination.requirement === 'overall' ? 'progress.aggregate' : 'progress.lowestGoverns', ui)}
             </p>
           )}
         </div>
@@ -179,14 +174,11 @@ export default function ProgressPage() {
       </section>
 
       <section className="space-y-3">
-        <SectionHeading icon={ScrollText}>What is not built for your exam</SectionHeading>
+        <SectionHeading icon={ScrollText}>{ts('today.notBuilt', ui)}</SectionHeading>
         <NotBuiltNote exam={exam} />
         {!gate.publishNumeric && (
           <p className="rounded-xl bg-surface-muted px-4 py-3 text-xs leading-relaxed text-ink-secondary">
-            <strong>What to do meanwhile:</strong> practise the tasks the exam actually sets, sit
-            the mock exam to see the band your answers hold, and enter any past score report you
-            have — that is the one number here that comes from the awarding body rather than from
-            us.
+            <Rich k="progress.meanwhile" />
           </p>
         )}
         {/* The destination's own surfaces — an external government page is not
@@ -214,7 +206,7 @@ export default function ProgressPage() {
 
       {/* 1 ── score over time */}
       <section className="space-y-3">
-        <SectionHeading icon={LineChart}>Score over time</SectionHeading>
+        <SectionHeading icon={LineChart}>{ts('progress.scoreOverTime', ui)}</SectionHeading>
 
         {/* Real results the candidate entered, on the exam's own scale, with
             the target drawn — because IRCC publishes the score→benchmark
@@ -232,11 +224,9 @@ export default function ProgressPage() {
 
       {/* 2 ── attempts */}
       <section className="space-y-3">
-        <SectionHeading icon={ListChecks}>Attempts</SectionHeading>
+        <SectionHeading icon={ListChecks}>{ts('progress.attempts', ui)}</SectionHeading>
         <p className="text-xs leading-relaxed text-ink-secondary">
-          How much work you have done, and when. <strong>Counting attempts is not the same as
-          awarding points for them</strong> — this is a record of what happened, not a score for
-          having turned up.
+          <Rich k="progress.attemptsNote" />
         </p>
         <div className="card divide-y divide-surface-divider">
           {(['listening', 'reading', 'writing', 'speaking'] as SkillKey[]).map((k) => {
@@ -285,31 +275,28 @@ export default function ProgressPage() {
           exactly what a candidate opens the app to see. So the block stays
           where it is looked at, and this page links to it. */}
       <section className="space-y-3">
-        <SectionHeading icon={Compass} meta={`Target: ${target} in every skill`}>
-          Where you stand
+        <SectionHeading icon={Compass} meta={tf('today.targetMeta', { target }, ui)}>
+          {ts('today.whereYouStand', ui)}
         </SectionHeading>
         <Link to="/" className="card flex items-center gap-3 p-4 hover:shadow-cardHover">
           <span className="flex-1 text-sm text-ink-secondary">
-            Your four skills and the level each one holds are on{' '}
-            <strong className="text-navy dark:text-white">Today</strong>.
+            <Rich k="progress.fourSkillsOnToday" vars={{ today: ts('nav.today', ui) }} />
           </span>
-          <span className="btn-secondary shrink-0">Open</span>
+          <span className="btn-secondary shrink-0">{ts('progress.open', ui)}</span>
         </Link>
       </section>
 
       {/* 4 ── the gap */}
       <section className="space-y-3">
-        <SectionHeading icon={MapPinned}>What you have not practised yet</SectionHeading>
+        <SectionHeading icon={MapPinned}>{ts('progress.notPractised', ui)}</SectionHeading>
         {untouched.length === 0 ? (
           <div className="card p-6 text-sm text-ink-secondary">
-            Every part of your plan has been attempted at least once.
+            {ts('progress.allAttempted', ui)}
           </div>
         ) : (
           <>
             <p className="text-xs leading-relaxed text-ink-secondary">
-              An untouched part of the exam predicts a low governing level better than a low score
-              on a part you have practised does. These are the {untouched.length} you have not
-              opened.
+              {tf('progress.untouchedNote', { n: untouched.length }, ui)}
             </p>
             <div className="card divide-y divide-surface-divider">
               {untouched.slice(0, 12).map((s) => (
@@ -317,16 +304,16 @@ export default function ProgressPage() {
                   <div className="min-w-[180px] flex-1">
                     <div className="text-sm font-semibold text-navy">{s.coordinate.label}</div>
                     <div className="text-xs text-ink-secondary">
-                      {SKILL_LABEL[s.coordinate.skill as SkillKey]}
-                      {s.items === 0 && ' · nothing is authored behind this yet'}
+                      {ts(SKILL_LABEL[s.coordinate.skill as SkillKey], ui)}
+                      {s.items === 0 && ` · ${ts('progress.nothingAuthored', ui)}`}
                     </div>
                   </div>
                   {s.items > 0 ? (
                     <Link to={PRACTICE[s.coordinate.skill] ?? '/practice'} className="text-sm font-medium text-teal hover:underline">
-                      Open
+                      {ts('progress.open', ui)}
                     </Link>
                   ) : (
-                    <span className="text-xs text-ink-secondary">not built</span>
+                    <span className="text-xs text-ink-secondary">{ts('progress.notBuiltShort', ui)}</span>
                   )}
                 </div>
               ))}
@@ -349,6 +336,7 @@ export default function ProgressPage() {
  * published by IRCC and carried in the exam definition. Nothing is converted.
  */
 function RealResults({ exam, goal, rows }: { exam: ExamDefinition; goal: Goal; rows: Attestation[] }) {
+  const ui = useUiLangValue();
   const skills: SkillId[] = ['listening', 'reading', 'writing', 'speaking'];
   const points = skills.map((k) => ({
     skill: k,
@@ -365,10 +353,9 @@ function RealResults({ exam, goal, rows }: { exam: ExamDefinition; goal: Goal; r
           <FileText className="h-5 w-5" />
         </span>
         <div className="min-w-[220px] flex-1">
-        <div className="text-sm font-semibold text-navy dark:text-white">No real result entered yet</div>
+        <div className="text-sm font-semibold text-navy dark:text-white">{ts('progress.noRealResult', ui)}</div>
         <p className="mt-1 text-xs leading-relaxed text-ink-secondary">
-          A line needs points. Enter a past {t(exam.name, 'en')} score report and this shows your
-          {' '}{goal.system} level per skill against the {goal.system} {goal.requiredLevel} you need.
+          {tf('progress.needPoints', { exam: t(exam.name, ui), system: goal.system, level: goal.requiredLevel }, ui)}
         </p>
         {/* D3 — the CTA that appeared four times. It is on the exam page
             now, and only there. This card says what is missing; the place to
@@ -380,11 +367,11 @@ function RealResults({ exam, goal, rows }: { exam: ExamDefinition; goal: Goal; r
 
   return (
     <div className="card space-y-4 p-5">
-      <div className="text-sm font-semibold text-navy">Your entered results · {goal.system}</div>
+      <div className="text-sm font-semibold text-navy">{tf('progress.enteredResults', { system: goal.system }, ui)}</div>
       {points.filter((p) => p.series.length > 0).map((p) => (
         <Series
           key={p.skill}
-          label={SKILL_LABEL[p.skill as SkillKey]}
+          label={ts(SKILL_LABEL[p.skill as SkillKey], ui)}
           series={p.series}
           target={goal.requiredLevel}
           max={12}
@@ -392,7 +379,7 @@ function RealResults({ exam, goal, rows }: { exam: ExamDefinition; goal: Goal; r
       ))}
       {points.every((p) => p.series.length < 2) && (
         <p className="text-xs leading-relaxed text-ink-secondary">
-          One result is a point, not a trend. A second entered result is what makes this a line.
+          {ts('progress.onePoint', ui)}
         </p>
       )}
     </div>
@@ -409,6 +396,7 @@ function RealResults({ exam, goal, rows }: { exam: ExamDefinition; goal: Goal; r
  * which is the same act with less scrutiny.
  */
 function PracticeSittings({ exam, rows, target }: { exam: ExamDefinition; rows: SittingRecord[]; target: string }) {
+  const ui = useUiLangValue();
   const BANDS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
   const counted = exam.sections.filter((s) => s.kind === 'comprehension');
 
@@ -424,10 +412,10 @@ function PracticeSittings({ exam, rows, target }: { exam: ExamDefinition; rows: 
         </div>
         <p className="mt-1 text-xs leading-relaxed text-ink-secondary">
           {rows.length === 0
-            ? 'This chart needs two sittings before it can show anything. It is left empty rather than filled with a number that would only be measuring how often you opened the app.'
-            : 'A second sitting is what turns a point into a line. Until then there is nothing here to draw, and drawing something anyway would be inventing a trend.'}
+            ? ts('progress.needTwoSittings', ui)
+            : ts('progress.secondSitting', ui)}
         </p>
-        <Link to="/exam" className="btn-secondary mt-3 inline-block">Take a mock exam</Link>
+        <Link to="/exam" className="btn-secondary mt-3 inline-block">{ts('progress.takeMock', ui)}</Link>
         </div>
       </div>
     );
@@ -435,7 +423,7 @@ function PracticeSittings({ exam, rows, target }: { exam: ExamDefinition; rows: 
 
   return (
     <div className="card space-y-4 p-5">
-      <div className="text-sm font-semibold text-navy">Practice sittings · band held</div>
+      <div className="text-sm font-semibold text-navy">{ts('progress.practiceSittings', ui)}</div>
       {counted.map((s) => {
         const series = rows
           .map((r) => {
@@ -449,7 +437,7 @@ function PracticeSittings({ exam, rows, target }: { exam: ExamDefinition; rows: 
         return (
           <Series
             key={s.id}
-            label={t(s.name, 'en')}
+            label={t(s.name, ui)}
             series={series}
             max={6}
             format={(v) => BANDS[v - 1] ?? '—'}
@@ -457,10 +445,7 @@ function PracticeSittings({ exam, rows, target }: { exam: ExamDefinition; rows: 
         );
       })}
       <p className="text-xs leading-relaxed text-ink-secondary">
-        This is the CEFR band each sitting held. It is <strong>not</strong> plotted against your{' '}
-        {target} target: a practice sitting produces a count of correct answers, and the conversion
-        from that count to the exam's published scale is not released by the awarding body. A target
-        line here would be a conversion drawn rather than computed.
+        <Rich k="progress.bandHeldNote" vars={{ target }} />
       </p>
     </div>
   );

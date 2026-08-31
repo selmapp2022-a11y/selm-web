@@ -20,6 +20,7 @@ import { loadAttestations } from '../exam/model/attestationStore';
 import OnboardingPage from './OnboardingPage';
 import { governingLevel } from '../exam/engine/comprehension';
 import { t } from '../exam/model/format';
+import { ts, tf, useUiLangValue, type UiLang } from '../i18n';
 import type {
   ExamDefinition,
   Goal,
@@ -89,7 +90,8 @@ function practiceHref(c: Coordinate): string {
 type Catalogue = { EXAMS: ExamDefinition[]; GOALS: Goal[] };
 
 export default function DashboardPage() {
-  useDocumentTitle('Today');
+  const ui = useUiLangValue();
+  useDocumentTitle(ts('nav.today', ui));
 
   const [cat, setCat] = useState<Catalogue | null>(null);
   const [catFailed, setCatFailed] = useState(false);
@@ -132,13 +134,13 @@ export default function DashboardPage() {
     return (
       <EmptyState
         icon={Compass}
-        title="The exam catalogue did not load"
-        body="Your dashboard is built from it, so nothing is shown rather than something wrong. Reload the page; if it keeps failing you are probably offline."
-        action={<a href={EXAM_HOME} className="btn-primary">Open the exam engine</a>}
+        title={ts('today.catalogueFailed', ui)}
+        body={ts('today.catalogueFailedBody', ui)}
+        action={<a href={EXAM_HOME} className="btn-primary">{ts('today.openEngine', ui)}</a>}
       />
     );
   }
-  if (!cat) return <Loader text="Loading your exam" />;
+  if (!cat) return <Loader text={ts('today.loadingExam', ui)} />;
 
   // A candidate who has not set a destination is a real state, not an error.
   // The old dashboard would have shown them a level and a streak; this one
@@ -177,20 +179,20 @@ export default function DashboardPage() {
               The countdown is the hero: it is the one number on this product
               that is both certain and the reason the candidate is here. */}
       <header className="space-y-4">
-        <h1 className="font-display text-3xl font-bold text-navy">Today</h1>
+        <h1 className="font-display text-3xl font-bold text-navy">{ts('nav.today', ui)}</h1>
 
         <div className="card overflow-hidden p-0">
           <div className="flex flex-wrap items-stretch">
             <div className="min-w-[220px] flex-1 p-6">
-              <span className="chip">{t(goal.destination.label, 'en')}</span>
+              <span className="chip">{t(goal.destination.label, ui)}</span>
               <h2 className="mt-3 font-display text-2xl font-bold text-navy">
-                {t(exam.name, 'en')}
+                {t(exam.name, ui)}
               </h2>
               <p className="mt-1 text-sm text-ink-secondary">
-                {requirementLine(goal)}
+                {requirementLine(goal, ui)}
               </p>
               <a href={EXAM_HOME} className="mt-3 inline-block text-xs font-medium text-teal hover:underline">
-                Change exam, destination or date
+                {ts('today.changeExam', ui)}
               </a>
             </div>
 
@@ -215,16 +217,16 @@ export default function DashboardPage() {
                 <>
                   <CalendarDays className="h-8 w-8 opacity-90" />
                   <div className="mt-3 text-center font-display text-xl font-bold leading-tight">
-                    When is your exam?
+                    {ts('today.whenIsExam', ui)}
                   </div>
                   <p className="mt-1 max-w-[22ch] text-center text-xs leading-relaxed opacity-90">
-                    Everything here is paced against that date. Without it you can practise, but not plan.
+                    {ts('today.pacedAgainstDate', ui)}
                   </p>
                   <a
                     href={EXAM_HOME}
                     className="mt-3 inline-flex min-h-[44px] items-center rounded-xl bg-white/15 px-4 text-sm font-semibold backdrop-blur-none transition hover:bg-white/25"
                   >
-                    Set the date
+                    {ts('today.setDate', ui)}
                   </a>
                 </>
               ) : (
@@ -233,9 +235,9 @@ export default function DashboardPage() {
                     {Math.abs(left)}
                   </div>
                   <div className="mt-2 text-center text-[11px] font-semibold uppercase tracking-widest opacity-90">
-                    {left >= 0
-                      ? `day${left === 1 ? '' : 's'} until your exam`
-                      : `day${left === -1 ? '' : 's'} since your exam`}
+                    {ts(left >= 0
+                      ? (left === 1 ? 'today.dayUntil' : 'today.daysUntil')
+                      : (left === -1 ? 'today.daySince' : 'today.daysSince'), ui)}
                   </div>
                 </>
               )}
@@ -248,7 +250,7 @@ export default function DashboardPage() {
       <section className="card relative overflow-hidden border-l-4 border-l-teal p-6">
         <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-teal/10" />
         <div className="relative flex items-center gap-2 text-sm font-semibold text-teal">
-          <Compass className="h-4 w-4" /> Do this next
+          <Compass className="h-4 w-4" /> {ts('today.doThisNext', ui)}
         </div>
           {/* `min-w-[180px]` on a `flex-1` child inside a `flex-wrap` row put
               the coordinate's name and its sentence OUTSIDE the card's left
@@ -264,13 +266,11 @@ export default function DashboardPage() {
             <div className="min-w-0 flex-1 basis-full sm:basis-auto">
               <div className="font-display text-2xl font-bold text-navy dark:text-white">{nextSlot.coordinate.label}</div>
               <div className="mt-0.5 text-xs text-ink-secondary">
-                {builtPlan.basis === 'attestation'
-                  ? 'Your weakest skill first — this is what moves your governing level.'
-                  : 'Your plan is in exam order until you enter a past result.'}
+                {ts(builtPlan.basis === 'attestation' ? 'today.weakestFirst' : 'today.examOrder', ui)}
               </div>
             </div>
             <Link to={practiceHref(nextSlot.coordinate)} className="btn-primary shrink-0">
-              Start now
+              {ts('today.startNow', ui)}
               <ChevronRight className="h-4 w-4" />
             </Link>
           </div>
@@ -280,15 +280,15 @@ export default function DashboardPage() {
                 on this same screen. The sentence tells the candidate what to
                 do; the tab bar is how they do it. A button that duplicates a
                 tab teaches that the tab is not to be trusted. */}
-            <p className="min-w-[180px] flex-1 text-sm text-ink-secondary">Pick a skill and begin.</p>
+            <p className="min-w-[180px] flex-1 text-sm text-ink-secondary">{ts('today.pickASkill', ui)}</p>
           </div>
         )}
       </section>
 
       {/* 2 ── the four skills, and which kind of number each one is */}
       <section className="space-y-3">
-        <SectionHeading icon={Flag} meta={`Target: ${target} in every skill`}>
-          Where you stand
+        <SectionHeading icon={Flag} meta={tf('today.targetMeta', { target }, ui)}>
+          {ts('today.whereYouStand', ui)}
         </SectionHeading>
 
         {/* FOUR ROWS, ONE STATUS CHIP EACH, NO PARAGRAPH — the ruling's §2.2,
@@ -342,7 +342,7 @@ export default function DashboardPage() {
           the page that owns the numbers. This is read at a glance, on the page
           that is opened several times a day. */}
       <section className="space-y-3">
-        <SectionHeading icon={ScrollText}>What is not built for your exam</SectionHeading>
+        <SectionHeading icon={ScrollText}>{ts('today.notBuilt', ui)}</SectionHeading>
         <NotBuiltNote exam={exam} />
         <Link
           to="/progress"
@@ -350,12 +350,12 @@ export default function DashboardPage() {
         >
           <div className="min-w-0 flex-1">
             <div className="text-sm font-semibold text-navy dark:text-white">
-              Are you ready to book?
+              {ts('today.readyToBook', ui)}
             </div>
             <div className="mt-0.5 text-xs text-ink-secondary">
               {gate.publishNumeric && governing.complete
-                ? `${exam.benchmark.system} ${governing.level} — and why`
-                : 'Not yet answerable — and why'}
+                ? tf('today.readyAnswer', { system: exam.benchmark.system, level: governing.level ?? '' }, ui)
+                : ts('today.notYetAnswerable', ui)}
             </div>
           </div>
           <ChevronRight className="h-5 w-5 shrink-0 text-ink-secondary" />
@@ -373,8 +373,8 @@ export default function DashboardPage() {
           <Crown className="h-6 w-6" />
         </div>
         <div className="flex-1">
-          <div className="font-display text-lg font-bold">Upgrade to SELM Pro</div>
-          <div className="text-xs text-white/80">Unlimited AI coaching · 7-day free trial</div>
+          <div className="font-display text-lg font-bold">{ts('today.upgrade', ui)}</div>
+          <div className="text-xs text-white/80">{ts('today.upgradeBlurb', ui)}</div>
         </div>
         <ChevronRight className="h-5 w-5 text-white/90" />
       </Link>
@@ -383,14 +383,15 @@ export default function DashboardPage() {
 }
 
 /** How this destination reads the result, in the candidate's own terms. */
-function requirementLine(goal: Goal): string {
+function requirementLine(goal: Goal, ui: UiLang): string {
   const target = `${goal.system} ${goal.requiredLevel}`;
+  const label = t(goal.label, ui);
   switch (goal.destination.requirement) {
     case 'overall':
-      return `${t(goal.label, 'en')} · an overall ${target}`;
+      return tf('today.reqOverall', { label, target }, ui);
     case 'both':
-      return `${t(goal.label, 'en')} · an overall ${target}, with a floor in every skill`;
+      return tf('today.reqBoth', { label, target }, ui);
     default:
-      return `${t(goal.label, 'en')} · ${target} in every skill, and the lowest one governs`;
+      return tf('today.reqEvery', { label, target }, ui);
   }
 }

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { AudioRecorder as Rec } from '../lib/audio';
 import { Mic, Square, Loader2 } from 'lucide-react';
 import clsx from 'clsx';
+import { ts, tf, useUiLangValue } from '../i18n';
 
 type Props = {
   onComplete: (blob: Blob, durationMs: number) => void;
@@ -13,6 +14,7 @@ type Props = {
 const BAR_COUNT = 32;
 
 export function AudioRecorder({ onComplete, maxSeconds = 60, disabled, label }: Props) {
+  const ui = useUiLangValue();
   const recRef = useRef<Rec | null>(null);
   const [state, setState] = useState<'idle' | 'requesting' | 'recording' | 'processing'>('idle');
   const [bars, setBars] = useState<number[]>(Array(BAR_COUNT).fill(0));
@@ -97,22 +99,22 @@ export function AudioRecorder({ onComplete, maxSeconds = 60, disabled, label }: 
       <div className="mt-6 flex justify-center">
         {state === 'idle' && (
           <button onClick={start} disabled={disabled} className="btn-accent w-48">
-            <Mic className="h-5 w-5" /> Start recording
+            <Mic className="h-5 w-5" /> {ts('recorder.start', ui)}
           </button>
         )}
         {state === 'requesting' && (
           <button disabled className="btn-secondary w-48">
-            <Loader2 className="h-5 w-5 animate-spin" /> Requesting mic…
+            <Loader2 className="h-5 w-5 animate-spin" /> {ts('recorder.requesting', ui)}
           </button>
         )}
         {state === 'recording' && (
           <button onClick={stop} className="btn w-48 bg-red-500 text-white hover:bg-red-600">
-            <Square className="h-4 w-4" /> Stop ({maxSeconds - seconds}s)
+            <Square className="h-4 w-4" /> {tf('recorder.stop', { s: maxSeconds - seconds }, ui)}
           </button>
         )}
         {state === 'processing' && (
           <button disabled className="btn-secondary w-48">
-            <Loader2 className="h-5 w-5 animate-spin" /> Processing…
+            <Loader2 className="h-5 w-5 animate-spin" /> {ts('recorder.processing', ui)}
           </button>
         )}
       </div>

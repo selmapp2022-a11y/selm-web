@@ -3,8 +3,11 @@ import { BackToPractice } from '../components/BackToPractice';
 import { useQuery } from '@tanstack/react-query';
 import { Brain, Eye, EyeOff, Plus } from 'lucide-react';
 import { dueWords, recordReview, addWord } from '../lib/vocab';
+import { ts, tf, useUiLangValue } from '../i18n';
+import { Rich } from '../i18n/Rich';
 
 export default function VocabularyPage() {
+  const ui = useUiLangValue();
   const { data, isLoading, refetch } = useQuery({ queryKey: ['vocab', 'due'], queryFn: dueWords });
   const [idx, setIdx] = useState(0);
   const [revealed, setRevealed] = useState(false);
@@ -50,30 +53,28 @@ export default function VocabularyPage() {
       <BackToPractice />
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl font-bold text-navy">Vocabulary review</h1>
-          <p className="mt-1 text-ink-secondary">Spaced repetition keeps words in your long-term memory.</p>
+          <h1 className="font-display text-3xl font-bold text-navy">{ts('vocab.title', ui)}</h1>
+          <p className="mt-1 text-ink-secondary">{ts('vocab.blurb', ui)}</p>
         </div>
         <button
           onClick={() => { setShowAdd((s) => !s); setAddMsg(null); setAddErr(null); }}
           className="btn-secondary flex items-center gap-2"
         >
-          <Plus className="h-4 w-4" /> Add word
+          <Plus className="h-4 w-4" /> {ts('vocab.addWord', ui)}
         </button>
       </div>
 
       {showAdd && (
         <div className="card p-5">
-          <label className="label">Add a word to your list</label>
-          <p className="mb-3 text-xs text-ink-secondary">
-            Type any English word. We'll look it up (or have your AI coach define it) and add it to your daily review.
-          </p>
+          <label className="label">{ts('vocab.addToList', ui)}</label>
+          <p className="mb-3 text-xs text-ink-secondary">{ts('vocab.addHelp', ui)}</p>
           <div className="flex gap-2">
             <input
               type="text"
               value={newWord}
               onChange={(e) => setNewWord(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter' && newWord.trim()) submitNewWord(); }}
-              placeholder="e.g. resilient"
+              placeholder={ts('vocab.placeholder', ui)}
               className="input flex-1"
               disabled={adding}
             />
@@ -82,7 +83,7 @@ export default function VocabularyPage() {
               disabled={!newWord.trim() || adding}
               className="btn-primary"
             >
-              {adding ? 'Adding…' : 'Add'}
+              {ts(adding ? 'vocab.adding' : 'vocab.add', ui)}
             </button>
           </div>
           {addMsg && <div className="mt-3 rounded-xl border-l-4 border-teal bg-teal/5 p-3 text-sm text-ink-primary">{addMsg}</div>}
@@ -95,16 +96,16 @@ export default function VocabularyPage() {
       {!isLoading && words.length === 0 && (
         <div className="card p-10 text-center">
           <Brain className="mx-auto mb-4 h-12 w-12 text-teal" />
-          <h3 className="mb-2 font-display text-xl font-bold text-navy">All caught up</h3>
-          <p className="text-ink-secondary">No words due for review right now. Tap <strong>Add word</strong> above to start your own list, or read and listen to pick up new ones.</p>
+          <h3 className="mb-2 font-display text-xl font-bold text-navy">{ts('vocab.allCaughtUp', ui)}</h3>
+          <p className="text-ink-secondary"><Rich k="vocab.nothingDue" /></p>
         </div>
       )}
 
       {!isLoading && words.length > 0 && !done && current && (
         <>
           <div className="flex items-center justify-between text-sm font-medium text-ink-secondary">
-            <span>Card {idx + 1} of {words.length}</span>
-            <button onClick={() => refetch()} className="btn-ghost text-sm">Refresh</button>
+            <span>{tf('vocab.cardOf', { i: idx + 1, n: words.length }, ui)}</span>
+            <button onClick={() => refetch()} className="btn-ghost text-sm">{ts('vocab.refresh', ui)}</button>
           </div>
           <div className="h-2 overflow-hidden rounded-full bg-surface-muted">
             <div className="h-full rounded-full bg-navy transition-all" style={{ width: `${((idx + 1) / words.length) * 100}%` }} />
@@ -112,7 +113,7 @@ export default function VocabularyPage() {
 
           <div className="card overflow-hidden p-10">
             <div className="text-center">
-              <div className="mb-1 text-xs uppercase tracking-wider text-ink-secondary">{current.part_of_speech || 'word'}</div>
+              <div className="mb-1 text-xs uppercase tracking-wider text-ink-secondary">{current.part_of_speech || ts('vocab.word', ui)}</div>
               <h2 className="font-display text-5xl font-bold text-navy">{current.word}</h2>
               {current.pronunciation && <p className="mt-2 font-mono text-sm text-ink-secondary">/{current.pronunciation}/</p>}
             </div>
@@ -120,27 +121,27 @@ export default function VocabularyPage() {
             {revealed ? (
               <div className="mt-8 space-y-4">
                 <div className="rounded-2xl bg-surface-muted p-5">
-                  <div className="text-xs font-bold uppercase text-ink-secondary">Definition</div>
+                  <div className="text-xs font-bold uppercase text-ink-secondary">{ts('vocab.definition', ui)}</div>
                   <p className="mt-1 text-lg text-ink-primary">{current.definition}</p>
                 </div>
                 {current.example && (
                   <div className="rounded-2xl border-l-4 border-teal bg-teal/5 p-5">
-                    <div className="text-xs font-bold uppercase text-teal">Example</div>
+                    <div className="text-xs font-bold uppercase text-teal">{ts('vocab.example', ui)}</div>
                     <p className="mt-1 italic text-ink-primary">"{current.example}"</p>
                   </div>
                 )}
 
                 <div className="grid grid-cols-3 gap-2 pt-4">
-                  <button onClick={() => grade(1)} className="btn bg-red-500 text-white hover:bg-red-600">Hard</button>
-                  <button onClick={() => grade(3)} className="btn bg-amber-500 text-white hover:bg-amber-600">Good</button>
-                  <button onClick={() => grade(5)} className="btn-accent">Easy</button>
+                  <button onClick={() => grade(1)} className="btn bg-red-500 text-white hover:bg-red-600">{ts('vocab.hard', ui)}</button>
+                  <button onClick={() => grade(3)} className="btn bg-amber-500 text-white hover:bg-amber-600">{ts('vocab.good', ui)}</button>
+                  <button onClick={() => grade(5)} className="btn-accent">{ts('vocab.easy', ui)}</button>
                 </div>
-                <p className="text-center text-xs text-ink-secondary">How well did you remember it?</p>
+                <p className="text-center text-xs text-ink-secondary">{ts('vocab.howWell', ui)}</p>
               </div>
             ) : (
               <div className="mt-10 text-center">
                 <button onClick={() => setRevealed(true)} className="btn-primary">
-                  <Eye className="h-5 w-5" /> Show definition
+                  <Eye className="h-5 w-5" /> {ts('vocab.showDefinition', ui)}
                 </button>
               </div>
             )}
@@ -151,9 +152,9 @@ export default function VocabularyPage() {
       {done && (
         <div className="card p-10 text-center">
           <div className="mb-4 text-5xl">🎉</div>
-          <h3 className="font-display text-2xl font-bold text-navy">Session complete</h3>
-          <p className="mt-2 text-ink-secondary">You reviewed {words.length} words. See you tomorrow.</p>
-          <button onClick={() => refetch()} className="btn-secondary mt-6">Check for more</button>
+          <h3 className="font-display text-2xl font-bold text-navy">{ts('vocab.sessionComplete', ui)}</h3>
+          <p className="mt-2 text-ink-secondary">{tf('vocab.reviewed', { n: words.length }, ui)}</p>
+          <button onClick={() => refetch()} className="btn-secondary mt-6">{ts('vocab.checkMore', ui)}</button>
         </div>
       )}
     </div>

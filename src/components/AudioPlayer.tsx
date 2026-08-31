@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Play, Pause, RotateCcw, Volume2, AlertCircle, Users } from 'lucide-react';
 import clsx from 'clsx';
 import { aiSpeakSequence, aiTTS, parseDialogue, stopBrowserTTS } from '../lib/tts';
+import { ts, tf, useUiLangValue } from '../i18n';
 
 const RATES = [0.5, 0.75, 1, 1.25, 1.5];
 
@@ -14,6 +15,7 @@ type Props = {
 // Mode: try the real audio file first; if it fails (404/network),
 // fall back to browser SpeechSynthesis using fallbackText.
 export function AudioPlayer({ src, fallbackText, onEnd }: Props) {
+  const ui = useUiLangValue();
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -177,17 +179,17 @@ export function AudioPlayer({ src, fallbackText, onEnd }: Props) {
                 <>
                   <Users className="mr-1 inline h-4 w-4" />
                   {ttsLoading
-                    ? <>Loading audio…</>
+                    ? <>{ts('player.loading', ui)}</>
                     : playing && seqIdx >= 0 && dialogue
-                    ? <>Now speaking: <span className="font-semibold text-teal">{dialogue[seqIdx].speaker}</span> ({seqIdx + 1}/{dialogue.length})</>
-                    : <>Dialogue • {dialogue!.length} lines • {Array.from(new Set(dialogue!.map((d) => d.speaker))).join(' & ')}</>}
+                    ? <>{ts('player.nowSpeaking', ui)} <span className="font-semibold text-teal">{dialogue[seqIdx].speaker}</span> ({seqIdx + 1}/{dialogue.length})</>
+                    : <>{tf('player.dialogue', { n: dialogue!.length }, ui)} • {Array.from(new Set(dialogue!.map((d) => d.speaker))).join(' & ')}</>}
                 </>
               ) : ttsLoading ? (
-                <><Volume2 className="mr-1 inline h-4 w-4 animate-pulse" /> Loading audio…</>
+                <><Volume2 className="mr-1 inline h-4 w-4 animate-pulse" /> {ts('player.loading', ui)}</>
               ) : (
                 <>
                   {audioFailed ? <AlertCircle className="mr-1 inline h-4 w-4" /> : <Volume2 className="mr-1 inline h-4 w-4" />}
-                  {audioFailed ? 'Audio file unavailable — using browser voice' : 'Browser voice'}
+                  {ts(audioFailed ? 'player.fileUnavailable' : 'player.browserVoice', ui)}
                 </>
               )}
             </div>

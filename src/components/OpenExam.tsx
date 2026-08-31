@@ -3,6 +3,7 @@ import { tokenStore } from '../lib/api';
 import { hasPrivacyConsent } from '../pages/ConsentPage';
 import { AppLayout } from './AppLayout';
 import { Logo } from './Logo';
+import { ts, useUiLangValue } from '../i18n';
 
 /**
  * ── THE FREE MOCK, WITHOUT AN ACCOUNT ────────────────────────────────────
@@ -41,6 +42,7 @@ import { Logo } from './Logo';
  */
 export function OpenExamLayout() {
   const loc = useLocation();
+  const ui = useUiLangValue();
   if (tokenStore.get()) {
     // A SIGNED-IN candidate is exactly who ProtectedRoute used to hold here,
     // and it held the consent too. Dropping this route out of ProtectedRoute
@@ -56,7 +58,7 @@ export function OpenExamLayout() {
       <header className="border-b border-surface-divider bg-white dark:border-slate-700 dark:bg-slate-900">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-3">
           <Logo />
-          <span className="text-xs font-medium text-ink-secondary">Free mock exam</span>
+          <span className="text-xs font-medium text-ink-secondary">{ts('openExam.freeMock', ui)}</span>
         </div>
       </header>
       <main>

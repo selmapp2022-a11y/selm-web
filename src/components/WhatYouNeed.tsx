@@ -1,5 +1,7 @@
 import { Target } from 'lucide-react';
 import type { PracticeSet } from '../lib/practiceTasks';
+import { ts, useUiLangValue } from '../i18n';
+import { Rich } from '../i18n/Rich';
 
 /**
  * What this destination demands of this skill, in the exam's own units.
@@ -24,23 +26,21 @@ import type { PracticeSet } from '../lib/practiceTasks';
  * published elsewhere; it states what the destination requires.
  */
 export function WhatYouNeed({ need, skill }: { need: PracticeSet['need']; skill: 'writing' | 'speaking' }) {
+  const ui = useUiLangValue();
   if (!need) return null;
-  const noun = skill === 'writing' ? 'writing' : 'speaking';
+  const noun = ts(skill === 'writing' ? 'need.writing' : 'need.speaking', ui);
 
   return (
     <div className="flex items-start gap-3 rounded-xl bg-surface-muted px-4 py-3">
       <Target className="mt-0.5 h-4 w-4 shrink-0 text-ink-secondary" />
       <p className="text-xs leading-relaxed text-ink-secondary">
-        Your destination needs <strong className="text-ink-primary">{need.system} {need.level}</strong> in {noun}
+        <Rich k="need.demand" vars={{ system: need.system, level: need.level, skill: noun }} />
         {need.score !== null && !need.onExamScale ? (
-          <>
-            , which on this exam is <strong className="text-ink-primary">{need.score.toFixed(1)}</strong>.{' '}
-          </>
+          <Rich k="need.onThisExam" vars={{ score: need.score.toFixed(1) }} />
         ) : (
           <>. </>
         )}
-        The task below is the one the exam sets at every level — what changes with the level you need is
-        what a sufficient answer looks like, not which question is asked.
+        {ts('need.sameTask', ui)}
       </p>
     </div>
   );

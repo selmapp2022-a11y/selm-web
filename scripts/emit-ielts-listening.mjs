@@ -38,7 +38,30 @@ const field = (b, name) => {
   const m = new RegExp(`\\n\\s+${name}: ['"]((?:[^"'\\\\]|\\\\.)*)['"],`).exec(b);
   return m ? m[1] : null;
 };
-for (const b of blocks) {
+// ── AND A SECOND FIELD ORDER PROBLEM, FOUND THE SAME WAY ──────────────────
+// The sixteen recordings authored on 31 August carry a `renditions.australia`
+// sub-object, and it declares a `variety` of its own — BEFORE the recording's.
+// `field()` reads the first match in the block, so every one of those sixteen
+// rows was emitted with the AUSTRALIA track's accent as if it were the
+// recording's, and `ielts-listening.check` went red saying the plan and the
+// file disagreed about what had been spoken. Both were right; the scraper was
+// reading a nested object as though it were the outer one.
+//
+// A recording now has TWO accents — one per track — so the row carries both
+// and the sub-object is lifted out before the outer fields are read.
+const splitRenditions = (b) => {
+  const at = b.indexOf('renditions: {');
+  if (at < 0) return [b, null];
+  let i = b.indexOf('{', at), depth = 0;
+  for (let j = i; j < b.length; j++) {
+    if (b[j] === '{') depth++;
+    else if (b[j] === '}' && --depth === 0) return [b.slice(0, at) + b.slice(j + 1), b.slice(at, j + 1)];
+  }
+  return [b, null];
+};
+
+for (const raw of blocks) {
+  const [b, renditions] = splitRenditions(raw);
   const id = field(b, 'id');
   const rawScript = /\n\s+script: "((?:[^"\\]|\\.)*)",/.exec(b);
   if (!id || !rawScript) continue;
@@ -60,6 +83,9 @@ for (const b of blocks) {
     level: field(b, 'level'),
     speakers: speakers ? Number(speakers[1]) : 1,
     variety: field(b, 'variety'),
+    // The Australia track's accent, where that track has been rendered. Null
+    // for a recording that only exists on the primary track.
+    australiaVariety: renditions ? field(renditions, 'variety') : null,
     narratorIntro: intro,
     narratorOutro: outro,
     body: lines,

@@ -38,6 +38,7 @@ import { EXAMS } from '../definitions';
 import { CATALOGUE } from '../definitions/prescriptions';
 import { coordinatesFor, MIN_ITEMS_PER_COORDINATE } from './planner';
 import { deliverable } from './practicePool';
+import { promptsOf } from './productionPool';
 import { isChoiceItem, isCompletionItem, isMatchingItem } from '../model/types';
 import type { ComprehensionSection, ExamDefinition, ProductionSection, SkillId } from '../model/types';
 
@@ -64,6 +65,13 @@ export type SkillRow = {
   /** Everything in the bank behind this skill. */
   existsItems: number;
   existsRecordings: number;
+  /**
+   * Production only: how many TASKS the exam has, where `existsItems` counts
+   * the SITUATIONS across them. Both are needed and they are not the same
+   * number — "2 tasks" is what the awarding body sets, "8 situations" is what
+   * the bank can put in front of a candidate who opens Task 1 four times.
+   */
+  existsTasks: number;
   byLevel: Record<string, number>;
   byGroup: Record<string, number>;
   byKind: Record<string, number>;
@@ -117,6 +125,7 @@ export function inventory(sizeOf: (audioPath: string) => number = () => 0): Skil
         serves: 0,
         existsItems: 0,
         existsRecordings: 0,
+        existsTasks: 0,
         byLevel: {},
         byGroup: {},
         byKind: {},
@@ -220,15 +229,34 @@ export function inventory(sizeOf: (audioPath: string) => number = () => 0): Skil
         row.freeExamItems = c.items.length;
       } else if (section?.kind === 'production') {
         const p = section as ProductionSection;
+        // ── COUNTED IN SITUATIONS, NOT IN TASKS OR IN COORDINATES ──────────
+        // Until 31 August this branch reported writing and speaking as ZERO
+        // servable on every exam. Two mistakes, one on top of the other:
+        // `reachableItems` and `servableItems` counted COORDINATES while
+        // `existsItems` counted TASKS — the exact unit mismatch the comment on
+        // those fields already warns about — and the planner's own
+        // `itemsForTask` returned 1 per task, so no task could ever reach the
+        // floor of 4. Two of four skills read empty with four situations
+        // sitting behind each of thirteen tasks.
+        //
+        // A production coordinate serves ONE SITUATION at a time, chosen
+        // least-recently-served among unseen. So the situation is the unit,
+        // and every number in this row is now in it.
+        const situations = p.tasks.reduce((n, t) => n + promptsOf(t).length, 0);
         row.sets = p.sets.tasks ?? null;
         row.setsUnit = 'tasks';
         row.setsSource = p.sets.source;
+        // One sitting sets one situation per task.
         row.serves = p.tasks.length;
-        row.existsItems = p.tasks.length;
-        for (const t of p.tasks) row.byGroup[t.id] = 1;
-        row.reachableItems = list.filter((x) => x.coordinate.kind === 'task' && x.items > 0).length;
-        row.servableItems = list.filter((x) => x.coordinate.kind === 'task' && x.items >= MIN_ITEMS_PER_COORDINATE).length;
-        row.freeExamItems = p.tasks.length;
+        row.existsItems = situations;
+        row.existsTasks = p.tasks.length;
+        for (const t of p.tasks) row.byGroup[t.id] = promptsOf(t).length;
+        const taskCoords = list.filter((x) => x.coordinate.kind === 'task');
+        row.reachableItems = taskCoords.reduce((n, x) => n + x.items, 0);
+        row.servableItems = taskCoords
+          .filter((x) => x.items >= MIN_ITEMS_PER_COORDINATE)
+          .reduce((n, x) => n + x.items, 0);
+        row.freeExamItems = situations;
       }
 
       // The paid side: prescription practice items. These are remediation —
@@ -253,12 +281,15 @@ export function hoursOfWork(rows: SkillRow[], exam: ExamDefinition): string {
   const mine = rows.filter((r) => r.exam === exam.id);
   const audioSec = mine.reduce((n, r) => n + r.audio.seconds, 0);
   const items = mine.reduce((n, r) => n + r.existsItems, 0);
+  // Production situations are charged at the task rate below, so they must not
+  // also be charged a minute here — they were, until 31 August.
   const tasks = mine.filter((r) => r.setsUnit === 'tasks').reduce((n, r) => n + r.existsItems, 0);
+  const counted = items - tasks;
   const practice = mine.reduce((n, r) => n + r.paidPracticeItems, 0);
   // A counted question takes roughly a minute including reading the material
   // it belongs to; a production task takes its published time. Both are
   // estimates and are labelled as such — the item COUNTS above are exact.
-  const minutes = Math.round(items * 1 + tasks * 20 + practice * 5 + audioSec / 60);
+  const minutes = Math.round(counted * 1 + tasks * 20 + practice * 5 + audioSec / 60);
   return `${exam.id}: ${items} items and ${practice} prescription practice items behind ${mine.length} skills, `
     + `with ${mmss(audioSec)} of audio. At roughly a minute per counted question, twenty minutes per production task `
     + `and five per prescription item, that is about ${Math.floor(minutes / 60)}h ${minutes % 60}m of non-repeating work `
@@ -297,7 +328,7 @@ export function report(sizeOf: (audioPath: string) => number): string {
         w(`     audio:      ${r.audio.files} files, ${mmss(r.audio.seconds)}, ${r.audio.varieties.length} varieties`
           + `${r.audio.varieties.length ? ` (${r.audio.varieties.join(', ')})` : ''}`);
       } else {
-        w(`     material:   ${r.existsItems} tasks`);
+        w(`     material:   ${r.existsTasks} tasks, ${r.existsItems} situations`);
       }
       w(`     by group:   ${Object.entries(r.byGroup).map(([k, n]) => `${k} ${n}`).join('  ') || '—'}`);
       w(`     cells:      ${r.cells} prescription cell(s), ${r.paidPracticeItems} practice item(s)`);

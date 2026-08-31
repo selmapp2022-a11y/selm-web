@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Mic, Headphones, BookOpen, PenLine, Brain, ChevronRight } from 'lucide-react';
 import { useDocumentTitle } from '../lib/useDocumentTitle';
 import { lookFor } from '../lib/skillLook';
+import { ts, useUiLangValue, type Key } from '../i18n';
 
 /**
  * SELM-IA.md §5 — one "start practising".
@@ -12,22 +13,24 @@ import { lookFor } from '../lib/skillLook';
  * "practice tabs" pass). Vocabulary is a support surface, not a fifth skill,
  * so it is a card here rather than a sibling in the nav.
  */
+// The four cards hold KEYS, not words. §5.2 — a label written here is a label
+// a francophone candidate reads in English on the page that decides what they
+// practise next.
 const SKILLS = [
-  { to: '/practice/speaking',  skill: 'speaking',  label: 'Speaking',  icon: Mic,        blurb: 'Record the exam’s speaking tasks and get scored feedback.' },
-  { to: '/practice/listening', skill: 'listening', label: 'Listening', icon: Headphones, blurb: 'The exam’s own listening questions, one at a time.' },
-  { to: '/practice/reading',   skill: 'reading',   label: 'Reading',   icon: BookOpen,   blurb: 'The exam’s own reading passages and questions.' },
-  { to: '/practice/writing',   skill: 'writing',   label: 'Writing',   icon: PenLine,    blurb: 'Write each exam task and get scored feedback.' },
-] as const;
+  { to: '/practice/speaking',  skill: 'speaking',  label: 'nav.speaking',  icon: Mic,        blurb: 'practice.speakingBlurb' },
+  { to: '/practice/listening', skill: 'listening', label: 'nav.listening', icon: Headphones, blurb: 'practice.listeningBlurb' },
+  { to: '/practice/reading',   skill: 'reading',   label: 'nav.reading',   icon: BookOpen,   blurb: 'practice.readingBlurb' },
+  { to: '/practice/writing',   skill: 'writing',   label: 'nav.writing',   icon: PenLine,    blurb: 'practice.writingBlurb' },
+] as const satisfies ReadonlyArray<{ to: string; skill: string; label: Key; icon: unknown; blurb: Key }>;
 
 export default function PracticePage() {
-  useDocumentTitle('Practice');
+  const ui = useUiLangValue();
+  useDocumentTitle(ts('nav.practice', ui));
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="font-display text-3xl font-bold text-navy">Practice</h1>
-        <p className="mt-1 text-ink-secondary">
-          Your four exam skills. Pick one and work its tasks — in the language your exam is set in.
-        </p>
+        <h1 className="font-display text-3xl font-bold text-navy">{ts('nav.practice', ui)}</h1>
+        <p className="mt-1 text-ink-secondary">{ts('practice.hubBlurb', ui)}</p>
       </header>
 
       <div className="grid gap-3 sm:grid-cols-2">
@@ -45,8 +48,8 @@ export default function PracticePage() {
                 <s.icon className="h-5 w-5" />
               </div>
               <div>
-                <div className="font-display text-lg font-bold text-navy">{s.label}</div>
-                <div className="mt-0.5 text-sm text-ink-secondary">{s.blurb}</div>
+                <div className="font-display text-lg font-bold text-navy">{ts(s.label, ui)}</div>
+                <div className="mt-0.5 text-sm text-ink-secondary">{ts(s.blurb, ui)}</div>
               </div>
             </div>
             <ChevronRight className="h-5 w-5 shrink-0 text-ink-secondary" />
@@ -60,8 +63,8 @@ export default function PracticePage() {
           <Brain className="h-5 w-5" />
         </div>
         <div className="min-w-0 flex-1">
-          <div className="font-display text-base font-bold text-navy">Vocabulary</div>
-          <div className="mt-0.5 text-sm text-ink-secondary">Extra practice that supports the four skills — not one of them.</div>
+          <div className="font-display text-base font-bold text-navy">{ts('nav.vocabulary', ui)}</div>
+          <div className="mt-0.5 text-sm text-ink-secondary">{ts('practice.vocabBlurb', ui)}</div>
         </div>
         <ChevronRight className="h-5 w-5 shrink-0 text-ink-secondary" />
       </Link>

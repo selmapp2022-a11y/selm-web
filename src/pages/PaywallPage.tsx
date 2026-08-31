@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Capacitor } from '@capacitor/core';
 import { Check, Crown, X, RefreshCw } from 'lucide-react';
+import { ts, tf, useUiLangValue, type Key } from '../i18n';
 
 // SELM Pro paywall — Build 38 / v2.0.7.
 //
@@ -95,12 +96,12 @@ const PLANS: UiPlan[] = [
   },
 ];
 
-const PERKS = [
-  'Unlimited AI coaching across Speaking, Listening, Reading, Writing',
-  'Real-time pronunciation feedback with IELTS-style scoring',
-  'Adaptive lessons tuned to your CEFR level (A1–C2)',
-  'Vocabulary spaced repetition',
-  'Priority AI response times',
+const PERKS: Key[] = [
+  'paywall.perk1',
+  'paywall.perk2',
+  'paywall.perk3',
+  'paywall.perk4',
+  'paywall.perk5',
 ];
 
 // Module-level flag so we only configure Purchases once per session,
@@ -232,6 +233,7 @@ async function loadProducts(): Promise<Record<string, StoreProduct>> {
 }
 
 export default function PaywallPage() {
+  const ui = useUiLangValue();
   const navigate = useNavigate();
   const isNative = Capacitor.isNativePlatform();
   const [selectedId, setSelectedId] = useState<string>(PRODUCT_YEARLY);
@@ -474,7 +476,7 @@ export default function PaywallPage() {
         <button
           onClick={() => navigate('/dashboard')}
           className="rounded-full p-2 text-ink-secondary hover:bg-slate-100 dark:hover:bg-slate-800"
-          aria-label="Close"
+          aria-label={ts('common.close', ui)}
         >
           <X className="h-5 w-5" />
         </button>
@@ -485,16 +487,14 @@ export default function PaywallPage() {
           <Crown className="h-8 w-8 text-white" />
         </div>
         <h1 className="text-3xl font-display font-bold text-navy dark:text-white">SELM Pro</h1>
-        <p className="mt-1 text-sm text-ink-secondary dark:text-slate-400">
-          Unlock every feature and reach fluency faster.
-        </p>
+        <p className="mt-1 text-sm text-ink-secondary dark:text-slate-400">{ts('paywall.blurb', ui)}</p>
       </div>
 
       <ul className="mb-6 space-y-2">
         {PERKS.map((perk) => (
           <li key={perk} className="flex items-start gap-2">
             <Check className="mt-0.5 h-5 w-5 flex-none text-navy" />
-            <span className="text-sm text-navy dark:text-slate-200">{perk}</span>
+            <span className="text-sm text-navy dark:text-slate-200">{ts(perk, ui)}</span>
           </li>
         ))}
       </ul>
@@ -513,7 +513,7 @@ export default function PaywallPage() {
             className="inline-flex items-center gap-1 rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-700"
           >
             <RefreshCw className="h-3.5 w-3.5" />
-            Reload
+            {ts('stale.reload', ui)}
           </button>
         </div>
       )}
@@ -531,14 +531,14 @@ export default function PaywallPage() {
             className="mt-2 inline-flex items-center gap-1 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-700"
           >
             <RefreshCw className="h-3.5 w-3.5" />
-            Reload subscriptions and try again
+            {ts('paywall.reloadSubs', ui)}
           </button>
         </div>
       )}
 
       {/* One-line reminder directly above the CTA. */}
       <p className="mb-2 text-center text-xs text-ink-secondary dark:text-slate-400">
-        Free for 7 days, then {selectedPrice}/{selectedPlan.cadence}. Auto-renews unless cancelled at least 24 hours before the trial ends.
+        {tf('paywall.reminder', { price: selectedPrice, cadence: selectedPlan.cadence }, ui)}
       </p>
 
       <button
@@ -546,7 +546,7 @@ export default function PaywallPage() {
         disabled={subscribeDisabled}
         className="w-full rounded-2xl bg-navy py-3.5 text-base font-bold text-white shadow-md transition hover:bg-navy-700 disabled:opacity-60"
       >
-        {busy ? 'Processing…' : 'Start 7-day free trial'}
+        {ts(busy ? 'recorder.processing' : 'paywall.startTrial', ui)}
       </button>
 
       <button
@@ -554,16 +554,11 @@ export default function PaywallPage() {
         disabled={busy}
         className="mt-3 w-full py-2 text-sm text-navy hover:underline disabled:opacity-60 dark:text-teal-300"
       >
-        Restore purchases
+        {ts('paywall.restore', ui)}
       </button>
 
       <p className="mt-6 text-center text-xs text-ink-secondary dark:text-slate-500">
-        Payment will be charged to your Apple ID account at the end of the
-        7-day free trial. Subscription automatically renews at {selectedPrice}/{selectedPlan.cadence}
-        {' '}unless cancelled at least 24 hours before the end of the current period.
-        You can manage and cancel your subscription any time by going to your account
-        settings on the App Store after purchase. No refunds are provided for partial
-        subscription periods.
+        {tf('paywall.legal', { price: selectedPrice, cadence: selectedPlan.cadence }, ui)}
       </p>
 
       {/* Terms of Use + Privacy Policy links — required by App Store
@@ -571,12 +566,12 @@ export default function PaywallPage() {
           subscriptions. Must be functional (both routes are public
           in App.tsx). */}
       <p className="mt-3 text-center text-xs text-ink-secondary dark:text-slate-500">
-        By subscribing you agree to our{' '}
+        {ts('paywall.bySubscribing', ui)}{' '}
         <a href="https://app.selmapp.ca/terms" target="_blank" rel="noreferrer noopener" className="font-semibold text-navy hover:underline dark:text-teal-300">
-          Terms of Use
-        </a>{' '}and{' '}
+          {ts('legal.termsOfUse', ui)}
+        </a>{' '}{ts('consent.and', ui)}{' '}
         <a href="https://app.selmapp.ca/privacy" target="_blank" rel="noreferrer noopener" className="font-semibold text-navy hover:underline dark:text-teal-300">
-          Privacy Policy
+          {ts('legal.privacyPolicy', ui)}
         </a>
         .
       </p>

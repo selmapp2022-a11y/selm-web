@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { BackToPractice } from '../components/BackToPractice';
 import { ComprehensionPractice } from '../components/ComprehensionPractice';
 import { examNameForPractice } from '../lib/practiceTasks';
+import { ts, tf, useUiLangValue } from '../i18n';
 
 /**
  * Reading — the exam's own reading section, and nothing else.
@@ -38,6 +39,7 @@ import { examNameForPractice } from '../lib/practiceTasks';
  * tasks are present.
  */
 export default function ReadingPage() {
+  const ui = useUiLangValue();
   const [examName, setExamName] = useState<string | null>(null);
   useEffect(() => { examNameForPractice().then(setExamName); }, []);
 
@@ -45,9 +47,9 @@ export default function ReadingPage() {
     <div className="space-y-6">
       <BackToPractice />
       <div>
-        <h1 className="font-display text-3xl font-bold text-navy dark:text-white">Reading</h1>
+        <h1 className="font-display text-3xl font-bold text-navy dark:text-white">{ts('nav.reading', ui)}</h1>
         <p className="mt-1 text-ink-secondary">
-          {examName ? `${examName} — read and answer, at your level.` : 'Read and answer, at your level.'}
+          {examName ? tf('practice.readAnswerNamed', { exam: examName }, ui) : ts('practice.readAnswer', ui)}
         </p>
       </div>
 

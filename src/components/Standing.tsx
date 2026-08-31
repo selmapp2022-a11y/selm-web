@@ -1,4 +1,5 @@
 import { ProgressBar } from '../exam/components/SectionClock';
+import { Rich } from '../i18n/Rich';
 import { lookFor } from '../lib/skillLook';
 import { t } from '../exam/model/format';
 import type { SittingRecord } from '../exam/model/history';
@@ -43,14 +44,11 @@ export function StandingNote({ exam }: { exam: ExamDefinition }) {
   const counted = exam.sections.filter((s) => s.kind === 'comprehension').length;
   return counted > 0 ? (
     <p className="text-xs leading-relaxed text-ink-secondary">
-      Comprehension is <strong>counted</strong> — an exact number of correct answers against our own
-      item bank. Production is <strong>estimated</strong>, and no estimate is published for it yet.
-      The two are not the same kind of number and are never added together.
+      <Rich k="standing.counted" />
     </p>
   ) : (
     <p className="text-xs leading-relaxed text-ink-secondary">
-      Every section of this exam is <strong>production</strong> — writing and speaking — which is
-      estimated rather than counted, and no estimate is published for it yet.
+      <Rich k="standing.allProduction" />
     </p>
   );
 }

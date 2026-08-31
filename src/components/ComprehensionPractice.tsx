@@ -17,6 +17,8 @@ import { isCompletionItem, isMatchingItem } from '../exam/model/types';
 import { markCompletion } from '../exam/engine/completion';
 import { isResponseCorrect } from '../exam/engine/comprehension';
 import { MatchingBank } from './MatchingBank';
+import { ts, tf, useUiLangValue } from '../i18n';
+import { Rich } from '../i18n/Rich';
 
 /**
  * Practice for a comprehension skill, served from THE EXAM'S OWN BANK.
@@ -48,6 +50,7 @@ import { MatchingBank } from './MatchingBank';
 const state0Name = (n: string) => n;
 
 export function ComprehensionPractice({ skill }: { skill: 'reading' | 'listening' }) {
+  const ui = useUiLangValue();
   const [params] = useSearchParams();
   const askedFamily = params.get('family');
   const askedLevel = params.get('level');
@@ -139,10 +142,10 @@ export function ComprehensionPractice({ skill }: { skill: 'reading' | 'listening
       // be checked from the screen is the kind this product does not make.
       const levelNote =
         level.basis === 'attestation'
-          ? `Served around ${cefrTag(level.index)} — the level your last ${state0Name(examName)} result puts you at.`
+          ? tf('cp.levelFromResult', { band: cefrTag(level.index), exam: state0Name(examName) }, ui)
           : goal
-            ? `Served around ${cefrTag(level.index)} — the level ${goal.system} ${goal.requiredLevel} asks for. A past score report makes this follow your marks instead.`
-            : `Served around ${cefrTag(level.index)}.`;
+            ? tf('cp.levelFromGoal', { band: cefrTag(level.index), system: goal.system, level: goal.requiredLevel }, ui)
+            : tf('cp.levelPlain', { band: cefrTag(level.index) }, ui);
       // The coordinate Today named, if it named one. `usable` is already
       // filtered by `deliverable` and by the accent track; this narrows it to
       // one family and band, and NOTHING silently widens it back.
@@ -166,17 +169,14 @@ export function ComprehensionPractice({ skill }: { skill: 'reading' | 'listening
   const Icon = skill === 'listening' ? Headphones : BookOpen;
 
   if (state.kind === 'loading') {
-    return <div className="card p-6 text-sm text-ink-secondary">Loading…</div>;
+    return <div className="card p-6 text-sm text-ink-secondary">{ts('common.loading', ui)}</div>;
   }
 
   if (state.kind === 'no-plan') {
     return (
       <div className="card p-6">
-        <p className="text-sm text-ink-primary">
-          Choose your exam first. Everything you practise here — the language, the text types, the
-          questions — comes from it.
-        </p>
-        <Link to="/me" className="btn-primary mt-4 inline-block">Choose my exam</Link>
+        <p className="text-sm text-ink-primary">{ts('cp.chooseExamFirst', ui)}</p>
+        <Link to="/me" className="btn-primary mt-4 inline-block">{ts('cp.chooseMyExam', ui)}</Link>
       </div>
     );
   }
@@ -188,19 +188,14 @@ export function ComprehensionPractice({ skill }: { skill: 'reading' | 'listening
           <Icon className="mt-0.5 h-5 w-5 shrink-0 text-ink-secondary" />
           <div>
             <p className="font-medium text-navy">
-              {state.examName} — this skill is not built yet
+              {tf('cp.skillNotBuilt', { exam: state.examName }, ui)}
             </p>
             <p className="mt-2 text-sm leading-relaxed text-ink-secondary">
-              Your exam awards a {skill} score, and we have not authored that part of it. Nothing is
-              shown here rather than substituting general {skill} material, because practising
-              something the exam does not set would not move your score, and telling you otherwise
-              would be worse than an empty page.
+              {tf('cp.skillNotBuiltWhy', { skill: ts(`nav.${skill}` as 'nav.reading', ui).toLowerCase() }, ui)}
             </p>
-            <p className="mt-3 text-sm text-ink-secondary">
-              The skills that are built are on the practice page.
-            </p>
+            <p className="mt-3 text-sm text-ink-secondary">{ts('cp.builtSkillsOnPractice', ui)}</p>
             <Link to="/practice" className="btn-ghost mt-3 inline-block border-2 border-surface-divider px-4 py-2">
-              Back to practice
+              {ts('cp.backToPractice', ui)}
             </Link>
           </div>
         </div>
@@ -214,14 +209,10 @@ export function ComprehensionPractice({ skill }: { skill: 'reading' | 'listening
         <div className="flex items-start gap-3">
           <Headphones className="mt-0.5 h-5 w-5 shrink-0 text-ink-secondary" />
           <div>
-            <p className="font-medium text-navy">{state.examName} — the recordings are not ready</p>
-            <p className="mt-2 text-sm leading-relaxed text-ink-secondary">
-              The questions exist but their audio has not been recorded. A listening question without
-              its recording is a reading question, so it is not offered. This section opens as soon as
-              the audio is in place.
-            </p>
+            <p className="font-medium text-navy">{tf('cp.audioNotReady', { exam: state.examName }, ui)}</p>
+            <p className="mt-2 text-sm leading-relaxed text-ink-secondary">{ts('cp.audioNotReadyWhy', ui)}</p>
             <Link to="/practice" className="btn-ghost mt-3 inline-block border-2 border-surface-divider px-4 py-2">
-              Back to practice
+              {ts('cp.backToPractice', ui)}
             </Link>
           </div>
         </div>
@@ -276,6 +267,7 @@ function Runner({
   /** The coordinate Today named, when it named one. */
   asked: { family: string; level: string; label: string } | null;
 }) {
+  const ui = useUiLangValue();
   // Which recording to serve is NOT this component's decision, and that is
   // the fix. Until 2026-08-29 it was: sort easiest-first, `useState(0)`, read
   // index 0 - and since component state does not survive a navigation, the
@@ -320,7 +312,8 @@ function Runner({
   const items = useMemo(() => (rec ? itemsOf(section, rec.id) : []), [section, rec]);
   const isAudio = section.delivery.audioPlaysOnce;
   const family = section.families?.find((f) => f.id === rec?.family);
-  const noun = isAudio ? 'recording' : 'passage';
+  const noun = ts(isAudio ? 'cp.recording' : 'cp.passage', ui);
+  const nounPl = ts(isAudio ? 'cp.recordings' : 'cp.passages', ui);
 
   // ── THE COORDINATE TODAY NAMED, AND THE CASE WHERE IT HOLDS NOTHING ────
   //
@@ -334,22 +327,20 @@ function Runner({
       <div className="card p-6">
         <span className="chip">{asked.label}</span>
         <h2 className="mt-3 font-display text-xl font-bold text-navy dark:text-white">
-          Nothing is written here yet
+          {ts('cp.nothingHereYet', ui)}
         </h2>
         <p className="mt-2 text-sm leading-relaxed text-ink-secondary">
-          Your plan points at <strong>{asked.label}</strong>, and this product holds no{' '}
-          {noun} at that coordinate for {examName}. That is a gap in what we have built, not
-          something you have already done — and it is the gap we fill next.
+          <Rich k="cp.planPointsAt" vars={{ label: asked.label, noun, exam: examName }} />
         </p>
         <Link to={`/practice/${section.skill}`} className="btn-secondary mt-4 inline-flex">
-          Practise {section.skill} at your level instead
+          {tf('cp.practiseInstead', { skill: ts(`nav.${section.skill}` as 'nav.reading', ui).toLowerCase() }, ui)}
         </Link>
       </div>
     );
   }
 
   if (!current || !rec) {
-    return <div className="card p-6 text-sm text-ink-secondary">Loading…</div>;
+    return <div className="card p-6 text-sm text-ink-secondary">{ts('common.loading', ui)}</div>;
   }
 
   /**
@@ -374,18 +365,19 @@ function Runner({
           </p>
         )}
         <p className={clsx('text-sm leading-relaxed text-ink-primary', tally.total > 0 && 'mt-3')}>
-          You have now practised every {noun} we have for {examName} {section.skill} — all{' '}
-          <strong>{current.total}</strong> of {current.total === 1 ? 'it' : 'them'}.
+          <Rich k="cp.bankFinished" vars={{
+            nounPl,
+            exam: examName,
+            skill: ts(`nav.${section.skill}` as 'nav.reading', ui).toLowerCase(),
+            n: current.total,
+          }} />
         </p>
         <p className="mt-2 text-sm leading-relaxed text-ink-secondary">
-          You may go through them again, and there is some use in that — spelling, the second
-          listen, the question you rushed. But a {noun} you have already answered mostly tests
-          whether you remember it, and remembering is not the skill the exam awards. We are saying
-          so rather than dealing you the same {noun} without comment.
+          {tf('cp.bankFinishedWhy', { noun }, ui)}
         </p>
         {tally.total > 0 && (
           <p className="mt-2 text-sm text-ink-secondary">
-            The score above is how you did on these questions today. It is not a predicted band.
+            {ts('cp.notAPredictedBand', ui)}
           </p>
         )}
         {/* The level line is dropped everywhere else on this page the moment
@@ -399,10 +391,10 @@ function Runner({
             onClick={() => { setReplaying(true); setChosen({}); setMarked(false); setTally({ correct: 0, total: 0 }); }}
             className="btn-primary inline-flex items-center gap-2"
           >
-            <RefreshCcw className="h-4 w-4" /> Go through them again
+            <RefreshCcw className="h-4 w-4" /> {ts('cp.goAgain', ui)}
           </button>
           <Link to="/practice" className="btn-ghost inline-block border-2 border-surface-divider px-4 py-2">
-            Back to practice
+            {ts('cp.backToPractice', ui)}
           </Link>
         </div>
       </div>
@@ -485,9 +477,7 @@ function Runner({
         {isAudio ? (
           <>
             <audio controls src={resolveAudio(audioFor(rec, track))} className="w-full" />
-            <p className="mt-2 text-xs text-ink-secondary">
-              You can replay this here. In the real exam you will hear it once.
-            </p>
+            <p className="mt-2 text-xs text-ink-secondary">{ts('cp.replayHere', ui)}</p>
           </>
         ) : (
           <p className="whitespace-pre-line text-sm leading-relaxed text-ink-primary">{rec.script}</p>
@@ -545,7 +535,7 @@ function Runner({
               )}
               {marked && verdict?.correct && (
                 <p className="mt-2 flex items-center gap-1.5 text-sm text-teal">
-                  <CheckCircle2 className="h-4 w-4" /> Correct
+                  <CheckCircle2 className="h-4 w-4" /> {ts('cp.correct', ui)}
                 </p>
               )}
             </div>

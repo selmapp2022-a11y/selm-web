@@ -5,6 +5,8 @@ import { Shield, Sparkles, Mic, Lock, CreditCard, ExternalLink } from 'lucide-re
 import { Capacitor } from '@capacitor/core';
 import { Logo } from '../components/Logo';
 import { tokenStore } from '../lib/api';
+import { ts, tf, useUiLangValue, type Key } from '../i18n';
+import { Rich } from '../i18n/Rich';
 
 // Which payment platform runs THIS binary. Apple rejected Build 38 v2.0.7
 // under Guideline 2.3.10 because the iOS binary mentioned "Google Play"
@@ -69,52 +71,61 @@ export function setPrivacyConsent(): void {
 
 type Row = {
   icon: JSX.Element;
+  /** A company name. Not translated — it is what appears on the invoice. */
   title: string;
-  data: string;
-  purpose: string;
+  data: Key;
+  purpose: Key;
+  vars?: Record<string, string>;
 };
 
+// The processors' NAMES stay in English because they are names. What is said
+// about each of them is a key, because a candidate reading the app in French
+// is being asked to consent, and consent given to a sentence you cannot read
+// is not consent.
 const ROWS: Row[] = [
   {
     icon: <Sparkles className="h-4 w-4" />,
     title: 'Google Gemini',
-    data: 'The English text you write in Speaking, Writing, Reading, and lesson answers',
-    purpose: 'to score your writing and generate personalised AI feedback.',
+    data: 'consent.gemini.data',
+    purpose: 'consent.gemini.purpose',
   },
   {
     icon: <Mic className="h-4 w-4" />,
     title: 'Google Cloud Speech-to-Text',
-    data: 'The short audio clips you record when you tap the microphone in Speaking',
-    purpose: 'to transcribe what you said into text so we can compare it to the target sentence.',
+    data: 'consent.stt.data',
+    purpose: 'consent.stt.purpose',
   },
   {
     icon: <Mic className="h-4 w-4" />,
     title: 'SpeechAce',
-    data: 'The same audio clips you record in Speaking',
-    purpose: 'to score your pronunciation, stress, fluency, and intonation and return CEFR / IELTS-style feedback.',
+    data: 'consent.speechace.data',
+    purpose: 'consent.speechace.purpose',
   },
   {
     icon: <Sparkles className="h-4 w-4" />,
     title: 'ElevenLabs',
-    data: 'Only lesson text (never your own audio)',
-    purpose: 'to synthesise the AI voices you hear in Listening exercises.',
+    data: 'consent.elevenlabs.data',
+    purpose: 'consent.elevenlabs.purpose',
   },
   {
     icon: <CreditCard className="h-4 w-4" />,
     title: 'RevenueCat',
-    data: `Your anonymous ${PAYMENT_NAME} receipt token`,
-    purpose: 'to verify that your SELM Pro subscription is active.',
+    data: 'consent.revenuecat.data',
+    purpose: 'consent.revenuecat.purpose',
+    vars: { store: PAYMENT_NAME },
   },
   {
     icon: <Lock className="h-4 w-4" />,
     title: PAYMENT_NAME,
-    data: `Your ${PAYMENT_ACCOUNT} identifier and payment method (handled entirely by ${IS_ANDROID ? 'Google' : 'Apple'})`,
-    purpose: `to process the actual subscription payment. SELM never sees your card number.`,
+    data: 'consent.store.data',
+    purpose: 'consent.store.purpose',
+    vars: { account: PAYMENT_ACCOUNT, vendor: IS_ANDROID ? 'Google' : 'Apple' },
   },
 ];
 
 export default function ConsentPage() {
   const navigate = useNavigate();
+  const ui = useUiLangValue();
   const [agreed, setAgreed] = useState(false);
 
   const handleAgree = () => {
@@ -155,12 +166,10 @@ export default function ConsentPage() {
           </div>
 
           <h1 className="text-center text-2xl font-display font-bold text-navy dark:text-white">
-            Your data & AI processors
+            {ts('consent.title', ui)}
           </h1>
           <p className="mt-2 text-center text-sm text-ink-secondary dark:text-slate-400">
-            SELM uses AI to coach your English. Before we send anything on
-            your behalf, here is exactly what we share, who it goes to,
-            and why. Nothing leaves your device until you accept below.
+            {ts('consent.intro', ui)}
           </p>
 
           {/* Structured row per processor.  Each row spells out
@@ -176,8 +185,10 @@ export default function ConsentPage() {
                 <div className="min-w-0">
                   <div className="font-semibold text-navy dark:text-white">{row.title}</div>
                   <p className="text-sm text-ink-secondary dark:text-slate-400">
-                    <span className="font-medium text-navy dark:text-slate-200">Data:</span> {row.data}.{' '}
-                    <span className="font-medium text-navy dark:text-slate-200">Purpose:</span> {row.purpose}
+                    <span className="font-medium text-navy dark:text-slate-200">{ts('consent.data', ui)}</span>{' '}
+                    {tf(row.data, row.vars ?? {}, ui)}.{' '}
+                    <span className="font-medium text-navy dark:text-slate-200">{ts('consent.purpose', ui)}</span>{' '}
+                    {tf(row.purpose, row.vars ?? {}, ui)}
                   </p>
                 </div>
               </div>
@@ -188,39 +199,31 @@ export default function ConsentPage() {
               us to confirm the third parties provide the same or equal
               protection. State it inline, not just in the policy. */}
           <div className="mt-5 rounded-xl border border-teal-200 bg-teal-50 p-3 text-xs text-navy dark:border-teal-800 dark:bg-teal-900/20 dark:text-teal-100">
-            <b>Our commitment.</b> Every processor listed above is bound
-            by a data-processing agreement that provides the same or
-            greater level of protection required by our Privacy Policy.
-            None of them may use your content to train their own AI
-            models. We do not sell your data. You can delete your
-            account and all of its data at any time from Settings.
+            <Rich k="consent.commitment" />
           </div>
 
           <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-ink-secondary dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-400">
-            Full details, including retention periods and your rights,
-            are in our{' '}
+            {ts('consent.fullDetails', ui)}{' '}
             <a
               href="https://app.selmapp.ca/privacy"
               target="_blank"
               rel="noreferrer noopener"
               className="inline-flex items-center gap-1 font-semibold text-navy hover:underline dark:text-teal-300"
             >
-              Privacy Policy
+              {ts('legal.privacyPolicy', ui)}
               <ExternalLink className="h-3 w-3" />
             </a>
-            {' '}and{' '}
+            {' '}{ts('consent.and', ui)}{' '}
             <a
               href="https://app.selmapp.ca/terms"
               target="_blank"
               rel="noreferrer noopener"
               className="inline-flex items-center gap-1 font-semibold text-navy hover:underline dark:text-teal-300"
             >
-              Terms of Use
+              {ts('legal.termsOfUse', ui)}
               <ExternalLink className="h-3 w-3" />
             </a>
-            . Only including this information in the policy is not
-            enough on its own — that is why we are asking you to accept
-            here as well.
+            . {ts('consent.notEnough', ui)}
           </div>
 
           {/* Explicit unchecked checkbox — Apple Guideline 5.1.1(i)
@@ -237,9 +240,7 @@ export default function ConsentPage() {
               className="mt-0.5 h-5 w-5 flex-none rounded border-slate-400 text-navy focus:ring-teal-500"
             />
             <span className="text-sm text-navy dark:text-slate-100">
-              I have read the above and I agree to SELM sharing the
-              listed data with the listed AI service providers for the
-              stated purposes.
+              {ts('consent.checkbox', ui)}
             </span>
           </label>
 
@@ -248,22 +249,19 @@ export default function ConsentPage() {
               onClick={handleDecline}
               className="flex-1 rounded-xl border border-slate-300 bg-white py-3 text-sm font-semibold text-ink-secondary transition hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
             >
-              Not now
+              {ts('consent.notNow', ui)}
             </button>
             <button
               onClick={handleAgree}
               disabled={!agreed}
               className="flex-[2] rounded-xl bg-navy py-3 text-sm font-bold text-white shadow-sm transition hover:bg-navy-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Agree & continue
+              {ts('consent.agree', ui)}
             </button>
           </div>
 
           <p className="mt-3 text-center text-xs text-ink-secondary dark:text-slate-500">
-            You can revoke this consent by deleting your account in
-            Settings. Withdrawal of consent for AI processing requires
-            account deletion because the AI features are the core of
-            SELM.
+            {ts('consent.revoke', ui)}
           </p>
         </div>
       </div>

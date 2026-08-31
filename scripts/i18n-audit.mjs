@@ -40,12 +40,33 @@ function walk(dir, out = []) {
 const JSX_TEXT = />\s*([A-Z][^<>{}\n]{2,}?)\s*</g;
 const ATTR = /(?:placeholder|title|aria-label|alt)=["']([^"']{3,})["']/g;
 
+// ── WHAT IS NOT LANGUAGE ──────────────────────────────────────────────────
+// The sweep of 31 August took this count from 236 to seven, and all seven
+// were the same two things: the brand, and a row of dots standing in for a
+// password. Neither has a French version — translating a wordmark is not
+// localisation, it is a different company — so they are named here rather
+// than left as a permanent non-zero score that stops meaning anything.
+//
+// An explicit list, not a clever rule: adding to it should be a decision
+// somebody made, visible in a diff, and not a regex that quietly widened
+// until it swallowed a real sentence.
+const NOT_LANGUAGE = new Set([
+  'SELM',                          // the wordmark
+  'SELM Pro',                      // the product, as it appears on the invoice
+  'Selm Mobile Application Inc.',  // the legal name
+]);
+// A masked-password placeholder. Dots, not words.
+const MASK = /^[\u2022*\u00b7\u25cf.]+$/;
+
 const files = walk(SRC);
 let total = 0;
 const rows = [];
 for (const f of files) {
   const s = readFileSync(f, 'utf8');
-  const hits = [...s.matchAll(JSX_TEXT), ...s.matchAll(ATTR)].map((m) => m[1]).filter((t) => !/^[\s\d.,%$·—–-]+$/.test(t));
+  const hits = [...s.matchAll(JSX_TEXT), ...s.matchAll(ATTR)]
+    .map((m) => m[1])
+    .filter((t) => !/^[\s\d.,%$·—–-]+$/.test(t))
+    .filter((t) => !NOT_LANGUAGE.has(t.trim()) && !MASK.test(t.trim()));
   if (hits.length) {
     total += hits.length;
     rows.push([hits.length, relative(ROOT, f)]);

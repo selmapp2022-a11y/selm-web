@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { uiLang, UI_LANG_EVENT } from '../i18n';
 import type {
   ComprehensionSection,
   ExamDefinition,
@@ -207,7 +208,19 @@ export const useExam = create<ExamState>((set) => ({
   exam: START,
   taskId: firstTask(START).id,
   goal: PLANNED_GOAL || GOALS[1],
-  ui: 'en',
+  // ── THE EXAM CHROME FOLLOWS THE INTERFACE LANGUAGE ─────────────────────
+  // Found on 31 August, during the §5.2 sweep: this was the literal `'en'`,
+  // and `setUi` was **never called from anywhere in the application**. So a
+  // candidate who chose French got a French app and an English exam — "Mock
+  // exam", "Start the mock exam — 2 sections", every section screen and every
+  // result — because the engine's own bilingual data was being asked for the
+  // English side on every render.
+  //
+  // The engine has been bilingual by data since it was written; what was
+  // missing was anyone telling it which language the reader chose. This reads
+  // the same store `i18n` reads, and the listener below keeps the two from
+  // drifting when the candidate changes it mid-session.
+  ui: uiLang(),
   response: null,
   result: null,
   setExam: (exam) =>
@@ -339,3 +352,11 @@ export const useExam = create<ExamState>((set) => ({
     set({ sitting: null });
   },
 }));
+
+// The interface language can change without a reload — `/me` has a switcher —
+// so the engine is told, once, rather than every screen remembering to ask.
+try {
+  window.addEventListener(UI_LANG_EVENT, () => useExam.getState().setUi(uiLang()));
+} catch {
+  /* no window: a check script importing the store is not a browser */
+}

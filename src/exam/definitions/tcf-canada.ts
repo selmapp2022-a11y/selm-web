@@ -2617,9 +2617,15 @@ export const TCF_CANADA: ExamDefinition = {
       // bank to 57 silently made the épreuve 57 questions long.
       // The band profile of the original 39, kept as the épreuve's shape.
       serve: { count: 39, byBand: { A1: 4, A2: 6, B1: 9, B2: 10, C1: 6, C2: 4 } },
+      // ── THIS TEXT WAS THE LISTENING SECTION'S, WORD FOR WORD ────────────
+      // Until 31 August this field was a copy of `comprehension-orale`'s, and
+      // it ended by describing the accents of recordings — in a section that
+      // has none. A provenance note is the one paragraph on the page whose
+      // whole job is to say exactly what is ours and what is the exam's; a
+      // copied one is worse than none, because it is read as checked.
       provenance: {
-        en: 'Every item in this section was written for this product, to the published format — 39 questions, ordered by progressive difficulty — and no real exam question is reproduced. The A1-to-C2 banding is ours: the exam publishes that difficulty rises across the section and does not publish which item sits at which level. Recordings use three French varieties — Parisian French as the majority, with Québécois and Swiss voices among them, applied inside each band rather than by level.',
-        fr: "Tous les items de cette épreuve ont été rédigés pour ce produit, selon le format publié — 39 questions, à difficulté progressive — sans reproduire aucune question réelle d'examen. Le classement A1 à C2 est le nôtre : l'examen indique que la difficulté augmente, sans publier le niveau de chaque item. Les enregistrements emploient trois variétés de français — surtout du français parisien, avec des voix québécoises et suisses, réparties à l'intérieur de chaque niveau et non par ordre de difficulté.",
+        en: 'Every item in this section was written for this product, to the published format — 39 questions, ordered by progressive difficulty — and no real exam question is reproduced. The A1-to-C2 banding is ours: the exam publishes that difficulty rises across the section and does not publish which item sits at which level. The passages are ours too, including their length: France Éducation international publishes the text types for the compréhension écrite épreuve but not a word count per band, so the lengths here are written to the type rather than to a published figure. The bank is larger than one épreuve, so a second sitting is not the same sitting.',
+        fr: "Tous les items de cette épreuve ont été rédigés pour ce produit, selon le format publié — 39 questions, à difficulté progressive — sans reproduire aucune question réelle d'examen. Le classement A1 à C2 est le nôtre : l'examen indique que la difficulté augmente, sans publier le niveau de chaque item. Les textes sont également les nôtres, y compris leur longueur : France Éducation international publie les types de textes de l'épreuve de compréhension écrite, mais aucun nombre de mots par niveau ; les longueurs retenues ici suivent donc le type et non un chiffre publié. La banque est plus grande qu'une épreuve, afin qu'une deuxième session ne soit pas la même session.",
       },
       families: [
         {

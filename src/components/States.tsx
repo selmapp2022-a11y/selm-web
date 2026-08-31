@@ -11,6 +11,7 @@
  * styles — two things that look alike today drift apart on the first change.
  */
 import type { ReactNode } from 'react';
+import { ts, useUiLangValue } from '../i18n';
 
 export function Loader({ text }: { text?: string }) {
   return (
@@ -24,10 +25,11 @@ export function Loader({ text }: { text?: string }) {
 }
 
 export function ErrorBox({ msg, onRetry }: { msg: string; onRetry?: () => void }) {
+  const ui = useUiLangValue();
   return (
     <div className="card p-6 text-center">
-      <p className="mb-4 text-red-700">{typeof msg === 'string' ? msg : 'Something went wrong.'}</p>
-      {onRetry && <button onClick={onRetry} className="btn-secondary">Try again</button>}
+      <p className="mb-4 text-red-700">{typeof msg === 'string' ? msg : ts('states.wentWrong', ui)}</p>
+      {onRetry && <button onClick={onRetry} className="btn-secondary">{ts('states.tryAgain', ui)}</button>}
     </div>
   );
 }

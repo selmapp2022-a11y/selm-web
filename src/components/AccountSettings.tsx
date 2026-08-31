@@ -36,6 +36,7 @@ import { setUiLang, ts, useUiLangValue } from '../i18n';
  */
 export function AccountSettings() {
   const uiLangNow = useUiLangValue();
+  const ui = uiLangNow;
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
   const [step, setStep] = useState<'idle' | 'confirm' | 'deleting' | 'done'>('idle');
@@ -75,13 +76,13 @@ export function AccountSettings() {
       <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
         <h2 className="mb-4 flex items-center gap-2 text-lg font-bold text-navy dark:text-white">
           <UserIcon className="h-5 w-5 text-navy" />
-          Account
+          {ts('account.title', ui)}
         </h2>
         <div className="space-y-3 text-sm">
           <div className="flex items-center gap-3">
             <UserIcon className="h-4 w-4 flex-none text-ink-secondary" />
             <div>
-              <div className="text-xs text-ink-secondary dark:text-slate-400">Name</div>
+              <div className="text-xs text-ink-secondary dark:text-slate-400">{ts('account.name', ui)}</div>
               <div className="font-medium text-navy dark:text-white">
                 {user?.full_name || user?.username || '—'}
               </div>
@@ -90,7 +91,7 @@ export function AccountSettings() {
           <div className="flex items-center gap-3">
             <Mail className="h-4 w-4 flex-none text-ink-secondary" />
             <div className="min-w-0">
-              <div className="text-xs text-ink-secondary dark:text-slate-400">Email</div>
+              <div className="text-xs text-ink-secondary dark:text-slate-400">{ts('auth.email', ui)}</div>
               <div className="truncate font-medium text-navy dark:text-white">
                 {user?.email || '—'}
               </div>
@@ -147,18 +148,16 @@ export function AccountSettings() {
       <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
         <h2 className="mb-3 flex items-center gap-2 text-lg font-bold text-navy dark:text-white">
           <Shield className="h-5 w-5 text-navy" />
-          Privacy
+          {ts('account.privacy', ui)}
         </h2>
-        <p className="mb-3 text-sm text-ink-secondary dark:text-slate-400">
-          Learn how SELM collects, uses, and stores your data.
-        </p>
+        <p className="mb-3 text-sm text-ink-secondary dark:text-slate-400">{ts('account.privacyBlurb', ui)}</p>
         <a
           href="https://app.selmapp.ca/privacy"
           target="_blank"
           rel="noreferrer noopener"
           className="inline-flex items-center gap-1 text-sm font-semibold text-navy hover:underline dark:text-teal-300"
         >
-          Read Privacy Policy →
+          {ts('account.readPolicy', ui)}
         </a>
       </section>
 
@@ -170,7 +169,7 @@ export function AccountSettings() {
       <section id="delete-account" className="mb-6 rounded-2xl border-2 border-red-200 bg-red-50 p-5 dark:border-red-800/60 dark:bg-red-900/20">
         <h2 className="mb-3 flex items-center gap-2 text-lg font-bold text-red-800 dark:text-red-200">
           <AlertTriangle className="h-5 w-5" />
-          Delete account
+          {ts('account.deleteTitle', ui)}
         </h2>
 
         {/* Button FIRST so it's always visible right under the title —
@@ -184,7 +183,7 @@ export function AccountSettings() {
 
         {step === 'done' ? (
           <div className="mb-3 rounded-xl border border-teal-300 bg-teal-50 px-3 py-2 text-sm text-teal-900 dark:border-teal-700 dark:bg-teal-900/40 dark:text-teal-200">
-            Your account has been deleted. Signing you out…
+            {ts('account.deleted', ui)}
           </div>
         ) : step === 'idle' ? (
           <button
@@ -194,12 +193,12 @@ export function AccountSettings() {
             style={{ WebkitTapHighlightColor: 'rgba(0,0,0,0.15)', touchAction: 'manipulation' }}
           >
             <Trash2 className="h-5 w-5" />
-            Delete my account
+            {ts('account.deleteMine', ui)}
           </button>
         ) : (
           <div className="rounded-xl border border-red-300 bg-white p-3 dark:border-red-700 dark:bg-red-950/40">
             <p className="mb-3 text-sm font-semibold text-red-900 dark:text-red-100">
-              Are you sure? This cannot be undone.
+              {ts('account.sure', ui)}
             </p>
             {/* Side-by-side so both buttons fit on the same row and
                 neither drops below the mobile bottom-nav. */}
@@ -211,7 +210,7 @@ export function AccountSettings() {
                 className="flex flex-1 items-center justify-center gap-1 rounded-xl border border-slate-300 bg-white py-3 text-sm font-semibold text-navy active:bg-slate-100 hover:bg-slate-50 disabled:opacity-60 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700"
                 style={{ WebkitTapHighlightColor: 'rgba(0,0,0,0.15)', touchAction: 'manipulation' }}
               >
-                Cancel
+                {ts('account.cancel', ui)}
               </button>
               <button
                 type="button"
@@ -221,7 +220,7 @@ export function AccountSettings() {
                 style={{ WebkitTapHighlightColor: 'rgba(0,0,0,0.15)', touchAction: 'manipulation' }}
               >
                 <Trash2 className="h-4 w-4" />
-                {step === 'deleting' ? 'Deleting…' : 'Yes, delete'}
+                {ts(step === 'deleting' ? 'account.deleting' : 'account.yesDelete', ui)}
               </button>
             </div>
           </div>
@@ -231,7 +230,7 @@ export function AccountSettings() {
             clipped by the mobile bottom-nav. Full details in Privacy. */}
         {step === 'idle' && (
           <p className="mt-3 text-xs text-red-900/80 dark:text-red-200/80">
-            Removes your account and all data. Cannot be undone.
+            {ts('account.deleteNote', ui)}
           </p>
         )}
       </section>
@@ -246,7 +245,7 @@ export function AccountSettings() {
           className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white py-3 text-sm font-semibold text-navy hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700"
         >
           <LogOut className="h-4 w-4" />
-          Sign out
+          {ts('nav.signOut', ui)}
         </button>
       </section>
     </div>

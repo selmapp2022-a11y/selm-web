@@ -25,6 +25,7 @@
  */
 import type { ExamDefinition, SkillId, TaskDefinition } from '../model/types';
 import { deliverable } from './practicePool';
+import { promptsOf } from './productionPool';
 import type { Attestation } from '../model/attestation';
 import { entriesFor } from '../definitions/prescriptions';
 
@@ -222,10 +223,25 @@ function familiesOf(exam: ExamDefinition, skill: SkillId): Array<{ family: strin
  * an authored task is practisable the moment it exists.
  *
  * So the task itself counts as one, and prescription items add to it.
+ *
+ * ── AND THAT "ONE" WAS WRONG FROM 30 AUGUST ────────────────────────────────
+ * On 30 August a task stopped holding one situation and started holding a
+ * LIST of them (`productionPool.ts`), because the exam sets a new situation
+ * every sitting. This function went on returning 1 for the task itself, so
+ * every production coordinate counted 1 against a floor of 4 — and the
+ * inventory reported **zero servable** for writing and speaking on both exams
+ * while thirteen tasks held four situations each. Two of four skills reported
+ * empty with the content sitting right there, and any decision taken on that
+ * number was taken on a false one.
+ *
+ * What sits behind a production coordinate is the situations it can set, so
+ * that is what is counted. Prescription items are no longer added: they are
+ * remediation offered AFTER a weak performance, not something a plan slot can
+ * set, and adding them made this number drift out of the unit the inventory
+ * reports it in. They are still counted, on the paid side, where they belong.
  */
-function itemsForTask(examId: string, taskId: string): number {
-  const entries = entriesFor(examId, taskId);
-  return 1 + entries.reduce((n, e) => n + e.cell.practiceItemIds.length, 0);
+function itemsForTask(task: TaskDefinition): number {
+  return promptsOf(task).length;
 }
 
 export type PlannerInput = {
@@ -360,7 +376,7 @@ export function coordinatesFor(
     for (const t of tasksOf(exam, a.skill))
       list.push({
         coordinate: { kind: 'task', skill: a.skill, taskId: t.id, label: t.name[exam.language] },
-        items: itemsForTask(exam.id, t.id),
+        items: itemsForTask(t),
       });
     const at = here(a.skill);
     const fams = familiesOf(exam, a.skill).map((f) => ({

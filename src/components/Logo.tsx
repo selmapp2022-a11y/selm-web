@@ -1,9 +1,18 @@
+import { useUiLangValue } from '../i18n';
+
 type LogoProps = {
   variant?: 'horizontal' | 'symbol';
   className?: string;
   tone?: 'navy' | 'white';
-  /** Which language the tagline is set in. The app is English; the exam
-   *  engine renders in whichever language the candidate chose. */
+  /**
+   * Override the tagline's language. Defaults to the interface language the
+   * candidate chose, which is the fix of 31 August: the default was the
+   * literal `'en'` and NO caller passed anything, so the eight screens that
+   * render the wordmark said KNOW YOUR SCORE to a candidate reading the app
+   * in French — on the login screen, the consent screen and the sidebar of
+   * every page. The French half of that tagline already existed; nothing was
+   * asking for it.
+   */
   lang?: 'en' | 'fr';
 };
 
@@ -27,7 +36,9 @@ const TAGLINE = { en: 'Know your score', fr: 'Connaissez votre score' } as const
  *  - Symbol: the brand icon (rounded navy tile with stylised "S").
  *  - Horizontal: icon + "SELM" wordmark with tagline.
  */
-export function Logo({ variant = 'horizontal', className = '', tone = 'navy', lang = 'en' }: LogoProps) {
+export function Logo({ variant = 'horizontal', className = '', tone = 'navy', lang }: LogoProps) {
+  const ui = useUiLangValue();
+  const tagline = TAGLINE[lang ?? ui];
   if (variant === 'symbol') {
     return <img src={ICON} alt="SELM" className={className || 'h-9 w-9'} />;
   }
@@ -39,7 +50,7 @@ export function Logo({ variant = 'horizontal', className = '', tone = 'navy', la
           SELM
         </span>
         <span className={`text-[10px] font-medium uppercase tracking-[0.18em] ${tone === 'white' ? 'text-white/70' : 'text-ink-secondary'}`}>
-          {TAGLINE[lang]}
+          {tagline}
         </span>
       </div>
     </div>
