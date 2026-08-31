@@ -9,7 +9,7 @@ import {
   ScrollText,
 } from 'lucide-react';
 import { EmptyState, Loader } from '../components/States';
-import { StandingRows } from '../components/Standing';
+import { StandingRows, NotBuiltNote } from '../components/Standing';
 import { SectionHeading } from '../components/SectionHeading';
 import { useDocumentTitle } from '../lib/useDocumentTitle';
 import { loadHistory, type SittingRecord } from '../exam/model/history';
@@ -194,12 +194,38 @@ export default function DashboardPage() {
               </a>
             </div>
 
-            <div className="flex min-w-[180px] flex-col items-center justify-center bg-gradient-to-br from-navy to-teal px-8 py-6 text-white">
+            {/* ── THE COUNTDOWN, AND THE CASE WHERE THERE ISN'T ONE ────────
+                Task 5.1: *"the countdown is the emotional centre of this
+                product and is currently a small grey chip."*
+
+                The countdown itself was already the hero — a 6xl number in a
+                gradient panel. **What was a small grey chip is the state the
+                founder is actually in: no date set.** A candidate with no date
+                sees the panel that should carry the one certain number on this
+                product, and it carries an eight-word label and a link in
+                small type.
+
+                Setting the date is what turns this product on: the plan, the
+                pacing and every "how long have I got" answer hang off it. So
+                the empty state is now the loudest thing on Today, with a real
+                control rather than an underline — and 44px, which the same
+                ruling asks for everywhere. */}
+            <div className="flex min-w-0 flex-1 basis-full flex-col items-center justify-center bg-gradient-to-br from-navy to-teal px-6 py-7 text-white sm:basis-[200px]">
               {left === null ? (
                 <>
-                  <CalendarDays className="h-7 w-7 opacity-90" />
-                  <div className="mt-2 text-center text-sm font-semibold">No exam date set</div>
-                  <a href={EXAM_HOME} className="mt-1 text-xs underline opacity-90">Set one</a>
+                  <CalendarDays className="h-8 w-8 opacity-90" />
+                  <div className="mt-3 text-center font-display text-xl font-bold leading-tight">
+                    When is your exam?
+                  </div>
+                  <p className="mt-1 max-w-[22ch] text-center text-xs leading-relaxed opacity-90">
+                    Everything here is paced against that date. Without it you can practise, but not plan.
+                  </p>
+                  <a
+                    href={EXAM_HOME}
+                    className="mt-3 inline-flex min-h-[44px] items-center rounded-xl bg-white/15 px-4 text-sm font-semibold backdrop-blur-none transition hover:bg-white/25"
+                  >
+                    Set the date
+                  </a>
                 </>
               ) : (
                 <>
@@ -224,9 +250,18 @@ export default function DashboardPage() {
         <div className="relative flex items-center gap-2 text-sm font-semibold text-teal">
           <Compass className="h-4 w-4" /> Do this next
         </div>
+          {/* `min-w-[180px]` on a `flex-1` child inside a `flex-wrap` row put
+              the coordinate's name and its sentence OUTSIDE the card's left
+              padding on a narrow screen, where `overflow-hidden` then clipped
+              them: "expose · B2" rendered as "xpose · B2". Photographed at
+              width on the deployed build.
+
+              A minimum width is a promise the container may not be able to
+              keep. `min-w-0` lets the column shrink to what there is, and the
+              row stacks instead of overflowing. */}
         {nextSlot && nextSkill ? (
           <div className="mt-3 flex flex-wrap items-center gap-4">
-            <div className="min-w-[180px] flex-1">
+            <div className="min-w-0 flex-1 basis-full sm:basis-auto">
               <div className="font-display text-2xl font-bold text-navy dark:text-white">{nextSlot.coordinate.label}</div>
               <div className="mt-0.5 text-xs text-ink-secondary">
                 {builtPlan.basis === 'attestation'
@@ -296,25 +331,36 @@ export default function DashboardPage() {
           The destination's own surfaces went with them for the same reason:
           an external link to a government page is not something a candidate
           needs on the screen they open before practising. */}
-      <Link
-        to="/progress"
-        className="card flex items-center gap-4 p-5 transition hover:border-navy/40 hover:bg-surface-muted"
-      >
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-surface-muted text-navy">
-          <ScrollText className="h-5 w-5" />
-        </div>
-        <div className="min-w-0 flex-1">
-          <div className="font-display text-base font-bold text-navy dark:text-white">
-            Are you ready to book?
+      {/* ── BLOCK 4: WHAT IS NOT BUILT ──────────────────────────────────
+          Task 5.1 asks for four blocks and names this as one of them, so it
+          is here — as the FACT, in `NotBuiltNote`, which is a short list of
+          what this exam does not yet have.
+
+          What went to `/progress` is the ESSAY around it: three paragraphs on
+          why the governing level is the lowest rather than the average, and a
+          fourth on what to do meanwhile. Those are read once, carefully, on
+          the page that owns the numbers. This is read at a glance, on the page
+          that is opened several times a day. */}
+      <section className="space-y-3">
+        <SectionHeading icon={ScrollText}>What is not built for your exam</SectionHeading>
+        <NotBuiltNote exam={exam} />
+        <Link
+          to="/progress"
+          className="card flex min-h-[44px] items-center gap-4 p-4 transition hover:border-navy/40 hover:bg-surface-muted"
+        >
+          <div className="min-w-0 flex-1">
+            <div className="text-sm font-semibold text-navy dark:text-white">
+              Are you ready to book?
+            </div>
+            <div className="mt-0.5 text-xs text-ink-secondary">
+              {gate.publishNumeric && governing.complete
+                ? `${exam.benchmark.system} ${governing.level} — and why`
+                : 'Not yet answerable — and why'}
+            </div>
           </div>
-          <div className="mt-0.5 text-sm text-ink-secondary">
-            {gate.publishNumeric && governing.complete
-              ? `${exam.benchmark.system} ${governing.level} · the reasoning, and what is not built for this exam`
-              : 'Not yet answerable — the reasoning, and what is not built for this exam'}
-          </div>
-        </div>
-        <ChevronRight className="h-5 w-5 shrink-0 text-ink-secondary" />
-      </Link>
+          <ChevronRight className="h-5 w-5 shrink-0 text-ink-secondary" />
+        </Link>
+      </section>
 
       {/* Upgrade to SELM Pro. This is the primary in-app entry point to the
           paywall and it stays on the dashboard: Apple's App Review has to be

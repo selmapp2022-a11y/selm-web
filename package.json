@@ -10,7 +10,8 @@
     "i18n": "node scripts/i18n-audit.mjs",
     "copy": "node scripts/copy-audit.mjs",
     "counts": "node scripts/counts-audit.mjs",
-    "audio": "node scripts/audio-audit.mjs"
+    "audio": "node scripts/audio-audit.mjs",
+    "build:mobile": "node scripts/build-mobile.mjs"
   },
   "dependencies": {
     "@capacitor-community/apple-sign-in": "^7.1.0",

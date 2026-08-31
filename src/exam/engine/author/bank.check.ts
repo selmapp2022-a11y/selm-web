@@ -93,7 +93,16 @@ function checkSection(exam: ExamDefinition, sec: ComprehensionSection) {
     // Fixing them means rewriting and re-rendering material candidates may
     // already have heard, which is a decision rather than a chore; until it is
     // taken, this is what is true.
-    const LEGACY_OUTSIDE = new Set(['tcf-co-23-r', 'tcf-co-28-r', 'tcf-co-33-r', 'tcf-co-37-r', 'tcf-co-39-r']);
+    const LEGACY_OUTSIDE = new Set([
+      // TCF listening, named 31 August when the section got its first anchors.
+      'tcf-co-23-r', 'tcf-co-28-r', 'tcf-co-33-r', 'tcf-co-37-r', 'tcf-co-39-r',
+      // TCF reading, named the same night for a different reason: 57 of its 61
+      // recordings were marked as anchors, so only four were ever measured.
+      // Reducing the instrument to one per band made fifty-one measurable for
+      // the first time, and these ten are what that measurement found.
+      'tcf-ce-25-r', 'tcf-ce-29-r', 'tcf-ce-31-r', 'tcf-ce-32-r', 'tcf-ce-44-r',
+      'tcf-ce-45-r', 'tcf-ce-46-r', 'tcf-ce-51-r', 'tcf-ce-53-r', 'tcf-ce-61-r',
+    ]);
     let outside = 0;
     let legacy = 0;
     let skipped = 0;
