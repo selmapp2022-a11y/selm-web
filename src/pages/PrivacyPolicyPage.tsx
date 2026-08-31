@@ -56,10 +56,10 @@ export default function PrivacyPolicyPage() {
             <h2 className="text-xl font-bold">1. Who we are</h2>
             <p>
               SELM ("we", "us", "our") is operated by Selm Mobile Application Inc.
-              We provide an AI-powered English learning app on iOS, Android,
-              and the web. This policy explains what personal information we
-              collect, how we use it, who we share it with, and the choices
-              you have.
+              We provide an exam preparation app for TCF Canada and IELTS on
+              iOS, Android, and the web. This policy explains what personal
+              information we collect, how we use it, who we share it with, and
+              the choices you have.
             </p>
             <p>Contact: admin@selmapp.com</p>
           </section>

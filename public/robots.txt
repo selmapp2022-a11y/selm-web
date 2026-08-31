@@ -1,0 +1,15 @@
+# app.selmapp.ca — the application, not the marketing site.
+#
+# There was no file here until 31 August, and the SPA fallback answered
+# /robots.txt with the app's own HTML and a 200. A crawler reading that gets a
+# document it cannot parse as rules, which is worse than getting nothing.
+#
+# Everything a crawler can reach on this host is the consent and sign-in
+# shell — every other route redirects to it until a person accepts and signs
+# in — so there is nothing to hide and nothing much to index. The canonical
+# tag in index.html points at this host; the pages worth ranking are on
+# selmapp.ca and that site has its own sitemap.
+User-agent: *
+Allow: /
+
+Sitemap: https://selmapp.ca/sitemap.xml

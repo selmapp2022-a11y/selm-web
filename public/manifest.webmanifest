@@ -1,7 +1,7 @@
 {
-  "name": "SELM — English Learning",
+  "name": "SELM — Know your score",
   "short_name": "SELM",
-  "description": "AI-powered English learning across CEFR levels A1 to C2.",
+  "description": "Sit a free full mock exam — four timed sections, audio once, and an exact comprehension score.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
