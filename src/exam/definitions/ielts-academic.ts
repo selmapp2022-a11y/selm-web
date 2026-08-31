@@ -208,9 +208,20 @@ export const IELTS_ACADEMIC: ExamDefinition = {
         en: 'Written for this product to the published IELTS Academic reading format; no real exam passage or question is reproduced, and no source text is quoted. CEFR banding and family assignment are ours and are unreviewed.',
         fr: "Rédigé pour ce produit selon le format publié de l'IELTS Academic ; aucun texte ni aucune question d'examen réels ne sont reproduits. Le classement CECRL et l'affectation aux familles sont les nôtres et non relus.",
       },
+      // ── ACADEMIC READING DOES NOT REACH DOWN THE LADDER ───────────────
+      //
+      // The paper is three long passages "suitable for people entering
+      // university", and the whole of it sits in the upper half. Crossing
+      // three text types with six bands asked for a research report at A1 — a
+      // study described from method to result, in language a beginner can
+      // read. That is not a passage the exam sets; it is a cell we made.
+      //
+      // Each type is declared across B2, C1 and C2. Sixteen empty coordinates
+      // become seven, and the one thin coordinate stays thin and visible.
       families: [
         {
           id: 'study',
+          bands: ['B2', 'C1', 'C2'],
           label: { en: 'Research report', fr: 'Compte rendu de recherche' },
           describes: {
             en: 'A study described from method to result. What is tested is separating what was measured from what the writer concludes.',
@@ -223,6 +234,7 @@ export const IELTS_ACADEMIC: ExamDefinition = {
         },
         {
           id: 'explanation',
+          bands: ['B2', 'C1', 'C2'],
           label: { en: 'Explanatory text', fr: 'Texte explicatif' },
           describes: {
             en: 'A mechanism or process explained. What is tested is following an order of causes across paragraphs.',
@@ -232,6 +244,7 @@ export const IELTS_ACADEMIC: ExamDefinition = {
         },
         {
           id: 'argued',
+          bands: ['B2', 'C1', 'C2'],
           label: { en: 'Argued text', fr: 'Texte argumentatif' },
           describes: {
             en: 'A position defended against an objection. What is tested is telling the claim from the concession.',

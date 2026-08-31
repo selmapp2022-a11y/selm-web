@@ -105,6 +105,36 @@ export type ComprehensionFamily = {
    * different things, and the difference has to survive into the code.
    */
   provenance: Localised;
+  /**
+   * THE BANDS THIS FAMILY ACTUALLY SPANS. Absent means all six.
+   *
+   * Added 31 August 2026 on the founder's ruling, after the inventory reported
+   * forty-six empty coordinates and the arithmetic of filling them came to
+   * about 187 passages and ~96,000 rendering credits.
+   *
+   * The families come from the published format. **The six CEFR bands do
+   * not** — the awarding bodies band by section, by part, or by nothing at
+   * all, and the CEFR banding is ours. Crossing the two produced coordinates
+   * that no exam contains: an IELTS listening Part 1 — booking a room,
+   * reporting a lost bag — at C2, and an academic research report at A1. The
+   * inventory counted each of those as a hole in the bank, and the plan to
+   * fill them was a plan to write material the exam does not set.
+   *
+   * So a family may declare its range, and where it does the grid is the
+   * declared range rather than the full ladder.
+   *
+   * What this is NOT: it is not a lower bar. `MIN_ITEMS_PER_COORDINATE` stays
+   * at four, the gate, the anchor comparison and the statistical veto are
+   * untouched, and nothing already authored is discarded. What changes is that
+   * a cell the exam does not contain stops being counted as one we owe.
+   *
+   * What it COSTS, stated because it is a real loss: the CEFR banding is what
+   * lets the planner say *"annonce · B2"* to a candidate, and a narrowed range
+   * narrows what the planner can offer at the ends. Every declaration below is
+   * therefore a judgement about a published format, made by us, and each one
+   * carries its reason where it is written.
+   */
+  bands?: Array<'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2'>;
 };
 
 export type BenchmarkBand = {

@@ -165,9 +165,30 @@ export const IELTS_LISTENING: ComprehensionSection = {
     en: 'Written for this product to the published IELTS Listening format: four parts, forty questions, completion in the majority with matching, labelling and multiple choice alongside. No real exam material is reproduced. The CEFR band on each recording and item is OURS and is unreviewed — IELTS reports bands 0–9 and publishes no per-question CEFR mapping.',
     fr: "Rédigé pour ce produit selon le format publié de l'IELTS Listening : quatre parties, quarante questions, une majorité de réponses à saisir, avec appariement, étiquetage de plan et choix multiple. Aucun matériel d'examen réel n'est reproduit. Le niveau CECRL de chaque enregistrement et de chaque question est LE NÔTRE et n'a pas été relu.",
   },
+  // ── EACH PART SPANS TWO BANDS, AND THAT IS A JUDGEMENT ─────────────────
+  //
+  // IELTS publishes four parts that rise in difficulty and publishes no CEFR
+  // level for any of them. Our banding crossed four families with six bands
+  // and produced twenty-four coordinates, twenty of them empty — including a
+  // Part 1 at C2, which would be two people booking a room in language a
+  // near-native listener finds demanding. No such recording exists in any IELTS
+  // paper, and writing one would have made the bank less like the exam.
+  //
+  // Each part is therefore declared across the two adjacent bands it actually
+  // occupies: the band the bank already sits at, and the neighbour a second
+  // version can legitimately reach without becoming a different part. Twenty
+  // empty coordinates become four, and eighty missing recordings become
+  // sixteen — which also brings the rendering inside the credit that remains.
+  //
+  // The reason for two rather than one: a part IS one step of the paper, and
+  // declaring a single band would say Part 1 is exactly B1, which is a
+  // precision we have not measured. Two bands say what we can defend — that
+  // Part 1 is easy and Part 4 is hard, and that scripts within a part vary.
   families: [
     {
       id: 'transactional',
+      // Part 1. Everyday social exchange, the easiest thing on the paper.
+      bands: ['A2', 'B1'],
       label: { en: 'Everyday conversation', fr: 'Conversation courante' },
       describes: {
         en: 'Two people arranging something ordinary — a booking, an enquiry, a form being filled in. What is tested is catching detail exactly: names, numbers, times, and the correction when a speaker changes their mind.',
@@ -180,6 +201,8 @@ export const IELTS_LISTENING: ComprehensionSection = {
     },
     {
       id: 'briefing',
+      // Part 2. Monologue in an everyday social context, one step up.
+      bands: ['B1', 'B2'],
       label: { en: 'Talk to a group', fr: 'Exposé à un groupe' },
       describes: {
         en: 'One speaker explaining a place or an arrangement to people who are new to it. What is tested is following a route or a structure while holding the whole picture.',
@@ -189,6 +212,8 @@ export const IELTS_LISTENING: ComprehensionSection = {
     },
     {
       id: 'discussion',
+      // Part 3. Up to four speakers in an educational context.
+      bands: ['B2', 'C1'],
       label: { en: 'Academic discussion', fr: 'Discussion académique' },
       describes: {
         en: 'Students and a tutor working through a piece of coursework. What is tested is separating who thinks what, and hearing agreement that is not quite agreement.',
@@ -198,6 +223,8 @@ export const IELTS_LISTENING: ComprehensionSection = {
     },
     {
       id: 'lecture',
+      // Part 4. Sustained academic monologue, the hardest thing on the paper.
+      bands: ['C1', 'C2'],
       label: { en: 'Lecture', fr: 'Cours magistral' },
       describes: {
         en: 'A sustained talk on a subject, in an order the speaker signposts. What is tested is holding a structure across several minutes and catching the term that carries the point.',

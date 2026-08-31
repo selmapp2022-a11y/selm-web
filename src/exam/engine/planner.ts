@@ -192,7 +192,11 @@ function familiesOf(exam: ExamDefinition, skill: SkillId): Array<{ family: strin
       counts.set(k, (counts.get(k) ?? 0) + 1);
     }
     for (const f of s.families ?? [])
-      for (const level of ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'])
+      // A family's declared range, or the whole ladder where it declares none.
+      // See `ComprehensionFamily.bands`: the families are the exam's and the
+      // six bands are ours, and crossing them unconditionally invented
+      // coordinates no exam contains.
+      for (const level of f.bands ?? ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'])
         out.push({ family: f.id, level, items: counts.get(`${f.id}|${level}`) ?? 0 });
   }
   return out;

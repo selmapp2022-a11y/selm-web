@@ -963,17 +963,37 @@ export const IELTS_GT: ExamDefinition = {
         en: 'Seed bank written for this product to the IELTS General Training reading format; no real exam question is reproduced. CEFR banding and family assignment are ours and are unreviewed.',
         fr: "Banque initiale rédigée pour ce produit selon le format IELTS General Training ; aucune question réelle n'est reproduite. Le classement CECRL et l'affectation aux familles sont les nôtres et non relus.",
       },
+      // ── WHICH BANDS EACH TEXT TYPE ACTUALLY REACHES ───────────────────
+      //
+      // General Training Reading is three sections that rise: social survival
+      // texts, then workplace texts, then one longer general-interest passage.
+      // The text types are the exam's; the CEFR bands are ours, and crossing
+      // them gave twenty-four coordinates with ten empty — among them a NOTICE
+      // at C2 and an ARGUED text at A1. A notice is short because notices are
+      // short, and Section 1 does not argue a case. Neither cell is a hole in
+      // the bank; both are cells we invented.
+      //
+      // Declared below, with the section each range belongs to. Ten empty
+      // coordinates become two.
       families: [
-        { id: 'notice', label: { en: 'Notice or instruction', fr: 'Avis ou consigne' },
+        { id: 'notice',
+          // Section 1 only. A sign, a timetable, a set of opening hours.
+          bands: ['A1', 'A2', 'B1'], label: { en: 'Notice or instruction', fr: 'Avis ou consigne' },
           describes: { en: 'A sign, label or short notice. What is tested is doing exactly what it says.', fr: "Un panneau, une étiquette ou un avis court. Ce qui est testé, c'est de faire exactement ce qui est écrit." },
           provenance: { en: 'Family names follow the GT reading text types; item assignment is ours and unreviewed.', fr: "Les familles suivent les types de textes du GT ; l'affectation est la nôtre et non relue." } },
-        { id: 'correspondence', label: { en: 'Letter, email or message', fr: 'Correspondance' },
+        { id: 'correspondence',
+          // Sections 1 and 2: a personal note through to a workplace letter.
+          bands: ['A1', 'A2', 'B1', 'B2'], label: { en: 'Letter, email or message', fr: 'Correspondance' },
           describes: { en: 'Someone writing to someone. What is tested is the intention behind the words.', fr: "Quelqu'un qui écrit à quelqu'un. Ce qui est testé, c'est l'intention derrière les mots." },
           provenance: { en: 'As above.', fr: 'Comme ci-dessus.' } },
-        { id: 'informative', label: { en: 'Informative text', fr: 'Texte informatif' },
+        { id: 'informative',
+          // All three sections: a leaflet, a staff handbook, a long article.
+          bands: ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'], label: { en: 'Informative text', fr: 'Texte informatif' },
           describes: { en: 'A factual passage. What is tested is finding a fact stated once among facts not asked about.', fr: "Un passage factuel. Ce qui est testé, c'est de retrouver un fait énoncé une seule fois." },
           provenance: { en: 'As above.', fr: 'Comme ci-dessus.' } },
-        { id: 'argued', label: { en: 'Argued text', fr: 'Texte argumentatif' },
+        { id: 'argued',
+          // Section 3, where the paper puts the one text that takes a position.
+          bands: ['B2', 'C1', 'C2'], label: { en: 'Argued text', fr: 'Texte argumentatif' },
           describes: { en: 'A text that takes a position. What is tested is separating what the author asserts from what the author reports.', fr: "Un texte qui prend position. Ce qui est testé, c'est de distinguer ce que l'auteur affirme de ce qu'il rapporte." },
           provenance: { en: 'As above.', fr: 'Comme ci-dessus.' } },
       ],

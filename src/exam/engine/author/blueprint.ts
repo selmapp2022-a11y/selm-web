@@ -243,13 +243,18 @@ export function kindsOf(section: ComprehensionSection): Array<'choice' | 'comple
  */
 export function blueprintsFor(exam: ExamDefinition, section: ComprehensionSection, cap = 100): Blueprint[] {
   const fams = section.families ?? [];
-  const coordinates = fams.length * BANDS.length;
+  // The grid is the families crossed with THE BANDS EACH ONE DECLARES, not with
+  // the whole ladder — see `ComprehensionFamily.bands`. A family that declares
+  // nothing still spans all six, so this is the same grid as before wherever
+  // the ruling of 31 August has not been applied.
+  const bandsOf = (f: (typeof fams)[number]): Band[] => (f.bands as Band[] | undefined) ?? BANDS;
+  const coordinates = fams.reduce((n, f) => n + bandsOf(f).length, 0);
   const want = Math.max(1, Math.round(cap / Math.max(1, coordinates)));
   const kinds = kindsOf(section);
   const format = formatFor(exam.id, section.skill);
   const out: Blueprint[] = [];
   for (const f of fams) {
-    for (const level of BANDS) {
+    for (const level of bandsOf(f)) {
       const passages = section.recordings.filter((r) => r.family === f.id && r.level === level);
       const ids = new Set(passages.map((r) => r.id));
       const have = section.items.filter((i) => ids.has(i.recordingId)).length;

@@ -332,7 +332,13 @@ const plan = thinnestFirst(blueprintsFor(gt, reading));
 t('the first coordinate is empty', plan[0].have, 0);
 t('the list is non-decreasing in what it holds',
   plan.every((b, i) => i === 0 || plan[i - 1].have <= b.have), true);
-t('every coordinate the planner can emit is in it', plan.length, (reading.families ?? []).length * 6);
+// The expected count is the families crossed with THE BANDS EACH DECLARES, not
+// with the whole ladder. Written as `families * 6` until 31 August, when the
+// ruling on the grid gave a family a range: this line then asserted that the
+// blueprint list still held the coordinates the ruling had just removed. The
+// sum below is the same number as before for any family that declares nothing.
+t('every coordinate the planner can emit is in it', plan.length,
+  (reading.families ?? []).reduce((n, f) => n + (f.bands?.length ?? 6), 0));
 console.log(`     first five: ${plan.slice(0, 5).map((b) => `${b.family}·${b.level}(${b.have})`).join('  ')}`);
 
 console.log('\n7. The profile is arithmetic, and says what it measured\n');
