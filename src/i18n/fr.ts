@@ -530,4 +530,17 @@ export const FR: FrenchDict = {
   'privacy.contactHeading': '10. Contact',
   'privacy.contactBlurb':
     'Des questions ou des demandes concernant cette politique ou vos données ?',
+
+  // ── Aujourd'hui : les quatre tuiles de compétence ────────────────────────
+  'today.yourFourSkills': 'Vos quatre compétences',
+  'today.startMock': "Commencer l'examen blanc",
+  'today.resumeMock': 'Reprendre la session',
+  'today.tileCorrect': '{correct} bonnes sur {total}',
+  'today.tileQuestions': '{n} questions · pas encore passée',
+  'today.tileTasks': "{tasks} tâches · {situations} sujets · ceux de l'examen",
+  'today.tileNotBuiltShort': 'Pas encore construite',
+
+  'me.progressTitle': 'Votre progression',
+  'me.progressBlurb':
+    'Chaque session et chaque tentative, tracées face au niveau fixé sur cette page.',
 };

@@ -8,7 +8,9 @@ import { ts, useUiLangValue } from '../i18n';
 /**
  * `/me` — YOU.
  *
- * The fourth and last tab, and the destination three routes were merged into.
+ * The last of the three tabs, and the destination three routes were merged
+ * into. It was the fourth of four until 31 August, when Mock exam left the tab
+ * bar for the home screen — see `components/AppLayout.tsx`.
  *
  * ── What was here before, and why it was three screens ──────────────────────
  * The navigation had five tabs and the account had three homes:
@@ -24,7 +26,8 @@ import { ts, useUiLangValue } from '../i18n';
  *
  * The IA ruling of 30 August: *"Four tabs is still right. Drop `My exam` into
  * `You` … and `Progress` folds into `You`, which holds the numbers alongside
- * the goal they are measured against."*
+ * the goal they are measured against."* Four became three on 31 August, and
+ * this page was not the one that changed.
  *
  * ── Why Progress is a link and not a section ────────────────────────────────
  * Folding Progress into `You` is about the NAVIGATION, not about the page:
@@ -34,13 +37,18 @@ import { ts, useUiLangValue } from '../i18n';
  * the ruling's two taps.
  *
  * ── And why Mock exam is NOT here ───────────────────────────────────────────
- * The audit proposed moving it under Practice. The ruling rejected that:
- * *"Practice teaches. The mock exam measures … it is the only surface that
- * answers 'are you ready to book?'"* It stays a top-level tab.
+ * The audit of 30 August proposed moving it under Practice. The ruling
+ * rejected that, and the reason survives: *"Practice teaches. The mock exam
+ * measures … it is the only surface that answers 'are you ready to book?'"*
+ *
+ * On 31 August it stopped being a tab all the same — but it did not go under
+ * Practice, and it was not demoted. It became the primary action of the home
+ * screen, which is a promotion: it now sits on the card that carries the exam
+ * and the countdown, and it is the first thing on the first screen.
  */
 export default function MePage() {
   const ui = useUiLangValue();
-  useDocumentTitle(ui === 'en' ? 'You' : 'Vous');
+  useDocumentTitle(ts('nav.you', ui));
 
   return (
     <div className="space-y-6">
@@ -64,13 +72,9 @@ export default function MePage() {
         </div>
         <div className="min-w-0 flex-1">
           <div className="font-display text-xl font-bold text-navy dark:text-white">
-            {ui === 'en' ? 'Your progress' : 'Votre progression'}
+            {ts('me.progressTitle', ui)}
           </div>
-          <p className="mt-1 text-sm text-ink-secondary">
-            {ui === 'en'
-              ? 'Every sitting and every practice attempt, plotted against the level this page sets.'
-              : 'Chaque session et chaque tentative, tracées face au niveau fixé sur cette page.'}
-          </p>
+          <p className="mt-1 text-sm text-ink-secondary">{ts('me.progressBlurb', ui)}</p>
         </div>
         <ChevronRight className="h-5 w-5 shrink-0 text-ink-secondary" />
       </Link>

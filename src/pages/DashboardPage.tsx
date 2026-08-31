@@ -3,17 +3,19 @@ import { Link } from 'react-router-dom';
 import {
   CalendarDays,
   ChevronRight,
+  ClipboardCheck,
   Compass,
   Crown,
   Flag,
-  ScrollText,
 } from 'lucide-react';
 import { EmptyState, Loader } from '../components/States';
-import { StandingRows, NotBuiltNote } from '../components/Standing';
+import { SkillTiles } from '../components/SkillTiles';
+import { lookFor } from '../lib/skillLook';
 import { SectionHeading } from '../components/SectionHeading';
 import { useDocumentTitle } from '../lib/useDocumentTitle';
 import { loadHistory, type SittingRecord } from '../exam/model/history';
 import { PLAN_EVENT, daysUntil, loadPlan, type Plan } from '../exam/model/plan';
+import { loadSitting } from '../exam/state';
 import { releaseGate } from '../exam/engine/aggregate';
 import { buildPlan, type Coordinate } from '../exam/engine/planner';
 import { loadAttestations } from '../exam/model/attestationStore';
@@ -171,218 +173,155 @@ export default function DashboardPage() {
   const nextSkill = nextSlot?.coordinate.skill ?? null;
 
 
+  const sitting = loadSitting();
+
   return (
-    <div className="mx-auto max-w-3xl space-y-8">
-      {/* 1 ── where you are going. The page's own name leads, because the
-              navigation calls this screen Today and a page whose heading is a
-              different word reads as an app assembled rather than designed.
-              The countdown is the hero: it is the one number on this product
-              that is both certain and the reason the candidate is here. */}
-      <header className="space-y-4">
-        <h1 className="font-display text-3xl font-bold text-navy">{ts('nav.today', ui)}</h1>
+    <div className="mx-auto max-w-3xl space-y-6">
+      {/* ── ONE HERO, NOT THREE CARDS ──────────────────────────────────
+          The founder, 31 August: *"the app is cluttered."* Today was six
+          stacked sections and the first screen held three of them — a page
+          heading, an exam card, and a countdown panel — before anything could
+          be started.
 
-        <div className="card overflow-hidden p-0">
-          <div className="flex flex-wrap items-stretch">
-            <div className="min-w-[220px] flex-1 p-6">
-              <span className="chip">{t(goal.destination.label, ui)}</span>
-              <h2 className="mt-3 font-display text-2xl font-bold text-navy">
-                {t(exam.name, ui)}
-              </h2>
-              <p className="mt-1 text-sm text-ink-secondary">
-                {requirementLine(goal, ui)}
-              </p>
-              <a href={EXAM_HOME} className="mt-3 inline-block text-xs font-medium text-teal hover:underline">
-                {ts('today.changeExam', ui)}
-              </a>
-            </div>
+          They are one thing: WHICH exam, HOW LONG, START. So they are one
+          card. The heading "Today" went with them: the tab bar already says
+          which screen this is, and a word repeated two inches below its own
+          label is the kind of clutter that is invisible until it is gone. */}
+      <section className="overflow-hidden rounded-2xl bg-gradient-to-br from-navy via-navy to-teal-700 text-white shadow-cardHover">
+        <div className="flex flex-wrap items-start justify-between gap-4 p-5">
+          <div className="min-w-0 flex-1">
+            <span className="inline-flex rounded-full bg-white/15 px-2.5 py-0.5 text-[11px] font-semibold">
+              {t(goal.destination.label, ui)}
+            </span>
+            <h1 className="mt-2 font-display text-2xl font-bold leading-tight">{t(exam.name, ui)}</h1>
+            {/* Two lines at most. The Express Entry requirement line runs to
+                four on a 390px screen and pushed the countdown's own card off
+                the first screen — the one number this card exists to carry. */}
+            <p className="mt-1 line-clamp-2 text-sm leading-snug text-white/75">{requirementLine(goal, ui)}</p>
+          </div>
 
-            {/* ── THE COUNTDOWN, AND THE CASE WHERE THERE ISN'T ONE ────────
-                Task 5.1: *"the countdown is the emotional centre of this
-                product and is currently a small grey chip."*
-
-                The countdown itself was already the hero — a 6xl number in a
-                gradient panel. **What was a small grey chip is the state the
-                founder is actually in: no date set.** A candidate with no date
-                sees the panel that should carry the one certain number on this
-                product, and it carries an eight-word label and a link in
-                small type.
-
-                Setting the date is what turns this product on: the plan, the
-                pacing and every "how long have I got" answer hang off it. So
-                the empty state is now the loudest thing on Today, with a real
-                control rather than an underline — and 44px, which the same
-                ruling asks for everywhere. */}
-            <div className="flex min-w-0 flex-1 basis-full flex-col items-center justify-center bg-gradient-to-br from-navy to-teal px-6 py-7 text-white sm:basis-[200px]">
-              {left === null ? (
-                <>
-                  <CalendarDays className="h-8 w-8 opacity-90" />
-                  <div className="mt-3 text-center font-display text-xl font-bold leading-tight">
-                    {ts('today.whenIsExam', ui)}
-                  </div>
-                  <p className="mt-1 max-w-[22ch] text-center text-xs leading-relaxed opacity-90">
-                    {ts('today.pacedAgainstDate', ui)}
-                  </p>
-                  <a
-                    href={EXAM_HOME}
-                    className="mt-3 inline-flex min-h-[44px] items-center rounded-xl bg-white/15 px-4 text-sm font-semibold backdrop-blur-none transition hover:bg-white/25"
-                  >
-                    {ts('today.setDate', ui)}
-                  </a>
-                </>
-              ) : (
-                <>
-                  <div className="font-display text-6xl font-bold leading-none tabular-nums">
-                    {Math.abs(left)}
-                  </div>
-                  <div className="mt-2 text-center text-[11px] font-semibold uppercase tracking-widest opacity-90">
-                    {ts(left >= 0
-                      ? (left === 1 ? 'today.dayUntil' : 'today.daysUntil')
-                      : (left === -1 ? 'today.daySince' : 'today.daysSince'), ui)}
-                  </div>
-                </>
-              )}
-            </div>
+          {/* The countdown is the one number on this product that is both
+              certain and the reason the candidate is here. When there is no
+              date it is not a small grey chip — it is the same size, asking
+              for the thing that turns the plan on. */}
+          <div className="flex shrink-0 flex-col items-center rounded-2xl bg-white/10 px-4 py-3 text-center">
+            {left === null ? (
+              <>
+                <CalendarDays className="h-6 w-6 opacity-90" />
+                <a
+                  href={EXAM_HOME}
+                  className="mt-2 inline-flex min-h-[44px] items-center rounded-xl bg-white/20 px-3 text-xs font-semibold transition hover:bg-white/30"
+                >
+                  {ts('today.setDate', ui)}
+                </a>
+              </>
+            ) : (
+              <>
+                <div className="font-display text-4xl font-bold leading-none tabular-nums">{Math.abs(left)}</div>
+                <div className="mt-1 max-w-[9ch] text-[10px] font-semibold uppercase leading-tight tracking-wider opacity-85">
+                  {ts(left >= 0
+                    ? (left === 1 ? 'today.dayUntil' : 'today.daysUntil')
+                    : (left === -1 ? 'today.daySince' : 'today.daysSince'), ui)}
+                </div>
+              </>
+            )}
           </div>
         </div>
-      </header>
 
-      {/* 2 ── the next thing, from the plan: one button, straight into it (IA §4) */}
-      <section className="card relative overflow-hidden border-l-4 border-l-teal p-6">
-        <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-teal/10" />
-        <div className="relative flex items-center gap-2 text-sm font-semibold text-teal">
-          <Compass className="h-4 w-4" /> {ts('today.doThisNext', ui)}
-        </div>
-          {/* `min-w-[180px]` on a `flex-1` child inside a `flex-wrap` row put
-              the coordinate's name and its sentence OUTSIDE the card's left
-              padding on a narrow screen, where `overflow-hidden` then clipped
-              them: "expose · B2" rendered as "xpose · B2". Photographed at
-              width on the deployed build.
-
-              A minimum width is a promise the container may not be able to
-              keep. `min-w-0` lets the column shrink to what there is, and the
-              row stacks instead of overflowing. */}
-        {nextSlot && nextSkill ? (
-          <div className="mt-3 flex flex-wrap items-center gap-4">
-            <div className="min-w-0 flex-1 basis-full sm:basis-auto">
-              <div className="font-display text-2xl font-bold text-navy dark:text-white">{nextSlot.coordinate.label}</div>
-              <div className="mt-0.5 text-xs text-ink-secondary">
-                {ts(builtPlan.basis === 'attestation' ? 'today.weakestFirst' : 'today.examOrder', ui)}
-              </div>
-            </div>
-            <Link to={practiceHref(nextSlot.coordinate)} className="btn-primary shrink-0">
-              {ts('today.startNow', ui)}
-              <ChevronRight className="h-4 w-4" />
-            </Link>
-          </div>
-        ) : (
-          <div className="mt-3 flex flex-wrap items-center gap-4">
-            {/* D6 — a "Go to Practice" button sat here, and Practice is a tab
-                on this same screen. The sentence tells the candidate what to
-                do; the tab bar is how they do it. A button that duplicates a
-                tab teaches that the tab is not to be trusted. */}
-            <p className="min-w-[180px] flex-1 text-sm text-ink-secondary">{ts('today.pickASkill', ui)}</p>
-          </div>
-        )}
+        {/* ── THE MOCK EXAM IS NO LONGER A TAB ────────────────────────────
+            It was the third of four tab-bar destinations. It is the product's
+            own hero — the thing the whole marketing site points at, and the
+            thing a candidate opens the app to do occasionally and
+            deliberately — and a tab is where you put what someone does
+            constantly. So it is the primary action of the home screen, at the
+            foot of the card that says which exam and how long is left, which
+            is the only place those three facts mean anything together. */}
+        <Link
+          to="/exam"
+          className="flex min-h-[3.5rem] items-center justify-between gap-3 border-t border-white/15 bg-white/10 px-5 py-4 transition hover:bg-white/20"
+        >
+          <span className="flex items-center gap-2.5 font-display text-base font-bold">
+            <ClipboardCheck className="h-5 w-5" />
+            {ts(sitting ? 'today.resumeMock' : 'today.startMock', ui)}
+          </span>
+          <ChevronRight className="h-5 w-5 opacity-80" />
+        </Link>
       </section>
 
-      {/* 2 ── the four skills, and which kind of number each one is */}
+      {/* ── THE FOUR SKILLS ─────────────────────────────────────────────
+          Four rows became four tiles, and "What is not built for your exam"
+          — a whole section of prose two scrolls below — became the state of
+          the tiles it was about. See `components/SkillTiles.tsx`. */}
       <section className="space-y-3">
         <SectionHeading icon={Flag} meta={tf('today.targetMeta', { target }, ui)}>
-          {ts('today.whereYouStand', ui)}
+          {ts('today.yourFourSkills', ui)}
         </SectionHeading>
-
-        {/* FOUR ROWS, ONE STATUS CHIP EACH, NO PARAGRAPH — the ruling's §2.2,
-            in its own words. `StandingNote` explained what "counted" and
-            "estimated" mean; it is on `/progress` now, beside the verdict it
-            qualifies, and Today shows the four rows a candidate opens the app
-            several times a day to see. */}
-        <StandingRows exam={exam} record={latest} target={target} />
-        {/* D2 — THE SENTENCE THAT WAS ON THIS SCREEN TWICE.
-            `gate.reason` ("no predicted score is published … it requires 150
-            official score reports") was printed under "Are you ready to book?"
-            AND again under "What is not built for your exam". Same words, one
-            scroll apart, which reads as two different facts until you notice
-            it is one. The IA ruling of 30 August: keep it once, under "Where
-            you stand", because that is the block it qualifies. */}
+        <SkillTiles exam={exam} record={latest} />
         {!gate.publishNumeric && (
-          <p className="text-xs leading-relaxed text-ink-secondary">{t(gate.reason, 'en')}</p>
+          <p className="text-xs leading-relaxed text-ink-secondary">{t(gate.reason, ui)}</p>
         )}
       </section>
 
-      {/* ── TODAY IS THREE CARDS ────────────────────────────────────────
-          IA ruling §1.4: *"`/` at 390px runs about four screens, roughly 70%
-          prose before any action. That is the real finding under 'clutter'."*
-          Walking the deployed app on 31 August measured it: **2,157px of
-          content, 2.56 screens of 844** against an acceptance criterion of
-          1.5. Reading the router would never have produced that number.
-
-          What stood here was two more blocks of prose — "Are you ready to
-          book?", with three paragraphs explaining why the governing level is
-          the lowest and not the average, and "What is not built for your
-          exam", with a fourth telling the candidate what to do meanwhile.
-
-          Both are TRUE and neither is deleted. They are moved to `/progress`,
-          which is the page that owns the numbers and is opened when a
-          candidate wants to study them — Today is opened several times a day
-          to see one thing. The verdict itself stays, as one line, because it
-          is the question the candidate came with; what left is the reasoning
-          behind it, one tap away and named.
-
-          The destination's own surfaces went with them for the same reason:
-          an external link to a government page is not something a candidate
-          needs on the screen they open before practising. */}
-      {/* ── BLOCK 4: WHAT IS NOT BUILT ──────────────────────────────────
-          Task 5.1 asks for four blocks and names this as one of them, so it
-          is here — as the FACT, in `NotBuiltNote`, which is a short list of
-          what this exam does not yet have.
-
-          What went to `/progress` is the ESSAY around it: three paragraphs on
-          why the governing level is the lowest rather than the average, and a
-          fourth on what to do meanwhile. Those are read once, carefully, on
-          the page that owns the numbers. This is read at a glance, on the page
-          that is opened several times a day. */}
-      <section className="space-y-3">
-        <SectionHeading icon={ScrollText}>{ts('today.notBuilt', ui)}</SectionHeading>
-        <NotBuiltNote exam={exam} />
+      {/* ── THE NEXT THING, AS ONE STRIP ────────────────────────────────
+          It was a card with a heading, a coordinate, a sentence of reasoning
+          and a button. The reasoning is one line now and sits under the
+          coordinate it explains. */}
+      {nextSlot && nextSkill && (
         <Link
-          to="/progress"
-          className="card flex min-h-[44px] items-center gap-4 p-4 transition hover:border-navy/40 hover:bg-surface-muted"
+          to={practiceHref(nextSlot.coordinate)}
+          className="card flex items-center gap-4 border-l-4 border-l-teal p-4 transition hover:shadow-cardHover"
         >
+          <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-white shadow-sm ${lookFor(nextSkill).tile}`}>
+            <Compass className="h-5 w-5" />
+          </span>
           <div className="min-w-0 flex-1">
-            <div className="text-sm font-semibold text-navy dark:text-white">
-              {ts('today.readyToBook', ui)}
-            </div>
-            <div className="mt-0.5 text-xs text-ink-secondary">
-              {gate.publishNumeric && governing.complete
-                ? tf('today.readyAnswer', { system: exam.benchmark.system, level: governing.level ?? '' }, ui)
-                : ts('today.notYetAnswerable', ui)}
+            <div className="text-[11px] font-semibold uppercase tracking-wide text-teal">{ts('today.doThisNext', ui)}</div>
+            <div className="truncate font-display text-lg font-bold text-navy dark:text-white">{nextSlot.coordinate.label}</div>
+            <div className="mt-0.5 text-xs leading-snug text-ink-secondary">
+              {ts(builtPlan.basis === 'attestation' ? 'today.weakestFirst' : 'today.examOrder', ui)}
             </div>
           </div>
           <ChevronRight className="h-5 w-5 shrink-0 text-ink-secondary" />
         </Link>
-      </section>
+      )}
 
-      {/* Upgrade to SELM Pro. This is the primary in-app entry point to the
-          paywall and it stays on the dashboard: Apple's App Review has to be
-          able to find the In-App Purchases without hunting through menus. */}
+      {/* The verdict, as one line, linking to the page that owns the
+          reasoning. Unchanged in substance from 31 August. */}
+      <Link
+        to="/progress"
+        className="card flex min-h-[44px] items-center gap-4 p-4 transition hover:border-navy/40 hover:bg-surface-muted"
+      >
+        <div className="min-w-0 flex-1">
+          <div className="text-sm font-semibold text-navy dark:text-white">{ts('today.readyToBook', ui)}</div>
+          <div className="mt-0.5 text-xs text-ink-secondary">
+            {gate.publishNumeric && governing.complete
+              ? tf('today.readyAnswer', { system: exam.benchmark.system, level: governing.level ?? '' }, ui)
+              : ts('today.notYetAnswerable', ui)}
+          </div>
+        </div>
+        <ChevronRight className="h-5 w-5 shrink-0 text-ink-secondary" />
+      </Link>
+
+      {/* Upgrade. This is the primary in-app entry point to the paywall and it
+          stays on the home screen: Apple's App Review has to be able to find
+          the In-App Purchases without hunting through menus. */}
       <Link
         to="/upgrade"
-        className="card flex items-center gap-4 overflow-hidden bg-gradient-to-br from-teal-500 to-teal-700 p-5 text-white shadow-cardHover"
+        className="card flex items-center gap-4 overflow-hidden bg-gradient-to-br from-teal-500 to-teal-700 p-4 text-white shadow-cardHover"
       >
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/20 backdrop-blur">
-          <Crown className="h-6 w-6" />
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/20 backdrop-blur">
+          <Crown className="h-5 w-5" />
         </div>
-        <div className="flex-1">
-          <div className="font-display text-lg font-bold">{ts('today.upgrade', ui)}</div>
+        <div className="min-w-0 flex-1">
+          <div className="font-display text-base font-bold">{ts('today.upgrade', ui)}</div>
           <div className="text-xs text-white/80">{ts('today.upgradeBlurb', ui)}</div>
         </div>
-        <ChevronRight className="h-5 w-5 text-white/90" />
+        <ChevronRight className="h-5 w-5 shrink-0 text-white/90" />
       </Link>
     </div>
   );
 }
 
-/** How this destination reads the result, in the candidate's own terms. */
 function requirementLine(goal: Goal, ui: UiLang): string {
   const target = `${goal.system} ${goal.requiredLevel}`;
   const label = t(goal.label, ui);

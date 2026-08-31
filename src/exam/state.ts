@@ -83,7 +83,7 @@ export type Sitting = {
 
 const SITTING_KEY = 'selm_exam_sitting_v1';
 
-const loadSitting = (): Sitting | null => {
+export const loadSitting = (): Sitting | null => {
   try {
     const raw = localStorage.getItem(SITTING_KEY);
     if (!raw) return null;

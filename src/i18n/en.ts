@@ -487,4 +487,17 @@ export const EN = {
 
   'privacy.contactHeading': '10. Contact',
   'privacy.contactBlurb': 'Questions or requests about this policy or your data?',
+
+  // ── Today: the four skill tiles ──────────────────────────────────────────
+  'today.yourFourSkills': 'Your four skills',
+  'today.startMock': 'Start the mock exam',
+  'today.resumeMock': 'Resume the sitting',
+  'today.tileCorrect': '{correct} of {total} correct',
+  'today.tileQuestions': '{n} questions · not sat yet',
+  'today.tileTasks': "{tasks} tasks · {situations} situations · the exam's own",
+  'today.tileNotBuiltShort': 'Not built yet',
+
+  'me.progressTitle': 'Your progress',
+  'me.progressBlurb':
+    'Every sitting and every practice attempt, plotted against the level this page sets.',
 } as const;

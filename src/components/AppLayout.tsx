@@ -6,40 +6,65 @@ import { useAuthStore } from '../store/authStore';
 import { syncAttemptsFromBackend } from '../lib/attempts';
 import { claimCandidateRecord } from '../lib/localRecord';
 import { syncDocumentLang, ts, useUiLangValue } from '../i18n';
-import { Home, Dumbbell, ClipboardCheck, CircleUser } from 'lucide-react';
+import { Home, Dumbbell, CircleUser } from 'lucide-react';
 import type { Key } from '../i18n';
 import clsx from 'clsx';
 
 /**
- * The FOUR destinations, declared once and rendered twice — the sidebar on a
+ * The THREE destinations, declared once and rendered twice — the sidebar on a
  * desktop, the tab bar on a phone. One list, so the two can never drift.
  *
- * ── Five became four on 31 August ───────────────────────────────────────────
- * IA ruling §2.1: *"Four tabs is still right. Drop `My exam` into `You` …
- * Keep Mock exam."*
+ * ── Five became four, then three, both on 31 August ─────────────────────────
+ * IA ruling §2.1, in the morning: *"Four tabs is still right. Drop `My exam`
+ * into `You` … Keep Mock exam."* `My exam` and `Progress` folded into `You`,
+ * which holds the numbers alongside the goal they are measured against.
  *
  *     Today · Practice · Mock exam · You
  *
- * `My exam` and `Progress` both fold into `You`, which holds the numbers
- * alongside the goal they are measured against. Five tabs on a 390px screen
- * is 78 points each; four is 97, and the two that went were the two a
- * candidate opens least often.
+ * In the evening the founder, looking at the built app: *"the app is
+ * cluttered."* Mock exam left the bar and became the primary action of the
+ * home screen — the detail and the reasoning are on `navItems` below.
  *
- * **Mock exam stays, and the ruling is explicit about why.** The audit
- * proposed moving it under Practice. *"Practice teaches. The mock exam
- * measures … it is the only surface that answers 'are you ready to book?' —
- * the question the candidate came with. Burying it demotes the thing they
- * came for."*
+ *     Today · Practice · You
+ *
+ * The arithmetic is the same argument the morning's ruling made: five tabs on
+ * a 390px screen is 78 points each, four is 97, three is 130. What went both
+ * times was the destination a candidate reaches least often, and neither one
+ * was deleted — `My exam` folded into a tab, and Mock exam moved to the first
+ * screen instead of the fourth tab.
+ *
+ * **The ruling's reason for keeping Mock exam is not overturned.** *"Practice
+ * teaches. The mock exam measures … it is the only surface that answers 'are
+ * you ready to book?'"* That is why it went to the home screen rather than
+ * under Practice: a tab bar ranks by FREQUENCY, and a full timed sitting is
+ * occasional by design. Frequency is the wrong axis for it; prominence is the
+ * right one, and the home screen gives it more of that than a quarter of the
+ * tab bar did.
  *
  * The labels are KEYS as of 30 August. They were hard-coded English, which
  * made this the one place §5.2 was not being followed and the most visible
  * one: a candidate reading the app in French met English words on every
  * screen, in the only component that is on every screen.
  */
+/**
+ * ── FOUR DESTINATIONS BECAME THREE, 31 AUGUST ─────────────────────────────
+ * The founder: *"the app is cluttered."*
+ *
+ * **Mock exam left the tab bar.** A tab bar is for what a candidate does
+ * constantly; a full timed sitting is occasional, deliberate and high-stakes,
+ * and it was competing for a thumb with the two screens that are opened
+ * several times a day. It did not lose its place — it gained a better one: it
+ * is now the primary action on Today, at the foot of the card that says which
+ * exam and how many days are left, which is the only place those three facts
+ * mean anything together. `/exam` is unchanged and still resolves.
+ *
+ * Three tabs also fixes something the fourth was costing: with four, each tap
+ * target is a quarter of the width, and the two most-used destinations were
+ * no easier to hit than the least-used one.
+ */
 const navItems: Array<{ to: string; label: Key; icon: typeof Home; end?: boolean }> = [
   { to: '/', label: 'nav.today', icon: Home, end: true },
   { to: '/practice', label: 'nav.practice', icon: Dumbbell },
-  { to: '/exam', label: 'nav.mockExam', icon: ClipboardCheck },
   { to: '/me', label: 'nav.you', icon: CircleUser },
 ];
 
@@ -180,7 +205,7 @@ export function AppLayout() {
       </header>
 
       {/* ── THE PHONE TAB BAR ───────────────────────────────────────────
-          Same four destinations as the sidebar, from the same list.
+          Same three destinations as the sidebar, from the same list.
 
           Three things changed on 30 August, all of them because this is the
           component a phone user touches most and it was the least considered:

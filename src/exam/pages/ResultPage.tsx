@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
 import { useExam } from '../state';
 import { readStability } from '../engine/stability';
@@ -33,10 +33,13 @@ function Badge({ children }: { children: React.ReactNode }) {
 export default function ResultPage() {
   const { result, goal, ui } = useExam();
   const nav = useNavigate();
-  if (!result) {
-    nav('/me');
-    return null;
-  }
+  // ── A REDIRECT, NOT A CALL DURING RENDER ────────────────────────────
+  // This was `nav('/me'); return null;` in the render body — a side effect
+  // during render, which React does not promise to run once, and which left
+  // the screen blank for a beat on the way out. It also pointed at the
+  // account page: this is the result of a PRACTICE task, so when there is no
+  // result the place to be is practice.
+  if (!result) return <Navigate to="/practice" replace />;
   const { exam, task, signal, gate, judges, judgeAggregate, examScaleAggregate, benchmarkLevel, release, zeroedBy, overtimeSec } = result;
   const scored = judges.filter((j) => j.kind === 'scored') as Extract<(typeof judges)[number], { kind: 'scored' }>[];
   const judge = judges[0];

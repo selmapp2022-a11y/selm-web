@@ -10,7 +10,7 @@ import { loadAttestations, ATTESTATION_EVENT } from '../exam/model/attestationSt
 import { buildPlan } from '../exam/engine/planner';
 import { releaseGate } from '../exam/engine/aggregate';
 import { governingLevel } from '../exam/engine/comprehension';
-import { StandingNote, NotBuiltNote } from '../components/Standing';
+import { StandingNote, NotBuiltNote, StandingRows } from '../components/Standing';
 import { useDocumentTitle } from '../lib/useDocumentTitle';
 import { fmtDate, fmtMonth, ts, tf, useUiLangValue, type Key } from '../i18n';
 import { Rich } from '../i18n/Rich';
@@ -278,12 +278,15 @@ export default function ProgressPage() {
         <SectionHeading icon={Compass} meta={tf('today.targetMeta', { target }, ui)}>
           {ts('today.whereYouStand', ui)}
         </SectionHeading>
-        <Link to="/" className="card flex items-center gap-3 p-4 hover:shadow-cardHover">
-          <span className="flex-1 text-sm text-ink-secondary">
-            <Rich k="progress.fourSkillsOnToday" vars={{ today: ts('nav.today', ui) }} />
-          </span>
-          <span className="btn-secondary shrink-0">{ts('progress.open', ui)}</span>
-        </Link>
+        {/* ── THE ROWS LIVE HERE NOW, 31 AUGUST ────────────────────────
+            They were on Today and this page linked to them. Today became four
+            tiles — glanceable, one screen, opened several times a day — and
+            the row for each skill, with its count, its bar and the sentence
+            about which kind of number it is, came here, to the page a
+            candidate opens to STUDY the numbers rather than to start. The
+            link that used to point back at Today is gone with them: it was
+            pointing at the thing this page should have been showing. */}
+        <StandingRows exam={exam} record={mine.length ? mine[mine.length - 1] : null} target={target} />
       </section>
 
       {/* 4 ── the gap */}

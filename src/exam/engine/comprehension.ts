@@ -24,13 +24,14 @@
  * rendering this must show the count, may show the profile, and must not
  * print a three-digit number.
  */
-import type { AccentTrack, ComprehensionItem, ComprehensionSection, Localised, Recording } from '../model/types';
+import type { AccentTrack, ComprehensionItem, ComprehensionSection, Localised, ProductionSection, Recording } from '../model/types';
 import { PRIMARY_TRACK } from '../model/types';
 import { isCompletionItem, isMatchingItem } from '../model/types';
 import { isCompletionCorrect } from './completion';
 import { newServeState, serve, type ServeState } from './pool';
 import { deliverable } from './practicePool';
 import { renditionFor } from '../model/rendition';
+import { promptsOf } from './productionPool';
 
 export const BANDS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'] as const;
 export type Band = (typeof BANDS)[number];
@@ -285,4 +286,41 @@ export function itemsOf(section: ComprehensionSection, recordingId: string): Com
 /** The questions carried by a served set of recordings, in that order. */
 export function itemsFor(section: ComprehensionSection, recordings: Recording[]): ComprehensionItem[] {
   return recordings.flatMap((r) => itemsOf(section, r.id));
+}
+
+/**
+ * How many questions this section can actually put in front of a candidate
+ * today — not how many are written.
+ *
+ * ── Why a function and not `section.items.length` ─────────────────────────
+ * `scripts/counts-audit.mjs` caught the tile on Today reading the raw bank
+ * length on 31 August, and it was right to. The founder's rule behind that
+ * audit: *"no tile may show a count the bank cannot serve. Listening holds
+ * 160 questions and serves zero — until the audio exists, any number on that
+ * tile is a lie."*
+ *
+ * `deliverable` is the one predicate that decides it, shared with practice
+ * and with the mock exam, so all three agree about what can be served. A
+ * written script with no rendered audio EXISTS and is not SERVABLE, and this
+ * returns the second number.
+ */
+export function servableQuestions(
+  section: ComprehensionSection,
+  track: AccentTrack = PRIMARY_TRACK,
+): number {
+  return section.recordings
+    .filter((r) => deliverable(section, r, track))
+    .reduce((n, r) => n + itemsOf(section, r.id).length, 0);
+}
+
+/**
+ * How many distinct situations a production section can set — its tâches
+ * multiplied by the situations each one holds, which is what a candidate
+ * meets one of per sitting.
+ *
+ * The production twin of the function above, and it lives here for the same
+ * reason: a screen may not count a bank for itself.
+ */
+export function servableSituations(section: ProductionSection): number {
+  return section.tasks.reduce((n, t) => n + promptsOf(t).length, 0);
 }
