@@ -13,25 +13,53 @@
 import { readFileSync } from 'node:fs';
 
 const src = readFileSync(new URL('../src/exam/definitions/ielts-listening.ts', import.meta.url), 'utf8');
+// `keep` is the variety plan's word, not this file's: it says whether the audio
+// that exists is in a variety the plan still allows. It was hand-edited into
+// the committed JSON once and then went missing the first time this script was
+// re-run, which is exactly the drift the committed copy exists to prevent.
+const planSrc = readFileSync(new URL('../src/exam/definitions/ielts-variety-plan.ts', import.meta.url), 'utf8');
+const keepOf = new Map();
+for (const m of planSrc.matchAll(/id: '([^']+)'[^}]*?keep: (true|false)/g)) keepOf.set(m[1], m[2] === 'true');
 
 // The recordings block, read as data rather than executed.
+//
+// This was one regular expression matching `id: 'gt-l-p\d'` with the fields in
+// a fixed order, and on 31 August it silently returned four rows out of
+// thirty-two: the sixteen recordings authored that day have longer ids and
+// carry `audioPath`, `variety` and `voice` before `level`. A scraper that
+// matches a field ORDER is a scraper that fails the first time a file is
+// written by a different hand, and it fails by returning less rather than by
+// stopping. So the block is split first and each field is read on its own.
 const rows = [];
-const re = /id: '(gt-l-p\d)',[\s\S]*?level: '(\w+)',[\s\S]*?speakers: (\d),\s*variety: '(\w+)',[\s\S]*?script: "((?:[^"\\]|\\.)*)",/g;
-let m;
-while ((m = re.exec(src))) {
-  const script = JSON.parse(`"${m[5]}"`);
+// Indentation is not uniform either: the original sixteen sit four spaces in
+// and the ones spliced later sit eight, so the split cannot depend on it.
+const blocks = src.split(/\n(?=\s{4,8}\{\n)/).filter((b) => /^\s+id: ["']gt-l-p\d/m.test(b));
+const field = (b, name) => {
+  const m = new RegExp(`\\n\\s+${name}: ['"]((?:[^"'\\\\]|\\\\.)*)['"],`).exec(b);
+  return m ? m[1] : null;
+};
+for (const b of blocks) {
+  const id = field(b, 'id');
+  const rawScript = /\n\s+script: "((?:[^"\\]|\\.)*)",/.exec(b);
+  if (!id || !rawScript) continue;
+  const script = JSON.parse(`"${rawScript[1]}"`);
   const lines = script.split('\n').filter((l) => l.trim().length > 0);
   // The narrator's own lines: the announcement that opens a part and the one
   // that closes it. They are the reason a narrator was cast — in IELTS the
   // candidate HEARS them — so they are rendered by the narrator voice, not by
   // whoever speaks the part.
   const intro = lines[0].startsWith('Now turn to Part') ? lines.shift() : null;
-  const outro = lines[lines.length - 1].startsWith('That is the end of Part') ? lines.pop() : null;
+  const outro = lines.length && lines[lines.length - 1].startsWith('That is the end of Part') ? lines.pop() : null;
+  const speakers = /\n\s+speakers: (\d)/.exec(b);
   rows.push({
-    id: m[1],
-    level: m[2],
-    speakers: Number(m[3]),
-    variety: m[4],
+    id,
+    // Audio exists iff the recording carries a path to it. Read from the same
+    // file the app reads, so the two cannot disagree.
+    rendered: /\n\s+audioPath: /.test(b),
+    keep: keepOf.get(id) ?? true,
+    level: field(b, 'level'),
+    speakers: speakers ? Number(speakers[1]) : 1,
+    variety: field(b, 'variety'),
     narratorIntro: intro,
     narratorOutro: outro,
     body: lines,

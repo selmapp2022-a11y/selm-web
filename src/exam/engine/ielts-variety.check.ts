@@ -54,7 +54,12 @@ console.log('\n2. Variety is a PART-level property, and Canadian is the majority
 // and no part is a single accent throughout.
 for (const part of ['Part 1', 'Part 2', 'Part 3', 'Part 4'] as const) {
   const here = IELTS_VARIETY_PLAN.filter((p) => p.part === part);
-  t(`${part}: four versions`, here.length, 4);
+  // Was `=== 4`, which said a part has exactly four versions. On 31 August
+  // each part gained four more at a second band, and the assertion went red
+  // for a reason that is growth rather than breakage. What it protects is
+  // that a re-sitting candidate meets a different recording, and that needs a
+  // floor, not a fixed number.
+  t(`${part}: at least four versions`, here.length >= 4, true, `${here.length}`);
   t(`${part}: not one accent throughout`, new Set(here.map((p) => p.variety)).size >= 2, true,
     here.map((p) => p.variety).join(', '));
   t(`${part}: a Canadian voice is reachable`, here.some((p) => p.variety === IELTS_MAJORITY_VARIETY), true);
@@ -120,6 +125,13 @@ const stale = IELTS_VARIETY_PLAN.filter((p) => p.rendered && !p.keep);
 t('no rendered file is left in a variety the plan forbids', stale.map((p) => p.id), []);
 t('and every recording in the bank has been rendered',
   IELTS_VARIETY_PLAN.filter((p) => p.rendered && p.keep).length, IELTS_VARIETY_PLAN.length);
+// The Australia track is DELIBERATELY incomplete, and the number is printed
+// rather than asserted to zero. Asserting completeness here would have made
+// the founder's ruling look like an outage.
+{
+  const waiting = IELTS_VARIETY_PLAN.filter((p) => !p.australiaRendered);
+  console.log(`     ${waiting.length} of ${IELTS_VARIETY_PLAN.length} have no Australia rendition yet: ${waiting.map((p) => p.id).join(', ') || 'none'}`);
+}
 
 console.log('\n4. The account’s limits are in the DATA, not met at render time\n');
 
@@ -150,6 +162,8 @@ console.log('\n5. The Australia track — the same scripts, other voices\n');
 // two renditions and the audio is chosen by destination — never the questions,
 // which are one bank with one authoring history.
 {
+  // The intended accent is declared for every row, rendered or not, so this
+  // reads the plan rather than the file system.
   const AU = IELTS_VARIETY_PLAN.map((p) => p.australiaVariety);
   const dom = AU.filter((v) => v === 'australian' || v === 'british').length;
   t('Australian and British are the majority of the Australia track', dom * 2 > AU.length, true,
@@ -168,7 +182,9 @@ console.log('\n5. The Australia track — the same scripts, other voices\n');
   // tracks are served the same file. A rendition is audio; two tracks sharing
   // one recording when the accent suits both is the correct answer, not a
   // compromise — and it is half the render bill.
-  const shared = IELTS_VARIETY_PLAN.filter((p) => p.variety === p.australiaVariety).length;
+  // Only rows whose Australia rendition actually exists can share a file.
+  const rendered = IELTS_VARIETY_PLAN.filter((p) => p.australiaRendered);
+  const shared = rendered.filter((p) => p.variety === p.australiaVariety).length;
   t('the tracks share every file they honestly can', shared, 8);
 }
 
@@ -198,8 +214,21 @@ console.log('\n7. Every recording is playable on BOTH tracks, and says who spoke
   const exam = EXAMS.find((e) => e.id === 'ielts-gt')!;
   const S2 = exam.sections.find((s): s is ComprehensionSection => s.id === 'listening')!;
   for (const track of ['canada', 'australia'] as const) {
-    const missing = S2.recordings.filter((r) => !renditionFor(r, track)).map((r) => r.id);
-    t(`${track}: every recording has a rendition`, missing, []);
+    // A recording the plan says has no rendition on this track is not a
+    // missing rendition; it is a rendition nobody has paid for yet, and the
+    // difference is the whole of the founder's Australia ruling. What must
+    // still hold with no exception is the Canada track, and that a rendition
+    // which DOES exist speaks the accent the plan promised.
+    const expected = S2.recordings.filter((r) => {
+      const row = IELTS_VARIETY_PLAN.find((p) => p.id === r.id);
+      return track === 'canada' ? true : row?.australiaRendered !== false;
+    });
+    const missing = expected.filter((r) => !renditionFor(r, track)).map((r) => r.id);
+    t(`${track}: every recording the plan renders has a rendition`, missing, []);
+    if (track === 'australia') {
+      const later = S2.recordings.length - expected.length;
+      console.log(`     ${later} recording(s) are Canada-only by ruling and are not counted here`);
+    }
     const wrong = S2.recordings.filter((r) => {
       const ren = renditionFor(r, track);
       const want = IELTS_VARIETY_PLAN.find((p) => p.id === r.id)!;
