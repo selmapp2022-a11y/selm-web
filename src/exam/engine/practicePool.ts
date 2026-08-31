@@ -199,9 +199,9 @@ function nearestTier(order: readonly Recording[], here: number): Recording[] {
  * carry questions and, for audio, that have been rendered. Practice must use
  * the same filter or the count it prints is not the count it serves.
  */
-export function practicable(section: ComprehensionSection): Recording[] {
+export function practicable(section: ComprehensionSection, track: AccentTrack = PRIMARY_TRACK): Recording[] {
   const withItems = new Set(section.items.map((i) => i.recordingId));
-  return section.recordings.filter((r) => deliverable(section, r) && withItems.has(r.id));
+  return section.recordings.filter((r) => deliverable(section, r, track) && withItems.has(r.id));
 }
 
 /**

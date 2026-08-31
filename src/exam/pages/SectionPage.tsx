@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { PRIMARY_TRACK } from '../model/types';
 import { audioFor } from '../model/rendition';
 import { useNavigate } from 'react-router-dom';
 import { AlertTriangle } from 'lucide-react';
@@ -52,7 +53,12 @@ export default function SectionPage() {
 }
 
 function Section({ section }: { section: ComprehensionSection }) {
-  const { ui, sitting, answerItem, submitSection, setPaper } = useExam();
+  const { ui, sitting, answerItem, submitSection, setPaper, goal } = useExam();
+  // WHICH ACCENT THIS CANDIDATE HEARS. The paper is drawn for their track, so
+  // an Australian candidate is never handed a Canadian recording of a script
+  // whose questions are identical — it would play perfectly and be the wrong
+  // exam for them.
+  const track = goal.accentTrack ?? PRIMARY_TRACK;
   const nav = useNavigate();
   const [cursor, setCursor] = useState(0);
   const [now, setNow] = useState(Date.now());
@@ -95,7 +101,7 @@ function Section({ section }: { section: ComprehensionSection }) {
   const [paper, setPaperState] = useState<Recording[] | null>(null);
   useEffect(() => {
     const stored = useExamStore.getState().sitting?.papers?.[section.id];
-    const { paper: rs, drew } = paperFor(section, stored);
+    const { paper: rs, drew } = paperFor(section, stored, track);
     if (drew) setPaper(section.id, rs.map((r) => r.id));
     setPaperState(rs);
   }, [section, setPaper]);
@@ -131,7 +137,7 @@ function Section({ section }: { section: ComprehensionSection }) {
   // which is the one behaviour worse than refusing outright — the candidate
   // would never know that questions had been dropped.
   const missing = section.delivery.audioPlaysOnce
-    ? recordings.filter((r) => !audioFor(r)).map((r) => r.id)
+    ? recordings.filter((r) => !audioFor(r, track)).map((r) => r.id)
     : [];
   const audioMissing = missing.length > 0;
 
@@ -269,7 +275,8 @@ function OneRecording({
   onChoose: (sectionId: string, itemId: string, chose: number | string | null) => void;
   ui: LanguageCode;
 }) {
-  const { sitting, markPlayed } = useExam();
+  const { sitting, markPlayed, goal } = useExam();
+  const track = goal.accentTrack ?? PRIMARY_TRACK;
   const rec = recordings[cursor];
   const its = itemsOf(section, rec.id);
   const before = recordings.slice(0, cursor).reduce((n, r) => n + itemsOf(section, r.id).length, 0);
@@ -287,7 +294,7 @@ function OneRecording({
         </span>
         <div className="mt-4">
           <PlayOnce
-            src={resolveAudio(audioFor(rec))}
+            src={resolveAudio(audioFor(rec, track))}
             played={played}
             // Recorded before the audio starts, and written straight into the
             // sitting, so a reload, a second click or a failed play does not

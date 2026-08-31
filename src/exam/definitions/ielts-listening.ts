@@ -332,6 +332,20 @@ export const IELTS_LISTENING: ComprehensionSection = {
         modelId: "eleven_flash_v2_5",
         renderedAt: "2026-08-29",
       },
+      renditions: {
+        australia: {
+          audioPath: "ielts-listening/gt-l-p1.mp3",
+          variety: 'australian',
+          voice: {
+        voiceId: "zMK1eWY5DTw3Jjb8efU8",
+        voiceIds: ["zMK1eWY5DTw3Jjb8efU8", "iIg0uI51lssRFauz7W21", "GrVxA7Ub86nJH91Viyiv"],
+        vendorName: "Emily + Neil + James (narrator)",
+        requestedVariety: 'australian',
+        modelId: "eleven_flash_v2_5",
+        renderedAt: "2026-08-29",
+          },
+        },
+      },
       script: "Now turn to Part one. You will hear a man enquiring about membership at a community sports centre. First, you have some time to look at questions one to ten.\n— Riverbank Leisure Centre, good morning. Erin speaking.\n— Oh, hello. I'd like to ask about joining, please. I've just moved into the area.\n— Of course. I'll take a few details and then talk you through what we offer. Can I start with your surname?\n— It's Whitfield.\n— Could you spell that for me?\n— Yes — W, H, I, T, F, I, E, L, D. Whitfield.\n— Thank you. And a contact number?\n— It's oh-seven-double-four, one-nine-six, three-eight-two. Sorry, that's my old one. Let me give you the new one — oh-seven-double-four, one-nine-six, three-two-eight.\n— Three-two-eight at the end. Got it. Now, we run three kinds of membership. There's Standard, which is the gym and the pool. There's Active, which adds every class on the timetable. And there's Family, which covers two adults and up to three children.\n— It would just be me. But I'd want the classes — I'm trying to get back into swimming properly, and there's a technique session I saw on your website.\n— Then Active is the one you want. Standard wouldn't include that session.\n— Active, then.\n— Lovely. Active is normally fifty-two pounds a month. There's an introductory rate for the first three months, though, which brings it down to forty-five.\n— Forty-five. That's better than I expected.\n— It goes up to the full fifty-two in month four, so do bear that in mind. Now, everyone joining does a short induction before their first visit — it's about forty minutes with one of the instructors.\n— When are those?\n— We run them Tuesdays and Thursdays. This week Tuesday's already full, I'm afraid, so the next one would be Thursday.\n— Thursday's fine.\n— And the times are ten in the morning or six in the evening.\n— Six, please. I don't finish work until half past four.\n— Six it is. Do come in something you can move in — you'll be shown the machines and you'll actually use a couple of them. And bring a towel; we don't provide those.\n— A towel. Right.\n— One more thing about the lockers. They take a one-pound coin, and you get it back when you return the key — but if you lose the key there's a charge of fifteen pounds for a replacement.\n— Fifteen. I'll be careful with it.\n— Most people are. Now, was there a particular class you wanted me to book you onto? The technique one you mentioned is called Stroke Clinic, and it fills up.\n— Yes, please — Stroke Clinic.\n— Stroke Clinic, Thursday evenings after your induction. And last thing, for our records: how did you hear about the centre?\n— A colleague, actually. Someone at work swims here.\n— A recommendation. That's what most people say. Right, Mr Whitfield, you're all set. See you Thursday at six.\nThat is the end of Part one.",
     },
     {
@@ -351,6 +365,20 @@ export const IELTS_LISTENING: ComprehensionSection = {
       level: 'B1',
       family: 'transactional',
       freshness: 'current',
+      renditions: {
+        australia: {
+          audioPath: "ielts-listening/au/gt-l-p1-v2.mp3",
+          variety: 'british',
+          voice: {
+        voiceId: "QJksobp1edMNvmwcG5lm",
+        voiceIds: ["QJksobp1edMNvmwcG5lm", "NuRyEq0OdD9mMOyd51UZ", "GrVxA7Ub86nJH91Viyiv"],
+        vendorName: "Juliet - British, Natural and Engaging + Jofra + James - English Storyteller",
+        requestedVariety: 'british',
+        modelId: "eleven_flash_v2_5",
+        renderedAt: "2026-08-31",
+          },
+        },
+      },
       script: "Now turn to Part one. You will hear a woman telephoning a van hire company. First, you have some time to look at questions one to ten.\n— Bridgeway Van Hire, good afternoon.\n— Hello. I'd like to book a van for a house move, if that's possible.\n— Certainly. Can I take your name?\n— It's Kowalski. K, O, W, A, L, S, K, I.\n— Kowalski. And a mobile number?\n— It's oh-seven-nine-one, four-double-six, two-oh-three.\n— Let me read that back. Oh-seven-nine-one, four-double-six, two-oh-three.\n— That's right.\n— Now, we have three sizes. The small van is really a car with a large boot. The medium is what most people take for a flat. And the long wheelbase is for a house of three bedrooms or more.\n— We're moving out of a two-bedroom flat, but there's a piano.\n— Then take the long wheelbase. The medium takes a piano only if you take nothing else that day, and people always have more than they think.\n— The long wheelbase, then.\n— The daily rate for that one is eighty-nine pounds. There's a deposit as well, which is two hundred, and you get that back when the van comes home undamaged.\n— And what about fuel?\n— Bring it back full. If you don't, we fill it and charge a handling fee of twenty pounds on top of the fuel itself.\n— Understood. What day did you want?\n— Saturday the fourteenth.\n— Saturday is our busiest day, so pick-up would be at eight in the morning rather than nine. Is that all right?\n— Eight is fine.\n— Good. Now, the driver has to be over twenty-three for the long wheelbase, and we'll need a licence at the counter. A photograph of it is not enough, I'm afraid — people ask.\n— I'll bring the licence itself.\n— One more thing. We include a trolley and four blankets with every van, at no charge. Ropes we don't lend, because they go missing, but you can buy a set here for six pounds.\n— I'll take a set of ropes.\n— Right. And how did you hear about us?\n— A leaflet, actually. It came through the door.\n— A leaflet. That's useful to know — we weren't sure anybody read them.\nThat is the end of Part one.",
     },
     {
@@ -370,6 +398,20 @@ export const IELTS_LISTENING: ComprehensionSection = {
       level: 'B1',
       family: 'transactional',
       freshness: 'current',
+      renditions: {
+        australia: {
+          audioPath: "ielts-listening/au/gt-l-p1-v3.mp3",
+          variety: 'australian',
+          voice: {
+        voiceId: "zMK1eWY5DTw3Jjb8efU8",
+        voiceIds: ["zMK1eWY5DTw3Jjb8efU8", "iIg0uI51lssRFauz7W21", "GrVxA7Ub86nJH91Viyiv"],
+        vendorName: "Emily - Calm, clear female Australian + Neil - Soft Australian accent + James - English Storyteller",
+        requestedVariety: 'australian',
+        modelId: "eleven_flash_v2_5",
+        renderedAt: "2026-08-31",
+          },
+        },
+      },
       script: "Now turn to Part one. You will hear a man enrolling his daughter in swimming lessons. First, you have some time to look at questions one to ten.\n— Meadowbank Pool, how can I help?\n— Hello. I'd like to put my daughter down for lessons.\n— Of course. What's her name?\n— Aoife. That's A, O, I, F, E.\n— Aoife. And her age?\n— She's seven. Eight in November.\n— Seven now is what I need. Can she swim at all?\n— A bit. She can get across the small pool but she won't put her face in.\n— Then she wants Stage Two, not Stage One. Stage One is for children who have never been in water. Stage Three assumes a full width on the front, which she isn't doing yet.\n— Stage Two, then.\n— Stage Two runs Tuesdays at five and Saturdays at nine. The Tuesday group is nearly full — there are two places left — and the Saturday group has just started, so it's quieter.\n— Saturday would suit us better anyway.\n— Saturday it is. Now, the term is ten weeks and it costs sixty pounds, which works out at six a lesson. We ask for the whole term up front, but if that's difficult you can pay half now and half at week five.\n— I'll pay the whole thing now.\n— Lovely. A few practical things. She'll need a swimming cap — that's the only thing we insist on, and it's because of the filters, not the hair. Goggles are up to you. We sell caps at reception for three pounds.\n— I'll get one on the day.\n— Please arrive fifteen minutes early for the first lesson only, so we can do the badge check by the door. After that, five minutes is plenty.\n— Fifteen the first time. Right.\n— And if she misses a week, tell us before the lesson and we'll add a week at the end. If you tell us afterwards, we can't — the register's already gone in.\n— Understood.\n— Last thing: parents watch from the balcony, not the poolside. It sounds strict, but children look up at the glass instead of the teacher, and the lesson goes backwards.\nThat is the end of Part one.",
     },
     {
@@ -389,6 +431,20 @@ export const IELTS_LISTENING: ComprehensionSection = {
       level: 'B1',
       family: 'transactional',
       freshness: 'current',
+      renditions: {
+        australia: {
+          audioPath: "ielts-listening/gt-l-p1-v4.mp3",
+          variety: 'north_american',
+          voice: {
+        voiceId: "plP9aw1rizYgjFfuvLQ7",
+        voiceIds: ["plP9aw1rizYgjFfuvLQ7", "HKFOb9iktHA85uKXydRT", "GrVxA7Ub86nJH91Viyiv"],
+        vendorName: "Heather - Warm, Raspy American Female + Russ + James - English Storyteller",
+        requestedVariety: 'north_american',
+        modelId: "eleven_flash_v2_5",
+        renderedAt: "2026-08-30",
+          },
+        },
+      },
       script: "Now turn to Part one. You will hear a man reporting a lost bag at a bus station. First, you have some time to look at questions one to ten.\n— Lost property. How can I help?\n— I left a bag on a bus this morning and I've been sent up here.\n— Right. Let's take the details. Your name first.\n— Ademola. A, D, E, M, O, L, A.\n— Ademola. Which service was it?\n— The four-two-one, from the hospital into town.\n— And roughly what time?\n— It was the ten past eight. I meant to catch the twenty to, but I missed it.\n— Ten past eight. Now, describe the bag for me.\n— It's a rucksack. Dark green, with a broken zip on the front pocket — that's the thing that would tell you it's mine.\n— A broken zip. Anything inside that identifies it?\n— A library book, and a jacket. And a water bottle, but that's just a bottle.\n— The book is more useful, because it has a ticket in it with a name. Was there anything valuable? I have to ask.\n— No money and no cards. That's all in my pocket.\n— That's good news for you and it makes it more likely you'll see it again, honestly. Now, drivers hand things in at the end of a shift, not straight away, so this morning's bus won't reach us until about six this evening.\n— So there's no point coming back before six.\n— None at all. And it may not be this evening — if the driver finished at another depot it comes across the following day.\n— How long do you keep things?\n— A month for an ordinary item. We'll ring you the moment it comes in, so let me take a number.\n— It's oh-seven-double-three, eight-one-five, nine-four-two.\n— Oh-seven-double-three, eight-one-five, nine-four-two. And there's no charge for collection, in case you're wondering. People often assume there is.\n— I did assume there was, actually.\n— Most people do. Bring something with your name on it when you come — a letter, a card, anything printed. And if you can, come before eight, because after that there is one member of staff on the whole station and the queue at the desk gets long.\n— Before eight. I'll try.\n— One last thing, and it is worth knowing. If the bag turns up at a different depot they will not send it here; they ring the number on the form instead. So do answer a call you do not recognise this week.\nThat is the end of Part one.",
     },
     {
@@ -415,6 +471,20 @@ export const IELTS_LISTENING: ComprehensionSection = {
         modelId: "eleven_flash_v2_5",
         renderedAt: "2026-08-29",
       },
+      renditions: {
+        australia: {
+          audioPath: "ielts-listening/gt-l-p2.mp3",
+          variety: 'british',
+          voice: {
+        voiceId: "QJksobp1edMNvmwcG5lm",
+        voiceIds: ["QJksobp1edMNvmwcG5lm", "GrVxA7Ub86nJH91Viyiv"],
+        vendorName: "Juliet + James (narrator)",
+        requestedVariety: 'british',
+        modelId: "eleven_flash_v2_5",
+        renderedAt: "2026-08-29",
+          },
+        },
+      },
       script: "Now turn to Part two. You will hear a volunteer coordinator showing a new group around the Riverbank Community Garden. First, you have some time to look at questions eleven to twenty.\nGood morning, everyone, and thank you for giving up your Saturday. Before we put anyone to work, let me walk you round the plan so you know where things are — you'll be surprised how often people end up watering the wrong beds.\nSo. You've come in through the gate at the bottom left, and the main path runs straight up from there, then turns right along the middle of the site. Keep that shape in your head and you won't get lost.\nThe site is two rows of plots. The top row runs along the river; the bottom row is the one you walk past on your way in from the gate.\nSo, first, the tool store. That's on the bottom row, the very first plot you come to from the entrance. Everything is signed inside and there's a list on the door — please put things back where the list says, not where there's a gap.\nThe compost area is on the same bottom row, but right along at the other end. Not the last plot — the one before it, third along. People do get this wrong, so: third along the bottom, with the pond after it.\nUp on the top row now, along the river. The fruit cages are the first plot up there, directly above the tool store. They're netted, so the door is stiff — lift it rather than pull it.\nThe polytunnel is the biggest structure we have. It's on the top row too, at the far end, the very last plot in that row. It gets the afternoon sun in that corner, which is the whole reason it went there rather than nearer the gate.\nAnd finally the wildlife pond, which is the one I want everyone to be careful around. It is the very last plot on the bottom row, in the corner. There's no fence — that's deliberate, for the hedgehogs — so watch your step, particularly if you've brought children.\nRight. A few practical things.\nFirst, the question everyone asks: can you take produce home? Yes, but not on your first day, and not by the bagful. The rule is that anything harvested on a session day goes to the share table by the entrance, and whatever's left at four o'clock, volunteers may take. It isn't about trust; it's that a share table is how we keep the neighbours on our side.\nSecond, tools. The powered tools — the mower and the strimmer — are for trained volunteers only, and the training runs once a month. Hand tools, anyone can use. Please don't be the person who decides today is the day they learn to strim.\nThird, wet weather. We do not cancel for rain. We cancel for high wind, because of the trees along the river, and you'll get a text by eight in the morning if a session is off. If you haven't had a text, assume we're on.\nFourth, and this one has caught people out: parking. The car park behind the centre is not ours. It belongs to the health centre and they do issue tickets at weekends. There's free parking on Mill Lane, two minutes' walk, and that is what we'd recommend.\nAnd last of all — what we most need from new volunteers is not muscle, honestly. It's people who come back. One person here every other Saturday for a year is worth far more to this garden than twenty people once.\nThat is the end of Part two.",
     },
     {
@@ -434,6 +504,20 @@ export const IELTS_LISTENING: ComprehensionSection = {
       level: 'B2',
       family: 'briefing',
       freshness: 'current',
+      renditions: {
+        australia: {
+          audioPath: "ielts-listening/au/gt-l-p2-v2.mp3",
+          variety: 'australian',
+          voice: {
+        voiceId: "zMK1eWY5DTw3Jjb8efU8",
+        voiceIds: ["zMK1eWY5DTw3Jjb8efU8", "GrVxA7Ub86nJH91Viyiv"],
+        vendorName: "Emily - Calm, clear female Australian + James - English Storyteller",
+        requestedVariety: 'australian',
+        modelId: "eleven_flash_v2_5",
+        renderedAt: "2026-08-31",
+          },
+        },
+      },
       script: "Now turn to Part two. You will hear a librarian briefing a group of new volunteers. First, you have some time to look at questions eleven to twenty.\nGood morning, and thank you for coming in early. I want to walk you through the building before it opens, because most of what goes wrong on a first shift is somebody sending a reader to the wrong floor with complete confidence.\nWe are on four levels and they are not numbered the way you would expect. The ground floor is what we call the Street floor, because it has the door on it. Below that is the Lower floor, which is not a basement and does have windows. Above the Street floor are the First and the Second.\nSo. Newspapers and the current magazines are on the Lower floor, at the back, past the lift. People assume they are near the door because they are quick to read, and they are not.\nThe children's library has the whole of the First floor. It has its own toilets and its own entrance from the car park, which matters on a wet Tuesday when a class arrives.\nLocal history is on the Second floor, and it is the only collection that does not lend. Everything there is consulted at the desk and stays in the room. If somebody asks to borrow a parish register, the answer is no, and the reason is that there is one of it.\nThe photocopier is on the Street floor beside the returns machine, and the study rooms are on the Second, along the corridor from local history. Do not send anyone to the First floor for a study room; the rooms up there are for staff and one of them is where we eat lunch.\nNow, some practical things, and I would rather over-explain than have you guess.\nFines. We do not charge them any more, on children's books or adult books. What we do charge for is a lost item, and the charge is the replacement cost, not a fixed fee. If a reader tells you they have been fined, they are remembering an old system.\nSecond: the self-service machines take a card but they will not renew an item that somebody else has reserved. The machine says so in very small type, so the reader will come to you convinced it is broken. It is not.\nThird, and this is the one I want you to remember: you may not look up what a reader has borrowed and tell somebody else, including their husband, their wife, or a police officer without a warrant. If you are asked, the answer is that you cannot, and you may send them to me. Nobody will be cross with you for saying no.\nFourth, the volunteer shift is three hours, and we ask you to take fifteen minutes of it as a break, in the staff room and not at the desk. People skip it and then get short with somebody at the end.\nAnd finally, what we actually need. It is not shelving, honestly, although there is always shelving. It is somebody willing to walk a reader to the shelf rather than pointing. That one habit changes what people think of this building more than anything else we do.\nThat is the end of Part two.",
     },
     {
@@ -453,6 +537,20 @@ export const IELTS_LISTENING: ComprehensionSection = {
       level: 'B2',
       family: 'briefing',
       freshness: 'current',
+      renditions: {
+        australia: {
+          audioPath: "ielts-listening/au/gt-l-p2-v3.mp3",
+          variety: 'british',
+          voice: {
+        voiceId: "QJksobp1edMNvmwcG5lm",
+        voiceIds: ["QJksobp1edMNvmwcG5lm", "GrVxA7Ub86nJH91Viyiv"],
+        vendorName: "Juliet - British, Natural and Engaging + James - English Storyteller",
+        requestedVariety: 'british',
+        modelId: "eleven_flash_v2_5",
+        renderedAt: "2026-08-31",
+          },
+        },
+      },
       script: "Now turn to Part two. You will hear a warden welcoming new residents to a hall of residence. First, you have some time to look at questions eleven to twenty.\nWelcome, all of you. I am going to speak for about ten minutes and then you can go and unpack. Most of this is on the sheet in your room, but people do not read the sheet, so here it is out loud.\nThe site is five blocks around a courtyard. They are named after rivers. That sounded charming to somebody in nineteen-sixty. It is now simply five names you have to learn: Avon, Brent, Colne, Derwent and Erne.\nThe laundry is in Brent, on the ground floor. It is the only one. Please do not carry a basket around all five blocks looking for another. The bicycle store is in Erne, at the far end from the gate. It opens with the same card as your room.\nThe post arrives at the porters' desk in Avon. That is the block with the arch. Sorting is into pigeonholes by surname and not by block. Parcels are held there too. The kitchen for anyone in a studio without one is in Colne. It is shared with the common room. Consequently it is noisy in the evening and deserted in the morning.\nQuiet hours run from eleven at night to seven in the morning, every night, including Saturday. I will be honest that Friday is enforced less strictly than Tuesday, but do not rely on that.\nOn kitchens: each floor has one and each floor cleans it. We do not have a cleaner for kitchens, and the reason is not money. It is that a cleaner meant nobody ever spoke to anybody about the state of it, and the kitchens were worse.\nMaintenance goes through the portal, not to me, and not to the porters. A message to me has to be typed into the portal by somebody. That somebody is me at eleven at night. If it is a leak or a smell of gas, then find a person immediately and do not use the portal at all.\nGuests may stay two nights in any week. You must sign them in at the porters' desk. The reason is fire, not suspicion. If the building empties at three in the morning we count heads against a list.\nThe deposit is two hundred pounds. It comes back in full unless something is broken. Ordinary marks on a wall are not something broken. A hole in a door is.\nOne last thing. The first fortnight is the loudest and the least representative. If you decide in week one that you have made a mistake, wait until week three before you decide it again.\nThat is the end of Part two.",
     },
     {
@@ -472,6 +570,20 @@ export const IELTS_LISTENING: ComprehensionSection = {
       level: 'B2',
       family: 'briefing',
       freshness: 'current',
+      renditions: {
+        australia: {
+          audioPath: "ielts-listening/gt-l-p2-v4.mp3",
+          variety: 'new_zealand',
+          voice: {
+        voiceId: "ANYdMtqQZTRmq10Nw496",
+        voiceIds: ["ANYdMtqQZTRmq10Nw496", "GrVxA7Ub86nJH91Viyiv"],
+        vendorName: "Ella - Casual New Zealand Female + James - English Storyteller",
+        requestedVariety: 'new_zealand',
+        modelId: "eleven_flash_v2_5",
+        renderedAt: "2026-08-30",
+          },
+        },
+      },
       script: "Now turn to Part two. You will hear a ranger briefing new guides at a wildlife reserve. First, you have some time to look at questions eleven to twenty.\nGood morning. You have all walked the reserve once as visitors. Today I want you to learn it as guides. That is a different thing. A guide has to know where not to take people.\nThe reserve divides into five zones and we use the same five names on every map and every radio call. The Reedbed is the wet ground at the eastern end. The Scrape is the shallow water with the islands in it. The Carr is the wet woodland. The Heath is the dry open ground on the ridge. And the Meadow is the field by the car park, which most visitors think is the whole reserve.\nThe main hide, the one with the ramp, looks over the Scrape. That is where you take anyone who cannot walk far. It is also where the birds are. Nobody is being handed the consolation option.\nThe pond dipping platform is in the Meadow, deliberately, because it is loud and children fall in. The nesting terns are on the Scrape as well. They sit on the far islands. That is why the telescope in the hide matters.\nThe boardwalk runs through the Carr. It is closed from the first of the month for repairs. If a visitor asks, do not say it is closed because of nesting; that is next spring and this is carpentry.\nAdders are on the Heath. They are there every year and they are not aggressive. The reason we mention them is not danger but dogs. Dogs stay on the lead on the ridge.\nNow, three things about guiding rather than about the reserve.\nFirst, do not promise a species. Say to a family that they will see a kingfisher and you have made the next ninety minutes a disappointment. Say what has been seen this week. That information is on the board by the door, updated every morning.\nSecond, the reserve is quiet in the middle of the day and there is nothing wrong with saying so. A guide who fills a silent hour with continuous talking has taught people that nothing was happening. A guide who says the birds are resting has taught them something true.\nThird, and this is the one guides get wrong for years: your group will look where you look. Point with your whole arm at nothing and twenty people will examine that nothing for a minute. They will trust you slightly less afterwards.\nAnd if you are asked a question you cannot answer, say so and write it on the board. Somebody who works here will know, and the visitor will remember the answer arriving more than they would have remembered you having it.\nThat is the end of Part two.",
     },
     {
@@ -497,6 +609,20 @@ export const IELTS_LISTENING: ComprehensionSection = {
         requestedVariety: 'canadian',
         modelId: "eleven_flash_v2_5",
         renderedAt: "2026-08-29",
+      },
+      renditions: {
+        australia: {
+          audioPath: "ielts-listening/au/gt-l-p3.mp3",
+          variety: 'australian',
+          voice: {
+        voiceId: "zMK1eWY5DTw3Jjb8efU8",
+        voiceIds: ["zMK1eWY5DTw3Jjb8efU8", "iIg0uI51lssRFauz7W21", "GrVxA7Ub86nJH91Viyiv"],
+        vendorName: "Emily - Calm, clear female Australian + Neil - Soft Australian accent + James - English Storyteller",
+        requestedVariety: 'australian',
+        modelId: "eleven_flash_v2_5",
+        renderedAt: "2026-08-31",
+          },
+        },
       },
       script: "Now turn to Part three. You will hear two students, Priya and Sam, discussing a project on urban transport with each other. First, you have some time to look at questions twenty-one to thirty.\n— Sam, have you got ten minutes? I want to divide the transport project up before Friday.\n— Yeah, now's good. I've got the brief here. Six sections, and we present for twenty minutes between us.\n— Right. So section one is the literature review, and I'd honestly rather do that on my own. I've already read most of it, and two people reading the same forty papers is how we waste a week.\n— No argument. That's yours.\n— Section two is the survey design. That one I think we have to do together — if I write the questions and you analyse the answers, we'll end up with data that doesn't answer anything.\n— Agreed. We sit down and draft the questions in the same room. Both of us.\n— Good. Section three, the cycling case study — that's Amsterdam and Copenhagen.\n— I'll take that. I spent a term there and I've still got contacts at the transport office.\n— Perfect, it's yours. Section four is the bus network modelling, and that's the one I'm nervous about, because it needs the software.\n— Which neither of us has used properly.\n— Which is why I'd rather one of us learns it well than both of us learn it badly. I'll take it. I've got a fortnight before it's due and I'd rather that be my problem.\n— If you're sure. Shout if it goes wrong.\n— Section five is the interviews with commuters.\n— That's got to be both of us — you can't run a focus group on your own and take notes at the same time.\n— That's a fair point. Both, then.\n— And section six, the cost comparison.\n— I'll do that one too. It's spreadsheets, and I'm faster at spreadsheets than you are.\n— I'm not going to pretend otherwise.\n— Right. Now — the part I actually wanted to talk about. Doctor Ellis said our research question was too broad.\n— She did. Although what she actually said was that it was too broad for the time we have. That's not the same as it being a bad question.\n— No, it isn't. So do we narrow it, or do we keep it and say clearly what we couldn't cover?\n— I'd narrow it. A report that admits it couldn't cover half its own question reads as though we ran out of time — which we did, but we don't have to advertise it.\n— See, I'd go the other way. I think naming the limits is what makes it look deliberate rather than rushed.\n— Hmm. We could do both. Narrow the question, and then have a limitations section that says what a wider study would have asked.\n— That I'll agree to.\n— Now, the presentation. Twenty minutes for six sections is three minutes each, which is nothing.\n— We don't present all six. We present the two case studies properly and summarise the rest in one slide.\n— Doctor Ellis will ask about the modelling, though. She always asks about the method.\n— Then we have a slide ready for it, but we don't lead with it. There's a difference between being ready for a question and spending eight of our twenty minutes on it.\n— Fine. One more thing — the deadline. It says Friday the fourteenth on the handbook, but the portal says the sixteenth.\n— The portal is the one that counts. But I'd work to the fourteenth anyway.\n— Why?\n— Because every time I've worked to the real deadline, something has gone wrong on the last day.\nThat is the end of Part three.",
     },
@@ -524,6 +650,20 @@ export const IELTS_LISTENING: ComprehensionSection = {
         modelId: "eleven_flash_v2_5",
         renderedAt: "2026-08-30",
       },
+      renditions: {
+        australia: {
+          audioPath: "ielts-listening/au/gt-l-p4.mp3",
+          variety: 'british',
+          voice: {
+        voiceId: "QJksobp1edMNvmwcG5lm",
+        voiceIds: ["QJksobp1edMNvmwcG5lm", "GrVxA7Ub86nJH91Viyiv"],
+        vendorName: "Juliet - British, Natural and Engaging + James - English Storyteller",
+        requestedVariety: 'british',
+        modelId: "eleven_flash_v2_5",
+        renderedAt: "2026-08-31",
+          },
+        },
+      },
       script: "Now turn to Part four. You will hear a lecturer talking about urban heat and how cities are responding to it. First, you have some time to look at questions thirty-one to forty.\nGood afternoon. Today I want to talk about a problem that is easy to measure, hard to see, and increasingly expensive: the fact that a city is warmer than the countryside around it. The phenomenon has a name — the urban heat island — and I want to cover three things. What causes it, what it costs, and what actually works.\nLet's begin with the cause, because there is a common misunderstanding here. People assume the heat is produced by the city: by cars, by air conditioning, by industry. Some of it is, but that is the smaller part. The larger part is not produced at all. It is stored.\nConcrete, brick and asphalt have a high thermal mass. They absorb solar radiation through the day and release it slowly through the night. A field cools quickly after sunset; a street does not. And so the difference between a city and its surroundings is at its greatest not at noon, as you might expect, but a few hours after dark. In a large European city that night-time difference typically reaches four degrees, and in extreme conditions it has been measured above seven.\nThe second contributor is the absence of water. In a landscape with vegetation, a large share of incoming energy goes into evaporating water from leaves and soil — a process called evapotranspiration — and energy spent evaporating water is energy not spent raising the temperature. Pave that landscape and the water runs off into a drain within minutes. The cooling mechanism has been removed, and nothing replaced it.\nThe third is geometry. Narrow streets between tall buildings behave like a series of traps: radiation bounces between the walls rather than escaping upwards. Researchers describe this using the sky view factor — essentially, how much of the sky you can see from street level. The less sky, the less heat escapes.\nSo much for the cause. Now the cost.\nThe obvious cost is health, and it falls unevenly. During the 2003 heatwave in western Europe, mortality rose most sharply among people over seventy-five living alone on upper floors of buildings without ventilation. Heat is not distributed evenly across a city, and neither is the ability to escape it. The neighbourhoods that are hottest are, with tedious reliability, the neighbourhoods with the least tree cover, and those are rarely the wealthy ones.\nThe less obvious cost is energy. Air conditioning is a feedback loop: it cools a building by moving heat outside, which warms the street, which raises the demand for air conditioning. In dense districts this can raise the outdoor temperature by a further degree overnight.\nWhich brings me to what works, and here I want to be careful, because this field has a weakness for the photogenic solution.\nThe most effective intervention, by a wide margin, is trees — mature trees, in streets, in enough numbers to form a continuous canopy. Shade prevents the surface from absorbing the heat in the first place, which is worth more than removing it afterwards, and the evapotranspiration adds cooling on top. Measurements of well-shaded streets consistently show surface temperatures around ten degrees below unshaded ones nearby.\nSecond: surface colour. Painting roofs white, or using reflective paving, raises what is called the albedo — the proportion of sunlight reflected rather than absorbed. It is cheap, it works, and it is unglamorous.\nThird, and this is the one I would ask you to be sceptical about: green roofs. They are popular with planners and they photograph beautifully. They do cool the building beneath them, and they help with rainfall. But a green roof five storeys up does very little for the temperature of the street below, and the street is where people actually are. It is not that they do not work. It is that they are frequently used to answer a question they were never designed to address.\nThe pattern across all three is the same. The interventions that work best are the ones that stop heat being absorbed, rather than the ones that deal with it afterwards. Next week we will look at how these measures are costed, and why the cheapest of them is so often the last to be funded.\nThat is the end of Part four.",
     },
     {
@@ -543,6 +683,20 @@ export const IELTS_LISTENING: ComprehensionSection = {
       level: 'C1',
       family: 'discussion',
       freshness: 'current',
+      renditions: {
+        australia: {
+          audioPath: "ielts-listening/au/gt-l-p3-v2.mp3",
+          variety: 'british',
+          voice: {
+        voiceId: "QJksobp1edMNvmwcG5lm",
+        voiceIds: ["QJksobp1edMNvmwcG5lm", "NuRyEq0OdD9mMOyd51UZ", "GrVxA7Ub86nJH91Viyiv"],
+        vendorName: "Juliet - British, Natural and Engaging + Jofra + James - English Storyteller",
+        requestedVariety: 'british',
+        modelId: "eleven_flash_v2_5",
+        renderedAt: "2026-08-31",
+          },
+        },
+      },
       script: "Now turn to Part three. You will hear two students, Rachel and Tomás, deciding what to do about an experiment that did not work. First, you have some time to look at questions twenty-one to thirty.\n— So. Run four is wrong and we both know it.\n— I don't know that it's wrong. I know it doesn't match the other three.\n— Which is what wrong means, Tomás.\n— No, it is what anomalous means, and the difference matters here: wrong would mean that we made a mistake somewhere, and I have been through the log twice without finding one.\n— The temperature drifted.\n— It drifted by half a degree, which is comfortably inside the tolerance we wrote down before we started, so if half a degree is enough to move the result that far then the interesting finding is the half degree rather than the run.\n— Or the probe was failing.\n— That I'll grant you. The probe is nine years old and the calibration certificate expired in March.\n— So we have two candidate explanations and no way to choose between them.\n— We have one way. Repeat run four with the new probe.\n— Which costs us a fortnight we don't have.\n— Then here is the honest question. What do we write if we don't repeat it?\n— We write that we observed an anomaly, we set out both explanations as fairly as we can, and we say plainly that we were not able to distinguish between them with the runs we had.\n— And Doctor Ellis will ask why we didn't repeat it.\n— And we answer that a repeat would have cost two weeks which we judged were better spent on the other four runs, which is a defensible position even though it is not a comfortable one to defend.\n— I'd rather be uncomfortable and honest than comfortable and quiet. But I still want the repeat.\n— Say why.\n— Because if the probe is genuinely failing then runs one to three are suspect as well, and we have already written three-quarters of a report resting on them.\n— That is a much better argument than the one you started with.\n— I know. I got there while you were talking.\n— All right. We repeat run four, and we do it with the borrowed probe from the second lab rather than waiting for ours to be calibrated.\n— Can we borrow it?\n— Marta says yes if we book it for a morning, because the second lab uses it in the afternoons and she is not willing to move that for us.\n— A morning is enough for one run, provided we set the bath up the night before and leave it running so the temperature has settled by the time we get there.\n— Then that's the plan. And whichever way it comes out, the anomaly goes in the report. If the repeat matches the others we say the first attempt was instrument error and we caught it. If it doesn't, we've found something.\n— And if the repeat is different from both?\n— Then we have a very short discussion with Doctor Ellis and a much longer chapter.\nThat is the end of Part three.",
     },
     {
@@ -562,6 +716,20 @@ export const IELTS_LISTENING: ComprehensionSection = {
       level: 'C1',
       family: 'discussion',
       freshness: 'current',
+      renditions: {
+        australia: {
+          audioPath: "ielts-listening/gt-l-p3-v3.mp3",
+          variety: 'british',
+          voice: {
+        voiceId: "QJksobp1edMNvmwcG5lm",
+        voiceIds: ["QJksobp1edMNvmwcG5lm", "NuRyEq0OdD9mMOyd51UZ", "GrVxA7Ub86nJH91Viyiv"],
+        vendorName: "Juliet - British, Natural and Engaging + Jofra + James - English Storyteller",
+        requestedVariety: 'british',
+        modelId: "eleven_flash_v2_5",
+        renderedAt: "2026-08-30",
+          },
+        },
+      },
       script: "Now turn to Part three. You will hear a student, Nadia, discussing a draft dissertation chapter with her supervisor. First, you have some time to look at questions twenty-one to thirty.\n— Come in, Nadia. I've read the chapter twice, which is more than I usually manage, and I want to start with what is working.\n— That would be a change.\n— The literature section is genuinely good, because you have organised it by argument rather than by decade, which almost nobody manages at this stage, and the effect of doing it that way is that a reader can see immediately what is actually contested and what is merely repeated.\n— That took the longest.\n— It shows, and it was worth it. The methods section is where I want to spend our time.\n— I thought it might be.\n— You describe what you did very clearly. What you do not do is say why you did it that way rather than another way. At the moment a reader has to take the design on trust.\n— I assumed that was obvious from the research question.\n— It is obvious to you because you have lived with it for eight months, whereas an examiner who reads the whole thing in a single afternoon has no way of telling an unstated reason from an absent one, so an unjustified choice reads as a choice you did not know you were making.\n— So I need a paragraph on why interviews rather than a survey.\n— A paragraph, and one on why twelve interviews rather than thirty. Not an apology. A reason.\n— Right.\n— Now, the sample. You have twelve participants and eleven of them are from the same organisation.\n— I know. I could not get access anywhere else in the time.\n— That is a perfectly good answer and it belongs in the text rather than in this room. What worries me is not the eleven from one organisation, which is defensible if you say why, but that the chapter as it stands reads as though you selected them deliberately.\n— Whereas actually they were who would speak to me.\n— Exactly. Write that. A limitation you have named is a limitation you have controlled; a limitation the examiner finds is something else entirely.\n— And the analysis?\n— Thin, but not wrong. You have coded the transcripts carefully and then reported the codes back to me, which is a description rather than an analysis, and what is missing is the step where you say what the pattern actually means. I would rather read three claims you are prepared to defend under questioning than nine you are merely reporting because you found them.\n— Three feels like very few.\n— Three defended claims is a chapter. Nine undefended ones is a list.\n— When do you need the revision?\n— The submission is the twentieth, and I would like the revision by the thirteenth, although I will be honest with you that the date is mine rather than the faculty's, because a week is what I need to read something properly instead of quickly.\n— The thirteenth is tight but possible.\n— If it is not possible, tell me on Monday rather than on the twelfth. I can do a great deal on Monday and almost nothing on the twelfth.\nThat is the end of Part three.",
     },
     {
@@ -581,6 +749,20 @@ export const IELTS_LISTENING: ComprehensionSection = {
       level: 'C1',
       family: 'discussion',
       freshness: 'current',
+      renditions: {
+        australia: {
+          audioPath: "ielts-listening/gt-l-p3-v4.mp3",
+          variety: 'australian',
+          voice: {
+        voiceId: "zMK1eWY5DTw3Jjb8efU8",
+        voiceIds: ["zMK1eWY5DTw3Jjb8efU8", "iIg0uI51lssRFauz7W21", "GrVxA7Ub86nJH91Viyiv"],
+        vendorName: "Emily - Calm, clear female Australian + Neil - Soft Australian accent + James - English Storyteller",
+        requestedVariety: 'australian',
+        modelId: "eleven_flash_v2_5",
+        renderedAt: "2026-08-30",
+          },
+        },
+      },
       script: "Now turn to Part three. You will hear two students, Callum and Ines, reviewing a group presentation they have just given. First, you have some time to look at questions twenty-one to thirty.\n— Well. That was not a disaster.\n— It was not a disaster, and what I would like to do while it is still fresh is work out why it so nearly was, because in a fortnight we will remember only that it went acceptably.\n— Go on, then. Start with the opening.\n— The opening was the strongest thing we did and it was also the part we rehearsed least, which bothers me rather more than anything that actually went wrong.\n— It bothers me too. I think it worked because we were nervous and therefore brief.\n— Possibly. The slides, though.\n— The slides were too full, and since I wrote them I will own that entirely: fourteen lines on a single slide is not a slide at all but a handout with a projector pointed at it.\n— I'd say the problem was not the number of lines. It was that you read them.\n— That's fair. Once the words are up there I cannot stop myself.\n— Then next time we put four words on a slide and you have to say the rest.\n— Agreed, although I will hate it.\n— The data section is the one I am least sure about. I thought it went well.\n— It went well for the two of us, but watch the room in the recording, because the moment the third graph appeared six people in the front half looked down at their phones.\n— Because the graph was unreadable at the back.\n— Partly, although I think the larger reason is that it was the third graph inside ninety seconds and not one of them arrived with a sentence attached saying what a reader was supposed to take from it.\n— So fewer graphs, and a sentence each.\n— One graph, with thirty seconds spent on it, because I would rather they walked out remembering one thing properly than four things approximately.\n— What about the questions at the end? I thought that was the weak part.\n— That is where I disagree with you, because I think the questions were the best evidence we have that anybody was listening at all: we answered four of them and three were about the method rather than the conclusion.\n— Which we had not practised at all.\n— And still answered. That is worth noticing rather than worrying about.\n— The timing, though. We ran to nineteen minutes on a fifteen-minute slot.\n— Which was my fault rather than yours, since I was the one who added the case study on the morning without taking anything out to make room for it.\n— It was a good case study.\n— It was a good case study in the wrong presentation, which is a different thing, and the rule we should take from it is that if something is added on the morning then something else has to come out on the morning.\n— That's the rule, then. And the marks come back when?\n— Two weeks, apparently. Although Doctor Reyes said last year's took four.\n— Then I am not going to think about them until the fourth week.\n— Sensible. One last thing while we are being honest with each other. I nearly did not come this morning.\n— I know. You said so in the corridor.\n— I am glad that I did, because half of what we have just worked out I would have forgotten entirely by Thursday, and the other half I would have remembered wrongly and then told you about with complete confidence.\n— That is the most accurate thing you have said today.\nThat is the end of Part three.",
     },
     {
@@ -600,6 +782,20 @@ export const IELTS_LISTENING: ComprehensionSection = {
       level: 'C1',
       family: 'lecture',
       freshness: 'timeless',
+      renditions: {
+        australia: {
+          audioPath: "ielts-listening/au/gt-l-p4-v2.mp3",
+          variety: 'australian',
+          voice: {
+        voiceId: "zMK1eWY5DTw3Jjb8efU8",
+        voiceIds: ["zMK1eWY5DTw3Jjb8efU8", "GrVxA7Ub86nJH91Viyiv"],
+        vendorName: "Emily - Calm, clear female Australian + James - English Storyteller",
+        requestedVariety: 'australian',
+        modelId: "eleven_flash_v2_5",
+        renderedAt: "2026-08-31",
+          },
+        },
+      },
       script: "Now turn to Part four. You will hear a lecturer talking about how the seabed is mapped. First, you have some time to look at questions thirty-one to forty.\nGood morning. I want to talk today about how we know the shape of the sea floor, which is a subject where the honest answer to almost every question is that we know far less than people assume, and where the reason we know anything at all is a single physical fact: sound travels through water very much better than light does.\nLet me begin with the method that is still the foundation of everything. A ship carries a device called a transducer, which converts an electrical signal into a pulse of sound and then, a moment later, converts the returning echo back into electricity. The instrument measures the time between the two, and because the speed of sound in seawater is roughly fifteen hundred metres a second, half that time multiplied by that speed gives the depth beneath the hull.\nThat sentence contains the whole method and also the whole difficulty, because the speed is not in fact constant. It varies with temperature, with pressure and with salinity, and a survey that assumes a single value will produce a chart that is systematically wrong in a way no amount of care in the measuring can correct. Serious surveys therefore lower an instrument that records the sound speed at every depth before any mapping begins, and that profile, rather than the textbook number, is what the calculation uses.\nThe second development was to stop asking about one point at a time. A single-beam echo sounder measures the depth directly under the ship and nothing else, so a survey is a set of lines with unmeasured water between them, and the cartographer draws the gaps in. Multibeam systems send out a fan of beams across the track and measure a swathe of the floor at once, typically about four times the water depth in width. That is the reason deep water is cheaper to survey per square kilometre than shallow water, which surprises people until they see the geometry.\nNow, the coverage. If you take the whole ocean floor and ask how much of it has been measured directly in this way, at a resolution useful for anything, the figure is about a quarter. The rest of what you see on a map of the sea floor is derived from satellite altimetry — the satellite measures the height of the sea surface very precisely, and because a seamount has mass, the water above it stands very slightly higher. That works, and the resolution is nothing like the same: a feature has to be several kilometres across before it disturbs the surface enough to be seen.\nWhich brings me to the practical consequence, and it is not a scientific one. Uncharted features are a hazard to shipping, and the ones that matter are exactly the ones the satellite method cannot resolve — a pinnacle two hundred metres across in otherwise deep water is invisible from orbit and perfectly capable of removing the bottom of a vessel.\nAnd the last point, which I want you to be sceptical about when you read popular accounts. It is often said that we have better maps of Mars than of the ocean floor. As a statement about resolution that is broadly true. As a statement about difficulty it is misleading, because the reason is not that the problem is harder but that the ocean is opaque to the instruments that made those Martian maps, and the instrument that does work has to be dragged through the water at the speed of a ship.\nNext week we will look at what the same technique tells us about the sediment beneath the floor, rather than the floor itself.\nThat is the end of Part four.",
     },
     {
@@ -619,6 +815,20 @@ export const IELTS_LISTENING: ComprehensionSection = {
       level: 'C1',
       family: 'lecture',
       freshness: 'timeless',
+      renditions: {
+        australia: {
+          audioPath: "ielts-listening/gt-l-p4-v3.mp3",
+          variety: 'north_american',
+          voice: {
+        voiceId: "plP9aw1rizYgjFfuvLQ7",
+        voiceIds: ["plP9aw1rizYgjFfuvLQ7", "GrVxA7Ub86nJH91Viyiv"],
+        vendorName: "Heather - Warm, Raspy American Female + James - English Storyteller",
+        requestedVariety: 'north_american',
+        modelId: "eleven_flash_v2_5",
+        renderedAt: "2026-08-30",
+          },
+        },
+      },
       script: "Now turn to Part four. You will hear a lecturer talking about the shipping container. First, you have some time to look at questions thirty-one to forty.\nGood afternoon. I want to spend this hour on an object that is deliberately boring, because the interesting thing about the shipping container is that almost none of its importance is in the box itself.\nThe box was not a new idea. Wooden containers moved on railways in the nineteenth century, and several companies tried steel ones in the nineteen-twenties without anything much happening. What changed in the nineteen-fifties was not the container but the agreement about the container, and specifically an agreement on the corner fitting — the steel casting at each of the eight corners that lets a crane pick the box up, and lets one box lock to another. Once that casting was standardised, a container loaded in one country could be lifted by a crane built in another, and everything else followed from that.\nSo consider what the old system cost. Before containers, cargo moved as what was called break bulk: sacks, barrels, crates, each handled individually. A ship might spend as long in port as it spent at sea, and the labour of loading was a very large share of the total cost of moving anything. The figure usually quoted is that handling accounted for roughly half the cost of an ocean voyage, and the striking part is that this cost did not fall with distance. Doubling the length of a voyage barely changed it.\nThat last point is the one I want you to hold onto, because it explains the consequence. When handling collapses as a share of cost, distance becomes cheap in a way it had never been, and a factory can be sited according to wages and land rather than according to proximity to the customer. The container did not cause that pattern on its own — tariffs and communications matter too — but it removed the friction that had held it back.\nNow, three things that are usually left out.\nThe first is that the ports which won were not the ports which had been winning. A container terminal needs deep water, a great deal of flat land behind the quay, and rail access. Old city docks, hemmed in by the city that had grown around them, had none of those, and the traffic moved to places that had been minor or did not exist. That is a redistribution rather than a growth, and the places that lost did not get it back.\nThe second is labour. The number of dockworkers required per ton fell by an enormous factor, and the disputes of the nineteen-sixties and seventies were not irrational resistance to progress; they were an accurate reading of what was about to happen to a trade.\nThe third is that the standard has a cost of its own. The corner fitting fixes the maximum dimensions, which fixes the geometry of the crane, the width of the ship and the height of the bridges under which the train will pass. Any improvement that would require a different box is now practically impossible, because the box is the least valuable part of a system built around it. Economists call this lock-in, and the container is the clearest example I know.\nNext week: what happens to the standard when the cargo changes shape, and why refrigerated units break the pattern.\nThat is the end of Part four.",
     },
     {
@@ -638,6 +848,20 @@ export const IELTS_LISTENING: ComprehensionSection = {
       level: 'C1',
       family: 'lecture',
       freshness: 'timeless',
+      renditions: {
+        australia: {
+          audioPath: "ielts-listening/gt-l-p4-v4.mp3",
+          variety: 'new_zealand',
+          voice: {
+        voiceId: "ANYdMtqQZTRmq10Nw496",
+        voiceIds: ["ANYdMtqQZTRmq10Nw496", "GrVxA7Ub86nJH91Viyiv"],
+        vendorName: "Ella - Casual New Zealand Female + James - English Storyteller",
+        requestedVariety: 'new_zealand',
+        modelId: "eleven_flash_v2_5",
+        renderedAt: "2026-08-30",
+          },
+        },
+      },
       script: "Now turn to Part four. You will hear a lecturer talking about soil compaction on farms. First, you have some time to look at questions thirty-one to forty.\nGood morning. Today's subject is a problem that is invisible from the surface, expensive to fix, and largely created by the machinery that was bought to make the work easier. I mean the compaction of agricultural soil.\nLet me start with what soil is, structurally, because the whole argument depends on it. A healthy agricultural soil is roughly half solid material and half pore space, and the pores matter more than the solids. They hold the water, they carry the air that roots need, and they provide the channels along which a root can travel without having to force its way. Compaction is simply the loss of that pore space under load, and it is a change in the arrangement of the soil rather than in its composition.\nThe load, of course, is the machine. And here is the fact that surprises people: the weight of farm machinery has increased by a factor of about ten since the nineteen-sixties, while the area of tyre in contact with the ground has not increased anything like as fast. The pressure at the surface is governed mainly by the inflation pressure of the tyre, which is why a wider tyre helps at the surface. But the stress deeper down is governed by the total axle load, and no tyre design changes that. So the modern machine has solved the shallow problem and made the deep one considerably worse.\nThat distinction between shallow and deep matters, because they are different problems with different prospects. Compaction in the top twenty-five centimetres can be lifted by cultivation, or by a winter of freezing and thawing, or by roots. Below about forty centimetres, none of those reach. Frost does not penetrate that far in most climates, the plough does not go there, and the roots that could break it are the roots that the compaction is preventing. Deep compaction is therefore effectively permanent on any timescale a farmer plans over.\nThe costs are of three kinds. Yield falls, and typical measured losses run between ten and twenty-five per cent on affected ground. Water does not infiltrate, so rainfall runs off the surface instead of entering the soil, which means both drought stress in the field and flooding downstream from it. And in waterlogged compacted soil, nitrogen is lost to the atmosphere as nitrous oxide, which is a greenhouse gas of considerable strength.\nWhat works, then. The most effective single measure is not a machine at all: it is confining traffic to permanent lanes, so that the same narrow strips are driven over every year and the rest of the field is never touched. Trials consistently show the largest benefit of anything tested, and the objection is not that it fails but that it requires the machinery to match the lane spacing, which is a capital decision rather than an agronomic one.\nAnd the measure I would ask you to be sceptical about is deep loosening — dragging a tine through the compacted layer to break it up. It works, it is expensive in fuel, and unless the traffic pattern that caused the compaction changes, the soil is back where it started within about three years. It treats the symptom on a field where the cause is still driving over it every spring.\nNext week we will look at how compaction is actually measured, and why the penetrometer readings in most published studies are less comparable than they appear.\nThat is the end of Part four.",
     },
   ],

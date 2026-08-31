@@ -1,4 +1,5 @@
 import type { Destination, ExamDefinition, Goal } from '../model/types';
+import { PRIMARY_TRACK, type AccentTrack } from '../model/types';
 import { IELTS_GT } from './ielts-gt';
 import { TCF_CANADA } from './tcf-canada';
 
@@ -93,8 +94,25 @@ export const GOALS: Goal[] = [
     scaleId: 'band',
     destination: AU_SKILLED,
     exams: ['ielts-gt'],
+    // The one destination on the Australian accent track. It sits the SAME
+    // IELTS General Training paper as Express Entry and citizenship — the
+    // scripts, the questions and the keys are one bank — and hears it read in
+    // Australian and British voices instead of Canadian ones.
+    accentTrack: 'australia',
   },
 ];
+
+/**
+ * WHICH ACCENT TRACK A CANDIDATE HEARS, from the goal they picked.
+ *
+ * One function, for the reason `deliverable` is one function: three surfaces
+ * choose audio — the mock exam, practice, and the inventory — and three
+ * answers to "which file" is how one of them ends up playing the Canadian
+ * recording to a candidate flying to Melbourne. It plays perfectly.
+ */
+export function trackForGoal(goalId: string | null | undefined): AccentTrack {
+  return (goalId ? goalById(goalId)?.accentTrack : undefined) ?? PRIMARY_TRACK;
+}
 
 export function goalById(id: string): Goal | undefined {
   return GOALS.find((g) => g.id === id);

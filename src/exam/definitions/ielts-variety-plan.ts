@@ -85,6 +85,12 @@ export type IeltsVarietyAssignment = {
   /** Two speakers need two voices of ONE variety — see the Irish/Scottish note. */
   speakers: number;
   variety: SpeechVariety;
+  /**
+   * The accent the SAME script is spoken in for a candidate going to
+   * Australia. See `AccentTrack`: three destinations sit this one paper and
+   * two of them are Canadian.
+   */
+  australiaVariety: SpeechVariety;
   /** True for the four heard on 29 August. Their variety is a record, not a plan. */
   rendered: boolean;
   /**
@@ -101,22 +107,22 @@ export type IeltsVarietyAssignment = {
 
 export const IELTS_VARIETY_PLAN: IeltsVarietyAssignment[] = [
   // ── Part 1 · B1 · two speakers ────────────────────────────────────────
-  { id: 'gt-l-p1',    part: 'Part 1', level: 'B1', speakers: 2, variety: 'australian',     rendered: true,  keep: true },
-  { id: 'gt-l-p1-v2', part: 'Part 1', level: 'B1', speakers: 2, variety: 'canadian',       rendered: true,  keep: true },
-  { id: 'gt-l-p1-v3', part: 'Part 1', level: 'B1', speakers: 2, variety: 'canadian',       rendered: true,  keep: true },
-  { id: 'gt-l-p1-v4', part: 'Part 1', level: 'B1', speakers: 2, variety: 'north_american', rendered: true,  keep: true },
+  { id: 'gt-l-p1',    part: 'Part 1', level: 'B1', speakers: 2, variety: 'australian', australiaVariety: 'australian',     rendered: true,  keep: true },
+  { id: 'gt-l-p1-v2', part: 'Part 1', level: 'B1', speakers: 2, variety: 'canadian', australiaVariety: 'british',       rendered: true,  keep: true },
+  { id: 'gt-l-p1-v3', part: 'Part 1', level: 'B1', speakers: 2, variety: 'canadian', australiaVariety: 'australian',       rendered: true,  keep: true },
+  { id: 'gt-l-p1-v4', part: 'Part 1', level: 'B1', speakers: 2, variety: 'north_american', australiaVariety: 'north_american', rendered: true,  keep: true },
 
   // ── Part 2 · B2 · one speaker ─────────────────────────────────────────
-  { id: 'gt-l-p2',    part: 'Part 2', level: 'B2', speakers: 1, variety: 'british',        rendered: true,  keep: true },
-  { id: 'gt-l-p2-v2', part: 'Part 2', level: 'B2', speakers: 1, variety: 'canadian',       rendered: true,  keep: true },
-  { id: 'gt-l-p2-v3', part: 'Part 2', level: 'B2', speakers: 1, variety: 'canadian',       rendered: true,  keep: true },
-  { id: 'gt-l-p2-v4', part: 'Part 2', level: 'B2', speakers: 1, variety: 'new_zealand',    rendered: true,  keep: true },
+  { id: 'gt-l-p2',    part: 'Part 2', level: 'B2', speakers: 1, variety: 'british', australiaVariety: 'british',        rendered: true,  keep: true },
+  { id: 'gt-l-p2-v2', part: 'Part 2', level: 'B2', speakers: 1, variety: 'canadian', australiaVariety: 'australian',       rendered: true,  keep: true },
+  { id: 'gt-l-p2-v3', part: 'Part 2', level: 'B2', speakers: 1, variety: 'canadian', australiaVariety: 'british',       rendered: true,  keep: true },
+  { id: 'gt-l-p2-v4', part: 'Part 2', level: 'B2', speakers: 1, variety: 'new_zealand', australiaVariety: 'new_zealand',    rendered: true,  keep: true },
 
   // ── Part 3 · C1 · two speakers ────────────────────────────────────────
-  { id: 'gt-l-p3',    part: 'Part 3', level: 'C1', speakers: 2, variety: 'canadian',       rendered: true,  keep: true },
-  { id: 'gt-l-p3-v2', part: 'Part 3', level: 'C1', speakers: 2, variety: 'canadian',       rendered: true,  keep: true },
-  { id: 'gt-l-p3-v3', part: 'Part 3', level: 'C1', speakers: 2, variety: 'british',        rendered: true,  keep: true },
-  { id: 'gt-l-p3-v4', part: 'Part 3', level: 'C1', speakers: 2, variety: 'australian',     rendered: true,  keep: true },
+  { id: 'gt-l-p3',    part: 'Part 3', level: 'C1', speakers: 2, variety: 'canadian', australiaVariety: 'australian',       rendered: true,  keep: true },
+  { id: 'gt-l-p3-v2', part: 'Part 3', level: 'C1', speakers: 2, variety: 'canadian', australiaVariety: 'british',       rendered: true,  keep: true },
+  { id: 'gt-l-p3-v3', part: 'Part 3', level: 'C1', speakers: 2, variety: 'british', australiaVariety: 'british',        rendered: true,  keep: true },
+  { id: 'gt-l-p3-v4', part: 'Part 3', level: 'C1', speakers: 2, variety: 'australian', australiaVariety: 'australian',     rendered: true,  keep: true },
 
   // ── Part 4 · C1 · one speaker ─────────────────────────────────────────
   // `gt-l-p4` was rendered IRISH, and re-rendering it is the one cost this
@@ -125,10 +131,10 @@ export const IELTS_VARIETY_PLAN: IeltsVarietyAssignment[] = [
   // it while calling the bank Canadian-majority would have been the
   // substitution defect with our own name on it. It is now Canadian and the
   // whole bank is `keep: true`; the row is kept as the record of why.
-  { id: 'gt-l-p4',    part: 'Part 4', level: 'C1', speakers: 1, variety: 'canadian',       rendered: true,  keep: true },
-  { id: 'gt-l-p4-v2', part: 'Part 4', level: 'C1', speakers: 1, variety: 'canadian',       rendered: true,  keep: true },
-  { id: 'gt-l-p4-v3', part: 'Part 4', level: 'C1', speakers: 1, variety: 'north_american', rendered: true,  keep: true },
-  { id: 'gt-l-p4-v4', part: 'Part 4', level: 'C1', speakers: 1, variety: 'new_zealand',    rendered: true,  keep: true },
+  { id: 'gt-l-p4',    part: 'Part 4', level: 'C1', speakers: 1, variety: 'canadian', australiaVariety: 'british',       rendered: true,  keep: true },
+  { id: 'gt-l-p4-v2', part: 'Part 4', level: 'C1', speakers: 1, variety: 'canadian', australiaVariety: 'australian',       rendered: true,  keep: true },
+  { id: 'gt-l-p4-v3', part: 'Part 4', level: 'C1', speakers: 1, variety: 'north_american', australiaVariety: 'north_american', rendered: true,  keep: true },
+  { id: 'gt-l-p4-v4', part: 'Part 4', level: 'C1', speakers: 1, variety: 'new_zealand', australiaVariety: 'new_zealand',    rendered: true,  keep: true },
 ];
 
 /** The four accents ielts.org names. A floor, not the whole list. */

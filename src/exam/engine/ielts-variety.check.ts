@@ -9,6 +9,8 @@
  */
 import { EXAMS } from '../definitions';
 import { IELTS_VARIETY_PLAN, IELTS_PUBLISHED_ACCENTS, SINGLE_VOICE_VARIETIES, IELTS_MAJORITY_VARIETY } from '../definitions/ielts-variety-plan';
+import { trackForGoal } from '../definitions';
+import { renditionFor } from '../model/rendition';
 import { IELTS_VOICE_CAST } from '../definitions/ielts-voices';
 import type { ComprehensionSection } from '../model/types';
 
@@ -139,6 +141,37 @@ for (const p of IELTS_VARIETY_PLAN.filter((x) => x.speakers > 1)) {
   t(`${p.id}: ${p.variety} has both genders for a dialogue`, genders.size >= 2, true);
 }
 
+console.log('\n5. The Australia track — the same scripts, other voices\n');
+
+// «برای آزمون زبان استرالیا لهجهٔ بریتیش و استرالیایی.»
+//
+// `au-competent` sits the SAME IELTS General Training paper as Express Entry
+// and citizenship. One audio file has one accent, so the same script carries
+// two renditions and the audio is chosen by destination — never the questions,
+// which are one bank with one authoring history.
+{
+  const AU = IELTS_VARIETY_PLAN.map((p) => p.australiaVariety);
+  const dom = AU.filter((v) => v === 'australian' || v === 'british').length;
+  t('Australian and British are the majority of the Australia track', dom * 2 > AU.length, true,
+    `${dom} of ${AU.length}`);
+  for (const v of IELTS_PUBLISHED_ACCENTS)
+    t(`ielts.org names ${v}, and the Australia track speaks it too`, AU.includes(v), true);
+  for (const part of ['Part 1', 'Part 2', 'Part 3', 'Part 4'] as const) {
+    const here = IELTS_VARIETY_PLAN.filter((p) => p.part === part);
+    t(`${part}: the Australia track is not one accent throughout`,
+      new Set(here.map((p) => p.australiaVariety)).size >= 2, true,
+      here.map((p) => p.australiaVariety).join(', '));
+  }
+  t('Canadian is never on the Australia track',
+    AU.filter((v) => v === IELTS_MAJORITY_VARIETY).length, 0);
+  // Eight of sixteen already speak an accent BOTH tracks allow, so both
+  // tracks are served the same file. A rendition is audio; two tracks sharing
+  // one recording when the accent suits both is the correct answer, not a
+  // compromise — and it is half the render bill.
+  const shared = IELTS_VARIETY_PLAN.filter((p) => p.variety === p.australiaVariety).length;
+  t('the tracks share every file they honestly can', shared, 8);
+}
+
 console.log('\n6. What the plan is NOT claiming\n');
 
 // The property `ielts-listening.check.ts` asserts over the anchors — no two
@@ -153,5 +186,39 @@ const openersNeeded = IELTS_VARIETY_PLAN.length;
 t('the cast cannot give every part a disjoint opener pool', speaking >= openersNeeded, false,
   `${speaking} voices, ${openersNeeded} recordings — the shortfall is real and is not a defect in the plan`);
 
-console.log(failed ? `\n${failed} FAILED\n` : '\nThe variety plan holds. Nothing has been rendered.\n');
+
+
+console.log('\n7. Every recording is playable on BOTH tracks, and says who spoke it\n');
+
+// The failure this section exists for: `audioPath` is always there once
+// anything has been rendered, so a surface that reads it directly plays the
+// Canadian file to an Australian candidate. It plays perfectly. Nothing on the
+// screen says which accent it is.
+{
+  const exam = EXAMS.find((e) => e.id === 'ielts-gt')!;
+  const S2 = exam.sections.find((s): s is ComprehensionSection => s.id === 'listening')!;
+  for (const track of ['canada', 'australia'] as const) {
+    const missing = S2.recordings.filter((r) => !renditionFor(r, track)).map((r) => r.id);
+    t(`${track}: every recording has a rendition`, missing, []);
+    const wrong = S2.recordings.filter((r) => {
+      const ren = renditionFor(r, track);
+      const want = IELTS_VARIETY_PLAN.find((p) => p.id === r.id)!;
+      return ren && ren.variety !== (track === 'canada' ? want.variety : want.australiaVariety);
+    }).map((r) => r.id);
+    t(`${track}: every rendition is the variety the plan asked for`, wrong, []);
+    const noProv = S2.recordings.filter((r) => {
+      const ren = renditionFor(r, track);
+      return ren && (!ren.voice?.voiceId || ren.voice.requestedVariety !== ren.variety);
+    }).map((r) => r.id);
+    t(`${track}: no rendition was spoken in a variety other than the one asked for`, noProv, []);
+  }
+  // And the destination is what chooses. A goal with no track hears the
+  // primary one, which is what every French destination does.
+  t('the Australian destination is on the Australia track', trackForGoal('au-competent'), 'australia');
+  t('and the Canadian ones are not',
+    ['ee-english', 'citizenship'].map((g) => trackForGoal(g)), ['canada', 'canada']);
+  t('and an unknown goal falls back rather than throwing', trackForGoal('nonsense'), 'canada');
+}
+
+console.log(failed ? `\n${failed} FAILED\n` : '\nBoth tracks hold. Nothing is inferred.\n');
 if (failed) throw new Error(`${failed} variety case(s) failed`);

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { audioFor } from '../exam/model/rendition';
+import type { AccentTrack } from '../exam/model/types';
 import { Link } from 'react-router-dom';
 import { CheckCircle2, XCircle, Headphones, BookOpen, RefreshCcw } from 'lucide-react';
 import clsx from 'clsx';
@@ -54,6 +55,8 @@ export function ComprehensionPractice({ skill }: { skill: 'reading' | 'listening
     | { kind: 'no-audio'; examName: string }
     | {
         kind: 'ready';
+        /** The candidate's accent track, decided by their destination. */
+        track: AccentTrack;
         examName: string;
         section: ComprehensionSection;
         recordings: Recording[];
@@ -90,7 +93,10 @@ export function ComprehensionPractice({ skill }: { skill: 'reading' | 'listening
       // is the number the selector can actually reach. When those two drifted
       // apart in the inventory the row read "40 exists / 4 reachable" and was
       // nonsense; the fix there was to count one thing, and it is the fix here.
-      const usable = practicable(section);
+      // The candidate's accent track — an Australian candidate practises on
+      // the Australian recording of the same script, not on the Canadian one.
+      const track = defs.trackForGoal(plan.goalId);
+      const usable = practicable(section, track);
       if (!usable.length) { if (alive) setState({ kind: 'no-audio', examName }); return; }
 
       // WHICH BAND, and this is the point of the screen.
@@ -119,7 +125,7 @@ export function ComprehensionPractice({ skill }: { skill: 'reading' | 'listening
           : goal
             ? `Served around ${cefrTag(level.index)} — the level ${goal.system} ${goal.requiredLevel} asks for. A past score report makes this follow your marks instead.`
             : `Served around ${cefrTag(level.index)}.`;
-      if (alive) setState({ kind: 'ready', examName, section, recordings: usable, lang, level, levelNote });
+      if (alive) setState({ kind: 'ready', examName, section, recordings: usable, lang, level, levelNote, track });
     };
     read();
     window.addEventListener(PLAN_EVENT, read);
@@ -199,6 +205,7 @@ export function ComprehensionPractice({ skill }: { skill: 'reading' | 'listening
       recordings={state.recordings}
       level={state.level}
       levelNote={state.levelNote}
+      track={state.track}
     />
   );
 }
@@ -224,12 +231,15 @@ function Runner({
   recordings,
   level,
   levelNote,
+  track,
 }: {
   examName: string;
   section: ComprehensionSection;
   recordings: Recording[];
   level: CandidateLevel;
   levelNote: string;
+  /** The candidate's accent track. Decided by the destination, not the exam. */
+  track: AccentTrack;
 }) {
   // Which recording to serve is NOT this component's decision, and that is
   // the fix. Until 2026-08-29 it was: sort easiest-first, `useState(0)`, read
@@ -410,7 +420,7 @@ function Runner({
       <div className="card p-6">
         {isAudio ? (
           <>
-            <audio controls src={resolveAudio(audioFor(rec))} className="w-full" />
+            <audio controls src={resolveAudio(audioFor(rec, track))} className="w-full" />
             <p className="mt-2 text-xs text-ink-secondary">
               You can replay this here. In the real exam you will hear it once.
             </p>

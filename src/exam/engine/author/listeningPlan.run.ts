@@ -28,6 +28,7 @@ import { IELTS_VARIETY_PLAN } from '../../definitions/ielts-variety-plan';
 import type { ComprehensionSection } from '../../model/types';
 
 const OUT = '../selmapp/backend/scripts/ielts-listening-plan.json';
+const OUT_AU = '../selmapp/backend/scripts/ielts-listening-plan-au.json';
 
 const exam = EXAMS.find((e) => e.id === 'ielts-gt')!;
 const S = exam.sections.find((s): s is ComprehensionSection => s.id === 'listening')!;
@@ -68,6 +69,21 @@ const rows = S.recordings.map((r) => {
 });
 
 writeFileSync(OUT, JSON.stringify(rows, null, 1) + '\n', 'utf-8');
+
+// ── THE AUSTRALIA TRACK, AND ONLY WHAT IT ACTUALLY NEEDS ──────────────────
+// Eight of the sixteen are already spoken in an accent the Australia track
+// allows — Australian, British, North American, New Zealand — so an
+// Australian candidate can be served the SAME FILE. Only the eight Canadian
+// ones are re-spoken. A rendition is audio; two tracks sharing one file when
+// the accent suits both is not a compromise, it is the correct answer.
+const au = rows
+  .map((r) => ({ r, plan: IELTS_VARIETY_PLAN.find((p) => p.id === r.id)! }))
+  .filter(({ r, plan }) => plan.australiaVariety !== r.variety)
+  .map(({ r, plan }) => ({ ...r, variety: plan.australiaVariety, rendered: false, keep: false }));
+writeFileSync(OUT_AU, JSON.stringify(au, null, 1) + '\n', 'utf-8');
+console.log(`\nwrote ${au.length} Australia-track rows to ${OUT_AU}`);
+console.log(`  ~${au.reduce((n, r) => n + r.chars, 0).toLocaleString()} characters`);
+console.log(`  ${rows.length - au.length} recordings are reused from the Canada track — the accent already suits both`);
 
 const todo = rows.filter((r) => !r.keep);
 const chars = todo.reduce((n, r) => n + r.chars, 0);

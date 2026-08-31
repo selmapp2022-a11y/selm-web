@@ -40,6 +40,7 @@
  * re-drawing would hand them a different exam mid-clock.
  */
 import { newServeState, type ServeState } from '../engine/pool';
+import { PRIMARY_TRACK, type AccentTrack } from './types';
 import { serveEpreuve } from '../engine/comprehension';
 import { promptsOf, servePromptWith, seedFor, type ServedPrompt } from '../engine/productionPool';
 import type { ComprehensionSection, Recording, TaskDefinition } from './types';
@@ -109,6 +110,8 @@ export function clearEpreuveMemory(): void {
 export function paperFor(
   section: ComprehensionSection,
   stored: readonly string[] | undefined,
+  /** The candidate's accent track — see `AccentTrack`. */
+  track: AccentTrack = PRIMARY_TRACK,
 ): { paper: Recording[]; drew: boolean } {
   if (stored && stored.length) {
     const by = new Map(section.recordings.map((r) => [r.id, r]));
@@ -119,7 +122,7 @@ export function paperFor(
     if (rs.length === stored.length) return { paper: rs, drew: false };
   }
   const st = loadEpreuveState(section.id);
-  const paper = serveEpreuve(section, st);
+  const paper = serveEpreuve(section, st, track);
   saveEpreuveState(section.id, st);
   return { paper, drew: true };
 }
