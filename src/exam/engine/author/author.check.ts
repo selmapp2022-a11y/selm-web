@@ -329,7 +329,12 @@ for (const exam of EXAMS) {
 }
 console.log('\n6. Thinnest first is an order, not a slogan\n');
 const plan = thinnestFirst(blueprintsFor(gt, reading));
-t('the first coordinate is empty', plan[0].have, 0);
+// Was `plan[0].have === 0` until 31 August, when GT reading stopped having an
+// empty coordinate and the case went red for the best possible reason. The
+// property being checked is that the order puts the thinnest first, not that
+// something is always empty — an assertion that a hole exists is one that must
+// fail the moment the hole is filled.
+t('the first coordinate is the thinnest', plan[0].have, Math.min(...plan.map((b) => b.have)));
 t('the list is non-decreasing in what it holds',
   plan.every((b, i) => i === 0 || plan[i - 1].have <= b.have), true);
 // The expected count is the families crossed with THE BANDS EACH DECLARES, not
