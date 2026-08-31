@@ -893,6 +893,20 @@ export const IELTS_LISTENING: ComprehensionSection = {
     },
         {
           id: "gt-l-p1-a2-v1-r",
+      renditions: {
+        australia: {
+          audioPath: "ielts-listening/au/gt-l-p1-a2-v1.mp3",
+          variety: 'british',
+          voice: {
+        voiceId: "QJksobp1edMNvmwcG5lm",
+        voiceIds: ["QJksobp1edMNvmwcG5lm", "NuRyEq0OdD9mMOyd51UZ", "GrVxA7Ub86nJH91Viyiv"],
+        vendorName: "Juliet - British, Natural and Engaging + Jofra + James - English Storyteller",
+        requestedVariety: 'british',
+        modelId: "eleven_flash_v2_5",
+        renderedAt: "2026-08-31",
+          },
+        },
+      },
           audioPath: "ielts-listening/gt-l-p1-a2-v1.mp3",
           variety: "canadian",
           voice: { voiceId: "lgkJiqKJlFaaki1bxYFT", voiceIds: ["lgkJiqKJlFaaki1bxYFT", "n5kSEVO24b8CF1IsU4B6", "GrVxA7Ub86nJH91Viyiv"], vendorName: "Rebecca - Calm, Warm and Engaging + Dave - Deep, Warm and Approachable + James - English Storyteller", requestedVariety: "canadian", modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
@@ -905,6 +919,20 @@ export const IELTS_LISTENING: ComprehensionSection = {
         },
         {
           id: "gt-l-p1-a2-v2-r",
+      renditions: {
+        australia: {
+          audioPath: "ielts-listening/au/gt-l-p1-a2-v2.mp3",
+          variety: 'australian',
+          voice: {
+        voiceId: "zMK1eWY5DTw3Jjb8efU8",
+        voiceIds: ["zMK1eWY5DTw3Jjb8efU8", "iIg0uI51lssRFauz7W21", "GrVxA7Ub86nJH91Viyiv"],
+        vendorName: "Emily - Calm, clear female Australian + Neil - Soft Australian accent + James - English Storyteller",
+        requestedVariety: 'australian',
+        modelId: "eleven_flash_v2_5",
+        renderedAt: "2026-08-31",
+          },
+        },
+      },
           audioPath: "ielts-listening/gt-l-p1-a2-v2.mp3",
           variety: "canadian",
           voice: { voiceId: "n5kSEVO24b8CF1IsU4B6", voiceIds: ["n5kSEVO24b8CF1IsU4B6", "lgkJiqKJlFaaki1bxYFT", "GrVxA7Ub86nJH91Viyiv"], vendorName: "Dave - Deep, Warm and Approachable + Rebecca - Calm, Warm and Engaging + James - English Storyteller", requestedVariety: "canadian", modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
@@ -917,6 +945,20 @@ export const IELTS_LISTENING: ComprehensionSection = {
         },
         {
           id: "gt-l-p1-a2-v3-r",
+      renditions: {
+        australia: {
+          audioPath: "ielts-listening/au/gt-l-p1-a2-v3.mp3",
+          variety: 'british',
+          voice: {
+        voiceId: "NuRyEq0OdD9mMOyd51UZ",
+        voiceIds: ["NuRyEq0OdD9mMOyd51UZ", "QJksobp1edMNvmwcG5lm", "GrVxA7Ub86nJH91Viyiv"],
+        vendorName: "Jofra + Juliet - British, Natural and Engaging + James - English Storyteller",
+        requestedVariety: 'british',
+        modelId: "eleven_flash_v2_5",
+        renderedAt: "2026-08-31",
+          },
+        },
+      },
           audioPath: "ielts-listening/gt-l-p1-a2-v3.mp3",
           variety: "canadian",
           voice: { voiceId: "n5kSEVO24b8CF1IsU4B6", voiceIds: ["n5kSEVO24b8CF1IsU4B6", "lgkJiqKJlFaaki1bxYFT", "GrVxA7Ub86nJH91Viyiv"], vendorName: "Dave - Deep, Warm and Approachable + Rebecca - Calm, Warm and Engaging + James - English Storyteller", requestedVariety: "canadian", modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
@@ -929,6 +971,20 @@ export const IELTS_LISTENING: ComprehensionSection = {
         },
         {
           id: "gt-l-p1-a2-v4-r",
+      renditions: {
+        australia: {
+          audioPath: "ielts-listening/au/gt-l-p1-a2-v4.mp3",
+          variety: 'australian',
+          voice: {
+        voiceId: "iIg0uI51lssRFauz7W21",
+        voiceIds: ["iIg0uI51lssRFauz7W21", "zMK1eWY5DTw3Jjb8efU8", "GrVxA7Ub86nJH91Viyiv"],
+        vendorName: "Neil - Soft Australian accent + Emily - Calm, clear female Australian + James - English Storyteller",
+        requestedVariety: 'australian',
+        modelId: "eleven_flash_v2_5",
+        renderedAt: "2026-08-31",
+          },
+        },
+      },
           role: 'anchor',
           audioPath: "ielts-listening/gt-l-p1-a2-v4.mp3",
           variety: "canadian",
@@ -942,6 +998,20 @@ export const IELTS_LISTENING: ComprehensionSection = {
         },
         {
           id: "gt-l-p2-b1-v1-r",
+      renditions: {
+        australia: {
+          audioPath: "ielts-listening/au/gt-l-p2-b1-v1.mp3",
+          variety: 'british',
+          voice: {
+        voiceId: "QJksobp1edMNvmwcG5lm",
+        voiceIds: ["QJksobp1edMNvmwcG5lm", "GrVxA7Ub86nJH91Viyiv"],
+        vendorName: "Juliet - British, Natural and Engaging + James - English Storyteller",
+        requestedVariety: 'british',
+        modelId: "eleven_flash_v2_5",
+        renderedAt: "2026-08-31",
+          },
+        },
+      },
           audioPath: "ielts-listening/gt-l-p2-b1-v1.mp3",
           variety: "canadian",
           voice: { voiceId: "n5kSEVO24b8CF1IsU4B6", voiceIds: ["n5kSEVO24b8CF1IsU4B6", "GrVxA7Ub86nJH91Viyiv"], vendorName: "Dave - Deep, Warm and Approachable + James - English Storyteller", requestedVariety: "canadian", modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
@@ -954,6 +1024,20 @@ export const IELTS_LISTENING: ComprehensionSection = {
         },
         {
           id: "gt-l-p2-b1-v2-r",
+      renditions: {
+        australia: {
+          audioPath: "ielts-listening/au/gt-l-p2-b1-v2.mp3",
+          variety: 'australian',
+          voice: {
+        voiceId: "zMK1eWY5DTw3Jjb8efU8",
+        voiceIds: ["zMK1eWY5DTw3Jjb8efU8", "GrVxA7Ub86nJH91Viyiv"],
+        vendorName: "Emily - Calm, clear female Australian + James - English Storyteller",
+        requestedVariety: 'australian',
+        modelId: "eleven_flash_v2_5",
+        renderedAt: "2026-08-31",
+          },
+        },
+      },
           audioPath: "ielts-listening/gt-l-p2-b1-v2.mp3",
           variety: "canadian",
           voice: { voiceId: "n5kSEVO24b8CF1IsU4B6", voiceIds: ["n5kSEVO24b8CF1IsU4B6", "GrVxA7Ub86nJH91Viyiv"], vendorName: "Dave - Deep, Warm and Approachable + James - English Storyteller", requestedVariety: "canadian", modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
@@ -966,6 +1050,20 @@ export const IELTS_LISTENING: ComprehensionSection = {
         },
         {
           id: "gt-l-p2-b1-v3-r",
+      renditions: {
+        australia: {
+          audioPath: "ielts-listening/au/gt-l-p2-b1-v3.mp3",
+          variety: 'british',
+          voice: {
+        voiceId: "NuRyEq0OdD9mMOyd51UZ",
+        voiceIds: ["NuRyEq0OdD9mMOyd51UZ", "GrVxA7Ub86nJH91Viyiv"],
+        vendorName: "Jofra + James - English Storyteller",
+        requestedVariety: 'british',
+        modelId: "eleven_flash_v2_5",
+        renderedAt: "2026-08-31",
+          },
+        },
+      },
           audioPath: "ielts-listening/gt-l-p2-b1-v3.mp3",
           variety: "canadian",
           voice: { voiceId: "lgkJiqKJlFaaki1bxYFT", voiceIds: ["lgkJiqKJlFaaki1bxYFT", "GrVxA7Ub86nJH91Viyiv"], vendorName: "Rebecca - Calm, Warm and Engaging + James - English Storyteller", requestedVariety: "canadian", modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
@@ -978,6 +1076,20 @@ export const IELTS_LISTENING: ComprehensionSection = {
         },
         {
           id: "gt-l-p2-b1-v4-r",
+      renditions: {
+        australia: {
+          audioPath: "ielts-listening/au/gt-l-p2-b1-v4.mp3",
+          variety: 'australian',
+          voice: {
+        voiceId: "iIg0uI51lssRFauz7W21",
+        voiceIds: ["iIg0uI51lssRFauz7W21", "GrVxA7Ub86nJH91Viyiv"],
+        vendorName: "Neil - Soft Australian accent + James - English Storyteller",
+        requestedVariety: 'australian',
+        modelId: "eleven_flash_v2_5",
+        renderedAt: "2026-08-31",
+          },
+        },
+      },
           audioPath: "ielts-listening/gt-l-p2-b1-v4.mp3",
           variety: "canadian",
           voice: { voiceId: "lgkJiqKJlFaaki1bxYFT", voiceIds: ["lgkJiqKJlFaaki1bxYFT", "GrVxA7Ub86nJH91Viyiv"], vendorName: "Rebecca - Calm, Warm and Engaging + James - English Storyteller", requestedVariety: "canadian", modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
@@ -990,6 +1102,20 @@ export const IELTS_LISTENING: ComprehensionSection = {
         },
         {
           id: "gt-l-p3-b2-v1-r",
+      renditions: {
+        australia: {
+          audioPath: "ielts-listening/au/gt-l-p3-b2-v1.mp3",
+          variety: 'british',
+          voice: {
+        voiceId: "QJksobp1edMNvmwcG5lm",
+        voiceIds: ["QJksobp1edMNvmwcG5lm", "NuRyEq0OdD9mMOyd51UZ", "GrVxA7Ub86nJH91Viyiv"],
+        vendorName: "Juliet - British, Natural and Engaging + Jofra + James - English Storyteller",
+        requestedVariety: 'british',
+        modelId: "eleven_flash_v2_5",
+        renderedAt: "2026-08-31",
+          },
+        },
+      },
           audioPath: "ielts-listening/gt-l-p3-b2-v1.mp3",
           variety: "canadian",
           voice: { voiceId: "n5kSEVO24b8CF1IsU4B6", voiceIds: ["n5kSEVO24b8CF1IsU4B6", "lgkJiqKJlFaaki1bxYFT", "GrVxA7Ub86nJH91Viyiv"], vendorName: "Dave - Deep, Warm and Approachable + Rebecca - Calm, Warm and Engaging + James - English Storyteller", requestedVariety: "canadian", modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
@@ -1002,6 +1128,20 @@ export const IELTS_LISTENING: ComprehensionSection = {
         },
         {
           id: "gt-l-p3-b2-v2-r",
+      renditions: {
+        australia: {
+          audioPath: "ielts-listening/au/gt-l-p3-b2-v2.mp3",
+          variety: 'australian',
+          voice: {
+        voiceId: "zMK1eWY5DTw3Jjb8efU8",
+        voiceIds: ["zMK1eWY5DTw3Jjb8efU8", "iIg0uI51lssRFauz7W21", "GrVxA7Ub86nJH91Viyiv"],
+        vendorName: "Emily - Calm, clear female Australian + Neil - Soft Australian accent + James - English Storyteller",
+        requestedVariety: 'australian',
+        modelId: "eleven_flash_v2_5",
+        renderedAt: "2026-08-31",
+          },
+        },
+      },
           audioPath: "ielts-listening/gt-l-p3-b2-v2.mp3",
           variety: "canadian",
           voice: { voiceId: "lgkJiqKJlFaaki1bxYFT", voiceIds: ["lgkJiqKJlFaaki1bxYFT", "n5kSEVO24b8CF1IsU4B6", "GrVxA7Ub86nJH91Viyiv"], vendorName: "Rebecca - Calm, Warm and Engaging + Dave - Deep, Warm and Approachable + James - English Storyteller", requestedVariety: "canadian", modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
@@ -1014,6 +1154,20 @@ export const IELTS_LISTENING: ComprehensionSection = {
         },
         {
           id: "gt-l-p3-b2-v3-r",
+      renditions: {
+        australia: {
+          audioPath: "ielts-listening/au/gt-l-p3-b2-v3.mp3",
+          variety: 'british',
+          voice: {
+        voiceId: "NuRyEq0OdD9mMOyd51UZ",
+        voiceIds: ["NuRyEq0OdD9mMOyd51UZ", "QJksobp1edMNvmwcG5lm", "GrVxA7Ub86nJH91Viyiv"],
+        vendorName: "Jofra + Juliet - British, Natural and Engaging + James - English Storyteller",
+        requestedVariety: 'british',
+        modelId: "eleven_flash_v2_5",
+        renderedAt: "2026-08-31",
+          },
+        },
+      },
           audioPath: "ielts-listening/gt-l-p3-b2-v3.mp3",
           variety: "canadian",
           voice: { voiceId: "lgkJiqKJlFaaki1bxYFT", voiceIds: ["lgkJiqKJlFaaki1bxYFT", "n5kSEVO24b8CF1IsU4B6", "GrVxA7Ub86nJH91Viyiv"], vendorName: "Rebecca - Calm, Warm and Engaging + Dave - Deep, Warm and Approachable + James - English Storyteller", requestedVariety: "canadian", modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
@@ -1026,6 +1180,20 @@ export const IELTS_LISTENING: ComprehensionSection = {
         },
         {
           id: "gt-l-p3-b2-v4-r",
+      renditions: {
+        australia: {
+          audioPath: "ielts-listening/au/gt-l-p3-b2-v4.mp3",
+          variety: 'australian',
+          voice: {
+        voiceId: "iIg0uI51lssRFauz7W21",
+        voiceIds: ["iIg0uI51lssRFauz7W21", "zMK1eWY5DTw3Jjb8efU8", "GrVxA7Ub86nJH91Viyiv"],
+        vendorName: "Neil - Soft Australian accent + Emily - Calm, clear female Australian + James - English Storyteller",
+        requestedVariety: 'australian',
+        modelId: "eleven_flash_v2_5",
+        renderedAt: "2026-08-31",
+          },
+        },
+      },
           audioPath: "ielts-listening/gt-l-p3-b2-v4.mp3",
           variety: "canadian",
           voice: { voiceId: "n5kSEVO24b8CF1IsU4B6", voiceIds: ["n5kSEVO24b8CF1IsU4B6", "lgkJiqKJlFaaki1bxYFT", "GrVxA7Ub86nJH91Viyiv"], vendorName: "Dave - Deep, Warm and Approachable + Rebecca - Calm, Warm and Engaging + James - English Storyteller", requestedVariety: "canadian", modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
@@ -1038,6 +1206,20 @@ export const IELTS_LISTENING: ComprehensionSection = {
         },
         {
           id: "gt-l-p4-c2-v1-r",
+      renditions: {
+        australia: {
+          audioPath: "ielts-listening/au/gt-l-p4-c2-v1.mp3",
+          variety: 'british',
+          voice: {
+        voiceId: "QJksobp1edMNvmwcG5lm",
+        voiceIds: ["QJksobp1edMNvmwcG5lm", "GrVxA7Ub86nJH91Viyiv"],
+        vendorName: "Juliet - British, Natural and Engaging + James - English Storyteller",
+        requestedVariety: 'british',
+        modelId: "eleven_flash_v2_5",
+        renderedAt: "2026-08-31",
+          },
+        },
+      },
           audioPath: "ielts-listening/gt-l-p4-c2-v1.mp3",
           variety: "canadian",
           voice: { voiceId: "lgkJiqKJlFaaki1bxYFT", voiceIds: ["lgkJiqKJlFaaki1bxYFT", "GrVxA7Ub86nJH91Viyiv"], vendorName: "Rebecca - Calm, Warm and Engaging + James - English Storyteller", requestedVariety: "canadian", modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
@@ -1050,6 +1232,20 @@ export const IELTS_LISTENING: ComprehensionSection = {
         },
         {
           id: "gt-l-p4-c2-v2-r",
+      renditions: {
+        australia: {
+          audioPath: "ielts-listening/au/gt-l-p4-c2-v2.mp3",
+          variety: 'australian',
+          voice: {
+        voiceId: "zMK1eWY5DTw3Jjb8efU8",
+        voiceIds: ["zMK1eWY5DTw3Jjb8efU8", "GrVxA7Ub86nJH91Viyiv"],
+        vendorName: "Emily - Calm, clear female Australian + James - English Storyteller",
+        requestedVariety: 'australian',
+        modelId: "eleven_flash_v2_5",
+        renderedAt: "2026-08-31",
+          },
+        },
+      },
           audioPath: "ielts-listening/gt-l-p4-c2-v2.mp3",
           variety: "canadian",
           voice: { voiceId: "lgkJiqKJlFaaki1bxYFT", voiceIds: ["lgkJiqKJlFaaki1bxYFT", "GrVxA7Ub86nJH91Viyiv"], vendorName: "Rebecca - Calm, Warm and Engaging + James - English Storyteller", requestedVariety: "canadian", modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
@@ -1062,6 +1258,20 @@ export const IELTS_LISTENING: ComprehensionSection = {
         },
         {
           id: "gt-l-p4-c2-v3-r",
+      renditions: {
+        australia: {
+          audioPath: "ielts-listening/au/gt-l-p4-c2-v3.mp3",
+          variety: 'british',
+          voice: {
+        voiceId: "NuRyEq0OdD9mMOyd51UZ",
+        voiceIds: ["NuRyEq0OdD9mMOyd51UZ", "GrVxA7Ub86nJH91Viyiv"],
+        vendorName: "Jofra + James - English Storyteller",
+        requestedVariety: 'british',
+        modelId: "eleven_flash_v2_5",
+        renderedAt: "2026-08-31",
+          },
+        },
+      },
           audioPath: "ielts-listening/gt-l-p4-c2-v3.mp3",
           variety: "canadian",
           voice: { voiceId: "n5kSEVO24b8CF1IsU4B6", voiceIds: ["n5kSEVO24b8CF1IsU4B6", "GrVxA7Ub86nJH91Viyiv"], vendorName: "Dave - Deep, Warm and Approachable + James - English Storyteller", requestedVariety: "canadian", modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
@@ -1074,6 +1284,20 @@ export const IELTS_LISTENING: ComprehensionSection = {
         },
         {
           id: "gt-l-p4-c2-v4-r",
+      renditions: {
+        australia: {
+          audioPath: "ielts-listening/au/gt-l-p4-c2-v4.mp3",
+          variety: 'australian',
+          voice: {
+        voiceId: "iIg0uI51lssRFauz7W21",
+        voiceIds: ["iIg0uI51lssRFauz7W21", "GrVxA7Ub86nJH91Viyiv"],
+        vendorName: "Neil - Soft Australian accent + James - English Storyteller",
+        requestedVariety: 'australian',
+        modelId: "eleven_flash_v2_5",
+        renderedAt: "2026-08-31",
+          },
+        },
+      },
           role: 'anchor',
           audioPath: "ielts-listening/gt-l-p4-c2-v4.mp3",
           variety: "canadian",
