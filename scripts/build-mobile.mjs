@@ -25,6 +25,29 @@
  *
  * Copying into `dist/` after the build cannot leave that residue: `dist` is
  * disposable and is rebuilt from scratch every time.
+ *
+ * ── NOT THE PATH 2.1.0 SHIPS ON. DECIDED 31 AUGUST 2026 ────────────────────
+ * The founder, asked to choose between shipping the bank offline and streaming
+ * it: **option 1 — no offline bank in 2.1.0.** So the release is built with
+ * the ordinary `npm run build && npx cap sync`, NOT with this script, and the
+ * artefact is about 15 MB instead of about 190.
+ *
+ * Three things decided it. The bank had grown to **176 MB across 156 files**,
+ * which puts an iOS artefact at 93% of Apple's 200 MB cellular-download line.
+ * The offline path has a defect that is written down and not yet fixed — see
+ * `SELM-PART0-store-release-blockers.md` §0.1: `VITE_EXAM_AUDIO_BASE` does not
+ * reach the bundle, so this script currently produces an app that is 176 MB
+ * larger AND still needs the network. And offline has never actually shipped:
+ * the live 2.0.8 carries no audio either, so option 1 takes nothing away from
+ * anyone — it just does not add.
+ *
+ * **The store listing must therefore not claim offline anything**, and it does
+ * not: the word does not appear in `SELM-2.1.0-store-listing.md`, in either
+ * language.
+ *
+ * Offline returns in 2.2.0, once the one-line fix has been made and walked on
+ * a real device. Until then, this script's own guard below is what stops it
+ * shipping a lie — and that guard has been tightened, see `points`.
  */
 import { cpSync, existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
@@ -64,7 +87,13 @@ if (bundled.length !== source.length) {
   process.exit(1);
 }
 const js = walk(join(OUT, 'assets')).filter((p) => /main-.*\.js$/.test(p));
-const points = js.some((p) => !/cdn\.digitaloceanspaces\.com/.test(readFileSync(p, 'utf8')));
+// `every`, not `some`. It was `some` — "at least one bundle resolves locally"
+// — and on a machine where `dist` cannot be emptied, stale bundles from
+// earlier builds sit beside the new one and one of THEM satisfied it. The
+// guard passed while the bundle about to ship still named the CDN. A build
+// that emits more than one `main-*.js` is a build whose output is uncertain,
+// and this now refuses both that and the original defect.
+const points = js.length > 0 && js.every((p) => !/cdn\.digitaloceanspaces\.com/.test(readFileSync(p, 'utf8')));
 console.log(`\n${bundled.length} recordings bundled · ${(bytes / 1e6).toFixed(1)} MB`);
 console.log(points
   ? 'and the bundle resolves audio locally, not against the CDN.'
