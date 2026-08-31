@@ -100,8 +100,16 @@ export function ingest(input: IngestInput): IngestResult {
   // A verdict with no judge is not a verdict.
   if (!anchorVerdict.judge.trim()) return fail('anchor', ['anchor.no-judge']);
   // And a comparison against nothing is not a comparison. At the ends of the
-  // ladder one side is legitimately absent; both cannot be.
-  if (anchorVerdict.easier === null && anchorVerdict.harder === null)
+  // ladder one side is legitimately absent; both cannot be — for an ITEM.
+  //
+  // For an anchor it can, and until 31 August that made an empty section
+  // impossible to start: the first rung of a ladder has nothing above it and
+  // nothing below it, so every candidate for it was refused at this line and
+  // the section stayed empty for want of the instrument it was being asked to
+  // provide. The rule is not relaxed for items, which is where it does work.
+  // An anchor with nothing either side is still recorded as unmeasured by the
+  // veto and still carries `needsReview: true`.
+  if (role === 'item' && anchorVerdict.easier === null && anchorVerdict.harder === null)
     return fail('anchor', ['anchor.no-anchors-either-side']);
 
   // An anchor is measured too, and the measurement is KEPT — it is what the

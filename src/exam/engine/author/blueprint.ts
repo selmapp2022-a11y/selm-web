@@ -221,7 +221,15 @@ export function formatFor(examId: string, skill: string): Format {
 export function kindsOf(section: ComprehensionSection): Array<'choice' | 'completion' | 'matching'> {
   const seen = new Set<'choice' | 'completion' | 'matching'>();
   for (const i of section.items) seen.add((i.kind ?? 'choice') as 'choice' | 'completion' | 'matching');
-  return [...seen];
+  // An EMPTY section holds no kinds, and read literally that forbids every
+  // kind — so the first batch into a new section was refused as
+  // `item.kind-not-in-section` for all four of its questions, by a rule whose
+  // purpose is to stop a batch introducing a format the section does not use.
+  // A section with nothing in it does not yet use any format. `choice` is the
+  // model's own default for an item that declares no kind, so it is what an
+  // empty section starts from; the moment the section holds anything, this
+  // line stops applying and the rule is as strict as before.
+  return seen.size ? [...seen] : ['choice'];
 }
 
 /**

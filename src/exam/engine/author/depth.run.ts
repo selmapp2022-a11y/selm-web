@@ -75,6 +75,15 @@ const skill = (process.argv.includes('--section') ? process.argv[process.argv.in
 // Nothing else changes: the same three layers, the same anchors, the same
 // refusal to accept anything a layer refuses.
 const examId = process.argv.includes('--exam') ? process.argv[process.argv.indexOf('--exam') + 1] : 'ielts-gt';
+// ── AND WHETHER THIS BATCH IS THE LADDER ──────────────────────────────────
+// A section with no anchors cannot measure anything, so its first batch is
+// the instrument rather than the supply. `ingest` already models this: an
+// anchor clears the gate and the anchor comparison, and is RECORDED as
+// unmeasured by the veto rather than as having passed it. The flag exists
+// because the runner had no way to say which kind of batch it was holding,
+// and a section that starts empty cannot otherwise be started at all.
+const role = (process.argv.includes('--role') ? process.argv[process.argv.indexOf('--role') + 1] : 'item') as 'anchor' | 'item';
+if (role !== 'anchor' && role !== 'item') throw new Error(`--role must be anchor or item, got ${role}`);
 const exam = EXAMS.find((e) => e.id === examId);
 if (!exam) throw new Error(`no exam ${examId}; known: ${EXAMS.map((e) => e.id).join(', ')}`);
 const section = exam.sections.find(
@@ -136,7 +145,7 @@ const results = raws.map((raw) => {
     reasons: [],
     measured: { comparedAgainst: [easier, harder].filter(Boolean).join(' / ') },
   };
-  return { raw, result: ingest({ candidate, blueprint, section, anchors, anchorVerdict, role: 'item' }) };
+  return { raw, result: ingest({ candidate, blueprint, section, anchors, anchorVerdict, role }) };
 });
 
 console.log(`\n${file}\n`);
@@ -200,7 +209,7 @@ if (emitAt) {
       .filter((k) => extra[k] !== undefined)
       .map((k) => `          ${k}: ${JSON.stringify(extra[k])},`)
       .join('\n');
-    return `        {\n          id: ${q(a.id)},\n${carry ? carry + '\n' : ''}          level: '${a.level}',\n          family: '${a.family}',\n          freshness: '${a.freshness}',\n          script: ${q(a.script)},\n        },`;
+    return `        {\n          id: ${q(a.id)},\n${carry ? carry + '\n' : ''}${role === 'anchor' ? "          role: 'anchor',\n" : ''}          level: '${a.level}',\n          family: '${a.family}',\n          freshness: '${a.freshness}',\n          script: ${q(a.script)},\n        },`;
   });
   const items = ok.flatMap(({ result }) => {
     const a = (result as { accepted: Candidate }).accepted;

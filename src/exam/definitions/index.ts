@@ -1,9 +1,10 @@
 import type { Destination, ExamDefinition, Goal } from '../model/types';
 import { PRIMARY_TRACK, type AccentTrack } from '../model/types';
+import { IELTS_ACADEMIC } from './ielts-academic';
 import { IELTS_GT } from './ielts-gt';
 import { TCF_CANADA } from './tcf-canada';
 
-export const EXAMS: ExamDefinition[] = [IELTS_GT, TCF_CANADA];
+export const EXAMS: ExamDefinition[] = [IELTS_GT, IELTS_ACADEMIC, TCF_CANADA];
 
 export function examById(id: string): ExamDefinition {
   const e = EXAMS.find((x) => x.id === id);
