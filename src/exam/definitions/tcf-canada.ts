@@ -2051,7 +2051,7 @@ export const TCF_CANADA: ExamDefinition = {
           level: "B1",
           stem: "Que se passe-t-il à seize heures ?",
           rationale: "Seule la boulangerie ferme à seize heures ; les autres rayons restent ouverts jusqu'à vingt et une heures et le pain reste en vente.",
-          options: ["Un seul rayon ferme","Tout le magasin ferme","Le pain est retiré de la vente","Le nettoyage du magasin commence"],
+          options: ["Le nettoyage du magasin commence","Un seul rayon ferme","Tout le magasin ferme","Le pain est retiré de la vente"],
           answer: 1,
         },
         {
@@ -2060,7 +2060,7 @@ export const TCF_CANADA: ExamDefinition = {
           level: "B1",
           stem: "Comment obtenir un passeport ?",
           rationale: "Le message dit qu'il faut prendre rendez-vous en ligne pour un passeport et que la mairie ne reçoit plus sans rendez-vous.",
-          options: ["Uniquement sur rendez-vous","En venant le mercredi après-midi","En se présentant au guichet","En téléphonant à la mairie"],
+          options: ["En se présentant au guichet","En téléphonant à la mairie","Uniquement sur rendez-vous","En venant le mercredi après-midi"],
           answer: 2,
         },
         {
@@ -2069,7 +2069,7 @@ export const TCF_CANADA: ExamDefinition = {
           level: "B1",
           stem: "Que reçoivent les abonnés pour la semaine perdue ?",
           rationale: "L'annonce exclut le remboursement et précise que la semaine manquée sera ajoutée à la fin de l'abonnement.",
-          options: ["Une semaine supplémentaire","Un remboursement","Un cours de rattrapage","Rien du tout"],
+          options: ["Un remboursement","Un cours de rattrapage","Rien du tout","Une semaine supplémentaire"],
           answer: 3,
         },
         {
@@ -2087,7 +2087,7 @@ export const TCF_CANADA: ExamDefinition = {
           level: "B2",
           stem: "Que deviennent les colis qui arriveront après la fermeture ?",
           rationale: "L'annonce dit que les colis arrivés ensuite seront transférés au bureau du boulevard Laurier, sans démarche du destinataire.",
-          options: ["Ils iront à un autre bureau","Ils seront retournés à l'expéditeur","Ils seront gardés rue Sainte-Anne","Ils seront livrés à domicile"],
+          options: ["Ils seront livrés à domicile","Ils iront à un autre bureau","Ils seront retournés à l'expéditeur","Ils seront gardés rue Sainte-Anne"],
           answer: 1,
         },
         {
@@ -2096,7 +2096,7 @@ export const TCF_CANADA: ExamDefinition = {
           level: "B2",
           stem: "Que faut-il comprendre de ce message ?",
           rationale: "Le message dit que la coupure est reportée à mardi et insiste sur le fait qu'il ne s'agit pas d'une annulation.",
-          options: ["La coupure aura lieu plus tard","La coupure est annulée","La coupure dure toute la journée","La coupure concerne tout l'immeuble"],
+          options: ["La coupure dure toute la journée","La coupure concerne tout l'immeuble","La coupure aura lieu plus tard","La coupure est annulée"],
           answer: 2,
         },
         {
@@ -2105,7 +2105,7 @@ export const TCF_CANADA: ExamDefinition = {
           level: "B2",
           stem: "Pourquoi l'heure de départ n'est-elle pas donnée ?",
           rationale: "L'annonce explique que l'heure exacte n'est pas connue et qu'elle préfère ne rien annoncer plutôt que de devoir se corriger.",
-          options: ["Elle n'est pas encore connue","Elle change toutes les heures","Elle dépend des voyageurs présents","Elle a déjà été annoncée deux fois"],
+          options: ["Elle change toutes les heures","Elle dépend des voyageurs présents","Elle a déjà été annoncée deux fois","Elle n'est pas encore connue"],
           answer: 3,
         },
         {
@@ -2123,7 +2123,7 @@ export const TCF_CANADA: ExamDefinition = {
           level: "C1",
           stem: "Pourquoi la photographie est-elle interdite dans cette aile ?",
           rationale: "L'annonce écarte explicitement la question des droits et donne la raison : la lumière des appareils abîme les encres anciennes de manière irréversible.",
-          options: ["Pour protéger les œuvres","Pour des raisons de droits d'auteur","Parce que la salle est trop sombre","Parce que les visiteurs y sont trop nombreux"],
+          options: ["Parce que les visiteurs y sont trop nombreux","Pour protéger les œuvres","Pour des raisons de droits d'auteur","Parce que la salle est trop sombre"],
           answer: 1,
         },
         {
@@ -2132,7 +2132,7 @@ export const TCF_CANADA: ExamDefinition = {
           level: "C1",
           stem: "Pourquoi faut-il se méfier du premier versement ?",
           rationale: "Le premier versement suit l'inscription d'environ six semaines, le temps de la vérification, d'où le conseil de ne pas compter dessus pour le premier loyer.",
-          options: ["Il arrive environ six semaines plus tard","Il est d'un montant plus faible","Il n'est pas confirmé par écrit","Il dépend du montant du loyer"],
+          options: ["Il n'est pas confirmé par écrit","Il dépend du montant du loyer","Il arrive environ six semaines plus tard","Il est d'un montant plus faible"],
           answer: 2,
         },
         {
@@ -2141,7 +2141,7 @@ export const TCF_CANADA: ExamDefinition = {
           level: "C1",
           stem: "Qu'est-ce qui ne change pas à sept heures ?",
           rationale: "La salle ouvre plus tôt, mais l'annonce précise que les prêts et les renseignements ne commencent qu'à neuf heures, faute de personnel supplémentaire.",
-          options: ["L'accès aux services de prêt","L'ouverture de la salle","L'accès aux places assises","L'entrée des abonnés"],
+          options: ["L'ouverture de la salle","L'accès aux places assises","L'entrée des abonnés","L'accès aux services de prêt"],
           answer: 3,
         },
         {
@@ -2159,7 +2159,7 @@ export const TCF_CANADA: ExamDefinition = {
           level: "C2",
           stem: "Pourquoi l'offre la moins chère a-t-elle été écartée ?",
           rationale: "L'entreprise la moins-disante refusait de s'engager sur un délai, ce qui compte parce que les échafaudages condamnent les balcons pendant tout le chantier.",
-          options: ["Elle ne garantissait aucun délai","Elle excluait les balcons du chantier","Elle ne prévoyait pas d'échafaudages","Elle avait été déposée trop tard"],
+          options: ["Elle avait été déposée trop tard","Elle ne garantissait aucun délai","Elle excluait les balcons du chantier","Elle ne prévoyait pas d'échafaudages"],
           answer: 1,
         },
         {
@@ -2168,7 +2168,7 @@ export const TCF_CANADA: ExamDefinition = {
           level: "C2",
           stem: "Qu'est-ce qui était faux dans l'information d'hier ?",
           rationale: "L'annonce distingue les deux : l'information était exacte quant au principe et fausse quant à la date, la fermeture prenant effet en septembre.",
-          options: ["La date de la fermeture","Le fait même de la fermeture","Le nom du service concerné","Le nombre de familles touchées"],
+          options: ["Le nom du service concerné","Le nombre de familles touchées","La date de la fermeture","Le fait même de la fermeture"],
           answer: 2,
         },
         {
@@ -2177,7 +2177,7 @@ export const TCF_CANADA: ExamDefinition = {
           level: "C2",
           stem: "Que faut-il comprendre du rang affiché en ligne ?",
           rationale: "Le rang indique une position dans un ensemble, mais les attributions dépendent aussi de la composition du ménage et de la taille du logement libéré.",
-          options: ["Il ne détermine pas à lui seul l'attribution","Il est mis à jour une fois par an","Il ne concerne que les grands logements","Il est calculé par le demandeur lui-même"],
+          options: ["Il est mis à jour une fois par an","Il ne concerne que les grands logements","Il est calculé par le demandeur lui-même","Il ne détermine pas à lui seul l'attribution"],
           answer: 3,
         },
         {
@@ -2195,7 +2195,7 @@ export const TCF_CANADA: ExamDefinition = {
           level: "A1",
           stem: "Quand le musée ouvre-t-il ?",
           rationale: "La réponse donne l'heure, dix heures, et la fréquence, tous les jours.",
-          options: ["À dix heures chaque jour","À dix heures le samedi","Tous les jours sauf lundi","À neuf heures chaque jour"],
+          options: ["À neuf heures chaque jour","À dix heures chaque jour","À dix heures le samedi","Tous les jours sauf lundi"],
           answer: 1,
         },
         {
@@ -2204,7 +2204,7 @@ export const TCF_CANADA: ExamDefinition = {
           level: "A1",
           stem: "Quel est le problème ?",
           rationale: "Le vendeur dit oui pour le noir, mais précise qu'il ne reste que la petite taille.",
-          options: ["Une seule taille reste","La couleur noire manque","Le manteau est trop cher","Le magasin va fermer"],
+          options: ["Le manteau est trop cher","Le magasin va fermer","Une seule taille reste","La couleur noire manque"],
           answer: 2,
         },
         {
@@ -2213,7 +2213,7 @@ export const TCF_CANADA: ExamDefinition = {
           level: "A1",
           stem: "Que fait la personne ?",
           rationale: "La deuxième voix répond en donnant la direction : tout droit, puis à gauche.",
-          options: ["Elle indique le chemin","Elle demande le chemin","Elle refuse de répondre","Elle propose un taxi"],
+          options: ["Elle demande le chemin","Elle refuse de répondre","Elle propose un taxi","Elle indique le chemin"],
           answer: 3,
         },
         {
@@ -2231,7 +2231,7 @@ export const TCF_CANADA: ExamDefinition = {
           level: "A1",
           stem: "Que conseille le message ?",
           rationale: "Après avoir dit qu'il fait froid, le message conseille de mettre un manteau avant de sortir.",
-          options: ["De porter un manteau","De rester à la maison","De prendre un parapluie","De sortir plus tard"],
+          options: ["De sortir plus tard","De porter un manteau","De rester à la maison","De prendre un parapluie"],
           answer: 1,
         },
         {
@@ -2240,7 +2240,7 @@ export const TCF_CANADA: ExamDefinition = {
           level: "A1",
           stem: "Quand la cafétéria est-elle fermée ?",
           rationale: "Le message dit que la cafétéria est fermée le dimanche et ouverte du lundi au samedi.",
-          options: ["Le dimanche","Le samedi","Le lundi","Tous les soirs"],
+          options: ["Le lundi","Tous les soirs","Le dimanche","Le samedi"],
           answer: 2,
         },
         {
@@ -2249,7 +2249,7 @@ export const TCF_CANADA: ExamDefinition = {
           level: "A1",
           stem: "Où a lieu le cours ?",
           rationale: "Le message donne l'heure, neuf heures, puis le lieu : la salle est au premier étage.",
-          options: ["Au premier étage","Au rez-de-chaussée","Au deuxième étage","Dans la salle neuf"],
+          options: ["Au rez-de-chaussée","Au deuxième étage","Dans la salle neuf","Au premier étage"],
           answer: 3,
         },
         {
@@ -2267,7 +2267,7 @@ export const TCF_CANADA: ExamDefinition = {
           level: "C2",
           stem: "Que craint la deuxième voix ?",
           rationale: "Elle accepte la distinction à condition qu'on ne s'en serve pas pour justifier l'absence de décision, comme la fois précédente.",
-          options: ["Que la distinction serve à ne rien décider","Que les délais soient encore allongés","Que la décision soit prise sans elle","Que le coût augmente de nouveau"],
+          options: ["Que le coût augmente de nouveau","Que la distinction serve à ne rien décider","Que les délais soient encore allongés","Que la décision soit prise sans elle"],
           answer: 1,
         },
         {
@@ -2276,7 +2276,7 @@ export const TCF_CANADA: ExamDefinition = {
           level: "C2",
           stem: "Que reproche la première voix au comité ?",
           rationale: "Elle refuse l'excuse de la forme : selon elle, une objection traitée en trois minutes a été écartée et non examinée.",
-          options: ["D'avoir écarté les objections plutôt que de les traiter","D'avoir choisi le mauvais site","D'avoir siégé trop longtemps","D'avoir refusé d'entendre les opposants"],
+          options: ["D'avoir siégé trop longtemps","D'avoir refusé d'entendre les opposants","D'avoir écarté les objections","D'avoir choisi le mauvais site"],
           answer: 2,
         },
         {
@@ -2285,7 +2285,7 @@ export const TCF_CANADA: ExamDefinition = {
           level: "C2",
           stem: "Quel est le défaut des chiffres cités ?",
           rationale: "La première voix reproche la comparaison d'une année complète avec un semestre, ce qui rend la progression flatteuse sans être réelle.",
-          options: ["Ils comparent des périodes de longueur différente","Ils proviennent d'un document non officiel","Ils ont été inventés par la deuxième voix","Ils ne portent pas sur le bon service"],
+          options: ["Ils proviennent d'un document non officiel","Ils ont été inventés par la deuxième voix","Ils ne portent pas sur le bon service","Ils comparent des périodes de longueur différente"],
           answer: 3,
         },
         {

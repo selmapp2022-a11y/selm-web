@@ -124,7 +124,24 @@ const results = raws.map((raw) => {
     // true report of a bug in this runner rather than in the item.
     const k = q.options!.length;
     const target = n++ % k;
-    const shift = ((q.correct! - target) % k + k) % k;
+    // ── READ BOTH NAMES, BECAUSE ONE BATCH IN THREE USED THE OTHER ────────
+    //
+    // This line read `q.correct` alone until 31 August. Three TCF batches
+    // written the same week used `answer` — the name the BANK uses for the
+    // same idea — so `q.correct` was `undefined`, `undefined - target` was
+    // `NaN`, `slice(NaN)` behaved as `slice(0)` and left the options exactly
+    // as written, and the answer index below was set to the rotation target
+    // regardless. Twenty-one items entered the bank keyed to a distractor
+    // while their rationale still explained the author's option. Nothing
+    // failed; the batch reported 100% accepted.
+    //
+    // Two names for one field is a defect in the format, and the format is
+    // JSON that a person types. So the runner accepts both and REFUSES the
+    // absence of both, which is the case that silently produced NaN.
+    const authored = q.correct ?? (q as { answer?: number }).answer;
+    if (typeof authored !== 'number' || !Number.isInteger(authored) || authored < 0 || authored >= k)
+      throw new Error(`${raw.id}: item ${qi + 1} has no usable key — set "correct" (or "answer") to an option index 0..${k - 1}`);
+    const shift = ((authored - target) % k + k) % k;
     const options = [...q.options!.slice(shift), ...q.options!.slice(0, shift)];
     return { ...base, options, answer: target } as ComprehensionItem;
   });
