@@ -1,4 +1,35 @@
 /**
+ * ── NEEDS A HUMAN: fr-CA REVIEW ───────────────────────────────────────────
+ *
+ * Every French string in this file was written by a language model on
+ * 31 August 2026. **No native speaker has read any of it.**
+ *
+ * That is the same standing as the exam bank — `selfJudged`, `needsReview` —
+ * and it is recorded in the same place the bank's standing is recorded, in the
+ * file itself, rather than in a document that can be closed.
+ *
+ * It matters more here than for a typical interface. The company's French
+ * claim is fr-CA fidelity: the marketing site says the audio is Quebec French
+ * "parce que l'examen s'appelle TCF *Canada*". An interface written in
+ * metropolitan-sounding French contradicts that claim on the same screen, and
+ * the French market is the larger half of the revenue forecast.
+ *
+ * **The reviewer is the one already contracted for content** — the French
+ * content reviewer in the business plan's Section 11 — and the register is
+ * `SELM-Website-Plan.md` PART 6, row 8, which named fr-CA review a blocking
+ * item while it was still only about the marketing site.
+ *
+ * TWO ITEMS OUTSIDE THIS FILE CARRY THE SAME FLAG, and they carry more risk,
+ * because they are contracts rather than labels:
+ *
+ *   `pages/PrivacyPolicyPage.tsx`  — the French privacy policy
+ *   `pages/TermsPage.tsx`          — the French Terms of Use / EULA
+ *
+ * Both state, on the page, that the English version governs in the event of a
+ * discrepancy. That clause is what makes shipping them before review
+ * defensible; it is not a substitute for the review.
+ */
+/**
  * Le français.
  *
  * §5.5 — la discipline établie à l'étape 08 : terminologie officielle prise à
@@ -489,7 +520,7 @@ export const FR: FrenchDict = {
     "Voici le niveau CECR tenu par chaque session. Il n'est **pas** tracé face à votre objectif {target} : une session d'entraînement produit un nombre de bonnes réponses, et la conversion de ce nombre vers l'échelle publiée de l'examen n'est pas diffusée par l'organisme certificateur. Une ligne d'objectif ici serait une conversion dessinée plutôt que calculée.",
 
   // ── Pages légales ────────────────────────────────────────────────────────
-  'legal.tagline': 'English, Simply',
+  'legal.tagline': 'Connaissez votre score',
   'legal.lastUpdated': 'Dernière mise à jour :',
   'legal.contactHeading': '11. Contact',
   'legal.address': 'Vancouver, Colombie-Britannique, Canada',

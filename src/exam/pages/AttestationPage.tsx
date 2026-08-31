@@ -138,8 +138,14 @@ export default function AttestationPage() {
     const sc = scaleOf(f.scaleId);
     if (!sc) return null;
     if (Number.isNaN(v)) return ui === 'en' ? 'Not a number' : 'Ce n’est pas un nombre';
-    if (v < sc.min || v > sc.max)
-      return ui === 'en' ? `Outside ${sc.min}–${sc.max}` : `Hors de ${sc.min}–${sc.max}`;
+    // An unknown ceiling cannot reject a number for being above it. No exam
+    // with one is served, so this cannot be reached today; it is written this
+    // way rather than with a `!` so that the day one is, the form asks for a
+    // score it can check the bottom of and says nothing about the top.
+    if (v < sc.min || (sc.max !== null && v > sc.max))
+      return ui === 'en'
+        ? `Outside ${sc.min}–${sc.max ?? '?'}`
+        : `Hors de ${sc.min}–${sc.max ?? '?'}`;
     // The scale declares its smallest reportable increment and the form has
     // to honour it. IELTS reports half bands and nothing between them, so
     // 4.7 is not a low score — it is not a score. Added after a real Test

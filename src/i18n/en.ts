@@ -475,7 +475,10 @@ export const EN = {
     "This is the CEFR band each sitting held. It is **not** plotted against your {target} target: a practice sitting produces a count of correct answers, and the conversion from that count to the exam's published scale is not released by the awarding body. A target line here would be a conversion drawn rather than computed.",
 
   // ── Legal pages (chrome; the documents themselves are data in the pages) ─
-  'legal.tagline': 'English, Simply',
+  // The wordmark's own tagline, per `components/Logo.tsx`. It read
+  // 'English, Simply' until 31 August — the tagline retired on 27 August,
+  // still printed at the top of the two documents a store reviewer opens.
+  'legal.tagline': 'Know your score',
   'legal.lastUpdated': 'Last updated:',
   'legal.contactHeading': '11. Contact',
   'legal.address': 'Vancouver, British Columbia, Canada',

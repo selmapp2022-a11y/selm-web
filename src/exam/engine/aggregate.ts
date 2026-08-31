@@ -25,7 +25,15 @@ export function aggregate(scoresByJudge: CriterionScore[][], scale: Scale): Aggr
   const point = means.reduce((a, b) => a + b, 0) / means.length;
   const spread = means.length > 1 ? Math.max(...means) - Math.min(...means) : 0;
   const stepped = Math.round(point / scale.step) * scale.step;
-  return { point: Math.min(scale.max, Math.max(scale.min, stepped)), judgeSpread: spread, judgeCount: means.length };
+  // A scale with no known maximum cannot clamp from above. Such an exam is
+  // not served — `catalogue.check` refuses it — so this branch is a guard
+  // rather than a behaviour, and it clamps only where it knows the wall is.
+  const clamped = Math.max(scale.min, stepped);
+  return {
+    point: scale.max === null ? clamped : Math.min(scale.max, clamped),
+    judgeSpread: spread,
+    judgeCount: means.length,
+  };
 }
 
 export function toBenchmark(

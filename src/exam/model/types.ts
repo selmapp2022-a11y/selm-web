@@ -30,7 +30,33 @@ export type Scale = {
   id: string;
   label: Localised;
   min: number;
-  max: number;
+  /**
+   * The highest score the awarding body reports on this scale.
+   *
+   * ── WHY THIS IS NULLABLE, AS OF 31 AUGUST 2026 ──────────────────────────
+   * TEF Canada. Two official sources, two different ceilings, and no way to
+   * choose between them from the outside:
+   *
+   *   Le français des affaires — the awarding body — publishes
+   *   "Correspondance Score TEF – Niveau NCLC" with all four épreuves on
+   *   **0–699** for tests taken from 11 December 2023.
+   *
+   *   IRCC publishes ONE equivalency table for Express Entry whose NCLC 7
+   *   row reads reading 207–232, listening 249–279, writing and speaking
+   *   310–348 — numbers that cannot sit on a 699 scale — and states that the
+   *   raw-score change CCI made between 11 December 2023 and 6 May 2024 "has
+   *   been reverted back to the Express Entry scoring grid we currently use".
+   *
+   * A candidate is told what they need by IRCC and handed a number by the
+   * awarding body. Until it is established which ceiling is printed on the
+   * attestation a candidate actually receives today, this product does not
+   * know what a TEF score is — and `null` is how it says so, rather than
+   * picking the more plausible of two official documents.
+   *
+   * **A `null` here means the exam MAY NOT BE SERVED.** `definitions/index.ts`
+   * keeps such an exam out of `EXAMS`, and `catalogue.check` asserts it.
+   */
+  max: number | null;
   /** Smallest reportable increment. IELTS criteria: 1. TCF: 1. */
   step: number;
   /** How a value on this scale is written out. */

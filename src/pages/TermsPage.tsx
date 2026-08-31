@@ -1,3 +1,9 @@
+// ── NEEDS A HUMAN: fr-CA REVIEW OF THE FRENCH TEXT BELOW ──────────────────
+// The French half of this document was written by a language model on
+// 31 August 2026 and no native speaker has read it. It ships with an
+// English-governs clause on the page, which is what makes that defensible —
+// not a substitute for the review. Same reviewer as the content; see the note
+// at the top of `src/i18n/fr.ts`.
 // Public Terms of Use / EULA page — served at /terms.
 //
 // Apple Guideline 3.1.2(c) rejected Build 38 v2.0.7 because the app

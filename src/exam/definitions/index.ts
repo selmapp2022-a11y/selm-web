@@ -3,8 +3,29 @@ import { PRIMARY_TRACK, type AccentTrack } from '../model/types';
 import { IELTS_ACADEMIC } from './ielts-academic';
 import { IELTS_GT } from './ielts-gt';
 import { TCF_CANADA } from './tcf-canada';
+import { TEF_CANADA } from './tef-canada';
 
+/** The exams this product serves. */
 export const EXAMS: ExamDefinition[] = [IELTS_GT, IELTS_ACADEMIC, TCF_CANADA];
+
+/**
+ * Exams that are DEFINED and NOT SERVED, with the reason attached.
+ *
+ * A second list rather than a flag on the first, so that every existing
+ * reader of `EXAMS` — the planner, the catalogue, the goal screen, the
+ * inventory — cannot accidentally reach one by forgetting to filter. Adding
+ * an exam here costs nothing downstream; adding it to `EXAMS` is the decision.
+ *
+ * `catalogue.check` asserts that nothing in `EXAMS` has an unknown scale
+ * maximum, which is what keeps TEF Canada on this side of the line.
+ */
+export const WITHHELD_EXAMS: Array<{ exam: ExamDefinition; because: string }> = [
+  {
+    exam: TEF_CANADA,
+    because:
+      'The maximum of each of its four scales is not established: the awarding body publishes 0–699 for tests from 11 December 2023, and IRCC publishes one Express Entry grid whose numbers cannot sit on a 699 scale. See the note in definitions/tef-canada.ts.',
+  },
+];
 
 export function examById(id: string): ExamDefinition {
   const e = EXAMS.find((x) => x.id === id);
