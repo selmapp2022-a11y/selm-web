@@ -60,17 +60,27 @@ type Raw = {
 };
 
 const file = process.argv[2];
-if (!file) throw new Error('usage: depth.run.ts <batch.json> [--emit out.ts] [--section listening]');
+if (!file) throw new Error('usage: depth.run.ts <batch.json> [--emit out.ts] [--section listening] [--exam tcf-canada]');
 const emitAt = process.argv.includes('--emit') ? process.argv[process.argv.indexOf('--emit') + 1] : null;
 // Reading was the only skill this ran for until 31 August. Listening is the
 // same pipeline over a different section, and the only thing that changes is
 // which section the blueprint and the anchors come from.
 const skill = (process.argv.includes('--section') ? process.argv[process.argv.indexOf('--section') + 1] : 'reading') as 'reading' | 'listening';
 
-const exam = EXAMS.find((e) => e.id === 'ielts-gt')!;
+// ── AND WHICH EXAM ────────────────────────────────────────────────────────
+// IELTS was the only exam this ran for until 31 August, when the founder
+// pointed at `annonce · B2` on his own Progress screen and asked what "not
+// built" meant. It meant a coordinate with nothing behind it, and the answer
+// is authoring, not a fix — so the runner had to stop being about one exam.
+// Nothing else changes: the same three layers, the same anchors, the same
+// refusal to accept anything a layer refuses.
+const examId = process.argv.includes('--exam') ? process.argv[process.argv.indexOf('--exam') + 1] : 'ielts-gt';
+const exam = EXAMS.find((e) => e.id === examId);
+if (!exam) throw new Error(`no exam ${examId}; known: ${EXAMS.map((e) => e.id).join(', ')}`);
 const section = exam.sections.find(
   (s): s is ComprehensionSection => s.kind === 'comprehension' && s.skill === skill,
-)!;
+);
+if (!section) throw new Error(`${examId} has no ${skill} comprehension section`);
 const blueprints = blueprintsFor(exam, section);
 const anchors = section.recordings
   .filter((r) => r.role === 'anchor')

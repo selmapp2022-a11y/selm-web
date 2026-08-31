@@ -208,6 +208,27 @@ export const TCF_CANADA: ExamDefinition = {
       name: { en: 'Listening comprehension', fr: 'Compréhension orale' },
       // Published: 35 minutes for the épreuve. FEI, TCF Canada page.
       timeLimitSec: 35 * 60,
+      // ── THE PAPER IS 39 QUESTIONS, AND THE BANK IS NOT THE PAPER ────────
+      //
+      // This section had NO serve spec until 31 August, and nobody noticed for
+      // a simple reason: the bank held exactly thirty-nine recordings, so
+      // "serve everything" and "serve the paper" were the same list. The night
+      // twenty-eight were written to fill the empty coordinates, they stopped
+      // being the same list, and `serveEpreuve` — which returns the whole bank
+      // when no spec is declared — would have put **sixty-seven questions**
+      // into a thirty-five-minute épreuve.
+      //
+      // It was caught by `comprehension.check.ts` before anything shipped, and
+      // it is the third time this exact defect has appeared: the TCF written
+      // section on 28 August, IELTS listening on 30 August, this on 31. The
+      // shape is always the same — a spec that is unnecessary while the bank
+      // is exactly one paper, and silently wrong the moment it is not.
+      //
+      // The profile is the one the bank was written to and the one the section
+      // publishes as progressive difficulty. A2 currently holds exactly six,
+      // so the épreuve cannot vary there yet; that is the next authoring
+      // target and it is visible in the inventory rather than hidden here.
+      serve: { count: 39, byBand: { A1: 4, A2: 6, B1: 9, B2: 10, C1: 6, C2: 4 } },
       scaleId: 'co699',
       delivery: {
         // The audio plays once. This is the rule candidates find hardest and
@@ -223,8 +244,8 @@ export const TCF_CANADA: ExamDefinition = {
         feedbackDuringSection: false,
       },
       provenance: {
-        en: 'Every item in this section was written for this product, to the published format — 39 questions, ordered by progressive difficulty — and no real exam question is reproduced. The A1-to-C2 banding is ours: the exam publishes that difficulty rises across the section and does not publish which item sits at which level. Recordings use several French varieties — mostly international French, with Quebec and West African voices among them.',
-        fr: "Tous les items de cette épreuve ont été rédigés pour ce produit, selon le format publié — 39 questions, à difficulté progressive — sans reproduire aucune question réelle d'examen. Le classement A1 à C2 est le nôtre : l'examen indique que la difficulté augmente, sans publier le niveau de chaque item. Les enregistrements emploient plusieurs variétés de français — surtout du français international, avec des voix québécoises et ouest-africaines.",
+        en: 'Every item in this section was written for this product, to the published format — 39 questions, ordered by progressive difficulty — and no real exam question is reproduced. The A1-to-C2 banding is ours: the exam publishes that difficulty rises across the section and does not publish which item sits at which level. Recordings use three French varieties — Parisian French as the majority, with Québécois and Swiss voices among them, applied inside each band rather than by level.',
+        fr: "Tous les items de cette épreuve ont été rédigés pour ce produit, selon le format publié — 39 questions, à difficulté progressive — sans reproduire aucune question réelle d'examen. Le classement A1 à C2 est le nôtre : l'examen indique que la difficulté augmente, sans publier le niveau de chaque item. Les enregistrements emploient trois variétés de français — surtout du français parisien, avec des voix québécoises et suisses, réparties à l'intérieur de chaque niveau et non par ordre de difficulté.",
       },
       families: [
         {
@@ -318,6 +339,117 @@ export const TCF_CANADA: ExamDefinition = {
           script: "Il pleut beaucoup aujourd'hui, prends ton parapluie.",
         },
         {
+          id: "tcf-co-56-r",
+          audioPath: "tcf-co/tcf-co-56.mp3",
+          variety: 'quebecois',
+          voice: { voiceId: "UJCi4DDncuo0VJDSIegj", voiceIds: ["UJCi4DDncuo0VJDSIegj", "1Ko2KP4agGOYHL6KVMtm"], vendorName: "Amélie - Young, Confident and Friendly + Alexandre - Authentic French Canadian", requestedVariety: 'quebecois', modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
+          speakers: 2,
+          level: 'A1',
+          family: 'dialogue',
+          freshness: 'current',
+          script: "— Bonjour, je voudrais deux billets pour Montréal.\n— Pour aujourd'hui ou pour demain ?",
+        },
+        {
+          id: "tcf-co-57-r",
+          audioPath: "tcf-co/tcf-co-57.mp3",
+          variety: 'international',
+          voice: { voiceId: "LFo5X4P9PhYaOLBA9Hyh", voiceIds: ["LFo5X4P9PhYaOLBA9Hyh", "1a3lMdKLUcfcMtvN772u"], vendorName: "Clémence - Advertising + Antoine - Audiobook Narrator", requestedVariety: 'international', modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
+          speakers: 2,
+          level: 'A1',
+          family: 'dialogue',
+          freshness: 'current',
+          script: "— Le musée ouvre à quelle heure ?\n— À dix heures, tous les jours.",
+        },
+        {
+          id: "tcf-co-58-r",
+          // ANCHOR. One per band, and the set is deliberately small: an
+          // instrument that absorbs what it measures widens by exactly the
+          // amount each item strays.
+          //
+          // ── HOW THESE SIX WERE CHOSEN, AND HOW THE FIRST RULE FAILED ─────
+          // The first attempt took the recording of MEDIAN LENGTH in each
+          // band. Objective, re-runnable, and wrong: length is one of four
+          // measures, and a ladder chosen on one of them came out
+          // non-monotonic on two others. `bank.check.ts` said so —
+          // *"sentence length, clause depth did not rise"* — and it was right
+          // about the yardstick rather than about the bank.
+          //
+          // These six are the recording CLOSEST TO ITS BAND'S MEDIAN PROFILE
+          // on all four measures, normalised. An anchor should be the ordinary
+          // member of its band, and "ordinary" has to mean ordinary in what is
+          // being measured. The band centres rise cleanly on every measure,
+          // which is what the bank is supposed to do and what these now say.
+          //
+          // A1 and A2 sit below `MIN_MEASURABLE_WORDS`: a fifteen-word
+          // exchange cannot define an envelope, so those two rungs are marked
+          // and are deliberately not used as one. That is honest for a bank
+          // whose easiest recordings are six words long.
+          role: 'anchor',
+          audioPath: "tcf-co/tcf-co-58.mp3",
+          variety: 'international',
+          voice: { voiceId: "LFo5X4P9PhYaOLBA9Hyh", voiceIds: ["LFo5X4P9PhYaOLBA9Hyh", "1a3lMdKLUcfcMtvN772u"], vendorName: "Clémence - Advertising + Antoine - Audiobook Narrator", requestedVariety: 'international', modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
+          speakers: 2,
+          level: 'A1',
+          family: 'dialogue',
+          freshness: 'current',
+          script: "— Vous avez ce manteau en noir ?\n— Oui, mais seulement en petite taille.",
+        },
+        {
+          id: "tcf-co-59-r",
+          audioPath: "tcf-co/tcf-co-59.mp3",
+          variety: 'quebecois',
+          voice: { voiceId: "UJCi4DDncuo0VJDSIegj", voiceIds: ["UJCi4DDncuo0VJDSIegj", "1Ko2KP4agGOYHL6KVMtm"], vendorName: "Amélie - Young, Confident and Friendly + Alexandre - Authentic French Canadian", requestedVariety: 'quebecois', modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
+          speakers: 2,
+          level: 'A1',
+          family: 'dialogue',
+          freshness: 'current',
+          script: "— Où est la station de métro ?\n— Tout droit, puis à gauche.",
+        },
+        {
+          id: "tcf-co-60-r",
+          audioPath: "tcf-co/tcf-co-60.mp3",
+          variety: 'international',
+          voice: { voiceId: "LFo5X4P9PhYaOLBA9Hyh", voiceIds: ["LFo5X4P9PhYaOLBA9Hyh"], vendorName: "Clémence - Advertising", requestedVariety: 'international', modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
+          speakers: 1,
+          level: 'A1',
+          family: 'expose',
+          freshness: 'current',
+          script: "Le train pour Ottawa part à huit heures. Il arrive à midi.",
+        },
+        {
+          id: "tcf-co-61-r",
+          audioPath: "tcf-co/tcf-co-61.mp3",
+          variety: 'quebecois',
+          voice: { voiceId: "UJCi4DDncuo0VJDSIegj", voiceIds: ["UJCi4DDncuo0VJDSIegj"], vendorName: "Amélie - Young, Confident and Friendly", requestedVariety: 'quebecois', modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
+          speakers: 1,
+          level: 'A1',
+          family: 'expose',
+          freshness: 'current',
+          script: "Aujourd'hui, il fait froid. Mettez un manteau avant de sortir.",
+        },
+        {
+          id: "tcf-co-62-r",
+          audioPath: "tcf-co/tcf-co-62.mp3",
+          variety: 'international',
+          voice: { voiceId: "LFo5X4P9PhYaOLBA9Hyh", voiceIds: ["LFo5X4P9PhYaOLBA9Hyh"], vendorName: "Clémence - Advertising", requestedVariety: 'international', modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
+          speakers: 1,
+          level: 'A1',
+          family: 'expose',
+          freshness: 'current',
+          script: "La cafétéria est fermée le dimanche. Elle ouvre du lundi au samedi.",
+        },
+        {
+          id: "tcf-co-63-r",
+          audioPath: "tcf-co/tcf-co-63.mp3",
+          variety: 'international',
+          voice: { voiceId: "LFo5X4P9PhYaOLBA9Hyh", voiceIds: ["LFo5X4P9PhYaOLBA9Hyh"], vendorName: "Clémence - Advertising", requestedVariety: 'international', modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
+          speakers: 1,
+          level: 'A1',
+          family: 'expose',
+          freshness: 'current',
+          script: "Le cours commence à neuf heures. La salle est au premier étage.",
+        },
+        {
           id: "tcf-co-05-r",
           audioPath: "tcf-co/tcf-co-05.mp3",
           variety: 'international',
@@ -362,6 +494,29 @@ export const TCF_CANADA: ExamDefinition = {
         },
         {
           id: "tcf-co-08-r",
+          // ANCHOR. One per band, and the set is deliberately small: an
+          // instrument that absorbs what it measures widens by exactly the
+          // amount each item strays.
+          //
+          // ── HOW THESE SIX WERE CHOSEN, AND HOW THE FIRST RULE FAILED ─────
+          // The first attempt took the recording of MEDIAN LENGTH in each
+          // band. Objective, re-runnable, and wrong: length is one of four
+          // measures, and a ladder chosen on one of them came out
+          // non-monotonic on two others. `bank.check.ts` said so —
+          // *"sentence length, clause depth did not rise"* — and it was right
+          // about the yardstick rather than about the bank.
+          //
+          // These six are the recording CLOSEST TO ITS BAND'S MEDIAN PROFILE
+          // on all four measures, normalised. An anchor should be the ordinary
+          // member of its band, and "ordinary" has to mean ordinary in what is
+          // being measured. The band centres rise cleanly on every measure,
+          // which is what the bank is supposed to do and what these now say.
+          //
+          // A1 and A2 sit below `MIN_MEASURABLE_WORDS`: a fifteen-word
+          // exchange cannot define an envelope, so those two rungs are marked
+          // and are deliberately not used as one. That is honest for a bank
+          // whose easiest recordings are six words long.
+          role: 'anchor',
           audioPath: "tcf-co/tcf-co-08.mp3",
           variety: 'quebecois',
           level: "A2",
@@ -455,6 +610,29 @@ export const TCF_CANADA: ExamDefinition = {
         },
         {
           id: "tcf-co-14-r",
+          // ANCHOR. One per band, and the set is deliberately small: an
+          // instrument that absorbs what it measures widens by exactly the
+          // amount each item strays.
+          //
+          // ── HOW THESE SIX WERE CHOSEN, AND HOW THE FIRST RULE FAILED ─────
+          // The first attempt took the recording of MEDIAN LENGTH in each
+          // band. Objective, re-runnable, and wrong: length is one of four
+          // measures, and a ladder chosen on one of them came out
+          // non-monotonic on two others. `bank.check.ts` said so —
+          // *"sentence length, clause depth did not rise"* — and it was right
+          // about the yardstick rather than about the bank.
+          //
+          // These six are the recording CLOSEST TO ITS BAND'S MEDIAN PROFILE
+          // on all four measures, normalised. An anchor should be the ordinary
+          // member of its band, and "ordinary" has to mean ordinary in what is
+          // being measured. The band centres rise cleanly on every measure,
+          // which is what the bank is supposed to do and what these now say.
+          //
+          // A1 and A2 sit below `MIN_MEASURABLE_WORDS`: a fifteen-word
+          // exchange cannot define an envelope, so those two rungs are marked
+          // and are deliberately not used as one. That is honest for a bank
+          // whose easiest recordings are six words long.
+          role: 'anchor',
           audioPath: "tcf-co/tcf-co-14.mp3",
           variety: 'quebecois',
           level: "B1",
@@ -547,6 +725,50 @@ export const TCF_CANADA: ExamDefinition = {
           script: "— J'hésite encore entre les deux logements.\n— Le premier est plus grand et moins cher, mais il est à quarante minutes du centre. Le deuxième est petit, plus cher, et tu descends au travail à pied. À toi de voir ce que tu préfères perdre : du temps ou de l'argent.",
         },
         {
+          id: "tcf-co-40-r",
+          audioPath: "tcf-co/tcf-co-40.mp3",
+          variety: 'international',
+          voice: { voiceId: "LFo5X4P9PhYaOLBA9Hyh", voiceIds: ["LFo5X4P9PhYaOLBA9Hyh"], vendorName: "Clémence - Advertising", requestedVariety: 'international', modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
+          speakers: 1,
+          level: 'B1',
+          family: 'annonce',
+          freshness: 'current',
+          script: "Mesdames et messieurs, le train pour Québec change de quai. Il partira du quai numéro sept, et non du quai trois. Les voyageurs déjà installés sont priés de se déplacer maintenant. L'heure du départ reste celle qui était annoncée.",
+        },
+        {
+          id: "tcf-co-41-r",
+          audioPath: "tcf-co/tcf-co-41.mp3",
+          variety: 'quebecois',
+          voice: { voiceId: "UJCi4DDncuo0VJDSIegj", voiceIds: ["UJCi4DDncuo0VJDSIegj"], vendorName: "Amélie - Young, Confident and Friendly", requestedVariety: 'quebecois', modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
+          speakers: 1,
+          level: 'B1',
+          family: 'annonce',
+          freshness: 'current',
+          script: "Chers clients, notre rayon boulangerie ferme exceptionnellement à seize heures. Un nettoyage complet est prévu pendant toute la soirée. Les autres rayons restent accessibles jusqu'à leur horaire habituel. Le pain déjà présenté reste en vente jusqu'à la fermeture.",
+        },
+        {
+          id: "tcf-co-42-r",
+          audioPath: "tcf-co/tcf-co-42.mp3",
+          variety: 'swiss',
+          voice: { voiceId: "liiuwXIkU9JRzMLLqlt9", voiceIds: ["liiuwXIkU9JRzMLLqlt9"], vendorName: "Nathalie - Tender and Optimistic", requestedVariety: 'swiss', modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
+          speakers: 1,
+          level: 'B1',
+          family: 'annonce',
+          freshness: 'current',
+          script: "Bonjour, vous êtes bien à la mairie de Sainte-Foy. Nos bureaux sont fermés au public le mercredi après-midi. Pour une demande de passeport, prenez rendez-vous en ligne : nous ne recevons plus sans rendez-vous depuis le mois dernier. Pour tout le reste, présentez-vous directement au guichet.",
+        },
+        {
+          id: "tcf-co-43-r",
+          audioPath: "tcf-co/tcf-co-43.mp3",
+          variety: 'international',
+          voice: { voiceId: "LFo5X4P9PhYaOLBA9Hyh", voiceIds: ["LFo5X4P9PhYaOLBA9Hyh"], vendorName: "Clémence - Advertising", requestedVariety: 'international', modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
+          speakers: 1,
+          level: 'B1',
+          family: 'annonce',
+          freshness: 'current',
+          script: "Attention, la piscine municipale sera vidée pour entretien complet. Les cours d'aquagym sont annulés du lundi au vendredi. La salle de sport reste accessible, mais temporairement sans vestiaires. Aucun remboursement : la semaine perdue sera ajoutée à la fin.",
+        },
+        {
           id: "tcf-co-20-r",
           audioPath: "tcf-co/tcf-co-20.mp3",
           variety: 'international',
@@ -581,6 +803,29 @@ export const TCF_CANADA: ExamDefinition = {
         },
         {
           id: "tcf-co-22-r",
+          // ANCHOR. One per band, and the set is deliberately small: an
+          // instrument that absorbs what it measures widens by exactly the
+          // amount each item strays.
+          //
+          // ── HOW THESE SIX WERE CHOSEN, AND HOW THE FIRST RULE FAILED ─────
+          // The first attempt took the recording of MEDIAN LENGTH in each
+          // band. Objective, re-runnable, and wrong: length is one of four
+          // measures, and a ladder chosen on one of them came out
+          // non-monotonic on two others. `bank.check.ts` said so —
+          // *"sentence length, clause depth did not rise"* — and it was right
+          // about the yardstick rather than about the bank.
+          //
+          // These six are the recording CLOSEST TO ITS BAND'S MEDIAN PROFILE
+          // on all four measures, normalised. An anchor should be the ordinary
+          // member of its band, and "ordinary" has to mean ordinary in what is
+          // being measured. The band centres rise cleanly on every measure,
+          // which is what the bank is supposed to do and what these now say.
+          //
+          // A1 and A2 sit below `MIN_MEASURABLE_WORDS`: a fifteen-word
+          // exchange cannot define an envelope, so those two rungs are marked
+          // and are deliberately not used as one. That is honest for a bank
+          // whose easiest recordings are six words long.
+          role: 'anchor',
           audioPath: "tcf-co/tcf-co-22.mp3",
           variety: 'international',
           level: "B2",
@@ -698,6 +943,50 @@ export const TCF_CANADA: ExamDefinition = {
           script: "— Vous nous dites donc que le délai de six semaines ne pose pas de problème.\n— Je dis que ce délai est tenable si les pièces arrivent en une seule livraison. Avec deux livraisons séparées, je ne m'engage sur rien.",
         },
         {
+          id: "tcf-co-44-r",
+          audioPath: "tcf-co/tcf-co-44.mp3",
+          variety: 'international',
+          voice: { voiceId: "LFo5X4P9PhYaOLBA9Hyh", voiceIds: ["LFo5X4P9PhYaOLBA9Hyh"], vendorName: "Clémence - Advertising", requestedVariety: 'international', modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
+          speakers: 1,
+          level: 'B2',
+          family: 'annonce',
+          freshness: 'current',
+          script: "Nous informons notre clientèle que le service de livraison à domicile sera suspendu pendant trois semaines. Il ne s'agit pas d'un arrêt définitif, contrairement à ce que certains ont compris : nous changeons de prestataire, et l'ancien contrat se termine avant que le nouveau ne commence. Les commandes passées d'ici vendredi seront honorées par l'ancien service.",
+        },
+        {
+          id: "tcf-co-45-r",
+          audioPath: "tcf-co/tcf-co-45.mp3",
+          variety: 'quebecois',
+          voice: { voiceId: "UJCi4DDncuo0VJDSIegj", voiceIds: ["UJCi4DDncuo0VJDSIegj"], vendorName: "Amélie - Young, Confident and Friendly", requestedVariety: 'quebecois', modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
+          speakers: 1,
+          level: 'B2',
+          family: 'annonce',
+          freshness: 'current',
+          script: "Nous informons notre clientèle que le bureau de poste de la rue Sainte-Anne fermera définitivement à la fin du mois, parce que le bail arrive à son terme. Les colis déjà arrivés pourront être retirés jusqu'au dernier jour d'ouverture. Ceux qui arriveront ensuite seront transférés au bureau du boulevard Laurier, sans démarche de votre part.",
+        },
+        {
+          id: "tcf-co-46-r",
+          audioPath: "tcf-co/tcf-co-46.mp3",
+          variety: 'swiss',
+          voice: { voiceId: "liiuwXIkU9JRzMLLqlt9", voiceIds: ["liiuwXIkU9JRzMLLqlt9"], vendorName: "Nathalie - Tender and Optimistic", requestedVariety: 'swiss', modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
+          speakers: 1,
+          level: 'B2',
+          family: 'annonce',
+          freshness: 'current',
+          script: "Message aux locataires du bâtiment C : la coupure d'eau prévue jeudi est reportée à mardi prochain, à la même heure. Il ne s'agit pas d'une annulation, car les travaux doivent avoir lieu avant l'hiver et un nouveau report ne serait plus possible. Prévoyez une réserve d'eau pour toute la matinée, puisque le rétablissement peut demander plus de temps que prévu.",
+        },
+        {
+          id: "tcf-co-47-r",
+          audioPath: "tcf-co/tcf-co-47.mp3",
+          variety: 'international',
+          voice: { voiceId: "LFo5X4P9PhYaOLBA9Hyh", voiceIds: ["LFo5X4P9PhYaOLBA9Hyh"], vendorName: "Clémence - Advertising", requestedVariety: 'international', modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
+          speakers: 1,
+          level: 'B2',
+          family: 'annonce',
+          freshness: 'current',
+          script: "Chers voyageurs, le vol à destination de Montréal est retardé d'environ deux heures. Nous ne connaissons pas encore l'heure exacte du départ, et nous préférons le dire plutôt que d'annoncer un horaire que nous devrions corriger ensuite. Restez dans la zone d'embarquement : l'appel se fera sans préavis.",
+        },
+        {
           id: "tcf-co-30-r",
           audioPath: "tcf-co/tcf-co-30.mp3",
           variety: 'international',
@@ -788,6 +1077,73 @@ export const TCF_CANADA: ExamDefinition = {
           script: "Le rapport annuel se félicite d'une baisse des plaintes de dix-huit pour cent. On aimerait sincèrement partager cet enthousiasme. Encore faudrait-il savoir si les usagers se plaignent moins parce que le service s'est amélioré, ou parce que le formulaire de plainte a changé d'adresse trois fois en un an.",
         },
         {
+          id: "tcf-co-48-r",
+          // ANCHOR. One per band, and the set is deliberately small: an
+          // instrument that absorbs what it measures widens by exactly the
+          // amount each item strays.
+          //
+          // ── HOW THESE SIX WERE CHOSEN, AND HOW THE FIRST RULE FAILED ─────
+          // The first attempt took the recording of MEDIAN LENGTH in each
+          // band. Objective, re-runnable, and wrong: length is one of four
+          // measures, and a ladder chosen on one of them came out
+          // non-monotonic on two others. `bank.check.ts` said so —
+          // *"sentence length, clause depth did not rise"* — and it was right
+          // about the yardstick rather than about the bank.
+          //
+          // These six are the recording CLOSEST TO ITS BAND'S MEDIAN PROFILE
+          // on all four measures, normalised. An anchor should be the ordinary
+          // member of its band, and "ordinary" has to mean ordinary in what is
+          // being measured. The band centres rise cleanly on every measure,
+          // which is what the bank is supposed to do and what these now say.
+          //
+          // A1 and A2 sit below `MIN_MEASURABLE_WORDS`: a fifteen-word
+          // exchange cannot define an envelope, so those two rungs are marked
+          // and are deliberately not used as one. That is honest for a bank
+          // whose easiest recordings are six words long.
+          role: 'anchor',
+          audioPath: "tcf-co/tcf-co-48.mp3",
+          variety: 'international',
+          voice: { voiceId: "LFo5X4P9PhYaOLBA9Hyh", voiceIds: ["LFo5X4P9PhYaOLBA9Hyh"], vendorName: "Clémence - Advertising", requestedVariety: 'international', modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
+          speakers: 1,
+          level: 'C1',
+          family: 'annonce',
+          freshness: 'current',
+          script: "Avis aux usagers de la ligne douze. Le service de nuit, qui devait être supprimé au printemps, sera finalement maintenu jusqu'en décembre, puisque la fréquentation observée cet hiver a dépassé les prévisions de la société. Cette prolongation ne préjuge cependant en rien de la décision finale, qui sera prise après une étude complète des coûts. Les horaires affichés en station restent valables.",
+        },
+        {
+          id: "tcf-co-49-r",
+          audioPath: "tcf-co/tcf-co-49.mp3",
+          variety: 'quebecois',
+          voice: { voiceId: "UJCi4DDncuo0VJDSIegj", voiceIds: ["UJCi4DDncuo0VJDSIegj"], vendorName: "Amélie - Young, Confident and Friendly", requestedVariety: 'quebecois', modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
+          speakers: 1,
+          level: 'C1',
+          family: 'annonce',
+          freshness: 'current',
+          script: "Nous rappelons aux visiteurs que la photographie est permise dans toutes les salles, à une exception près. L'aile des estampes, où la lumière est volontairement réduite, ne s'y prête pas. Il ne s'agit pas des droits, contrairement à ce que l'on croit souvent, mais de la conservation. La lumière des appareils abîme les encres anciennes, lentement, et de façon définitive.",
+        },
+        {
+          id: "tcf-co-50-r",
+          audioPath: "tcf-co/tcf-co-50.mp3",
+          variety: 'international',
+          voice: { voiceId: "LFo5X4P9PhYaOLBA9Hyh", voiceIds: ["LFo5X4P9PhYaOLBA9Hyh"], vendorName: "Clémence - Advertising", requestedVariety: 'international', modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
+          speakers: 1,
+          level: 'C1',
+          family: 'annonce',
+          freshness: 'current',
+          script: "Information destinée aux nouveaux inscrits, quelle que soit leur filière. Le paiement de la bourse arrive le quinze de chaque mois, sans exception. Le premier versement suit pourtant l'inscription de six semaines, le temps que le dossier soit vérifié. Ne comptez donc pas dessus pour le loyer, ni pour le dépôt de garantie.",
+        },
+        {
+          id: "tcf-co-51-r",
+          audioPath: "tcf-co/tcf-co-51.mp3",
+          variety: 'international',
+          voice: { voiceId: "LFo5X4P9PhYaOLBA9Hyh", voiceIds: ["LFo5X4P9PhYaOLBA9Hyh"], vendorName: "Clémence - Advertising", requestedVariety: 'international', modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
+          speakers: 1,
+          level: 'C1',
+          family: 'annonce',
+          freshness: 'current',
+          script: "Chers abonnés, la salle de lecture ouvrira désormais à sept heures, et non plus à neuf. Cette ouverture avancée répond à une demande ancienne, faite depuis plusieurs années. Aucun agent de plus n'accompagne pourtant ce changement, ce qui limite ce qui est possible. Les prêts et les renseignements commenceront donc à neuf heures, comme auparavant.",
+        },
+        {
           id: "tcf-co-36-r",
           audioPath: "tcf-co/tcf-co-36.mp3",
           variety: 'international',
@@ -844,6 +1200,117 @@ export const TCF_CANADA: ExamDefinition = {
           speakers: 1,
           voice: { voiceId: "UJCi4DDncuo0VJDSIegj", voiceIds: ["UJCi4DDncuo0VJDSIegj"], vendorName: "Amélie - Young, Confident and Friendly", requestedVariety: 'quebecois', modelId: "eleven_flash_v2_5", renderedAt: "2026-08-30" },
           script: "On célèbre le retour de l'usine comme on célébrerait un fils prodigue. Trois cents emplois, annonce le communiqué ; deux cents, précise la note en bas de page, pour la première année. J'ajoute, sans malice, que la même municipalité expliquait il y a huit ans que l'avenir de la région ne passait plus par l'industrie. Je ne lui reproche pas d'avoir changé d'avis. Je lui reproche de n'avoir jamais changé de ton.",
+        },
+        {
+          id: "tcf-co-52-r",
+          audioPath: "tcf-co/tcf-co-52.mp3",
+          variety: 'international',
+          voice: { voiceId: "LFo5X4P9PhYaOLBA9Hyh", voiceIds: ["LFo5X4P9PhYaOLBA9Hyh"], vendorName: "Clémence - Advertising", requestedVariety: 'international', modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
+          speakers: 1,
+          level: 'C2',
+          family: 'annonce',
+          freshness: 'current',
+          script: "Un mot sur la réforme du stationnement, dont l'application était annoncée pour janvier. Le conseil a choisi de la reporter d'un an, non pas qu'il en conteste le principe, mais parce que les habitants des quartiers concernés n'ont pas été consultés dans les formes. Le report portera donc sur la procédure et non sur le fond, et il serait imprudent d'en déduire que le projet est enterré : les tarifs annoncés restent ceux qui s'appliqueront.",
+        },
+        {
+          id: "tcf-co-53-r",
+          audioPath: "tcf-co/tcf-co-53.mp3",
+          variety: 'quebecois',
+          voice: { voiceId: "UJCi4DDncuo0VJDSIegj", voiceIds: ["UJCi4DDncuo0VJDSIegj"], vendorName: "Amélie - Young, Confident and Friendly", requestedVariety: 'quebecois', modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
+          speakers: 1,
+          level: 'C2',
+          family: 'annonce',
+          freshness: 'current',
+          script: "Avis aux copropriétaires : le ravalement de la façade sud, voté l'an dernier, commencera effectivement au mois d'avril. Le devis retenu n'est pas le moins cher, et le conseil syndical tient à justifier publiquement ce choix, puisque la question a été soulevée en assemblée générale. L'entreprise la moins-disante refusait tout engagement sur les délais, alors que les échafaudages condamneront les balcons pendant toute la durée du chantier. Le surcoût, rapporté aux semaines d'immobilisation évitées, est apparu raisonnable, et l'assemblée l'a approuvé unanimement.",
+        },
+        {
+          id: "tcf-co-54-r",
+          audioPath: "tcf-co/tcf-co-54.mp3",
+          variety: 'swiss',
+          voice: { voiceId: "liiuwXIkU9JRzMLLqlt9", voiceIds: ["liiuwXIkU9JRzMLLqlt9"], vendorName: "Nathalie - Tender and Optimistic", requestedVariety: 'swiss', modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
+          speakers: 1,
+          level: 'C2',
+          family: 'annonce',
+          freshness: 'current',
+          script: "Nous devons revenir sur l'information diffusée hier concernant la fermeture de l'accueil du soir, qui a été mal comprise. Elle était exacte quant au principe, mais fausse quant à la date, puisque la fermeture prendra effet en septembre et non ce mois-ci. Ce délai supplémentaire laisse le temps d'orienter les familles concernées, quartier par quartier, vers les autres structures du secteur. Nous regrettons cette confusion, d'autant qu'elle a conduit certaines personnes, par précaution, à renoncer à un service encore ouvert.",
+        },
+        {
+          id: "tcf-co-55-r",
+          audioPath: "tcf-co/tcf-co-55.mp3",
+          variety: 'international',
+          voice: { voiceId: "LFo5X4P9PhYaOLBA9Hyh", voiceIds: ["LFo5X4P9PhYaOLBA9Hyh"], vendorName: "Clémence - Advertising", requestedVariety: 'international', modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
+          speakers: 1,
+          level: 'C2',
+          family: 'annonce',
+          freshness: 'current',
+          script: "Message aux personnes inscrites sur la liste d'attente du logement social, dont le fonctionnement est souvent mal compris. Le rang que vous consultez en ligne n'est pas, à proprement parler, un classement, et l'interpréter ainsi conduit régulièrement à des déceptions. Il indique une position dans un ensemble, alors que les attributions tiennent compte, en plus, de la composition du ménage et de la taille du logement libéré. Un rang qui recule n'est donc pas nécessairement un mauvais signe, contrairement à ce que beaucoup en concluent hâtivement.",
+        },
+        {
+          id: "tcf-co-64-r",
+          audioPath: "tcf-co/tcf-co-64.mp3",
+          variety: 'quebecois',
+          voice: { voiceId: "UJCi4DDncuo0VJDSIegj", voiceIds: ["UJCi4DDncuo0VJDSIegj", "1Ko2KP4agGOYHL6KVMtm"], vendorName: "Amélie - Young, Confident and Friendly + Alexandre - Authentic French Canadian", requestedVariety: 'quebecois', modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
+          speakers: 2,
+          level: 'C2',
+          family: 'dialogue',
+          freshness: 'current',
+          script: "— Je comprends votre position, mais le rapport que vous invoquez portait sur l'année précédente, alors que la situation du service a changé depuis, et considérablement.\n— C'est justement pour cette raison que je le cite, puisqu'il montre à quel point la dégradation était prévisible, et personne, à l'époque, n'a voulu l'entendre.\n— Prévisible ne veut pas dire inévitable, et présenter les choses ainsi revient à excuser l'inaction plutôt qu'à l'expliquer.",
+        },
+        {
+          id: "tcf-co-65-r",
+          // ANCHOR. One per band, and the set is deliberately small: an
+          // instrument that absorbs what it measures widens by exactly the
+          // amount each item strays.
+          //
+          // ── HOW THESE SIX WERE CHOSEN, AND HOW THE FIRST RULE FAILED ─────
+          // The first attempt took the recording of MEDIAN LENGTH in each
+          // band. Objective, re-runnable, and wrong: length is one of four
+          // measures, and a ladder chosen on one of them came out
+          // non-monotonic on two others. `bank.check.ts` said so —
+          // *"sentence length, clause depth did not rise"* — and it was right
+          // about the yardstick rather than about the bank.
+          //
+          // These six are the recording CLOSEST TO ITS BAND'S MEDIAN PROFILE
+          // on all four measures, normalised. An anchor should be the ordinary
+          // member of its band, and "ordinary" has to mean ordinary in what is
+          // being measured. The band centres rise cleanly on every measure,
+          // which is what the bank is supposed to do and what these now say.
+          //
+          // A1 and A2 sit below `MIN_MEASURABLE_WORDS`: a fifteen-word
+          // exchange cannot define an envelope, so those two rungs are marked
+          // and are deliberately not used as one. That is honest for a bank
+          // whose easiest recordings are six words long.
+          role: 'anchor',
+          audioPath: "tcf-co/tcf-co-65.mp3",
+          variety: 'international',
+          voice: { voiceId: "LFo5X4P9PhYaOLBA9Hyh", voiceIds: ["LFo5X4P9PhYaOLBA9Hyh", "1a3lMdKLUcfcMtvN772u"], vendorName: "Clémence - Advertising + Antoine - Audiobook Narrator", requestedVariety: 'international', modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
+          speakers: 2,
+          level: 'C2',
+          family: 'dialogue',
+          freshness: 'current',
+          script: "— Vous proposez de réduire les délais, mais ce que vous appelez un délai recouvre en réalité deux choses distinctes, et les confondre nous a déjà coûté cher.\n— Je veux bien les distinguer, à condition que l'on ne s'en serve pas ensuite pour justifier l'absence de toute décision, comme la dernière fois.\n— La distinction n'est pas une manœuvre, néanmoins je reconnais qu'elle a servi de prétexte, et c'est précisément ce que je voudrais éviter cette fois.",
+        },
+        {
+          id: "tcf-co-66-r",
+          audioPath: "tcf-co/tcf-co-66.mp3",
+          variety: 'international',
+          voice: { voiceId: "LFo5X4P9PhYaOLBA9Hyh", voiceIds: ["LFo5X4P9PhYaOLBA9Hyh", "1a3lMdKLUcfcMtvN772u"], vendorName: "Clémence - Advertising + Antoine - Audiobook Narrator", requestedVariety: 'international', modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
+          speakers: 2,
+          level: 'C2',
+          family: 'dialogue',
+          freshness: 'current',
+          script: "— Le comité a tranché en faveur du site nord, ce qui me surprend, car les objections soulevées en séance portaient sur des points que personne n'a réellement traités.\n— Elles ont été traitées, mais brièvement, et j'admets que la forme a pu donner le sentiment d'un examen expédié.\n— Ce n'est pas une question de forme : une objection à laquelle on répond en trois minutes n'a pas été examinée, elle a été écartée.",
+        },
+        {
+          id: "tcf-co-67-r",
+          audioPath: "tcf-co/tcf-co-67.mp3",
+          variety: 'quebecois',
+          voice: { voiceId: "UJCi4DDncuo0VJDSIegj", voiceIds: ["UJCi4DDncuo0VJDSIegj", "1Ko2KP4agGOYHL6KVMtm"], vendorName: "Amélie - Young, Confident and Friendly + Alexandre - Authentic French Canadian", requestedVariety: 'quebecois', modelId: "eleven_flash_v2_5", renderedAt: "2026-08-31" },
+          speakers: 2,
+          level: 'C2',
+          family: 'dialogue',
+          freshness: 'current',
+          script: "— Vous parlez d'un succès, néanmoins les chiffres que vous citez comparent une année complète à un semestre, ce qui rend la progression flatteuse sans qu'elle soit réelle.\n— La comparaison figure telle quelle dans le document officiel, et je ne fais que la reprendre, sans intention de tromper qui que ce soit.\n— Je vous crois volontiers, cependant reprendre une comparaison fausse ne la rend pas juste, et le document devra être corrigé avant d'être diffusé.",
         },
       ],
       items: [
@@ -1206,6 +1673,258 @@ export const TCF_CANADA: ExamDefinition = {
           answer: 3,
           rationale: "Tests a final reproach placed in the contrast between changer d'avis and changer de ton; the job figures are reported without accusing anyone of lying, and the speaker takes no side on industrial policy.",
         },
+        {
+          id: "tcf-co-40-q1",
+          recordingId: "tcf-co-40-r",
+          level: "B1",
+          stem: "Qu'est-ce qui change pour les voyageurs ?",
+          rationale: "L'annonce dit que le train partira du quai sept et non du quai trois, et précise ensuite que le départ reste à l'heure prévue.",
+          options: ["Le quai de départ","L'heure du départ","La destination du train","Le numéro du train"],
+          answer: 0,
+        },
+        {
+          id: "tcf-co-41-q1",
+          recordingId: "tcf-co-41-r",
+          level: "B1",
+          stem: "Que se passe-t-il à seize heures ?",
+          rationale: "Seule la boulangerie ferme à seize heures ; les autres rayons restent ouverts jusqu'à vingt et une heures et le pain reste en vente.",
+          options: ["Un seul rayon ferme","Tout le magasin ferme","Le pain est retiré de la vente","Le nettoyage du magasin commence"],
+          answer: 1,
+        },
+        {
+          id: "tcf-co-42-q1",
+          recordingId: "tcf-co-42-r",
+          level: "B1",
+          stem: "Comment obtenir un passeport ?",
+          rationale: "Le message dit qu'il faut prendre rendez-vous en ligne pour un passeport et que la mairie ne reçoit plus sans rendez-vous.",
+          options: ["Uniquement sur rendez-vous","En venant le mercredi après-midi","En se présentant au guichet","En téléphonant à la mairie"],
+          answer: 2,
+        },
+        {
+          id: "tcf-co-43-q1",
+          recordingId: "tcf-co-43-r",
+          level: "B1",
+          stem: "Que reçoivent les abonnés pour la semaine perdue ?",
+          rationale: "L'annonce exclut le remboursement et précise que la semaine manquée sera ajoutée à la fin de l'abonnement.",
+          options: ["Une semaine supplémentaire","Un remboursement","Un cours de rattrapage","Rien du tout"],
+          answer: 3,
+        },
+        {
+          id: "tcf-co-44-q1",
+          recordingId: "tcf-co-44-r",
+          level: "B2",
+          stem: "Pourquoi le service est-il interrompu ?",
+          rationale: "Le message écarte explicitement l'arrêt définitif et donne la raison : l'ancien contrat se termine avant le début du nouveau prestataire.",
+          options: ["Un changement de prestataire","Une baisse de la demande","Un manque de personnel","Une décision définitive de la direction"],
+          answer: 0,
+        },
+        {
+          id: "tcf-co-45-q1",
+          recordingId: "tcf-co-45-r",
+          level: "B2",
+          stem: "Que deviennent les colis qui arriveront après la fermeture ?",
+          rationale: "L'annonce dit que les colis arrivés ensuite seront transférés au bureau du boulevard Laurier, sans démarche du destinataire.",
+          options: ["Ils iront à un autre bureau","Ils seront retournés à l'expéditeur","Ils seront gardés rue Sainte-Anne","Ils seront livrés à domicile"],
+          answer: 1,
+        },
+        {
+          id: "tcf-co-46-q1",
+          recordingId: "tcf-co-46-r",
+          level: "B2",
+          stem: "Que faut-il comprendre de ce message ?",
+          rationale: "Le message dit que la coupure est reportée à mardi et insiste sur le fait qu'il ne s'agit pas d'une annulation.",
+          options: ["La coupure aura lieu plus tard","La coupure est annulée","La coupure dure toute la journée","La coupure concerne tout l'immeuble"],
+          answer: 2,
+        },
+        {
+          id: "tcf-co-47-q1",
+          recordingId: "tcf-co-47-r",
+          level: "B2",
+          stem: "Pourquoi l'heure de départ n'est-elle pas donnée ?",
+          rationale: "L'annonce explique que l'heure exacte n'est pas connue et qu'elle préfère ne rien annoncer plutôt que de devoir se corriger.",
+          options: ["Elle n'est pas encore connue","Elle change toutes les heures","Elle dépend des voyageurs présents","Elle a déjà été annoncée deux fois"],
+          answer: 3,
+        },
+        {
+          id: "tcf-co-48-q1",
+          recordingId: "tcf-co-48-r",
+          level: "C1",
+          stem: "Que dit l'annonce de la suppression du service de nuit ?",
+          rationale: "Le service est maintenu jusqu'en décembre, mais l'annonce précise que cette prolongation ne préjuge en rien de la décision finale, qui reste à prendre.",
+          options: ["Elle est repoussée, sans être écartée","Elle est définitivement abandonnée","Elle est avancée au printemps","Elle dépend des horaires affichés"],
+          answer: 0,
+        },
+        {
+          id: "tcf-co-49-q1",
+          recordingId: "tcf-co-49-r",
+          level: "C1",
+          stem: "Pourquoi la photographie est-elle interdite dans cette aile ?",
+          rationale: "L'annonce écarte explicitement la question des droits et donne la raison : la lumière des appareils abîme les encres anciennes de manière irréversible.",
+          options: ["Pour protéger les œuvres","Pour des raisons de droits d'auteur","Parce que la salle est trop sombre","Parce que les visiteurs y sont trop nombreux"],
+          answer: 1,
+        },
+        {
+          id: "tcf-co-50-q1",
+          recordingId: "tcf-co-50-r",
+          level: "C1",
+          stem: "Pourquoi faut-il se méfier du premier versement ?",
+          rationale: "Le premier versement suit l'inscription d'environ six semaines, le temps de la vérification, d'où le conseil de ne pas compter dessus pour le premier loyer.",
+          options: ["Il arrive environ six semaines plus tard","Il est d'un montant plus faible","Il n'est pas confirmé par écrit","Il dépend du montant du loyer"],
+          answer: 2,
+        },
+        {
+          id: "tcf-co-51-q1",
+          recordingId: "tcf-co-51-r",
+          level: "C1",
+          stem: "Qu'est-ce qui ne change pas à sept heures ?",
+          rationale: "La salle ouvre plus tôt, mais l'annonce précise que les prêts et les renseignements ne commencent qu'à neuf heures, faute de personnel supplémentaire.",
+          options: ["L'accès aux services de prêt","L'ouverture de la salle","L'accès aux places assises","L'entrée des abonnés"],
+          answer: 3,
+        },
+        {
+          id: "tcf-co-52-q1",
+          recordingId: "tcf-co-52-r",
+          level: "C2",
+          stem: "Quelle conclusion l'annonce écarte-t-elle explicitement ?",
+          rationale: "L'annonce dit qu'il serait imprudent de déduire que le projet est enterré, et ajoute que les tarifs annoncés restent ceux qui s'appliqueront.",
+          options: ["Que le projet est abandonné","Que les tarifs vont augmenter","Que la consultation a eu lieu","Que le conseil est divisé"],
+          answer: 0,
+        },
+        {
+          id: "tcf-co-53-q1",
+          recordingId: "tcf-co-53-r",
+          level: "C2",
+          stem: "Pourquoi l'offre la moins chère a-t-elle été écartée ?",
+          rationale: "L'entreprise la moins-disante refusait de s'engager sur un délai, ce qui compte parce que les échafaudages condamnent les balcons pendant tout le chantier.",
+          options: ["Elle ne garantissait aucun délai","Elle excluait les balcons du chantier","Elle ne prévoyait pas d'échafaudages","Elle avait été déposée trop tard"],
+          answer: 1,
+        },
+        {
+          id: "tcf-co-54-q1",
+          recordingId: "tcf-co-54-r",
+          level: "C2",
+          stem: "Qu'est-ce qui était faux dans l'information d'hier ?",
+          rationale: "L'annonce distingue les deux : l'information était exacte quant au principe et fausse quant à la date, la fermeture prenant effet en septembre.",
+          options: ["La date de la fermeture","Le fait même de la fermeture","Le nom du service concerné","Le nombre de familles touchées"],
+          answer: 2,
+        },
+        {
+          id: "tcf-co-55-q1",
+          recordingId: "tcf-co-55-r",
+          level: "C2",
+          stem: "Que faut-il comprendre du rang affiché en ligne ?",
+          rationale: "Le rang indique une position dans un ensemble, mais les attributions dépendent aussi de la composition du ménage et de la taille du logement libéré.",
+          options: ["Il ne détermine pas à lui seul l'attribution","Il est mis à jour une fois par an","Il ne concerne que les grands logements","Il est calculé par le demandeur lui-même"],
+          answer: 3,
+        },
+        {
+          id: "tcf-co-56-q1",
+          recordingId: "tcf-co-56-r",
+          level: "A1",
+          stem: "Que demande l'employé ?",
+          rationale: "Le client a déjà dit combien de billets et pour quelle ville ; l'employé demande seulement si c'est pour aujourd'hui ou pour demain.",
+          options: ["Le jour du voyage","Le nombre de billets","Le prix des billets","La ville de départ"],
+          answer: 0,
+        },
+        {
+          id: "tcf-co-57-q1",
+          recordingId: "tcf-co-57-r",
+          level: "A1",
+          stem: "Quand le musée ouvre-t-il ?",
+          rationale: "La réponse donne l'heure, dix heures, et la fréquence, tous les jours.",
+          options: ["À dix heures chaque jour","À dix heures le samedi","Tous les jours sauf lundi","À neuf heures chaque jour"],
+          answer: 1,
+        },
+        {
+          id: "tcf-co-58-q1",
+          recordingId: "tcf-co-58-r",
+          level: "A1",
+          stem: "Quel est le problème ?",
+          rationale: "Le vendeur dit oui pour le noir, mais précise qu'il ne reste que la petite taille.",
+          options: ["Une seule taille reste","La couleur noire manque","Le manteau est trop cher","Le magasin va fermer"],
+          answer: 2,
+        },
+        {
+          id: "tcf-co-59-q1",
+          recordingId: "tcf-co-59-r",
+          level: "A1",
+          stem: "Que fait la personne ?",
+          rationale: "La deuxième voix répond en donnant la direction : tout droit, puis à gauche.",
+          options: ["Elle indique le chemin","Elle demande le chemin","Elle refuse de répondre","Elle propose un taxi"],
+          answer: 3,
+        },
+        {
+          id: "tcf-co-60-q1",
+          recordingId: "tcf-co-60-r",
+          level: "A1",
+          stem: "Le train arrive à quelle heure ?",
+          rationale: "Le message donne l'heure du départ, huit heures, et celle de l'arrivée, midi.",
+          options: ["À midi","À huit heures","À dix heures","À quatre heures"],
+          answer: 0,
+        },
+        {
+          id: "tcf-co-61-q1",
+          recordingId: "tcf-co-61-r",
+          level: "A1",
+          stem: "Que conseille le message ?",
+          rationale: "Après avoir dit qu'il fait froid, le message conseille de mettre un manteau avant de sortir.",
+          options: ["De porter un manteau","De rester à la maison","De prendre un parapluie","De sortir plus tard"],
+          answer: 1,
+        },
+        {
+          id: "tcf-co-62-q1",
+          recordingId: "tcf-co-62-r",
+          level: "A1",
+          stem: "Quand la cafétéria est-elle fermée ?",
+          rationale: "Le message dit que la cafétéria est fermée le dimanche et ouverte du lundi au samedi.",
+          options: ["Le dimanche","Le samedi","Le lundi","Tous les soirs"],
+          answer: 2,
+        },
+        {
+          id: "tcf-co-63-q1",
+          recordingId: "tcf-co-63-r",
+          level: "A1",
+          stem: "Où a lieu le cours ?",
+          rationale: "Le message donne l'heure, neuf heures, puis le lieu : la salle est au premier étage.",
+          options: ["Au premier étage","Au rez-de-chaussée","Au deuxième étage","Dans la salle neuf"],
+          answer: 3,
+        },
+        {
+          id: "tcf-co-64-q1",
+          recordingId: "tcf-co-64-r",
+          level: "C2",
+          stem: "Sur quoi porte le désaccord ?",
+          rationale: "Le premier reproche au rapport d'être dépassé, le second l'invoque pour montrer que la dégradation était prévisible : le désaccord porte sur ce que le rapport prouve, non sur son contenu.",
+          options: ["Sur la portée du rapport cité","Sur la date de publication du rapport","Sur les chiffres contenus dans le rapport","Sur l'auteur du rapport"],
+          answer: 0,
+        },
+        {
+          id: "tcf-co-65-q1",
+          recordingId: "tcf-co-65-r",
+          level: "C2",
+          stem: "Que craint la deuxième voix ?",
+          rationale: "Elle accepte la distinction à condition qu'on ne s'en serve pas pour justifier l'absence de décision, comme la fois précédente.",
+          options: ["Que la distinction serve à ne rien décider","Que les délais soient encore allongés","Que la décision soit prise sans elle","Que le coût augmente de nouveau"],
+          answer: 1,
+        },
+        {
+          id: "tcf-co-66-q1",
+          recordingId: "tcf-co-66-r",
+          level: "C2",
+          stem: "Que reproche la première voix au comité ?",
+          rationale: "Elle refuse l'excuse de la forme : selon elle, une objection traitée en trois minutes a été écartée et non examinée.",
+          options: ["D'avoir écarté les objections plutôt que de les traiter","D'avoir choisi le mauvais site","D'avoir siégé trop longtemps","D'avoir refusé d'entendre les opposants"],
+          answer: 2,
+        },
+        {
+          id: "tcf-co-67-q1",
+          recordingId: "tcf-co-67-r",
+          level: "C2",
+          stem: "Quel est le défaut des chiffres cités ?",
+          rationale: "La première voix reproche la comparaison d'une année complète avec un semestre, ce qui rend la progression flatteuse sans être réelle.",
+          options: ["Ils comparent des périodes de longueur différente","Ils proviennent d'un document non officiel","Ils ont été inventés par la deuxième voix","Ils ne portent pas sur le bon service"],
+          answer: 3,
+        },
       ],
     },
     {
@@ -1238,8 +1957,8 @@ export const TCF_CANADA: ExamDefinition = {
       // The band profile of the original 39, kept as the épreuve's shape.
       serve: { count: 39, byBand: { A1: 4, A2: 6, B1: 9, B2: 10, C1: 6, C2: 4 } },
       provenance: {
-        en: 'Every item in this section was written for this product, to the published format — 39 questions, ordered by progressive difficulty — and no real exam question is reproduced. The A1-to-C2 banding is ours: the exam publishes that difficulty rises across the section and does not publish which item sits at which level. Recordings use several French varieties — mostly international French, with Quebec and West African voices among them.',
-        fr: "Tous les items de cette épreuve ont été rédigés pour ce produit, selon le format publié — 39 questions, à difficulté progressive — sans reproduire aucune question réelle d'examen. Le classement A1 à C2 est le nôtre : l'examen indique que la difficulté augmente, sans publier le niveau de chaque item. Les enregistrements emploient plusieurs variétés de français — surtout du français international, avec des voix québécoises et ouest-africaines.",
+        en: 'Every item in this section was written for this product, to the published format — 39 questions, ordered by progressive difficulty — and no real exam question is reproduced. The A1-to-C2 banding is ours: the exam publishes that difficulty rises across the section and does not publish which item sits at which level. Recordings use three French varieties — Parisian French as the majority, with Québécois and Swiss voices among them, applied inside each band rather than by level.',
+        fr: "Tous les items de cette épreuve ont été rédigés pour ce produit, selon le format publié — 39 questions, à difficulté progressive — sans reproduire aucune question réelle d'examen. Le classement A1 à C2 est le nôtre : l'examen indique que la difficulté augmente, sans publier le niveau de chaque item. Les enregistrements emploient trois variétés de français — surtout du français parisien, avec des voix québécoises et suisses, réparties à l'intérieur de chaque niveau et non par ordre de difficulté.",
       },
       families: [
         {

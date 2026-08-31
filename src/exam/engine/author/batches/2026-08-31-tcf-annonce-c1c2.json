@@ -1,0 +1,170 @@
+[
+ {
+  "id": "tcf-co-48-r",
+  "level": "C1",
+  "family": "annonce",
+  "speakers": 1,
+  "freshness": "current",
+  "script": "Avis aux usagers de la ligne douze. Le service de nuit, qui devait être supprimé au printemps, sera finalement maintenu jusqu'en décembre, puisque la fréquentation observée cet hiver a dépassé les prévisions de la société. Cette prolongation ne préjuge cependant en rien de la décision finale, qui sera prise après une étude complète des coûts. Les horaires affichés en station restent valables.",
+  "items": [
+   {
+    "stem": "Que dit l'annonce de la suppression du service de nuit ?",
+    "options": [
+     "Elle est repoussée, sans être écartée",
+     "Elle est définitivement abandonnée",
+     "Elle est avancée au printemps",
+     "Elle dépend des horaires affichés"
+    ],
+    "answer": 0,
+    "rationale": "Le service est maintenu jusqu'en décembre, mais l'annonce précise que cette prolongation ne préjuge en rien de la décision finale, qui reste à prendre."
+   }
+  ]
+ },
+ {
+  "id": "tcf-co-49-r",
+  "level": "C1",
+  "family": "annonce",
+  "speakers": 1,
+  "freshness": "current",
+  "script": "Nous rappelons aux visiteurs que la photographie est permise dans toutes les salles, à une exception près. L'aile des estampes, où la lumière est volontairement réduite, ne s'y prête pas. Il ne s'agit pas des droits, contrairement à ce que l'on croit souvent, mais de la conservation. La lumière des appareils abîme les encres anciennes, lentement, et de façon définitive.",
+  "items": [
+   {
+    "stem": "Pourquoi la photographie est-elle interdite dans cette aile ?",
+    "options": [
+     "Pour protéger les œuvres",
+     "Pour des raisons de droits d'auteur",
+     "Parce que la salle est trop sombre",
+     "Parce que les visiteurs y sont trop nombreux"
+    ],
+    "answer": 0,
+    "rationale": "L'annonce écarte explicitement la question des droits et donne la raison : la lumière des appareils abîme les encres anciennes de manière irréversible."
+   }
+  ]
+ },
+ {
+  "id": "tcf-co-50-r",
+  "level": "C1",
+  "family": "annonce",
+  "speakers": 1,
+  "freshness": "current",
+  "script": "Information destinée aux nouveaux inscrits, quelle que soit leur filière. Le paiement de la bourse arrive le quinze de chaque mois, sans exception. Le premier versement suit pourtant l'inscription de six semaines, le temps que le dossier soit vérifié. Ne comptez donc pas dessus pour le loyer, ni pour le dépôt de garantie.",
+  "items": [
+   {
+    "stem": "Pourquoi faut-il se méfier du premier versement ?",
+    "options": [
+     "Il arrive environ six semaines plus tard",
+     "Il est d'un montant plus faible",
+     "Il n'est pas confirmé par écrit",
+     "Il dépend du montant du loyer"
+    ],
+    "answer": 0,
+    "rationale": "Le premier versement suit l'inscription d'environ six semaines, le temps de la vérification, d'où le conseil de ne pas compter dessus pour le premier loyer."
+   }
+  ]
+ },
+ {
+  "id": "tcf-co-51-r",
+  "level": "C1",
+  "family": "annonce",
+  "speakers": 1,
+  "freshness": "current",
+  "script": "Chers abonnés, la salle de lecture ouvrira désormais à sept heures, et non plus à neuf. Cette ouverture avancée répond à une demande ancienne, faite depuis plusieurs années. Aucun agent de plus n'accompagne pourtant ce changement, ce qui limite ce qui est possible. Les prêts et les renseignements commenceront donc à neuf heures, comme auparavant.",
+  "items": [
+   {
+    "stem": "Qu'est-ce qui ne change pas à sept heures ?",
+    "options": [
+     "L'accès aux services de prêt",
+     "L'ouverture de la salle",
+     "L'accès aux places assises",
+     "L'entrée des abonnés"
+    ],
+    "answer": 0,
+    "rationale": "La salle ouvre plus tôt, mais l'annonce précise que les prêts et les renseignements ne commencent qu'à neuf heures, faute de personnel supplémentaire."
+   }
+  ]
+ },
+ {
+  "id": "tcf-co-52-r",
+  "level": "C2",
+  "family": "annonce",
+  "speakers": 1,
+  "freshness": "current",
+  "script": "Un mot sur la réforme du stationnement, dont l'application était annoncée pour janvier. Le conseil a choisi de la reporter d'un an, non pas qu'il en conteste le principe, mais parce que les habitants des quartiers concernés n'ont pas été consultés dans les formes. Le report portera donc sur la procédure et non sur le fond, et il serait imprudent d'en déduire que le projet est enterré : les tarifs annoncés restent ceux qui s'appliqueront.",
+  "items": [
+   {
+    "stem": "Quelle conclusion l'annonce écarte-t-elle explicitement ?",
+    "options": [
+     "Que le projet est abandonné",
+     "Que les tarifs vont augmenter",
+     "Que la consultation a eu lieu",
+     "Que le conseil est divisé"
+    ],
+    "answer": 0,
+    "rationale": "L'annonce dit qu'il serait imprudent de déduire que le projet est enterré, et ajoute que les tarifs annoncés restent ceux qui s'appliqueront."
+   }
+  ]
+ },
+ {
+  "id": "tcf-co-53-r",
+  "level": "C2",
+  "family": "annonce",
+  "speakers": 1,
+  "freshness": "current",
+  "script": "Avis aux copropriétaires : le ravalement de la façade sud, voté l'an dernier, commencera effectivement au mois d'avril. Le devis retenu n'est pas le moins cher, et le conseil syndical tient à justifier publiquement ce choix, puisque la question a été soulevée en assemblée générale. L'entreprise la moins-disante refusait tout engagement sur les délais, alors que les échafaudages condamneront les balcons pendant toute la durée du chantier. Le surcoût, rapporté aux semaines d'immobilisation évitées, est apparu raisonnable, et l'assemblée l'a approuvé unanimement.",
+  "items": [
+   {
+    "stem": "Pourquoi l'offre la moins chère a-t-elle été écartée ?",
+    "options": [
+     "Elle ne garantissait aucun délai",
+     "Elle excluait les balcons du chantier",
+     "Elle ne prévoyait pas d'échafaudages",
+     "Elle avait été déposée trop tard"
+    ],
+    "answer": 0,
+    "rationale": "L'entreprise la moins-disante refusait de s'engager sur un délai, ce qui compte parce que les échafaudages condamnent les balcons pendant tout le chantier."
+   }
+  ]
+ },
+ {
+  "id": "tcf-co-54-r",
+  "level": "C2",
+  "family": "annonce",
+  "speakers": 1,
+  "freshness": "current",
+  "script": "Nous devons revenir sur l'information diffusée hier concernant la fermeture de l'accueil du soir, qui a été mal comprise. Elle était exacte quant au principe, mais fausse quant à la date, puisque la fermeture prendra effet en septembre et non ce mois-ci. Ce délai supplémentaire laisse le temps d'orienter les familles concernées, quartier par quartier, vers les autres structures du secteur. Nous regrettons cette confusion, d'autant qu'elle a conduit certaines personnes, par précaution, à renoncer à un service encore ouvert.",
+  "items": [
+   {
+    "stem": "Qu'est-ce qui était faux dans l'information d'hier ?",
+    "options": [
+     "La date de la fermeture",
+     "Le fait même de la fermeture",
+     "Le nom du service concerné",
+     "Le nombre de familles touchées"
+    ],
+    "answer": 0,
+    "rationale": "L'annonce distingue les deux : l'information était exacte quant au principe et fausse quant à la date, la fermeture prenant effet en septembre."
+   }
+  ]
+ },
+ {
+  "id": "tcf-co-55-r",
+  "level": "C2",
+  "family": "annonce",
+  "speakers": 1,
+  "freshness": "current",
+  "script": "Message aux personnes inscrites sur la liste d'attente du logement social, dont le fonctionnement est souvent mal compris. Le rang que vous consultez en ligne n'est pas, à proprement parler, un classement, et l'interpréter ainsi conduit régulièrement à des déceptions. Il indique une position dans un ensemble, alors que les attributions tiennent compte, en plus, de la composition du ménage et de la taille du logement libéré. Un rang qui recule n'est donc pas nécessairement un mauvais signe, contrairement à ce que beaucoup en concluent hâtivement.",
+  "items": [
+   {
+    "stem": "Que faut-il comprendre du rang affiché en ligne ?",
+    "options": [
+     "Il ne détermine pas à lui seul l'attribution",
+     "Il est mis à jour une fois par an",
+     "Il ne concerne que les grands logements",
+     "Il est calculé par le demandeur lui-même"
+    ],
+    "answer": 0,
+    "rationale": "Le rang indique une position dans un ensemble, mais les attributions dépendent aussi de la composition du ménage et de la taille du logement libéré."
+   }
+  ]
+ }
+]

@@ -100,15 +100,52 @@ function envelopeFor(
   tolerance = 0.15,
 ): Envelope {
   const i = bandIndex(level);
-  const at = (b: number) => anchors.filter((a) => bandIndex(a.level) === b).map((a) => pick(profile(a.script, locale)));
+  // ── AN ANCHOR TOO SHORT TO PROFILE CANNOT DEFINE AN ENVELOPE ────────────
+  //
+  // `MIN_MEASURABLE_WORDS` has always guarded the passage BEING measured, and
+  // never the anchors doing the measuring. On 31 August the TCF listening bank
+  // made the gap visible: its anchors run from seven words to eighty-six, and
+  // the envelopes they produced were arithmetic about the denominator —
+  // sentence-length bounds derived from a twenty-three-word exchange, then
+  // applied to nineteen recordings, which duly came out "outside".
+  //
+  // Nineteen failures that are a property of the instrument rather than of the
+  // material is worse than no measurement, because it reads as a finding. An
+  // anchor below the floor is therefore not used, and a band with no usable
+  // anchor either side is reported UNMEASURABLE — which the veto already knows
+  // how to say, and which is the honest answer for a bank of six-word notices.
+  const usable = anchors.filter((a) => words(a.script, segmentationFor(locale)).length >= MIN_MEASURABLE_WORDS);
+  const at = (b: number) => usable.filter((a) => bandIndex(a.level) === b).map((a) => pick(profile(a.script, locale)));
   const below = i > 0 ? at(i - 1) : [];
   const above = i < BANDS.length - 1 ? at(i + 1) : [];
   const min = (xs: number[]) => (xs.length ? Math.min(...xs) : null);
   const max = (xs: number[]) => (xs.length ? Math.max(...xs) : null);
   const slack = (v: number | null, dir: number) => (v === null ? null : v * (1 + dir * tolerance));
-  return rising
+  const env = rising
     ? { lo: slack(min(below), -1), hi: slack(max(above), +1) }
     : { lo: slack(min(above), -1), hi: slack(max(below), +1) };
+
+  // ── AN INVERTED ENVELOPE IS A CONTRADICTION, NOT A CONSTRAINT ───────────
+  //
+  // `rising: true` assumes the measure grows with the band. Three of the four
+  // do, reliably. **Clause depth does not**, and the TCF listening bank made
+  // that visible on 31 August: its B1 envelope came out `[0.85, 0.57]` and its
+  // C1 envelope `[0.42, 0.23]` — a low bound ABOVE the high bound, which no
+  // value can satisfy. Every item was therefore counted as failing that
+  // measure, silently, and each one arrived at the three-of-four rule already
+  // one short.
+  //
+  // That is not a strict envelope. It is a broken one, and it was punishing
+  // material for a property of the ANCHORS rather than of itself: a commas-per
+  // -sentence count depends on how a particular writer punctuates, and the
+  // anchor one band up is not obliged to punctuate more heavily than the one
+  // below.
+  //
+  // The honest reading is that the neighbours BRACKET the band, and which of
+  // them is the lower number is an empirical fact rather than an assumption.
+  // So an inverted pair is swapped, not enforced as written.
+  if (env.lo !== null && env.hi !== null && env.lo > env.hi) return { lo: env.hi, hi: env.lo };
+  return env;
 }
 
 const MEASURES: Array<{ id: string; pick: (p: Profile) => number; rising: boolean }> = [

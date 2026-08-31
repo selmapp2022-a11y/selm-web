@@ -270,11 +270,19 @@ for (const s of sections) {
 // shares is a defect in a table someone can read — and the alternative is
 // discovering it after 39 files have been paid for and shipped.
 {
-  console.log('\n6. The variety plan for the 39 French recordings\n');
+  console.log('\n6. The variety plan for the French listening bank\n');
   const plan = TCF_VARIETY_PLAN;
   const shares = TCF_VARIETY_SHARES;
 
-  ok(plan.length === 39, 'the plan covers all 39 recordings', `${plan.length}`);
+  // COUNTED FROM THE BANK, NOT WRITTEN DOWN. This said 39 and was true for two
+  // days. On 31 August twenty-eight recordings were written to fill the seven
+  // empty coordinates, and a check that names a number is a check that fails
+  // the moment the work it guards succeeds — which is the wrong direction for
+  // a failure to point.
+  const bankSize = (TCF_CANADA.sections
+    .find((sec): sec is ComprehensionSection => sec.kind === 'comprehension' && sec.id === 'comprehension-orale')
+    ?.recordings.length) ?? 0;
+  ok(plan.length === bankSize, 'the plan covers every recording in the bank', `${plan.length} of ${bankSize}`);
 
   const counted: Record<string, number> = {};
   for (const a of plan) counted[a.variety] = (counted[a.variety] ?? 0) + 1;

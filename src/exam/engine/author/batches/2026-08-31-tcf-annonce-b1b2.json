@@ -1,0 +1,170 @@
+[
+ {
+  "id": "tcf-co-40-r",
+  "level": "B1",
+  "family": "annonce",
+  "speakers": 1,
+  "freshness": "current",
+  "script": "Mesdames et messieurs, le train pour Québec change de quai. Il partira du quai numéro sept, et non du quai trois. Les voyageurs déjà installés sont priés de se déplacer maintenant. L'heure du départ reste celle qui était annoncée.",
+  "items": [
+   {
+    "stem": "Qu'est-ce qui change pour les voyageurs ?",
+    "options": [
+     "Le quai de départ",
+     "L'heure du départ",
+     "La destination du train",
+     "Le numéro du train"
+    ],
+    "answer": 0,
+    "rationale": "L'annonce dit que le train partira du quai sept et non du quai trois, et précise ensuite que le départ reste à l'heure prévue."
+   }
+  ]
+ },
+ {
+  "id": "tcf-co-41-r",
+  "level": "B1",
+  "family": "annonce",
+  "speakers": 1,
+  "freshness": "current",
+  "script": "Chers clients, notre rayon boulangerie ferme exceptionnellement à seize heures. Un nettoyage complet est prévu pendant toute la soirée. Les autres rayons restent accessibles jusqu'à leur horaire habituel. Le pain déjà présenté reste en vente jusqu'à la fermeture.",
+  "items": [
+   {
+    "stem": "Que se passe-t-il à seize heures ?",
+    "options": [
+     "Un seul rayon ferme",
+     "Tout le magasin ferme",
+     "Le pain est retiré de la vente",
+     "Le nettoyage du magasin commence"
+    ],
+    "answer": 0,
+    "rationale": "Seule la boulangerie ferme à seize heures ; les autres rayons restent ouverts jusqu'à vingt et une heures et le pain reste en vente."
+   }
+  ]
+ },
+ {
+  "id": "tcf-co-42-r",
+  "level": "B1",
+  "family": "annonce",
+  "speakers": 1,
+  "freshness": "current",
+  "script": "Bonjour, vous êtes bien à la mairie de Sainte-Foy. Nos bureaux sont fermés au public le mercredi après-midi. Pour une demande de passeport, prenez rendez-vous en ligne : nous ne recevons plus sans rendez-vous depuis le mois dernier. Pour tout le reste, présentez-vous directement au guichet.",
+  "items": [
+   {
+    "stem": "Comment obtenir un passeport ?",
+    "options": [
+     "Uniquement sur rendez-vous",
+     "En venant le mercredi après-midi",
+     "En se présentant au guichet",
+     "En téléphonant à la mairie"
+    ],
+    "answer": 0,
+    "rationale": "Le message dit qu'il faut prendre rendez-vous en ligne pour un passeport et que la mairie ne reçoit plus sans rendez-vous."
+   }
+  ]
+ },
+ {
+  "id": "tcf-co-43-r",
+  "level": "B1",
+  "family": "annonce",
+  "speakers": 1,
+  "freshness": "current",
+  "script": "Attention, la piscine municipale sera vidée pour entretien complet. Les cours d'aquagym sont annulés du lundi au vendredi. La salle de sport reste accessible, mais temporairement sans vestiaires. Aucun remboursement : la semaine perdue sera ajoutée à la fin.",
+  "items": [
+   {
+    "stem": "Que reçoivent les abonnés pour la semaine perdue ?",
+    "options": [
+     "Une semaine supplémentaire",
+     "Un remboursement",
+     "Un cours de rattrapage",
+     "Rien du tout"
+    ],
+    "answer": 0,
+    "rationale": "L'annonce exclut le remboursement et précise que la semaine manquée sera ajoutée à la fin de l'abonnement."
+   }
+  ]
+ },
+ {
+  "id": "tcf-co-44-r",
+  "level": "B2",
+  "family": "annonce",
+  "speakers": 1,
+  "freshness": "current",
+  "script": "Nous informons notre clientèle que le service de livraison à domicile sera suspendu pendant trois semaines. Il ne s'agit pas d'un arrêt définitif, contrairement à ce que certains ont compris : nous changeons de prestataire, et l'ancien contrat se termine avant que le nouveau ne commence. Les commandes passées d'ici vendredi seront honorées par l'ancien service.",
+  "items": [
+   {
+    "stem": "Pourquoi le service est-il interrompu ?",
+    "options": [
+     "Un changement de prestataire",
+     "Une baisse de la demande",
+     "Un manque de personnel",
+     "Une décision définitive de la direction"
+    ],
+    "answer": 0,
+    "rationale": "Le message écarte explicitement l'arrêt définitif et donne la raison : l'ancien contrat se termine avant le début du nouveau prestataire."
+   }
+  ]
+ },
+ {
+  "id": "tcf-co-45-r",
+  "level": "B2",
+  "family": "annonce",
+  "speakers": 1,
+  "freshness": "current",
+  "script": "Nous informons notre clientèle que le bureau de poste de la rue Sainte-Anne fermera définitivement à la fin du mois, parce que le bail arrive à son terme. Les colis déjà arrivés pourront être retirés jusqu'au dernier jour d'ouverture. Ceux qui arriveront ensuite seront transférés au bureau du boulevard Laurier, sans démarche de votre part.",
+  "items": [
+   {
+    "stem": "Que deviennent les colis qui arriveront après la fermeture ?",
+    "options": [
+     "Ils iront à un autre bureau",
+     "Ils seront retournés à l'expéditeur",
+     "Ils seront gardés rue Sainte-Anne",
+     "Ils seront livrés à domicile"
+    ],
+    "answer": 0,
+    "rationale": "L'annonce dit que les colis arrivés ensuite seront transférés au bureau du boulevard Laurier, sans démarche du destinataire."
+   }
+  ]
+ },
+ {
+  "id": "tcf-co-46-r",
+  "level": "B2",
+  "family": "annonce",
+  "speakers": 1,
+  "freshness": "current",
+  "script": "Message aux locataires du bâtiment C : la coupure d'eau prévue jeudi est reportée à mardi prochain, à la même heure. Il ne s'agit pas d'une annulation, car les travaux doivent avoir lieu avant l'hiver et un nouveau report ne serait plus possible. Prévoyez une réserve d'eau pour toute la matinée, puisque le rétablissement peut demander plus de temps que prévu.",
+  "items": [
+   {
+    "stem": "Que faut-il comprendre de ce message ?",
+    "options": [
+     "La coupure aura lieu plus tard",
+     "La coupure est annulée",
+     "La coupure dure toute la journée",
+     "La coupure concerne tout l'immeuble"
+    ],
+    "answer": 0,
+    "rationale": "Le message dit que la coupure est reportée à mardi et insiste sur le fait qu'il ne s'agit pas d'une annulation."
+   }
+  ]
+ },
+ {
+  "id": "tcf-co-47-r",
+  "level": "B2",
+  "family": "annonce",
+  "speakers": 1,
+  "freshness": "current",
+  "script": "Chers voyageurs, le vol à destination de Montréal est retardé d'environ deux heures. Nous ne connaissons pas encore l'heure exacte du départ, et nous préférons le dire plutôt que d'annoncer un horaire que nous devrions corriger ensuite. Restez dans la zone d'embarquement : l'appel se fera sans préavis.",
+  "items": [
+   {
+    "stem": "Pourquoi l'heure de départ n'est-elle pas donnée ?",
+    "options": [
+     "Elle n'est pas encore connue",
+     "Elle change toutes les heures",
+     "Elle dépend des voyageurs présents",
+     "Elle a déjà été annoncée deux fois"
+    ],
+    "answer": 0,
+    "rationale": "L'annonce explique que l'heure exacte n'est pas connue et qu'elle préfère ne rien annoncer plutôt que de devoir se corriger."
+   }
+  ]
+ }
+]

@@ -119,11 +119,50 @@ export const TCF_VARIETY_PLAN: VarietyAssignment[] = [
   { id: 'tcf-co-37-r', level: 'C2', speakers: 1, variety: 'international' },
   { id: 'tcf-co-38-r', level: 'C2', speakers: 1, variety: 'international' },
   { id: 'tcf-co-39-r', level: 'C2', speakers: 1, variety: 'quebecois' },
+
+  // ── THE TWENTY-EIGHT WRITTEN ON 31 AUGUST ──────────────────────────────
+  //
+  // The founder pointed at `annonce · B2` on his own Progress screen and asked
+  // what "not built" meant. It meant a coordinate with nothing behind it —
+  // seven of them in this section — and the answer was authoring.
+  //
+  // Placed BAND BY BAND, like the nine above and for the same reason: shares
+  // applied in level order produce a bank where an unfamiliar accent is a
+  // hard-band problem, which no real exam does. Québécois is now in every one
+  // of the six bands and Swiss in five.
+  { id: 'tcf-co-56-r', level: 'A1', speakers: 2, variety: 'quebecois' },
+  { id: 'tcf-co-57-r', level: 'A1', speakers: 2, variety: 'international' },
+  { id: 'tcf-co-58-r', level: 'A1', speakers: 2, variety: 'international' },
+  { id: 'tcf-co-59-r', level: 'A1', speakers: 2, variety: 'quebecois' },
+  { id: 'tcf-co-60-r', level: 'A1', speakers: 1, variety: 'international' },
+  { id: 'tcf-co-61-r', level: 'A1', speakers: 1, variety: 'quebecois' },
+  { id: 'tcf-co-62-r', level: 'A1', speakers: 1, variety: 'international' },
+  { id: 'tcf-co-63-r', level: 'A1', speakers: 1, variety: 'international' },
+  { id: 'tcf-co-40-r', level: 'B1', speakers: 1, variety: 'international' },
+  { id: 'tcf-co-41-r', level: 'B1', speakers: 1, variety: 'quebecois' },
+  { id: 'tcf-co-42-r', level: 'B1', speakers: 1, variety: 'swiss' },
+  { id: 'tcf-co-43-r', level: 'B1', speakers: 1, variety: 'international' },
+  { id: 'tcf-co-44-r', level: 'B2', speakers: 1, variety: 'international' },
+  { id: 'tcf-co-45-r', level: 'B2', speakers: 1, variety: 'quebecois' },
+  { id: 'tcf-co-46-r', level: 'B2', speakers: 1, variety: 'swiss' },
+  { id: 'tcf-co-47-r', level: 'B2', speakers: 1, variety: 'international' },
+  { id: 'tcf-co-48-r', level: 'C1', speakers: 1, variety: 'international' },
+  { id: 'tcf-co-49-r', level: 'C1', speakers: 1, variety: 'quebecois' },
+  { id: 'tcf-co-50-r', level: 'C1', speakers: 1, variety: 'international' },
+  { id: 'tcf-co-51-r', level: 'C1', speakers: 1, variety: 'international' },
+  { id: 'tcf-co-52-r', level: 'C2', speakers: 1, variety: 'international' },
+  { id: 'tcf-co-53-r', level: 'C2', speakers: 1, variety: 'quebecois' },
+  { id: 'tcf-co-54-r', level: 'C2', speakers: 1, variety: 'swiss' },
+  { id: 'tcf-co-55-r', level: 'C2', speakers: 1, variety: 'international' },
+  { id: 'tcf-co-64-r', level: 'C2', speakers: 2, variety: 'quebecois' },
+  { id: 'tcf-co-65-r', level: 'C2', speakers: 2, variety: 'international' },
+  { id: 'tcf-co-66-r', level: 'C2', speakers: 2, variety: 'international' },
+  { id: 'tcf-co-67-r', level: 'C2', speakers: 2, variety: 'quebecois' },
 ];
 
 /** The shares this plan realises, for a check to assert against. */
 export const TCF_VARIETY_SHARES: Record<string, number> = {
-  international: 22,
-  quebecois: 12,
-  swiss: 5,
+  international: 38,
+  quebecois: 21,
+  swiss: 8,
 };
