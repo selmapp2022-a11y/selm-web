@@ -9,7 +9,8 @@
     "preview": "vite preview --host 0.0.0.0 --port 4173",
     "i18n": "node scripts/i18n-audit.mjs",
     "copy": "node scripts/copy-audit.mjs",
-    "counts": "node scripts/counts-audit.mjs"
+    "counts": "node scripts/counts-audit.mjs",
+    "audio": "node scripts/audio-audit.mjs"
   },
   "dependencies": {
     "@capacitor-community/apple-sign-in": "^7.1.0",
