@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { audioFor } from '../exam/model/rendition';
 import type { AccentTrack } from '../exam/model/types';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { CheckCircle2, XCircle, Headphones, BookOpen, RefreshCcw } from 'lucide-react';
 import clsx from 'clsx';
 import { loadPlan, PLAN_EVENT } from '../exam/model/plan';
@@ -48,6 +48,9 @@ import { MatchingBank } from './MatchingBank';
 const state0Name = (n: string) => n;
 
 export function ComprehensionPractice({ skill }: { skill: 'reading' | 'listening' }) {
+  const [params] = useSearchParams();
+  const askedFamily = params.get('family');
+  const askedLevel = params.get('level');
   const [state, setState] = useState<
     | { kind: 'loading' }
     | { kind: 'no-plan' }
@@ -57,6 +60,8 @@ export function ComprehensionPractice({ skill }: { skill: 'reading' | 'listening
         kind: 'ready';
         /** The candidate's accent track, decided by their destination. */
         track: AccentTrack;
+        /** The coordinate the candidate asked for, when Today named one. */
+        asked: { family: string; level: string; label: string } | null;
         examName: string;
         section: ComprehensionSection;
         recordings: Recording[];
@@ -97,6 +102,19 @@ export function ComprehensionPractice({ skill }: { skill: 'reading' | 'listening
       // the Australian recording of the same script, not on the Canadian one.
       const track = defs.trackForGoal(plan.goalId);
       const usable = practicable(section, track);
+
+      // ── THE COORDINATE THE CANDIDATE ASKED FOR, IF THEY ASKED ───────────
+      //
+      // Today's "Do this next" card names a coordinate and now links to it.
+      // Serving the whole skill instead is the defect the IA audit called its
+      // worst: a card that names an item and delivers a different screen.
+      //
+      // A coordinate with nothing behind it is NOT quietly widened to the
+      // whole skill. The candidate is told the name of what is missing —
+      // Amendment 1 §6, *"never a substituted generic lesson"* — because that
+      // emptiness is also the signal for what to author next, and it is the
+      // sentence the founder read on his own Progress screen the night the
+      // seven empty French coordinates were filled.
       if (!usable.length) { if (alive) setState({ kind: 'no-audio', examName }); return; }
 
       // WHICH BAND, and this is the point of the screen.
@@ -125,7 +143,20 @@ export function ComprehensionPractice({ skill }: { skill: 'reading' | 'listening
           : goal
             ? `Served around ${cefrTag(level.index)} — the level ${goal.system} ${goal.requiredLevel} asks for. A past score report makes this follow your marks instead.`
             : `Served around ${cefrTag(level.index)}.`;
-      if (alive) setState({ kind: 'ready', examName, section, recordings: usable, lang, level, levelNote, track });
+      // The coordinate Today named, if it named one. `usable` is already
+      // filtered by `deliverable` and by the accent track; this narrows it to
+      // one family and band, and NOTHING silently widens it back.
+      const asked = askedFamily && askedLevel
+        ? {
+            family: askedFamily,
+            level: askedLevel,
+            label: `${section.families?.find((f) => f.id === askedFamily)?.label.en ?? askedFamily} · ${askedLevel}`,
+          }
+        : null;
+      const here = asked
+        ? usable.filter((r) => r.family === asked.family && r.level === asked.level)
+        : usable;
+      if (alive) setState({ kind: 'ready', examName, section, recordings: here, lang, level, levelNote, track, asked });
     };
     read();
     window.addEventListener(PLAN_EVENT, read);
@@ -206,6 +237,7 @@ export function ComprehensionPractice({ skill }: { skill: 'reading' | 'listening
       level={state.level}
       levelNote={state.levelNote}
       track={state.track}
+      asked={state.asked}
     />
   );
 }
@@ -232,6 +264,7 @@ function Runner({
   level,
   levelNote,
   track,
+  asked,
 }: {
   examName: string;
   section: ComprehensionSection;
@@ -240,6 +273,8 @@ function Runner({
   levelNote: string;
   /** The candidate's accent track. Decided by the destination, not the exam. */
   track: AccentTrack;
+  /** The coordinate Today named, when it named one. */
+  asked: { family: string; level: string; label: string } | null;
 }) {
   // Which recording to serve is NOT this component's decision, and that is
   // the fix. Until 2026-08-29 it was: sort easiest-first, `useState(0)`, read
@@ -286,6 +321,32 @@ function Runner({
   const isAudio = section.delivery.audioPlaysOnce;
   const family = section.families?.find((f) => f.id === rec?.family);
   const noun = isAudio ? 'recording' : 'passage';
+
+  // ── THE COORDINATE TODAY NAMED, AND THE CASE WHERE IT HOLDS NOTHING ────
+  //
+  // Amendment 1 §6: a coordinate with no material is a VISIBLE GAP, never a
+  // substituted generic lesson. So an empty coordinate says its own name and
+  // offers the whole skill as a separate, labelled choice — it does not
+  // quietly become the whole skill, which is the defect this link was added
+  // to fix, arriving from the other direction.
+  if (asked && recordings.length === 0) {
+    return (
+      <div className="card p-6">
+        <span className="chip">{asked.label}</span>
+        <h2 className="mt-3 font-display text-xl font-bold text-navy dark:text-white">
+          Nothing is written here yet
+        </h2>
+        <p className="mt-2 text-sm leading-relaxed text-ink-secondary">
+          Your plan points at <strong>{asked.label}</strong>, and this product holds no{' '}
+          {noun} at that coordinate for {examName}. That is a gap in what we have built, not
+          something you have already done — and it is the gap we fill next.
+        </p>
+        <Link to={`/practice/${section.skill}`} className="btn-secondary mt-4 inline-flex">
+          Practise {section.skill} at your level instead
+        </Link>
+      </div>
+    );
+  }
 
   if (!current || !rec) {
     return <div className="card p-6 text-sm text-ink-secondary">Loading…</div>;
@@ -413,6 +474,9 @@ function Runner({
           {items.length} {items.length === 1 ? 'question' : 'questions'}
         </span>
         <span className="chip">{rec.level}{family ? ` · ${family.label.en}` : ''}</span>
+        {/* The candidate arrived from a card that named this coordinate. Saying
+            so is how they can tell the promise was kept. */}
+        {asked && <span className="chip">from your plan</span>}
       </div>
 
       <p className="text-xs leading-relaxed text-ink-secondary">{levelNote}</p>

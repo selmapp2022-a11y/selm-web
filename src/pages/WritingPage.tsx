@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { BackToPractice } from '../components/BackToPractice';
 import { PenLine, Sparkles, FileText } from 'lucide-react';
 import clsx from 'clsx';
 import { checkGrammar, rewriteText, assessWriting, type GrammarCheck, type WritingAssessment } from '../lib/writing';
@@ -38,6 +39,7 @@ export default function WritingPage() {
 
   return (
     <div className="space-y-6">
+      <BackToPractice />
       <div>
         <h1 className="font-display text-3xl font-bold text-navy">Writing</h1>
         <p className="mt-1 text-ink-secondary">

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { LineChart, ListChecks, Compass, MapPinned, CalendarPlus, FileText } from 'lucide-react';
+import { LineChart, ListChecks, Compass, MapPinned, CalendarPlus, FileText, Flag, ScrollText, ExternalLink } from 'lucide-react';
 import { SectionHeading } from '../components/SectionHeading';
 import { lookFor } from '../lib/skillLook';
 import { ATTEMPTS_EVENT, attemptsBySkill, getAttempts, type SkillKey } from '../lib/attempts';
@@ -8,6 +8,9 @@ import { loadHistory, type SittingRecord } from '../exam/model/history';
 import { PLAN_EVENT, loadPlan, daysUntil } from '../exam/model/plan';
 import { loadAttestations, ATTESTATION_EVENT } from '../exam/model/attestationStore';
 import { buildPlan } from '../exam/engine/planner';
+import { releaseGate } from '../exam/engine/aggregate';
+import { governingLevel } from '../exam/engine/comprehension';
+import { StandingNote, NotBuiltNote } from '../components/Standing';
 import { useDocumentTitle } from '../lib/useDocumentTitle';
 import { fmtDate, fmtMonth, useUiLangValue } from '../i18n';
 import { t } from '../exam/model/format';
@@ -119,6 +122,13 @@ export default function ProgressPage() {
   }
 
   const left = daysUntil(plan.examDate);
+  // Moved from Today on 31 August with the prose it explains. Four nulls is
+  // the honest state of both exams: comprehension has no published
+  // conversion, production is refused by the release gate — and it is
+  // computed rather than written down so the day one of them produces a
+  // level, this page follows without being edited.
+  const gate = releaseGate(exam);
+  const governing = governingLevel(exam.sections.map(() => null) as Array<number | null>);
   const built = buildPlan({
     exam,
     attestation: myAttestations[myAttestations.length - 1] ?? null,
@@ -136,6 +146,71 @@ export default function ProgressPage() {
   return (
     <div className="space-y-8">
       {header}
+
+      {/* ── THE VERDICT, AND ITS REASONING, MOVED HERE ON 31 AUGUST ──────
+          Today measured 2.56 screens against an acceptance criterion of 1.5,
+          and roughly seventy per cent of it was prose before any action. This
+          is the prose. It is not deleted — it is on the page that owns the
+          numbers, where a candidate who wants to study them already is.
+
+          Today keeps the verdict as one line and links here for the rest. */}
+      <section className="space-y-3">
+        <SectionHeading icon={Flag} meta={`Target: ${target} in every skill`}>
+          Are you ready to book?
+        </SectionHeading>
+        <div className="card p-6">
+          <p className="font-display text-2xl font-bold text-navy dark:text-white">
+            {gate.publishNumeric && governing.complete
+              ? `${exam.benchmark.system} ${governing.level}`
+              : 'Not yet answerable'}
+          </p>
+          {!gate.publishNumeric && (
+            <p className="mt-2 text-xs leading-relaxed text-ink-secondary">{t(gate.reason, 'en')}</p>
+          )}
+          {!governing.complete && (
+            <p className="mt-2 text-xs leading-relaxed text-ink-secondary">
+              {goal.destination.requirement === 'overall'
+                ? 'This destination reads an aggregate, so a weak skill can be carried — but an aggregate still needs every skill to have a number, and not all of them do.'
+                : 'The lowest of your four skills is the one that counts, not the average — a candidate at 8, 8, 8 and 5 is at 5. No overall level is shown while any skill is unknown, because taking the lowest of the ones that do have a number would show you a better result than you hold.'}
+            </p>
+          )}
+        </div>
+        <StandingNote exam={exam} />
+      </section>
+
+      <section className="space-y-3">
+        <SectionHeading icon={ScrollText}>What is not built for your exam</SectionHeading>
+        <NotBuiltNote exam={exam} />
+        {!gate.publishNumeric && (
+          <p className="rounded-xl bg-surface-muted px-4 py-3 text-xs leading-relaxed text-ink-secondary">
+            <strong>What to do meanwhile:</strong> practise the tasks the exam actually sets, sit
+            the mock exam to see the band your answers hold, and enter any past score report you
+            have — that is the one number here that comes from the awarding body rather than from
+            us.
+          </p>
+        )}
+        {/* The destination's own surfaces — an external government page is not
+            something a candidate needs on the screen they open before
+            practising. An Australian candidate sees neither, because the
+            destination declares neither. */}
+        {goal.destination.surfaces.length > 0 && (
+          <div className="grid gap-2 sm:grid-cols-2">
+            {goal.destination.surfaces.map((sf) => (
+              <a
+                key={sf.id}
+                href={sf.href}
+                target="_blank"
+                rel="noreferrer"
+                className="card flex min-h-[44px] items-center gap-3 p-4 hover:shadow-cardHover"
+              >
+                <ScrollText className="h-5 w-5 shrink-0 text-teal" />
+                <span className="flex-1 text-sm font-medium text-navy">{t(sf.label, 'en')}</span>
+                <ExternalLink className="h-4 w-4 text-ink-secondary" />
+              </a>
+            ))}
+          </div>
+        )}
+      </section>
 
       {/* 1 ── score over time */}
       <section className="space-y-3">

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { BackToPractice } from '../components/BackToPractice';
 import { useQuery } from '@tanstack/react-query';
 import { Brain, Eye, EyeOff, Plus } from 'lucide-react';
 import { dueWords, recordReview, addWord } from '../lib/vocab';
@@ -46,6 +47,7 @@ export default function VocabularyPage() {
 
   return (
     <div className="space-y-6">
+      <BackToPractice />
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="font-display text-3xl font-bold text-navy">Vocabulary review</h1>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { BackToPractice } from '../components/BackToPractice';
 import { ComprehensionPractice } from '../components/ComprehensionPractice';
 import { examNameForPractice } from '../lib/practiceTasks';
 
@@ -50,6 +51,7 @@ export default function ListeningPage() {
 
   return (
     <div className="space-y-6">
+      <BackToPractice />
       <div>
         <h1 className="font-display text-3xl font-bold text-navy dark:text-white">Listening</h1>
         <p className="mt-1 text-ink-secondary">

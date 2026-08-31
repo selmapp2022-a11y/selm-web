@@ -5,18 +5,17 @@ import {
   ChevronRight,
   Compass,
   Crown,
-  ExternalLink,
   Flag,
   ScrollText,
 } from 'lucide-react';
 import { EmptyState, Loader } from '../components/States';
-import { StandingRows, StandingNote, NotBuiltNote } from '../components/Standing';
+import { StandingRows } from '../components/Standing';
 import { SectionHeading } from '../components/SectionHeading';
 import { useDocumentTitle } from '../lib/useDocumentTitle';
 import { loadHistory, type SittingRecord } from '../exam/model/history';
 import { PLAN_EVENT, daysUntil, loadPlan, type Plan } from '../exam/model/plan';
-import { levelsShort, releaseGate } from '../exam/engine/aggregate';
-import { buildPlan } from '../exam/engine/planner';
+import { releaseGate } from '../exam/engine/aggregate';
+import { buildPlan, type Coordinate } from '../exam/engine/planner';
 import { loadAttestations } from '../exam/model/attestationStore';
 import OnboardingPage from './OnboardingPage';
 import { governingLevel } from '../exam/engine/comprehension';
@@ -65,6 +64,27 @@ const PRACTICE: Record<SkillId, string> = {
   writing: '/practice/writing',
   speaking: '/practice/speaking',
 };
+
+/**
+ * WHERE "DO THIS NEXT" ACTUALLY GOES.
+ *
+ * The card names a coordinate — `exposé · B2` — and until 31 August its button
+ * went to the generic `/practice/listening`, which serves whatever the pool
+ * draws. The IA audit called this **the worst defect it found**, and the
+ * ruling agreed: *"the card names an item and delivers a different screen. It
+ * must open the named item."*
+ *
+ * It was found again by WALKING the deployed app rather than reading the
+ * router, which is the condition the ruling attached to this whole phase.
+ *
+ * A task coordinate has no query to carry — the writing and speaking pages
+ * serve the exam's tasks in order — so only a family coordinate gets one.
+ */
+function practiceHref(c: Coordinate): string {
+  const base = PRACTICE[c.skill];
+  if (c.kind !== 'family') return base;
+  return `${base}?family=${encodeURIComponent(c.family)}&level=${encodeURIComponent(c.level)}`;
+}
 
 type Catalogue = { EXAMS: ExamDefinition[]; GOALS: Goal[] };
 
@@ -131,7 +151,6 @@ export default function DashboardPage() {
 
   const left = daysUntil(plan.examDate);
   const gate = releaseGate(exam);
-  const short = levelsShort(exam);
   const target = `${goal.system} ${goal.requiredLevel}`;
 
   // Every skill's benchmark level. Comprehension has none because the
@@ -215,7 +234,7 @@ export default function DashboardPage() {
                   : 'Your plan is in exam order until you enter a past result.'}
               </div>
             </div>
-            <Link to={PRACTICE[nextSkill]} className="btn-primary shrink-0">
+            <Link to={practiceHref(nextSlot.coordinate)} className="btn-primary shrink-0">
               Start now
               <ChevronRight className="h-4 w-4" />
             </Link>
@@ -237,8 +256,12 @@ export default function DashboardPage() {
           Where you stand
         </SectionHeading>
 
+        {/* FOUR ROWS, ONE STATUS CHIP EACH, NO PARAGRAPH — the ruling's §2.2,
+            in its own words. `StandingNote` explained what "counted" and
+            "estimated" mean; it is on `/progress` now, beside the verdict it
+            qualifies, and Today shows the four rows a candidate opens the app
+            several times a day to see. */}
         <StandingRows exam={exam} record={latest} target={target} />
-        <StandingNote exam={exam} />
         {/* D2 — THE SENTENCE THAT WAS ON THIS SCREEN TWICE.
             `gate.reason` ("no predicted score is published … it requires 150
             official score reports") was printed under "Are you ready to book?"
@@ -251,99 +274,47 @@ export default function DashboardPage() {
         )}
       </section>
 
-      {/* Still block 3: the decision, stated against the evidence rather than
-          as a verdict. It is the summary of where you stand, not a fifth
-          block — the ruling sets four and this is the last line of the third. */}
-      <section className="space-y-3">
-        <h3 className="font-display text-lg font-bold text-navy">Are you ready to book?</h3>
-        <div className="card p-6">
-          <div className="flex items-start gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-navy to-teal text-white shadow-md">
-              <Flag className="h-6 w-6" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="font-display text-2xl font-bold text-navy">
-                {gate.publishNumeric && governing.complete
-                  ? `${exam.benchmark.system} ${governing.level}`
-                  : 'Not yet answerable'}
-              </p>
-              {!governing.complete && (
-                <p className="mt-2 text-xs leading-relaxed text-ink-secondary">
-                  {goal.destination.requirement === 'overall'
-                    ? 'This destination reads an aggregate, so a weak skill can be carried — but an aggregate still needs every skill to have a number, and not all of them do.'
-                    : 'The lowest of your four skills is the one that counts, not the average — a candidate at 8, 8, 8 and 5 is at 5. No overall level is shown here while any skill is unknown, because taking the lowest of the ones that do have a number would show you a better result than you hold.'}
-                </p>
-              )}
-              {/* The per-level shortfall is expressed in the exam's benchmark
-                  system — CLB, NCLC. To a candidate bound for Australia,
-                  whose requirement is set on the IELTS band scale, a list of
-                  CLB levels is a Canadian instrument appearing on a page it
-                  has no business being on. The count is already stated above
-                  in `gate.reason`; only the breakdown is withheld. */}
-              {short.length > 0 && !goal.scaleId && (
-                <ul className="mt-3 space-y-1 text-xs text-ink-secondary">
-                  {short.map((r) => (
-                    <li key={r.level} className="tabular-nums">
-                      {exam.benchmark.system} {r.level}: {r.have} of {r.need} score reports collected
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
+      {/* ── TODAY IS THREE CARDS ────────────────────────────────────────
+          IA ruling §1.4: *"`/` at 390px runs about four screens, roughly 70%
+          prose before any action. That is the real finding under 'clutter'."*
+          Walking the deployed app on 31 August measured it: **2,157px of
+          content, 2.56 screens of 844** against an acceptance criterion of
+          1.5. Reading the router would never have produced that number.
+
+          What stood here was two more blocks of prose — "Are you ready to
+          book?", with three paragraphs explaining why the governing level is
+          the lowest and not the average, and "What is not built for your
+          exam", with a fourth telling the candidate what to do meanwhile.
+
+          Both are TRUE and neither is deleted. They are moved to `/progress`,
+          which is the page that owns the numbers and is opened when a
+          candidate wants to study them — Today is opened several times a day
+          to see one thing. The verdict itself stays, as one line, because it
+          is the question the candidate came with; what left is the reasoning
+          behind it, one tap away and named.
+
+          The destination's own surfaces went with them for the same reason:
+          an external link to a government page is not something a candidate
+          needs on the screen they open before practising. */}
+      <Link
+        to="/progress"
+        className="card flex items-center gap-4 p-5 transition hover:border-navy/40 hover:bg-surface-muted"
+      >
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-surface-muted text-navy">
+          <ScrollText className="h-5 w-5" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="font-display text-base font-bold text-navy dark:text-white">
+            Are you ready to book?
+          </div>
+          <div className="mt-0.5 text-sm text-ink-secondary">
+            {gate.publishNumeric && governing.complete
+              ? `${exam.benchmark.system} ${governing.level} · the reasoning, and what is not built for this exam`
+              : 'Not yet answerable — the reasoning, and what is not built for this exam'}
           </div>
         </div>
-
-        {/* A3 — surfaces that belong to the destination, not to the product.
-            An Australian candidate sees neither of these, because the
-            destination declares neither. */}
-        {goal.destination.surfaces.length > 0 && (
-          <div className="grid gap-2 sm:grid-cols-2">
-            {goal.destination.surfaces.map((sf) => (
-              <a
-                key={sf.id}
-                href={sf.href}
-                target="_blank"
-                rel="noreferrer"
-                className="card flex items-center gap-3 p-4 hover:shadow-cardHover"
-              >
-                <ScrollText className="h-5 w-5 shrink-0 text-teal" />
-                <span className="flex-1 text-sm font-medium text-navy">{t(sf.label, 'en')}</span>
-                <ExternalLink className="h-4 w-4 text-ink-secondary" />
-              </a>
-            ))}
-          </div>
-        )}
-      </section>
-
-
-
-      {/* 4 ── what this product has not built for this exam. Stated once,
-              plainly, with what to do meanwhile — not scattered as a footnote
-              under a table where it reads as a caveat rather than a fact. */}
-      <section className="space-y-3">
-        <SectionHeading icon={ScrollText}>What is not built for your exam</SectionHeading>
-        <NotBuiltNote exam={exam} />
-        {/* The second printing of `gate.reason` stood here. It is now stated
-            once, under "Where you stand". What was useful in this paragraph
-            was the advice rather than the repetition, so the advice stays and
-            the restatement goes. */}
-        {gate.publishNumeric ? null : (
-          <p className="rounded-xl bg-surface-muted px-4 py-3 text-xs leading-relaxed text-ink-secondary">
-            <strong>What to do meanwhile:</strong> practise the tasks the exam actually sets, sit
-            the mock exam to see the band your answers hold, and enter any past score report you
-            have — that is the one number here that comes from the awarding body rather than from
-            us.
-          </p>
-        )}
-        {/* D6 — two buttons stood here, "Practice" and "Mock exam", and both
-            are tabs in the bar at the foot of this same screen. The paragraph
-            above names both actions in prose, which is what it is for; the
-            buttons only said them again in a different shape.
-
-            D3 removed a third — "Enter a past result" appeared four times in
-            the app: here, on Progress, and twice on the exam page. It now
-            appears exactly once, on the page that owns past results. */}
-      </section>
+        <ChevronRight className="h-5 w-5 shrink-0 text-ink-secondary" />
+      </Link>
 
       {/* Upgrade to SELM Pro. This is the primary in-app entry point to the
           paywall and it stays on the dashboard: Apple's App Review has to be

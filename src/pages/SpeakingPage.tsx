@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { BackToPractice } from '../components/BackToPractice';
 import { Mic, Trophy, RefreshCcw, Volume2, Play } from 'lucide-react';
 import clsx from 'clsx';
 import { AudioRecorder } from '../components/AudioRecorder';
@@ -48,6 +49,7 @@ export default function SpeakingPage() {
 
   return (
     <div className="space-y-6">
+      <BackToPractice />
       <div>
         <h1 className="font-display text-3xl font-bold text-navy">Speaking</h1>
         <p className="mt-1 text-ink-secondary">
@@ -297,11 +299,29 @@ function TaskMode({ task, need }: { task: PracticeTask; need: PracticeSet['need'
             <PlayButton text={prompt} />
           </div>
           <p className="text-base leading-relaxed text-ink-primary">{prompt}</p>
-          <p className="mt-3 text-xs text-ink-secondary">Speak for 1–2 minutes.</p>
+          {/* ── THE CLOCK IS THE EXAM'S, NOT A ROUND NUMBER ────────────────
+              This said "Speak for 1–2 minutes" under every task, and the
+              recorder below it was hard-coded to stop at 120 seconds. TCF
+              Tâche 2 is 210 seconds and Tâche 3 is 270 — so a candidate
+              practising the longest speaking task the exam sets was **cut off
+              at less than half of it**, mid-sentence, with nothing on screen
+              to say why.
+              The founder found it by testing: *"the microphone was not
+              working and it was cut off."* */}
+          <p className="mt-3 text-xs text-ink-secondary">
+            Speak for up to {Math.floor(task.timeLimitSec / 60)}
+            {task.timeLimitSec % 60 ? `:${String(task.timeLimitSec % 60).padStart(2, '0')}` : ''}{' '}
+            minute{task.timeLimitSec >= 120 ? 's' : ''}
+            {task.timeIsOurs ? ' — our apportionment of the section time' : ' — the exam’s own limit'}.
+          </p>
         </div>
         <WhatYouNeed need={need} skill="speaking" />
         <PromptCount task={task} verb="recorded" />
-        <AudioRecorder onComplete={onRecorded} maxSeconds={120} label="Tap to start your 2-minute response" />
+        <AudioRecorder
+          onComplete={onRecorded}
+          maxSeconds={task.timeLimitSec}
+          label={`Tap to start — up to ${Math.round(task.timeLimitSec / 60 * 10) / 10} minutes`}
+        />
       </div>
       <div className="space-y-4">
         {loading && <Loading text="Scoring your response…" />}

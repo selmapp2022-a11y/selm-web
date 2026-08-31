@@ -9,6 +9,20 @@ export type RecorderEvents = {
   onError?: (err: Error) => void;
 };
 
+/** The browser's own failure name, turned into the sentence that has a remedy. */
+function explain(err: any): string {
+  const name = err?.name ?? '';
+  if (name === 'NotAllowedError' || name === 'SecurityError')
+    return 'Microphone permission was refused. Allow it for this site in your browser’s address bar, then try again.';
+  if (name === 'NotFoundError' || name === 'OverconstrainedError')
+    return 'No microphone was found. Connect one, or choose a different input in your system sound settings.';
+  if (name === 'NotReadableError' || name === 'AbortError')
+    return 'The microphone is in use by another application — a video call, usually. Close it and try again.';
+  if (typeof window !== 'undefined' && !window.isSecureContext)
+    return 'Recording needs a secure connection, and this page is not on one.';
+  return err?.message ? `Could not start recording: ${err.message}` : 'Could not start recording.';
+}
+
 export class AudioRecorder {
   private mediaRecorder: MediaRecorder | null = null;
   private stream: MediaStream | null = null;
@@ -56,9 +70,23 @@ export class AudioRecorder {
       this.mediaRecorder.start(250); // gather chunks every 250ms
       this.state = 'recording';
     } catch (err: any) {
-      this.events.onError?.(err);
+      // ── SAY WHICH FAILURE IT WAS ─────────────────────────────────────
+      //
+      // This re-threw the raw DOMException, and every one of them reached the
+      // candidate as "Could not access microphone." — which is true of all
+      // four causes and useful for none. The founder reported *"the
+      // microphone was not working"* on 31 August, and that sentence is all
+      // the screen was able to tell him, so it is all he was able to tell us.
+      //
+      // The names are the browser's own, and each one has a different remedy:
+      // a permission the candidate can grant, a device that is not plugged
+      // in, a device another application is holding — on macOS, usually a
+      // video call — and a page that is not on HTTPS.
+      const named = new Error(explain(err));
+      named.name = err?.name ?? 'Error';
+      this.events.onError?.(named);
       this.cleanup();
-      throw err;
+      throw named;
     }
   }
 
