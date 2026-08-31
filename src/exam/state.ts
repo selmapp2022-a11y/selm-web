@@ -127,7 +127,11 @@ type ExamState = {
   history: SittingRecord[];
   recordSitting: (r: SittingRecord) => void;
   clearHistory: () => void;
-  startSitting: (e: ExamDefinition) => void;
+  /**
+   * Begin a sitting. `only: 'comprehension'` runs the device-scored sections
+   * alone — the shape a guest sitting takes, see `components/OpenExam.tsx`.
+   */
+  startSitting: (e: ExamDefinition, only?: 'comprehension') => void;
   answerItem: (sectionId: string, itemId: string, chose: number | string | null) => void;
   /** Record that a recording has been played. Irreversible within a sitting. */
   markPlayed: (recordingId: string) => void;
@@ -252,10 +256,21 @@ export const useExam = create<ExamState>((set) => ({
     saveHistory([]);
     set({ history: [] });
   },
-  startSitting: (exam) => {
+  startSitting: (exam, only) => {
+    // `only: 'comprehension'` is what a guest sitting runs.
+    //
+    // Not a smaller exam for its own sake. The two comprehension sections are
+    // scored on this device and send nothing anywhere; a production section
+    // posts the candidate's own words or voice to the backend and from there
+    // to a third-party model, which needs both an account and the privacy
+    // consent. Serving a guest the production sections would put the wall in
+    // the MIDDLE of a timed exam, which is worse than putting it at the end.
+    const order = exam.sections
+      .filter((s) => (only === 'comprehension' ? s.kind === 'comprehension' : true))
+      .map((s) => s.id);
     const sitting: Sitting = {
       examId: exam.id,
-      order: exam.sections.map((s) => s.id),
+      order,
       at: 0,
       sectionStartedAt: Date.now(),
       answers: {},

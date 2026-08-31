@@ -213,7 +213,7 @@ export default function LoginPage() {
 
           <p className="mt-6 text-center text-sm text-ink-secondary">
             New to SELM?{' '}
-            <Link to="/register" className="font-semibold text-navy hover:underline">
+            <Link to={`/register${window.location.search}`} className="font-semibold text-navy hover:underline">
               Create an account
             </Link>
           </p>

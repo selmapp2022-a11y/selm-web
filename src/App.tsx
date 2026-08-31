@@ -18,6 +18,7 @@ import MePage from './pages/MePage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import TermsPage from './pages/TermsPage';
 import ConsentPage, { hasPrivacyConsent } from './pages/ConsentPage';
+import { OpenExamLayout, AccountRequired } from './components/OpenExam';
 import { initTheme } from './lib/theme';
 import PracticePage from './pages/PracticePage';
 import MockExamPage from './exam/pages/MockExamPage';
@@ -45,7 +46,12 @@ function ConsentGate({ children }: { children: JSX.Element }) {
   const allowedWithoutConsent = ['/consent', '/forgot-password', '/reset-password'];
   const isAllowed = allowedWithoutConsent.some((p) => location.pathname.startsWith(p));
   if (!hasPrivacyConsent() && !isAllowed) {
-    return <Navigate to="/consent" replace state={{ from: location.pathname }} />;
+    // Carry the destination. Until 31 August this dropped it — a candidate
+    // sent to `/register?next=/sitting-result` after a guest sitting arrived
+    // at `/consent`, accepted, and was put on `/login` with the exam they had
+    // just finished nowhere in sight. `ConsentPage` already reads `next`.
+    const next = encodeURIComponent(location.pathname + location.search);
+    return <Navigate to={`/consent?next=${next}`} replace />;
   }
   return children;
 }
@@ -84,6 +90,21 @@ export default function App() {
       <Route path="/register" element={<ConsentGate><RegisterPage /></ConsentGate>} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+      {/* ── THE FREE MOCK EXAM, OPEN ────────────────────────────────────
+          Ruling of 31 August 2026. `/exam` was inside ProtectedRoute, so the
+          visitor the marketing site was built to attract — someone who
+          googled "which test does Canada accept" and followed the CTA — met
+          a consent screen and a sign-up form before a single question. The
+          exam now starts without an account; the RESULT is what needs one.
+          `components/OpenExam.tsx` carries the reasoning and the limits. */}
+      <Route element={<OpenExamLayout />}>
+        <Route path="/exam" element={<MockExamPage />} />
+        <Route path="/section" element={<SectionPage />} />
+        <Route element={<AccountRequired />}>
+          <Route path="/sitting-result" element={<SittingResultPage />} />
+        </Route>
+      </Route>
 
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
@@ -152,9 +173,6 @@ export default function App() {
           <Route path="/plan" element={<PlanPage />} />
           <Route path="/task" element={<TaskPage />} />
           <Route path="/result" element={<ResultPage />} />
-          <Route path="/exam" element={<MockExamPage />} />
-          <Route path="/section" element={<SectionPage />} />
-          <Route path="/sitting-result" element={<SittingResultPage />} />
           {/* D8 — past sittings were split across `/history` and
               `/progress`, and `/history` → `/exam` → `/history` was a
               circular dead end with no third exit. `/progress` already draws

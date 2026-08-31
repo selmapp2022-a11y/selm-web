@@ -13,6 +13,10 @@ export default function RegisterPage() {
   // Carried from `/exam.html`, which is a separate document. `safeNext`
   // refuses anything that is not a path on this origin.
   const back = safeNext(window.location.search);
+  // Sent here by `AccountRequired` from a sitting the candidate has just
+  // finished. Without this line the form is indistinguishable from the wall
+  // that used to stand in front of the exam.
+  const fromSitting = back === '/sitting-result';
   const { setUser } = useAuthStore();
   const [form, setForm] = useState({ full_name: '', email: '', username: '', password: '' });
   const [loading, setLoading] = useState(false);
@@ -78,8 +82,14 @@ export default function RegisterPage() {
       <div className="w-full max-w-md">
         <div className="mb-8 flex justify-center"><Logo /></div>
         <div className="card p-8">
-          <h1 className="text-2xl font-display font-bold text-navy mb-1">Create your account</h1>
-          <p className="text-ink-secondary mb-6">Personal English coaching, powered by AI.</p>
+          <h1 className="text-2xl font-display font-bold text-navy mb-1">
+            {fromSitting ? 'Your exam is marked' : 'Create your account'}
+          </h1>
+          <p className="text-ink-secondary mb-6">
+            {fromSitting
+              ? 'The answers are counted and waiting on this device. Create an account to read the score — it is kept with your account, not in a browser tab.'
+              : 'Personal English coaching, powered by AI.'}
+          </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -151,7 +161,7 @@ export default function RegisterPage() {
 
           <p className="mt-6 text-center text-sm text-ink-secondary">
             Already have an account?{' '}
-            <Link to="/login" className="font-semibold text-navy hover:underline">Sign in</Link>
+            <Link to={`/login${window.location.search}`} className="font-semibold text-navy hover:underline">Sign in</Link>
           </p>
         </div>
       </div>
