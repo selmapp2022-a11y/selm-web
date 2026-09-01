@@ -1,7 +1,6 @@
 import { TrendingUp } from 'lucide-react';
 import { BoardRow } from '../components/Board';
 import { ExamGoal } from '../exam/components/ExamGoal';
-import { AccountSettings } from '../components/AccountSettings';
 import { useDocumentTitle } from '../lib/useDocumentTitle';
 import { ts, useUiLangValue } from '../i18n';
 
@@ -48,17 +47,13 @@ import { ts, useUiLangValue } from '../i18n';
  */
 export default function MePage() {
   const ui = useUiLangValue();
-  // 1 September: the page is called Settings, because that is now the only
-  // name it has. The `You` tab was removed from the bar and the gear in the
-  // header is the single door — a door labelled Settings that opened a page
-  // headed "You" was two names for one room.
-  useDocumentTitle(ts('nav.settings', ui));
+  useDocumentTitle(ts('nav.you', ui));
 
   return (
     <div className="space-y-6">
       <header>
         <h1 className="font-display text-3xl font-bold text-navy dark:text-white">
-          {ts('nav.settings', ui)}
+          {ts('nav.you', ui)}
         </h1>
       </header>
 
@@ -74,7 +69,6 @@ export default function MePage() {
         sub={ts('me.progressBlurb', ui)}
       />
 
-      <AccountSettings />
     </div>
   );
 }

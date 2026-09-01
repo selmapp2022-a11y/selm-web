@@ -15,6 +15,7 @@ import VocabularyPage from './pages/VocabularyPage';
 import ProgressPage from './pages/ProgressPage';
 import PaywallPage from './pages/PaywallPage';
 import MePage from './pages/MePage';
+import SettingsPage from './pages/SettingsPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import TermsPage from './pages/TermsPage';
 import ConsentPage, { hasPrivacyConsent } from './pages/ConsentPage';
@@ -163,7 +164,10 @@ export default function App() {
               the gear in the phone header. `/settings` was the path App
               Review was given; it still resolves. */}
           <Route path="/me" element={<MePage />} />
-          <Route path="/settings" element={<Navigate to="/me" replace />} />
+          {/* 1 September: `/settings` is a page again, not a redirect. The
+              gear at the top and the `You` tab at the foot were opening the
+              same page; each has its own room now. */}
+          <Route path="/settings" element={<SettingsPage />} />
           <Route path="/account" element={<Navigate to="/me" replace />} />
           <Route path="/goal" element={<Navigate to="/me" replace />} />
 
