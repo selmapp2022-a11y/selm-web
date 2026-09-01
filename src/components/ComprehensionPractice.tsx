@@ -18,6 +18,7 @@ import { markCompletion } from '../exam/engine/completion';
 import { isResponseCorrect } from '../exam/engine/comprehension';
 import { MatchingBank } from './MatchingBank';
 import { ts, tf, useUiLangValue } from '../i18n';
+import { t } from '../exam/model/format';
 import { Rich } from '../i18n/Rich';
 
 /**
@@ -458,17 +459,30 @@ function Runner({
           * as on the first. What is worth counting is how much of the bank
           * they have not met.
           */}
+        {/* ── THIS LINE WAS ENGLISH ON A FRENCH SCREEN ────────────────
+            Found on 1 September by opening the app with the interface set to
+            French to photograph it for the marketing site: the count read
+            *"102 of 102 textes left to practise"* — an English sentence with
+            one French word inside it — the family chip read "Argued text",
+            and the plan chip read "from your plan". Three strings built in
+            code rather than taken from a key, so the i18n audit could not
+            see them: it compares the two dictionaries and these were in
+            neither.
+
+            The plural is a key of its own (`nounPl`) rather than `noun + 's'`.
+            English tolerates the shortcut; French agrees the adjective too,
+            and a product that serves a French exam does not get to guess. */}
         <span>
           {replaying
-            ? `${current.total} ${noun}${current.total === 1 ? '' : 's'} in this bank · all practised`
-            : `${current.unseen} of ${current.total} ${noun}${current.total === 1 ? '' : 's'} left to practise`}
+            ? tf('cp.allPractised', { total: current.total, nouns: nounPl }, ui)
+            : tf('cp.leftToPractise', { unseen: current.unseen, total: current.total, nouns: nounPl }, ui)}
           {' · '}
-          {items.length} {items.length === 1 ? 'question' : 'questions'}
+          {tf(items.length === 1 ? 'cp.oneQuestion' : 'cp.nQuestions', { n: items.length }, ui)}
         </span>
-        <span className="chip">{rec.level}{family ? ` · ${family.label.en}` : ''}</span>
+        <span className="chip">{rec.level}{family ? ` · ${t(family.label, ui)}` : ''}</span>
         {/* The candidate arrived from a card that named this coordinate. Saying
             so is how they can tell the promise was kept. */}
-        {asked && <span className="chip">from your plan</span>}
+        {asked && <span className="chip">{ts('cp.fromYourPlan', ui)}</span>}
       </div>
 
       <p className="text-xs leading-relaxed text-ink-secondary">{levelNote}</p>

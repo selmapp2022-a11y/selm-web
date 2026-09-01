@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
+import { ts, useUiLangValue } from '../i18n';
 
 /**
  * THE WAY OUT OF A SKILL PAGE.
@@ -19,14 +20,19 @@ import { ChevronLeft } from 'lucide-react';
  * 44px minimum on both axes — the ruling's other §1.2 item, tap targets under
  * 44×44 on inline text links, and the reason the padding here is not decorative.
  */
-export function BackToPractice({ label = 'Practice' }: { label?: string }) {
+/* The label defaulted to the literal 'Practice', so every skill page carried
+   an English breadcrumb in French — seen on 1 September in a French screenshot
+   of the reading page. The default now comes from the same key the tab bar
+   uses, which is also the word the candidate is being sent back to. */
+export function BackToPractice({ label }: { label?: string }) {
+  const ui = useUiLangValue();
   return (
     <Link
       to="/practice"
       className="-ml-2 inline-flex min-h-[44px] items-center gap-1 rounded-xl px-2 text-sm font-medium text-ink-secondary transition hover:bg-surface-muted hover:text-navy"
     >
       <ChevronLeft className="h-4 w-4" />
-      {label}
+      {label ?? ts('nav.practice', ui)}
     </Link>
   );
 }

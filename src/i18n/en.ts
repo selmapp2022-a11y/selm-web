@@ -271,6 +271,11 @@ export const EN = {
   'cp.audioNotReady': '{exam} — the recordings are not ready',
   'cp.audioNotReadyWhy':
     'The questions exist but their audio has not been recorded. A listening question without its recording is a reading question, so it is not offered. This section opens as soon as the audio is in place.',
+  'cp.leftToPractise': '{unseen} of {total} {nouns} left to practise',
+  'cp.allPractised': '{total} {nouns} in this bank · all practised',
+  'cp.oneQuestion': '{n} question',
+  'cp.nQuestions': '{n} questions',
+  'cp.fromYourPlan': 'from your plan',
   'cp.recording': 'recording',
   'cp.recordings': 'recordings',
   'cp.passage': 'passage',

@@ -309,6 +309,11 @@ export const FR: FrenchDict = {
   'cp.audioNotReady': '{exam} — les enregistrements ne sont pas prêts',
   'cp.audioNotReadyWhy':
     "Les questions existent mais leur audio n'a pas été enregistré. Une question de compréhension orale sans son enregistrement est une question de lecture ; elle n'est donc pas proposée. Cette section s'ouvrira dès que l'audio sera en place.",
+  'cp.leftToPractise': '{unseen} {nouns} sur {total} \u00e0 travailler',
+  'cp.allPractised': '{total} {nouns} dans cette banque \u00b7 tous travaill\u00e9s',
+  'cp.oneQuestion': '{n} question',
+  'cp.nQuestions': '{n} questions',
+  'cp.fromYourPlan': 'de votre plan',
   'cp.recording': 'enregistrement',
   'cp.recordings': 'enregistrements',
   'cp.passage': 'texte',
