@@ -43,7 +43,7 @@ export const EN = {
   'onboarding.subtitle':
     'It is the only thing we need to start. No placement test, no level — the exam gives every candidate the same tasks, so there is nothing to place you on.',
   'onboarding.complete': 'Complete — all four skills built.',
-  'onboarding.partial': '{built} only. {missing} not built yet.',
+  'onboarding.partial': '{built} — built and ready to sit.',
   'onboarding.onlyBuilt':
     'Only exams that are actually built are listed. An exam offered but unbuilt would be a claim we cannot keep.',
   'onboarding.satBefore': 'Have you sat it before?',

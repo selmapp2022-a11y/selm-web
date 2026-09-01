@@ -155,15 +155,20 @@ export default function OnboardingPage() {
                   {missing.length === 0 ? (
                     <div className="mt-1 text-sm text-teal">{t('onboarding.complete')}</div>
                   ) : (
-                    // §1.1: state it plainly. The list is computed from the
-                    // definition, so it cannot drift out of date the way a
-                    // sentence written by hand would — and the joining word
-                    // comes from the dictionary too, because "and"/"et" is a
-                    // string like any other.
-                    <div className="mt-1 text-sm text-amber-700">
+                    // 2026-09-01. This line used to read "<built> only.
+                    // <missing> not built yet." in amber, and it was the first
+                    // sentence a new candidate met on the App Store — the app
+                    // introduced itself by its holes. It now names what IS
+                    // here, which is the ruling already in force on the skill
+                    // tiles (WHAT IS HERE, NOT WHAT IS MISSING).
+                    //
+                    // Nothing is concealed by this: what an exam does not yet
+                    // carry is still stated on Today, under
+                    // 'today.notBuilt', once the exam is chosen. The list is
+                    // still computed from the definition, so it cannot drift.
+                    <div className="mt-1 text-sm text-ink-secondary">
                       {t('onboarding.partial', {
                         built: r.built.join(lang === 'fr' ? ' et ' : ' and '),
-                        missing: missing.join(lang === 'fr' ? ' et ' : ' and '),
                       })}
                     </div>
                   )}

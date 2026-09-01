@@ -78,7 +78,7 @@ export const FR: FrenchDict = {
   'onboarding.subtitle':
     "C'est la seule chose dont nous avons besoin pour commencer. Aucun test de niveau : l'examen donne les mêmes tâches à tous les candidats, il n'y a donc rien à situer.",
   'onboarding.complete': 'Complet — les quatre compétences sont construites.',
-  'onboarding.partial': '{built} seulement. {missing} pas encore construit.',
+  'onboarding.partial': '{built} — prêtes à passer.',
   'onboarding.onlyBuilt':
     "Seuls les examens réellement construits figurent ici. Proposer un examen non construit serait une promesse que nous ne pourrions pas tenir.",
   'onboarding.satBefore': "L'avez-vous déjà passé ?",
