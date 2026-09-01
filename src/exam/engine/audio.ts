@@ -40,10 +40,29 @@
  * that wants them offline can copy them into `public/` at build time; nothing
  * here decides that.
  */
-const BASE: string =
-  ((import.meta as unknown as { env?: Record<string, string> }).env?.VITE_EXAM_AUDIO_BASE
-    ?? 'https://selmapp.nyc3.cdn.digitaloceanspaces.com/exam-audio')
-    .replace(/\/+$/, '');
+/**
+ * ── Why this is written the long way round ────────────────────────────────
+ * 2026-09-01. It used to read the variable through a cast and an optional
+ * chain:
+ *
+ *     (import.meta as unknown as { env?: Record<string, string> })
+ *       .env?.VITE_EXAM_AUDIO_BASE
+ *
+ * Vite substitutes `import.meta.env.VITE_NAME` **statically, as that exact
+ * expression**. The cast and the `?.` defeat the match, so nothing was
+ * inlined: `import.meta.env` became `{}`, the variable was never in it, and
+ * the fallback always won. `npm run build:mobile` therefore produced a bundle
+ * 176 MB larger that still fetched every recording over the network — the
+ * worst of both — and no test caught it, because `npm run audio` asserts the
+ * DEFAULT is the CDN rather than what the build actually resolved.
+ *
+ * The literal expression below is the fix. It changes nothing for a normal
+ * build, where the variable is unset and the CDN default still wins.
+ */
+const ENV_BASE = import.meta.env.VITE_EXAM_AUDIO_BASE as string | undefined;
+
+const BASE: string = (ENV_BASE || 'https://selmapp.nyc3.cdn.digitaloceanspaces.com/exam-audio')
+  .replace(/\/+$/, '');
 
 export function resolveAudio(audioPath: string | undefined): string | undefined {
   if (!audioPath) return undefined;

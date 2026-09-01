@@ -93,9 +93,19 @@ const js = walk(join(OUT, 'assets')).filter((p) => /main-.*\.js$/.test(p));
 // guard passed while the bundle about to ship still named the CDN. A build
 // that emits more than one `main-*.js` is a build whose output is uncertain,
 // and this now refuses both that and the original defect.
-const points = js.length > 0 && js.every((p) => !/cdn\.digitaloceanspaces\.com/.test(readFileSync(p, 'utf8')));
+// Two halves, because the negative alone is not evidence. A bundle that
+// names neither the CDN nor `/audio` would pass a CDN-absence test and serve
+// nothing at all. §0.1 asked for a check that greps the built bundle for the
+// base it EXPECTS, so this asserts both: the CDN is gone, and `/audio` is
+// there.
+const readAll = js.map((p) => readFileSync(p, 'utf8'));
+const noCdn = js.length > 0 && readAll.every((t) => !/cdn\.digitaloceanspaces\.com/.test(t));
+const hasLocal = readAll.every((t) => t.includes('/audio'));
+const points = noCdn && hasLocal;
 console.log(`\n${bundled.length} recordings bundled · ${(bytes / 1e6).toFixed(1)} MB`);
 console.log(points
   ? 'and the bundle resolves audio locally, not against the CDN.'
-  : 'WARNING: the bundle still names the CDN — check VITE_EXAM_AUDIO_BASE.');
+  : !noCdn
+    ? 'WARNING: the bundle still names the CDN — check VITE_EXAM_AUDIO_BASE.'
+    : 'WARNING: the bundle names neither the CDN nor /audio — it would serve no audio at all.');
 if (!points) process.exit(1);

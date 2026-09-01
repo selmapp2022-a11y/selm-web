@@ -48,13 +48,17 @@ import { ts, useUiLangValue } from '../i18n';
  */
 export default function MePage() {
   const ui = useUiLangValue();
-  useDocumentTitle(ts('nav.you', ui));
+  // 1 September: the page is called Settings, because that is now the only
+  // name it has. The `You` tab was removed from the bar and the gear in the
+  // header is the single door — a door labelled Settings that opened a page
+  // headed "You" was two names for one room.
+  useDocumentTitle(ts('nav.settings', ui));
 
   return (
     <div className="space-y-6">
       <header>
         <h1 className="font-display text-3xl font-bold text-navy dark:text-white">
-          {ts('nav.you', ui)}
+          {ts('nav.settings', ui)}
         </h1>
       </header>
 

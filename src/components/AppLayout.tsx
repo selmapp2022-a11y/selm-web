@@ -6,7 +6,7 @@ import { useAuthStore } from '../store/authStore';
 import { syncAttemptsFromBackend } from '../lib/attempts';
 import { claimCandidateRecord } from '../lib/localRecord';
 import { syncDocumentLang, ts, useUiLangValue } from '../i18n';
-import { Home, Dumbbell, CircleUser } from 'lucide-react';
+import { Home, Dumbbell, Settings } from 'lucide-react';
 import type { Key } from '../i18n';
 import clsx from 'clsx';
 
@@ -62,10 +62,27 @@ import clsx from 'clsx';
  * target is a quarter of the width, and the two most-used destinations were
  * no easier to hit than the least-used one.
  */
+/**
+ * ── THREE BECAME TWO, 1 SEPTEMBER ─────────────────────────────────────────
+ * The founder, looking at the shipped app: the person icon at the top and the
+ * `You` tab at the bottom went to the SAME page, `/me`. Two doors into one
+ * room, on a screen 390 points wide.
+ *
+ * The bottom door is the one that closed. The top one had to stay: Apple
+ * rejected build 38 under 5.1.1(v) because account deletion was not reachable,
+ * and that gear is the route to it — so the choice was never which to keep.
+ * It is now a gear rather than a person, because the room it opens is called
+ * Settings.
+ *
+ *     Today · Practice
+ *
+ * Two tabs on a 390px screen is 195 points each. Nothing was deleted: `/me`
+ * is unchanged and still holds the destinations, the exam date, the past
+ * results and the account.
+ */
 const navItems: Array<{ to: string; label: Key; icon: typeof Home; end?: boolean }> = [
   { to: '/', label: 'nav.today', icon: Home, end: true },
   { to: '/practice', label: 'nav.practice', icon: Dumbbell },
-  { to: '/me', label: 'nav.you', icon: CircleUser },
 ];
 
 export function AppLayout() {
@@ -132,6 +149,23 @@ export function AppLayout() {
               want to discover it by accident. It is now behind the `You`
               tab, beside the account it signs out of. */}
           <div className="border-t border-surface-divider p-4">
+            {/* The sidebar reached Settings only through the `You` tab, and
+                that tab is gone as of 1 September. On a phone the gear in the
+                header covers it; on a desktop there is no header, so without
+                this row the account — and account deletion with it — would be
+                unreachable. */}
+            <NavLink
+              to="/me"
+              className={({ isActive }) => clsx(
+                'mb-3 flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition',
+                isActive
+                  ? 'bg-navy font-semibold text-white shadow-card'
+                  : 'font-medium text-ink-secondary hover:bg-surface-muted hover:text-navy'
+              )}
+            >
+              <Settings className="h-5 w-5" strokeWidth={1.8} />
+              {ts('nav.settings', ui)}
+            </NavLink>
             <div className="px-2">
               <div className="text-sm font-semibold text-navy">{user?.full_name || user?.username || 'Learner'}</div>
               <div className="truncate text-xs text-ink-secondary">{user?.email}</div>
@@ -200,7 +234,7 @@ export function AppLayout() {
           className="-mr-2 flex h-11 w-11 items-center justify-center rounded-full text-ink-secondary transition hover:bg-surface-muted hover:text-navy"
           aria-label={ts('nav.settings', ui)}
         >
-          <CircleUser className="h-5 w-5" />
+          <Settings className="h-5 w-5" />
         </NavLink>
       </header>
 
