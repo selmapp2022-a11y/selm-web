@@ -21,8 +21,11 @@ android {
         // Jumped to versionCode 42 to leap past the failed upload attempts
         // that Play Console registered as "used" (codes 2, 3, 4 — and the
         // existing live Flutter line which is at 15). Reserving room.
-        versionCode 43
-        versionName "2.1.0"
+        // 1 September 2026: 44 / 2.2.0. Release 43 carried the first-screen
+        // copy the founder objected to; this is the bundle that fixes it, and
+        // it also carries the You/Settings split.
+        versionCode 44
+        versionName "2.2.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
