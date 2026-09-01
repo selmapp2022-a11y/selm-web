@@ -7,9 +7,11 @@ import {
   Compass,
   Crown,
   Flag,
+  TrendingUp,
 } from 'lucide-react';
 import { EmptyState, Loader } from '../components/States';
 import { SkillTiles } from '../components/SkillTiles';
+import { BoardRow } from '../components/Board';
 import { lookFor } from '../lib/skillLook';
 import { SectionHeading } from '../components/SectionHeading';
 import { useDocumentTitle } from '../lib/useDocumentTitle';
@@ -267,57 +269,42 @@ export default function DashboardPage() {
           and a button. The reasoning is one line now and sits under the
           coordinate it explains. */}
       {nextSlot && nextSkill && (
-        <Link
+        <BoardRow
           to={practiceHref(nextSlot.coordinate)}
-          className="card flex items-center gap-4 border-l-4 border-l-teal p-4 transition hover:shadow-cardHover"
-        >
-          <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-white shadow-sm ${lookFor(nextSkill).tile}`}>
-            <Compass className="h-5 w-5" />
-          </span>
-          <div className="min-w-0 flex-1">
-            <div className="text-[11px] font-semibold uppercase tracking-wide text-teal">{ts('today.doThisNext', ui)}</div>
-            <div className="truncate font-display text-lg font-bold text-navy dark:text-white">{nextSlot.coordinate.label}</div>
-            <div className="mt-0.5 text-xs leading-snug text-ink-secondary">
-              {ts(builtPlan.basis === 'attestation' ? 'today.weakestFirst' : 'today.examOrder', ui)}
-            </div>
-          </div>
-          <ChevronRight className="h-5 w-5 shrink-0 text-ink-secondary" />
-        </Link>
+          accent="border-l-teal"
+          icon={Compass}
+          iconClass={`${lookFor(nextSkill).tile} text-white`}
+          eyebrow={ts('today.doThisNext', ui)}
+          title={nextSlot.coordinate.label}
+          sub={ts(builtPlan.basis === 'attestation' ? 'today.weakestFirst' : 'today.examOrder', ui)}
+        />
       )}
 
       {/* The verdict, as one line, linking to the page that owns the
           reasoning. Unchanged in substance from 31 August. */}
-      <Link
+      <BoardRow
         to="/progress"
-        className="card flex min-h-[44px] items-center gap-4 p-4 transition hover:border-navy/40 hover:bg-surface-muted"
-      >
-        <div className="min-w-0 flex-1">
-          <div className="text-sm font-semibold text-navy dark:text-white">{ts('today.readyToBook', ui)}</div>
-          <div className="mt-0.5 text-xs text-ink-secondary">
-            {gate.publishNumeric && governing.complete
-              ? tf('today.readyAnswer', { system: exam.benchmark.system, level: governing.level ?? '' }, ui)
-              : ts('today.notYetAnswerable', ui)}
-          </div>
-        </div>
-        <ChevronRight className="h-5 w-5 shrink-0 text-ink-secondary" />
-      </Link>
+        icon={TrendingUp}
+        title={ts('today.readyToBook', ui)}
+        sub={
+          gate.publishNumeric && governing.complete
+            ? tf('today.readyAnswer', { system: exam.benchmark.system, level: governing.level ?? '' }, ui)
+            : ts('today.notYetAnswerable', ui)
+        }
+      />
 
       {/* Upgrade. This is the primary in-app entry point to the paywall and it
           stays on the home screen: Apple's App Review has to be able to find
           the In-App Purchases without hunting through menus. */}
-      <Link
+      <BoardRow
         to="/upgrade"
-        className="card flex items-center gap-4 overflow-hidden bg-gradient-to-br from-teal-500 to-teal-700 p-4 text-white shadow-cardHover"
-      >
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/20 backdrop-blur">
-          <Crown className="h-5 w-5" />
-        </div>
-        <div className="min-w-0 flex-1">
-          <div className="font-display text-base font-bold">{ts('today.upgrade', ui)}</div>
-          <div className="text-xs text-white/80">{ts('today.upgradeBlurb', ui)}</div>
-        </div>
-        <ChevronRight className="h-5 w-5 shrink-0 text-white/90" />
-      </Link>
+        icon={Crown}
+        iconClass="bg-white/20 text-white backdrop-blur"
+        tint="bg-gradient-to-br from-teal-500 to-teal-700 text-white shadow-cardHover"
+        light
+        title={ts('today.upgrade', ui)}
+        sub={ts('today.upgradeBlurb', ui)}
+      />
     </div>
   );
 }

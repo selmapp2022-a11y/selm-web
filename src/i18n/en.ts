@@ -128,11 +128,11 @@ export const EN = {
 
   'practice.hubBlurb':
     'Your four exam skills. Pick one and work its tasks — in the language your exam is set in.',
-  'practice.speakingBlurb': 'Record the exam’s speaking tasks and get scored feedback.',
-  'practice.listeningBlurb': 'The exam’s own listening questions, one at a time.',
-  'practice.readingBlurb': 'The exam’s own reading passages and questions.',
-  'practice.writingBlurb': 'Write each exam task and get scored feedback.',
-  'practice.vocabBlurb': 'Extra practice that supports the four skills — not one of them.',
+  'practice.speakingBlurb': 'The exam’s speaking tasks, recorded.',
+  'practice.listeningBlurb': 'The exam’s own listening questions.',
+  'practice.readingBlurb': 'The exam’s own reading passages.',
+  'practice.writingBlurb': 'The exam’s own writing tasks.',
+  'practice.vocabBlurb': 'Support for the four skills.',
   'practice.listenAnswer': 'Listen and answer, at your level.',
   'practice.listenAnswerNamed': '{exam} — listen and answer, at your level.',
   'practice.readAnswer': 'Read and answer, at your level.',

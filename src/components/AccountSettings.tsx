@@ -73,7 +73,7 @@ export function AccountSettings() {
     <div>
 
       {/* Account details */}
-      <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+      <section className="card mb-6 p-5">
         <h2 className="mb-4 flex items-center gap-2 text-lg font-bold text-navy dark:text-white">
           <UserIcon className="h-5 w-5 text-navy" />
           {ts('account.title', ui)}
@@ -106,7 +106,7 @@ export function AccountSettings() {
           nothing more, because many francophone candidates carry phones set
           to English. And it is independent of the exam's language: a
           candidate can read the app in French and sit IELTS in English. */}
-      <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+      <section className="card mb-6 p-5">
         <h2 className="mb-3 flex items-center gap-2 text-lg font-bold text-navy dark:text-white">
           <Languages className="h-5 w-5 text-navy" />
           {ts('lang.label')}
@@ -136,7 +136,7 @@ export function AccountSettings() {
           sign-out. A theme is chosen roughly once; it does not earn a
           permanent seat on the smallest screen in the product, and it belongs
           beside the interface language, which is the same kind of choice. */}
-      <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+      <section className="card mb-6 p-5">
         <h2 className="mb-3 flex items-center gap-2 text-lg font-bold text-navy dark:text-white">
           <Sun className="h-5 w-5 text-navy" />
           {ts('nav.appearance')}
@@ -145,7 +145,7 @@ export function AccountSettings() {
       </section>
 
       {/* Privacy */}
-      <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+      <section className="card mb-6 p-5">
         <h2 className="mb-3 flex items-center gap-2 text-lg font-bold text-navy dark:text-white">
           <Shield className="h-5 w-5 text-navy" />
           {ts('account.privacy', ui)}
@@ -166,7 +166,7 @@ export function AccountSettings() {
           bottom-nav bar (which was covering the button on iPhone).
           The Delete button is now visible in the middle of the page
           without any scroll gymnastics. */}
-      <section id="delete-account" className="mb-6 rounded-2xl border-2 border-red-200 bg-red-50 p-5 dark:border-red-800/60 dark:bg-red-900/20">
+      <section id="delete-account" className="card mb-6 border-red-200 bg-red-50 p-5 dark:border-red-800/60 dark:bg-red-900/20">
         <h2 className="mb-3 flex items-center gap-2 text-lg font-bold text-red-800 dark:text-red-200">
           <AlertTriangle className="h-5 w-5" />
           {ts('account.deleteTitle', ui)}
@@ -238,7 +238,7 @@ export function AccountSettings() {
       {/* Sign out — moved after the danger zone so the Delete Account
           block sits mid-page and is never covered by the mobile
           bottom-nav bar. */}
-      <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+      <section className="card mb-6 p-5">
         <button
           type="button"
           onClick={handleSignOut}

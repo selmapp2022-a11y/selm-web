@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CalendarDays, ChevronRight } from 'lucide-react';
-import clsx from 'clsx';
+import { CalendarDays, ChevronRight, Flag } from 'lucide-react';
+import { Board, BoardGrid, Panel } from '../../components/Board';
 import { useExam } from '../state';
 import { GOALS } from '../definitions';
 import { t } from '../model/format';
@@ -109,40 +109,34 @@ export function ExamGoal() {
         </p>
       </header>
 
-      <section className="grid gap-3">
-        {GOALS.map((g) => {
-          const selected = g.id === goal.id;
-          return (
-            <button
-              key={g.id}
-              type="button"
-              onClick={() => setGoal(g)}
-              className={clsx(
-                'flex w-full items-center justify-between gap-3 rounded-xl border-2 px-5 py-4 text-left text-sm font-medium transition-all',
-                selected
-                  ? 'border-teal bg-teal/10 text-navy shadow-card'
-                  : 'border-surface-divider bg-white text-ink-secondary hover:border-navy/40 hover:bg-surface-muted'
-              )}
-            >
-              <span className="min-w-0">
-                {t(g.label, ui)}
-                <span className="mt-0.5 block text-xs font-normal text-ink-secondary">
-                  {t(g.destination.label, ui)}
-                </span>
-              </span>
-              <span className="shrink-0 rounded-full bg-teal/10 px-2.5 py-0.5 text-xs font-bold text-teal">
-                {g.system} {g.requiredLevel}
-              </span>
-            </button>
-          );
-        })}
-      </section>
+      {/* ── THE DESTINATIONS, IN THE APP'S ONE BOARD SHAPE ─────────────────
+          These were full-width rows with a 2px border and a right-hand chip —
+          a third card shape, on the third tab, for a set of peer choices that
+          Today and Practice both draw as a grid of tiles. The founder, 31
+          August: *"on every page the boards must be one size and one shape."*
+          The required level keeps its chip; it moved to the corner because
+          that is where a Board carries a badge. See `components/Board.tsx`. */}
+      <BoardGrid>
+        {GOALS.map((g) => (
+          <Board
+            key={g.id}
+            onClick={() => setGoal(g)}
+            selected={g.id === goal.id}
+            icon={Flag}
+            iconClass={g.id === goal.id ? 'bg-gradient-to-br from-navy to-teal' : 'bg-slate-400 dark:bg-slate-600'}
+            tint={g.id === goal.id ? 'bg-teal/10' : undefined}
+            title={t(g.label, ui)}
+            badge={`${g.system} ${g.requiredLevel}`}
+            meta={t(g.destination.label, ui)}
+          />
+        ))}
+      </BoardGrid>
 
       {/* The date. Not a nicety and not a reminder feature — it is the
           number the whole dashboard is arranged around, and until it is set
           the product can tell the candidate how they are doing but not
           whether they are on time. */}
-      <section className="card p-6">
+      <Panel>
         <div className="flex items-start gap-4">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-navy to-teal text-white shadow-md">
             <CalendarDays className="h-6 w-6" />
@@ -195,9 +189,9 @@ export function ExamGoal() {
             </p>
           </div>
         </div>
-      </section>
+      </Panel>
 
-      <section className="card p-6">
+      <Panel>
         <span className="chip">{ui === 'en' ? 'Selected exam' : 'Examen choisi'}</span>
         <h2 className="mt-3 font-display text-xl font-bold text-navy">{t(exam.name, ui)}</h2>
         <p className="mt-1 text-sm text-ink-secondary">{t(exam.acceptedFor, ui)}</p>
@@ -246,9 +240,9 @@ export function ExamGoal() {
               : `Cet examen s'exprime en ${exam.benchmark.system} et l'objectif choisi est en ${goal.system}. Ce sont deux barèmes distincts ; aucune conversion n'est affichée car aucune n'est revendiquée.`}
           </p>
         )}
-      </section>
+      </Panel>
 
-      <section className="card p-6">
+      <Panel>
         <span className="chip">{ui === 'en' ? 'Already sat this exam?' : 'Déjà passé cet examen ?'}</span>
         {/* Copy rule 1 — no sentence twice on one screen — applies inside a
             card as well as across one. The heading names the thing; the
@@ -278,7 +272,7 @@ export function ExamGoal() {
             navigation reporting its own failure. Both are one tap away in the
             tab bar on every screen, and a sentence pointing at them says only
             that we did not trust the tab bar. */}
-      </section>
+      </Panel>
     </div>
   );
 }

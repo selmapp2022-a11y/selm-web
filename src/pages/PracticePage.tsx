@@ -1,5 +1,6 @@
-import { Link } from 'react-router-dom';
-import { Mic, Headphones, BookOpen, PenLine, Brain, ChevronRight } from 'lucide-react';
+import { Mic, Headphones, BookOpen, PenLine, Brain } from 'lucide-react';
+import { Board, BoardGrid, BoardRow } from '../components/Board';
+import type { ComponentType } from 'react';
 import { useDocumentTitle } from '../lib/useDocumentTitle';
 import { lookFor } from '../lib/skillLook';
 import { ts, useUiLangValue, type Key } from '../i18n';
@@ -21,7 +22,7 @@ const SKILLS = [
   { to: '/practice/listening', skill: 'listening', label: 'nav.listening', icon: Headphones, blurb: 'practice.listeningBlurb' },
   { to: '/practice/reading',   skill: 'reading',   label: 'nav.reading',   icon: BookOpen,   blurb: 'practice.readingBlurb' },
   { to: '/practice/writing',   skill: 'writing',   label: 'nav.writing',   icon: PenLine,    blurb: 'practice.writingBlurb' },
-] as const satisfies ReadonlyArray<{ to: string; skill: string; label: Key; icon: unknown; blurb: Key }>;
+] as const satisfies ReadonlyArray<{ to: string; skill: string; label: Key; icon: ComponentType<{ className?: string }>; blurb: Key }>;
 
 export default function PracticePage() {
   const ui = useUiLangValue();
@@ -29,45 +30,51 @@ export default function PracticePage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="font-display text-3xl font-bold text-navy">{ts('nav.practice', ui)}</h1>
+        <h1 className="font-display text-3xl font-bold text-navy dark:text-white">{ts('nav.practice', ui)}</h1>
         <p className="mt-1 text-ink-secondary">{ts('practice.hubBlurb', ui)}</p>
       </header>
 
-      <div className="grid gap-3 sm:grid-cols-2">
+      {/* ── ONE SHAPE, DECIDED IN `components/Board.tsx` ────────────────────
+          These were wide rows with the icon beside an 18px title and a 14px
+          blurb, and Vocabulary was a full-width card below them — three
+          shapes on one tab, and none of them the shape Today used for the
+          same four skills. The founder, 31 August: *"on every page the boards
+          must be one size and one shape."* The four skills and Vocabulary are
+          now the same Board that Today draws, in the same grid, and this file
+          no longer decides how a card looks.
+
+          Vocabulary is still not a fifth skill — IA §5. It keeps the support
+          surface's own neutral colour, which is how it says so now that it
+          cannot say it by being a different size. */}
+      <BoardGrid>
         {SKILLS.map((s) => (
-          <Link
+          <Board
             key={s.to}
             to={s.to}
-            className="card flex items-center justify-between gap-4 p-5 text-left hover:shadow-cardHover"
-          >
-            <div className="flex items-center gap-4">
-              {/* The skill's own colour, from `lib/skillLook.ts`. Four cards
-                  in one teal made the hub read as a single object; the hue is
-                  what a candidate recognises on Today and Progress too. */}
-              <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-white shadow-sm ${lookFor(s.skill).tile}`}>
-                <s.icon className="h-5 w-5" />
-              </div>
-              <div>
-                <div className="font-display text-lg font-bold text-navy">{ts(s.label, ui)}</div>
-                <div className="mt-0.5 text-sm text-ink-secondary">{ts(s.blurb, ui)}</div>
-              </div>
-            </div>
-            <ChevronRight className="h-5 w-5 shrink-0 text-ink-secondary" />
-          </Link>
+            icon={s.icon}
+            iconClass={lookFor(s.skill).tile}
+            tint={lookFor(s.skill).soft}
+            title={ts(s.label, ui)}
+            titleClass={lookFor(s.skill).ink}
+            meta={ts(s.blurb, ui)}
+          />
         ))}
-      </div>
+      </BoardGrid>
 
-      {/* Vocabulary is a support surface, not a fifth skill — IA §5. */}
-      <Link to="/practice/vocabulary" className="card flex items-center gap-4 p-5 hover:shadow-cardHover">
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-surface-muted text-navy">
-          <Brain className="h-5 w-5" />
-        </div>
-        <div className="min-w-0 flex-1">
-          <div className="font-display text-base font-bold text-navy">{ts('nav.vocabulary', ui)}</div>
-          <div className="mt-0.5 text-sm text-ink-secondary">{ts('practice.vocabBlurb', ui)}</div>
-        </div>
-        <ChevronRight className="h-5 w-5 shrink-0 text-ink-secondary" />
-      </Link>
+      {/* Vocabulary is a support surface, not a fifth skill — IA §5, and the
+          shape says so. As a fifth tile it sat in the grid's left column and
+          left a hole beside it; the founder, 1 September: *"make the
+          vocabulary board a rectangle that runs the full width under the four
+          blocks — no empty space."* It is the app's own full-width row, the
+          same one Today uses under its four tiles, so the page still has
+          exactly two card shapes and neither of them is new. */}
+      <BoardRow
+        to="/practice/vocabulary"
+        icon={Brain}
+        iconClass="bg-gradient-to-br from-slate-500 to-slate-700 text-white"
+        title={ts('nav.vocabulary', ui)}
+        sub={ts('practice.vocabBlurb', ui)}
+      />
     </div>
   );
 }

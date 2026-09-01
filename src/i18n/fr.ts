@@ -155,11 +155,11 @@ export const FR: FrenchDict = {
 
   'practice.hubBlurb':
     "Vos quatre compétences d'examen. Choisissez-en une et travaillez ses tâches — dans la langue de votre examen.",
-  'practice.speakingBlurb': "Enregistrez les tâches d'expression orale de l'examen et recevez un retour noté.",
-  'practice.listeningBlurb': "Les questions de compréhension orale de l'examen, une par une.",
-  'practice.readingBlurb': "Les textes et les questions de compréhension écrite de l'examen.",
-  'practice.writingBlurb': "Rédigez chaque tâche de l'examen et recevez un retour noté.",
-  'practice.vocabBlurb': "Un entraînement complémentaire qui soutient les quatre compétences — sans en être une cinquième.",
+  'practice.speakingBlurb': "Les tâches d'expression orale de l'examen.",
+  'practice.listeningBlurb': "Les questions de compréhension orale.",
+  'practice.readingBlurb': "Les textes de compréhension écrite.",
+  'practice.writingBlurb': "Les tâches d'expression écrite de l'examen.",
+  'practice.vocabBlurb': "Un complément aux quatre compétences.",
   'practice.listenAnswer': 'Écoutez et répondez, à votre niveau.',
   'practice.listenAnswerNamed': '{exam} — écoutez et répondez, à votre niveau.',
   'practice.readAnswer': 'Lisez et répondez, à votre niveau.',
@@ -380,7 +380,7 @@ export const FR: FrenchDict = {
     '{label} · {target} dans chaque compétence, et la plus basse fait foi',
 
   // ── Expression écrite ────────────────────────────────────────────────────
-  'writing.eachTask': "Rédigez chaque tâche de l'examen et recevez un retour noté.",
+  'writing.eachTask': "Les tâches d'expression écrite de l'examen.",
   'writing.eachTaskNamed': '{exam} — rédigez chaque tâche et recevez un retour noté.',
   'writing.liveGrammar': 'Grammaire en direct',
   'writing.smartRewrite': 'Reformulation',
